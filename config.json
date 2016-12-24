@@ -1,0 +1,56 @@
+{
+    "server": {
+        "port": 8081
+    },
+    "db": {
+        "url": "mongodb://localhost:27017/anontown",
+        "user": "tkr",
+        "pass": "pass"
+    },
+    "user": {
+        "sn": "[a-z0-9_]{3,10}",
+        "pass": "[a-zA-Z0-9_]{3,10}",
+        "lvMax": 1000,
+        "profile": {
+            "name": ".{1,50}",
+            "text": ".{1,3000}"
+        },
+        "token": {
+            "name": ".{1,50}",
+            "req": {
+                "expireMinute": 5
+            }
+        },
+        "client": {
+            "name": ".{0,30}",
+            "url": "https?:\\/\\/.{1,500}"
+        }
+    },
+    "topic": {
+        "title": ".{1,100}",
+        "category": "[a-z0-9_]{1,15}",
+        "categoryMax": 10,
+        "text": ".{1,10000}"
+    },
+    "res": {
+        "defaultName": "名無しさん",
+        "name": ".{0,50}",
+        "text": ".{1,5000}",
+        "wait": {
+            "maxLv": 3,
+            "minSecond": 30,
+            "m10": 5,
+            "m30": 10,
+            "h1": 15,
+            "h6": 20,
+            "h12": 35,
+            "d1": 50
+        }
+    },
+    "salt": {
+        "pass": "a",
+        "hash": "b",
+        "token": "c",
+        "tokenReq": "d"
+    }
+}
