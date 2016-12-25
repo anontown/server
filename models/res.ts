@@ -46,6 +46,9 @@ export interface IResAPI {
 export type ResDeleteFlag = "active" | "self" | "vote" | "freeze";
 
 export class Res {
+  static writeListener = new Set<(res: Res) => void>();
+
+
   private constructor(private _id: ObjectID,
     private _topic: ObjectID,
     private _date: Date,
@@ -65,6 +68,10 @@ export class Res {
 
   get user(): ObjectID {
     return this._user;
+  }
+
+  get topic(): ObjectID {
+    return this._topic;
   }
 
   static async findOne(id: ObjectID): Promise<Res> {
@@ -216,6 +223,7 @@ export class Res {
   static async insert(res: Res): Promise<null> {
     let db = await DB;
     await db.collection("reses").insert(res.toDB());
+    this.writeListener.forEach(x => x(res));
     return null;
   }
 

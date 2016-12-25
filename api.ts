@@ -5,14 +5,20 @@ import { Validator } from 'jsonschema';
 import { AtError, StatusCode } from './at-error';
 import { User, Token } from './models';
 import { ObjectID } from 'mongodb';
-
+import * as http from 'http';
+import * as socketio from 'socket.io';
+import { Res } from './models/res';
 
 export class API {
   private static valid = new Validator();
   private app: express.Express;
+  private server: http.Server;
+  private io: SocketIO.Server;
 
   constructor(private port: number) {
     this.app = express();
+    this.server = http.createServer(this.app);
+    this.io = socketio.listen(this.server);
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(bodyParser.json());
   }
@@ -115,7 +121,26 @@ export class API {
   }
 
   run() {
-    this.app.listen(this.port);
+    /*socket設定*/
+    let con = this.io.on("connection", (socket) => {
+      socket.on("topic-join", (msg: string) => {
+        socket.join("topic-" + msg);
+      });
+
+      socket.on("topic-leave", (msg: string) => {
+        socket.leave("topic-" + msg);
+      });
+
+      socket.on('disconnect', function () {
+        //切断
+      });
+    });
+    Res.writeListener.add((res) => {
+      //トピック更新通知
+      con.to("topic-" + res.topic.toString()).emit("topic", res.topic.toString());
+    });
+
+    this.server.listen(this.port);
     console.log("サーバー起動");
   }
 }
