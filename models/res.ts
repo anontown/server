@@ -330,6 +330,11 @@ export class Res {
       }
     }
 
+    //もしリプ先があるかつ、トピックがリプ先と違えばエラー
+    if (reply !== null && !reply.topic.equals(topic.id)) {
+      throw new AtError(StatusCode.MisdirectedRequest, "他のトピックのレスへのリプは出来ません");
+    }
+
     if (autoName === null) {
       user.changeLastRes(date);
     }
