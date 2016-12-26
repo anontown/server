@@ -139,7 +139,7 @@ export class Profile {
   }
 
   changeData(authToken: IAuthToken, name: string, text: string) {
-    if (authToken.user !== this._user) {
+    if (!authToken.user.equals(this._user)) {
       throw new AtError(StatusCode.MisdirectedRequest, "人のプロフィール変更は出来ません");
     }
     if (!name.match(Config.user.profile.name)) {
