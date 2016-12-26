@@ -40,7 +40,8 @@ export interface IResAPI {
   vote: number,
   hash: string,
   profile: string | null,
-  replyCount: number
+  replyCount: number,
+  isVote: boolean | null
 }
 
 export type ResDeleteFlag = "active" | "self" | "vote" | "freeze";
@@ -278,6 +279,14 @@ export class Res {
         mdtext = "<p>" + text + "</p>";
         break;
     }
+
+    let isVote: boolean | null;
+    if (authToken === null) {
+      isVote = null;
+    } else {
+      isVote = this._voteUser.find((id) => authToken.user.equals(id)) !== undefined;
+    }
+
     return {
       id: this._id.toString(),
       topic: this._topic.toString(),
@@ -291,7 +300,8 @@ export class Res {
       vote: this._vote,
       hash: this._hash,
       profile: this._profile !== null ? this._profile.toString() : null,
-      replyCount: this._replyCount
+      replyCount: this._replyCount,
+      isVote
     };
   }
 
@@ -360,9 +370,10 @@ export class Res {
     if (user.id.equals(this._user)) {
       throw new AtError(StatusCode.Forbidden, "自分に投票は出来ません");
     }
-    if (this._voteUser.find(x => x === user.id) !== undefined) {
+    if (this._voteUser.find(x => x.equals(user.id)) !== undefined) {
       throw new AtError(StatusCode.Forbidden, "投票は一回までです");
     }
+    this._voteUser.push(user.id);
     resUser.changeLv(resUser.lv + Math.floor(user.lv / 100) + 1);
     this._vote += user.lv;
   }
@@ -371,10 +382,10 @@ export class Res {
     if (user.id.equals(this._user)) {
       throw new AtError(StatusCode.Forbidden, "自分に投票は出来ません");
     }
-    if (this._voteUser.find(x => x === user.id) !== undefined) {
+    if (this._voteUser.find(x => x.equals(user.id)) !== undefined) {
       throw new AtError(StatusCode.Forbidden, "投票は一回までです");
     }
-
+    this._voteUser.push(user.id);
     resUser.changeLv(resUser.lv - Math.floor(user.lv / 100) - 1);
     this._vote -= user.lv;
 
