@@ -1142,7 +1142,6 @@ const api = new API(Config.server.port);
     call: async (params: { id: string, name: string, url: string }, _authToken: IAuthToken | null, authUser: IAuthUser): Promise<IClientAPI> => {
       let client = await Client.findOne(new ObjectID(params.id));
       client.changeData(authUser, params.name, params.url);
-      client.changeData(authUser, params.name, params.url);
       await Client.update(client);
       return client.toAPI(authUser);
     }
