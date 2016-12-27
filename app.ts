@@ -1207,6 +1207,19 @@ const api = new API(Config.server.port);
   });
 }
 
+api.addAPI({
+  url: "/user/auth",
+
+  isAuthUser: true,
+  isAuthToken: false,
+  schema: {
+    type: "null",
+  },
+  call: async (_params: null, _authToken: IAuthToken | null, _authUser: IAuthUser): Promise<null> => {
+    return null;
+  }
+});
+
 api.run();
 
 //cron
