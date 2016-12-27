@@ -310,11 +310,11 @@ export class Res {
   }
 
   static create(topic: Topic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null): Res {
-    if (!name.match(Config.res.name)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "名前が不正です。");
+    if (!name.match(Config.res.name.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.res.name.msg);
     }
-    if (!text.match(Config.res.text)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "本文が不正です。");
+    if (!text.match(Config.res.text.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest,Config.res.text.msg);
     }
 
     let date = new Date();

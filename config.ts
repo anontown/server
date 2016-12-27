@@ -10,34 +10,70 @@ interface IConfig {
         pass: string
     },
     user: {
-        sn: string,
-        pass: string,
+        sn: {
+            regex: string,
+            msg: string
+        },
+        pass: {
+            regex: string,
+            msg: string
+        },
         lvMax: number,
         profile: {
-            name: string,
-            text: string
+            name: {
+                regex: string,
+                msg: string
+            },
+            text: {
+                regex: string,
+                msg: string
+            }
         },
         token: {
-            name: string,
+            name: {
+                regex: string,
+                msg: string
+            },
             req: {
                 expireMinute: 5
             }
         },
         client: {
-            name: string,
-            url: string
+            name: {
+                regex: string,
+                msg: string
+            },
+            url: {
+                regex: string,
+                msg: string
+            }
         }
     },
     topic: {
-        title: string,
-        category: string,
-        categoryMax: number,
-        text: string
+        title: {
+            regex: string,
+            msg: string
+        },
+        category: {
+            regex: string,
+            max: number,
+            msg: string
+        },
+        text: {
+            regex: string,
+            msg: string
+        }
     },
     res: {
         defaultName: string,
-        name: string,
-        text: string,
+        name: {
+            regex: string,
+            msg: string
+        },
+        text: {
+            regex: string,
+            msg: string
+        },
         wait: {
             maxLv: number,
             minSecond: number,

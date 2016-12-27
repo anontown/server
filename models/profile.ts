@@ -121,11 +121,11 @@ export class Profile {
   }
 
   static create(authToken: IAuthToken, name: string, text: string): Profile {
-    if (!name.match(Config.user.profile.name)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "名前が不正です");
+    if (!name.match(Config.user.profile.name.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.name.msg);
     }
-    if (!text.match(Config.user.profile.text)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "本文が不正です");
+    if (!text.match(Config.user.profile.text.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.text.msg);
     }
 
     let now = new Date();
@@ -142,11 +142,11 @@ export class Profile {
     if (!authToken.user.equals(this._user)) {
       throw new AtError(StatusCode.MisdirectedRequest, "人のプロフィール変更は出来ません");
     }
-    if (!name.match(Config.user.profile.name)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "名前が不正です");
+    if (!name.match(Config.user.profile.name.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.name.msg);
     }
-    if (!text.match(Config.user.profile.text)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "本文が不正です");
+    if (!text.match(Config.user.profile.text.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.text.msg);
     }
 
     this._name = name;

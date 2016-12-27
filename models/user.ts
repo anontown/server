@@ -135,12 +135,12 @@ export class User {
   }
 
   static create(sn: string, pass: string): User {
-    if (!pass.match(Config.user.pass)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "パスワードが不正です");
+    if (!pass.match(Config.user.pass.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
     }
 
-    if (!sn.toString().match(Config.user.sn)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "スクリーンネームが不正です");
+    if (!sn.toString().match(Config.user.sn.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.sn.msg);
     }
     let now = new Date();
     return new User(new ObjectID(),
@@ -153,8 +153,8 @@ export class User {
   }
 
   changePass(_authUser: IAuthUser, pass: string) {
-    if (!pass.match(Config.user.pass)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "パスワードが不正です");
+    if (!pass.match(Config.user.pass.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
     }
 
     this._pass = StringUtil.hashLong(pass + Config.salt.pass);
@@ -203,7 +203,7 @@ export class User {
     }
   }
   changeLastTopic(lastTopic: Date) {
-    if (this._lastTopic.getTime() + ((60 * 24) / this._lv + 30) * 1000 < lastTopic.getTime()) {
+    if (this._lastTopic.getTime() + 60 * 60 * 6 < lastTopic.getTime()) {
       this._lastTopic = lastTopic;
     } else {
       throw new AtError(StatusCode.Forbidden, "連続書き込みはできません");

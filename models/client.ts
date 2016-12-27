@@ -112,11 +112,11 @@ export class Client {
   }
 
   static create(authUser: IAuthUser, name: string, url: string): Client {
-    if (!name.match(Config.user.client.name)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "名前が不正です");
+    if (!name.match(Config.user.client.name.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.name.msg);
     }
-    if (!url.match(Config.user.client.url)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "URLが不正です");
+    if (!url.match(Config.user.client.url.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.url.msg);
     }
 
     let now = new Date();
@@ -133,11 +133,11 @@ export class Client {
     if (!authUser.id.equals(this._user)) {
       throw new AtError(StatusCode.MisdirectedRequest, "人のクライアント変更は出来ません");
     }
-    if (!name.match(Config.user.client.name)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "名前が不正です");
+    if (!name.match(Config.user.client.name.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.name.msg);
     }
-    if (!url.match(Config.user.client.url)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "URLが不正です");
+    if (!url.match(Config.user.client.url.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.url.msg);
     }
 
     this._name = name;

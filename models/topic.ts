@@ -195,19 +195,19 @@ export class Topic {
 
   //{{setter
   changeData(user: User, authToken: IAuthToken, title: string, category: string[], text: string): { res: Res, history: History } {
-    if (!title.match(Config.topic.title)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "タイトルが不正です");
+    if (!title.match(Config.topic.title.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.topic.title.msg);
     }
-    if (category.length > Config.topic.categoryMax) {
-      throw new AtError(StatusCode.MisdirectedRequest, "カテゴリの階層が深すぎます");
+    if (category.length > Config.topic.category.max) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.topic.category.msg);
     }
     category.forEach(x => {
-      if (!x.match(Config.topic.category)) {
-        throw new AtError(StatusCode.MisdirectedRequest, "カテゴリが不正です");
+      if (!x.match(Config.topic.category.regex)) {
+        throw new AtError(StatusCode.MisdirectedRequest, Config.topic.category.msg);
       }
     });
-    if (!text.match(Config.topic.text)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "本文が不正です");
+    if (!text.match(Config.topic.text.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.topic.text.msg);
     }
 
     let date = new Date();
