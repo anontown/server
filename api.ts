@@ -96,7 +96,7 @@ export class API {
               Promise.resolve(null)) as Promise<IAuthUser | null>
           ]);
 
-          let result = await call(params, auth[0], auth[1], req.headers["X-Forwarded-For"] || req.connection.remoteAddress);
+          let result = await call(params, auth[0], auth[1], req.headers["X-Real-IP"] || req.connection.remoteAddress);
           resultFunc(200, result);
           console.log("成功");
         } else {
