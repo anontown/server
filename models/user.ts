@@ -203,7 +203,7 @@ export class User {
     }
   }
   changeLastTopic(lastTopic: Date) {
-    if (this._lastTopic.getTime() + 60 * 60 * 6 < lastTopic.getTime()) {
+    if (this._lastTopic.getTime() + 1000 * 60 * 30 < lastTopic.getTime()) {
       this._lastTopic = lastTopic;
     } else {
       throw new AtError(StatusCode.Forbidden, "連続書き込みはできません");
