@@ -8,6 +8,7 @@ import { ObjectID } from 'mongodb';
 import * as http from 'http';
 import * as socketio from 'socket.io';
 import { Res } from './models/res';
+import { Logger } from './logger';
 
 export class API {
   private static valid = new Validator();
@@ -21,6 +22,7 @@ export class API {
     this.io = socketio.listen(this.server);
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(bodyParser.json());
+    this.app.use(Logger.express);
   }
 
   addAPI({url, isAuthUser, isAuthToken, schema, call}: {
@@ -28,7 +30,7 @@ export class API {
     schema: Object,
     isAuthToken: boolean,
     isAuthUser: boolean,
-    call: (params: any, authToken: IAuthToken | null, authUser: IAuthUser | null) => Promise<any>
+    call: (params: any, authToken: IAuthToken | null, authUser: IAuthUser | null, ip: string) => Promise<any>
   }) {
     this.app.post(url, async (req: express.Request, res: express.Response) => {
       let errorFunc = function (error: AtError) {
@@ -94,7 +96,7 @@ export class API {
               Promise.resolve(null)) as Promise<IAuthUser | null>
           ]);
 
-          let result = await call(params, auth[0], auth[1]);
+          let result = await call(params, auth[0], auth[1], req.connection.remoteAddress);
           resultFunc(200, result);
           console.log("成功");
         } else {
@@ -104,9 +106,9 @@ export class API {
         if (e instanceof AtError) {
           errorFunc(e);
         } else {
+          Logger.error.error("サーバー内部エラー", e);
           errorFunc(new AtError(StatusCode.InternalServerError, "サーバー内部エラー"));
         }
-        console.log("例外", e);
       });
     });
 
@@ -141,7 +143,7 @@ export class API {
     });
 
     this.server.listen(this.port);
-    console.log("サーバー起動");
+    Logger.system.info("サーバー起動");
   }
 }
 

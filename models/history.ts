@@ -40,6 +40,10 @@ export class History {
 
   }
 
+  get id():ObjectID{
+    return this._id;
+  }
+
   static async insert(history: History): Promise<null> {
     let db = await DB;
     await db.collection("histories").insert(history.toDB());

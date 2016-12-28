@@ -23,9 +23,13 @@ import {
   ITokenReqAPI
 } from './models';
 import { ObjectID } from 'mongodb';
-
+import { Logger } from './logger';
+function appLog(method: string, ip: string, idName: string, id: ObjectID) {
+  Logger.app.info(method, ip, idName, id.toString());
+}
 
 const api = new API(Config.server.port);
+
 
 //[res]
 {
@@ -62,7 +66,7 @@ const api = new API(Config.server.port);
       text: string,
       reply: string | null,
       profile: string | null
-    }, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<IResAPI> => {
+    }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IResAPI> => {
       let val = await Promise.all([
         Topic.findOne(new ObjectID(params.topic)),
         User.findOne(authToken.user),
@@ -90,6 +94,7 @@ const api = new API(Config.server.port);
         User.update(user)
       ]);
 
+      appLog("create/res", ip, "reses", res.id)
       return res.toAPI(authToken);
     }
   });
@@ -460,7 +465,7 @@ const api = new API(Config.server.port);
       title: string,
       category: string[],
       text: string
-    }, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<ITopicAPI> => {
+    }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<ITopicAPI> => {
       let user = await User.findOne(authToken.user);
       let create = Topic.create(params.title,
         params.category,
@@ -475,6 +480,7 @@ const api = new API(Config.server.port);
         History.insert(create.history)
       ]);
 
+      appLog("topic/create", ip, "histories", create.history.id);
       return create.topic.toAPI();
     }
   });
@@ -584,7 +590,7 @@ const api = new API(Config.server.port);
         }
       }
     },
-    call: async (params: { id: string, title: string, category: string[], text: string }, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<ITopicAPI> => {
+    call: async (params: { id: string, title: string, category: string[], text: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip): Promise<ITopicAPI> => {
       let val = await Promise.all([
         Topic.findOne(new ObjectID(params.id)),
         User.findOne(authToken.user)
@@ -604,6 +610,7 @@ const api = new API(Config.server.port);
         User.update(user)
       ]);
 
+      appLog("topic/update", ip, "histories", history.id);
       return topic.toAPI();
     }
   });
@@ -728,9 +735,10 @@ const api = new API(Config.server.port);
         }
       }
     },
-    call: async (params: { name: string, text: string }, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<IProfileAPI> => {
+    call: async (params: { name: string, text: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IProfileAPI> => {
       let profile = Profile.create(authToken, params.name, params.text);
       await Profile.insert(profile);
+      appLog("profile/create", ip, "profiles", profile.id);
       return profile.toAPI(authToken);
     }
   });
@@ -815,10 +823,11 @@ const api = new API(Config.server.port);
         }
       }
     },
-    call: async (params: { id: string, name: string, text: string }, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<IProfileAPI> => {
+    call: async (params: { id: string, name: string, text: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IProfileAPI> => {
       let profile = await Profile.findOne(new ObjectID(params.id));
       profile.changeData(authToken, params.name, params.text);
       await Profile.update(profile);
+      appLog("profile/update", ip, "profiles", profile.id);
       return profile.toAPI(authToken);
     }
   });
@@ -1111,9 +1120,10 @@ const api = new API(Config.server.port);
         }
       }
     },
-    call: async (params: { name: string, url: string }, _authToken: IAuthToken | null, authUser: IAuthUser): Promise<IClientAPI> => {
+    call: async (params: { name: string, url: string }, _authToken: IAuthToken | null, authUser: IAuthUser, ip: string): Promise<IClientAPI> => {
       let client = Client.create(authUser, params.name, params.url);
       await Client.insert(client);
+      appLog("client/create", ip, "clients", client.id);
       return client.toAPI(authUser);
     }
   });
@@ -1139,10 +1149,11 @@ const api = new API(Config.server.port);
         }
       }
     },
-    call: async (params: { id: string, name: string, url: string }, _authToken: IAuthToken | null, authUser: IAuthUser): Promise<IClientAPI> => {
+    call: async (params: { id: string, name: string, url: string }, _authToken: IAuthToken | null, authUser: IAuthUser, ip: string): Promise<IClientAPI> => {
       let client = await Client.findOne(new ObjectID(params.id));
       client.changeData(authUser, params.name, params.url);
       await Client.update(client);
+      appLog("client/update", ip, "clients", client.id);
       return client.toAPI(authUser);
     }
   });

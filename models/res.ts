@@ -67,6 +67,10 @@ export class Res {
     private _replyCount: number) {
   }
 
+  get id():ObjectID{
+    return this._id;
+  }
+
   get user(): ObjectID {
     return this._user;
   }
