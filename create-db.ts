@@ -25,12 +25,6 @@ updateFunc.push((async () => {
     await user.createIndex({ sn: 1 }, { unique: true });
 }));
 
-updateFunc.push((async () => {
-    let db = await DB;
-
-    await db.collection("users").update({}, { $set: { token: [] } }, { multi: true });
-}));
-
 
 export async function update() {
     let ver: number;
@@ -45,7 +39,7 @@ export async function update() {
         await updateFunc[i]();
     }
 
-    fs.writeFileSync("./db-version.json", JSON.stringify(ver), {
+    fs.writeFileSync("./db-version.json", JSON.stringify(updateFunc.length), {
         encoding: "utf8"
     });
 }
