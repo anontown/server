@@ -1,6 +1,9 @@
 import { DB } from './db';
+import * as fs from 'fs';
 
-(async () => {
+let updateFunc: (() => Promise<void>)[] = [];
+
+updateFunc.push((async () => {
     let db = await DB;
 
     await db.createCollection("clients");
@@ -20,7 +23,29 @@ import { DB } from './db';
 
     let user = await db.createCollection("users");
     await user.createIndex({ sn: 1 }, { unique: true });
+}));
 
-    console.log("完了");
-    process.exit();
-})();
+updateFunc.push((async () => {
+    let db = await DB;
+
+    await db.collection("users").update({}, { $set: { token: [] } }, { multi: true });
+}));
+
+
+export async function update() {
+    let ver: number;
+    try {
+        ver = JSON.parse(fs.readFileSync("./db-version.json", "utf8"));
+    } catch (e) {
+        //ファイルがなければ0
+        ver = 0;
+    }
+
+    for (let i = ver; i < updateFunc.length; i++) {
+        await updateFunc[i]();
+    }
+
+    fs.writeFileSync("./db-version.json", JSON.stringify(ver), {
+        encoding: "utf8"
+    });
+}
