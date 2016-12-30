@@ -35,7 +35,7 @@ export class Msg {
     let db = await DB;
     let msg: IMsgDB | null = await db.collection("msgs").findOne({
       _id: { $in: id },
-      $or: [{ user: authToken.id }, { user: null }]
+      $or: [{ receiver: authToken.user }, { receiver: null }]
     });
 
     if (msg === null) {
@@ -49,7 +49,7 @@ export class Msg {
     let db = await DB;
     let msgs: IMsgDB[] = await db.collection("msgs").find({
       _id: { $in: ids },
-      $or: [{ user: authToken.id }, { user: null }]
+      $or: [{ receiver: authToken.user }, { receiver: null }]
     }).sort({ date: -1 })
       .toArray();
 
@@ -65,7 +65,7 @@ export class Msg {
 
     let msgs: IMsgDB[] = await db.collection("msgs")
       .find({
-        $or: [{ user: authToken.id }, { user: null }],
+        $or: [{ receiver: authToken.user }, { receiver: null }],
         date: { [type === "after" ? (equal ? "$gte" : "$gt") : (equal ? "$lte" : "$lt")]: date }
       })
       .sort({ date: type === "after" ? 1 : -1 })
@@ -83,7 +83,7 @@ export class Msg {
 
     let msgs: IMsgDB[] = await db.collection("msgs")
       .find({
-        $or: [{ user: authToken.id }, { user: null }]
+        $or: [{ receiver: authToken.user }, { receiver: null }]
       })
       .sort({ date: -1 })
       .skip(0)
