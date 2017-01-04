@@ -40,7 +40,7 @@ export class History {
 
   }
 
-  get id():ObjectID{
+  get id(): ObjectID {
     return this._id;
   }
 
@@ -78,21 +78,6 @@ export class History {
     }
 
     return histories.map(h => this.fromDB(h));
-  }
-
-  static async findAllIn(topics: ObjectID[]): Promise<Map<string, History[]>> {
-    let db = await DB;
-    let histories: IHistoryDB[] = await db.collection("histories")
-      .find({ topic: { $in: topics } })
-      .sort({ date: -1 })
-      .toArray();
-
-    let map = new Map<string, History[]>();
-    topics.forEach(t => map.set(t.toString(), []));
-    histories.map(h => this.fromDB(h)).
-      forEach(h => (map.get(h._topic.toString()) as History[]).unshift(h));
-
-    return map;
   }
 
   static async findAll(topic: Topic): Promise<History[]> {

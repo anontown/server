@@ -2,7 +2,7 @@ import * as marked from 'marked';
 import { ObjectID } from 'mongodb';
 import { User } from './user';
 import { Res } from './res';
-import { History, IHistoryAPI } from './history';
+import { History } from './history';
 import { DB } from '../db';
 import { IAuthToken } from '../auth';
 import { AtError, StatusCode } from '../at-error'
@@ -27,8 +27,7 @@ export interface ITopicAPI {
   mdtext: string,
   update: string,
   date: string,
-  resCount: number,
-  histories: IHistoryAPI[]
+  resCount: number
 }
 
 export class Topic {
@@ -39,8 +38,7 @@ export class Topic {
     private _mdtext: string,
     private _update: Date,
     private _date: Date,
-    private _resCount: number,
-    private _histories: History[]) {
+    private _resCount: number) {
 
   }
 
@@ -128,9 +126,7 @@ export class Topic {
     let count = new Map<string, number>();
     countArr.forEach(c => count.set(c._id.toString(), c.resCount));
 
-    let histories = await History.findAllIn(topics.map(t => t._id));
-
-    return topics.map(t => this.fromDB(t, count.has(t._id.toString()) ? count.get(t._id.toString()) as number : 0, histories.get(t._id.toString()) as History[]));
+    return topics.map(t => this.fromDB(t, count.has(t._id.toString()) ? count.get(t._id.toString()) as number : 0));
 
   }
 
@@ -167,13 +163,12 @@ export class Topic {
       mdtext: this._mdtext,
       update: this._update.toISOString(),
       date: this._date.toISOString(),
-      resCount: this._resCount,
-      histories: this._histories.map(h => h.toAPI())
+      resCount: this._resCount
     }
   }
 
-  static fromDB(t: ITopicDB, resCount: number, histories: History[]): Topic {
-    return new Topic(t._id, t.title, t.category, t.text, t.mdtext, t.update, t.date, resCount, histories);
+  static fromDB(t: ITopicDB, resCount: number): Topic {
+    return new Topic(t._id, t.title, t.category, t.text, t.mdtext, t.update, t.date, resCount);
   }
 
 
@@ -187,7 +182,7 @@ export class Topic {
 
   static create(title: string, category: string[], text: string, user: User, authToken: IAuthToken): { topic: Topic, res: Res, history: History } {
     var now = new Date();
-    var topic = new Topic(new ObjectID(), title, category, text, marked.parse(text, { sanitize: true }), now, now, 1, []);
+    var topic = new Topic(new ObjectID(), title, category, text, marked.parse(text, { sanitize: true }), now, now, 1);
     var cd = topic.changeData(user, authToken, title, category, text);
     user.changeLastTopic(now);
     return { topic, history: cd.history, res: cd.res };

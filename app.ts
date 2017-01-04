@@ -20,7 +20,8 @@ import {
   IProfileAPI,
   ITokenAPI,
   IUserAPI,
-  ITokenReqAPI
+  ITokenReqAPI,
+  IHistoryAPI
 } from './models';
 import { ObjectID } from 'mongodb';
 import { Logger } from './logger';
@@ -619,6 +620,80 @@ import * as createDB from './create-db';
 
         appLog("topic/update", ip, "histories", history.id);
         return topic.toAPI();
+      }
+    });
+  }
+  //[history]
+  {
+    api.addAPI({
+      url: "/history/find/one",
+
+      isAuthUser: false,
+      isAuthToken: false,
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["id"],
+        properties: {
+          id: {
+            type: "string"
+          }
+        }
+      },
+      call: async (params: {
+        id: string
+      }, _authToken: IAuthToken, _authUser: IAuthUser | null): Promise<IHistoryAPI> => {
+        return (await History.findOne(new ObjectID(params.id)))
+          .toAPI();
+      }
+    });
+
+    api.addAPI({
+      url: "/history/find/in",
+
+      isAuthUser: false,
+      isAuthToken: false,
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["ids"],
+        properties: {
+          ids: {
+            type: "array",
+            items: {
+              type: "string"
+            }
+          }
+        }
+      },
+      call: async (params: {
+        ids: string[]
+      }, _authToken: IAuthToken, _authUser: IAuthUser | null): Promise<IHistoryAPI[]> => {
+        return (await History.findIn(params.ids.map(id => new ObjectID(id))))
+          .map(h => h.toAPI());
+      }
+    });
+
+    api.addAPI({
+      url: "/history/find/all",
+
+      isAuthUser: false,
+      isAuthToken: false,
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["topic"],
+        properties: {
+          topic: {
+            type: "string"
+          }
+        }
+      },
+      call: async (params: {
+        topic: string
+      }, _authToken: IAuthToken, _authUser: IAuthUser | null): Promise<IHistoryAPI[]> => {
+        return (await History.findAll(await Topic.findOne(new ObjectID(params.topic))))
+          .map(h => h.toAPI());
       }
     });
   }
