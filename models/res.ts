@@ -67,7 +67,7 @@ export class Res {
     private _replyCount: number) {
   }
 
-  get id():ObjectID{
+  get id(): ObjectID {
     return this._id;
   }
 
@@ -318,7 +318,7 @@ export class Res {
       throw new AtError(StatusCode.MisdirectedRequest, Config.res.name.msg);
     }
     if (!text.match(Config.res.text.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest,Config.res.text.msg);
+      throw new AtError(StatusCode.MisdirectedRequest, Config.res.text.msg);
     }
 
     let date = new Date();
@@ -391,7 +391,8 @@ export class Res {
     }
     this._voteUser.push(user.id);
     resUser.changeLv(resUser.lv - Math.floor(user.lv / 100) - 1);
-    this._vote -= user.lv;
+    //低評価1回で削除されないように
+    this._vote -= Math.min(user.lv, Math.ceil(this._lv / 3));
 
     let msg: Msg | null;
     if (this._vote < -this._lv && (this._deleteFlag === "active" || this._deleteFlag === "self")) {

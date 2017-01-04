@@ -190,6 +190,7 @@ export class Topic {
 
   //{{setter
   changeData(user: User, authToken: IAuthToken, title: string, category: string[], text: string): { res: Res, history: History } {
+
     if (!title.match(Config.topic.title.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.topic.title.msg);
     }
