@@ -1,5 +1,5 @@
 import * as marked from 'marked';
-import { ObjectID } from 'mongodb';
+import { ObjectID, WriteError } from 'mongodb';
 import { User } from './user';
 import { Res } from './res';
 import { History } from './history';
@@ -138,7 +138,13 @@ export class Topic {
   static async insert(topic: Topic): Promise<null> {
     let db = await DB;
     if (topic._type === "board") {
-      await db.collection("boards").insert({ category: topic._category.join("/") });
+      await db.collection("boards").insert({ category: topic._category.join("/") }).catch((e: WriteError) => {
+        if (e.code === 11000) {
+          throw new AtError(StatusCode.Conflict, "既に板が存在します");
+        } else {
+          throw e;
+        }
+      });
     }
     await db.collection("topics").insert(topic.toDB());
     return null;
