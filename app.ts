@@ -546,6 +546,20 @@ import * as createDB from './create-db';
     });
 
     api.addAPI({
+      url: "/topic/find/board",
+
+      isAuthUser: false,
+      isAuthToken: false,
+      schema: {
+        type: "null"
+      },
+      call: async (_params: null, _authToken: IAuthToken | null, _authUser: IAuthUser | null): Promise<ITopicAPI[]> => {
+        let topics = await Topic.findBoard();
+        return topics.map(t => t.toAPI());
+      }
+    });
+
+    api.addAPI({
       url: "/topic/find",
 
       isAuthUser: false,

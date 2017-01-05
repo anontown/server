@@ -88,6 +88,16 @@ export class Topic {
     return this.aggregate(topics);
   }
 
+  static async findBoard(): Promise<Topic[]> {
+    let db = await DB;
+
+    let topics: ITopicDB[] = await db.collection("topics").find({ type: "board" })
+      .sort({ update: -1 })
+      .toArray();
+
+    return this.aggregate(topics);
+  }
+
   static async find(title: string, category: string[], skip: number, limit: number): Promise<Topic[]> {
     let db = await DB;
 
@@ -99,7 +109,9 @@ export class Topic {
 
         category.forEach((v, i) => {
           query["category." + i] = v;
-        })
+        });
+
+        query["type"] = "normal";
 
         return query;
       })())
