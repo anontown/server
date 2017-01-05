@@ -13,7 +13,8 @@ interface IUserDB {
   lv: number,
   resWait: IResWait,
   lastTopic: Date,
-  date: Date
+  date: Date,
+  point: number
 }
 
 export interface IUserAPI {
@@ -38,7 +39,9 @@ export class User {
     private _lv: number,
     private _resWait: IResWait,
     private _lastTopic: Date,
-    private _date: Date) {
+    private _date: Date,
+    //毎日リセットされ、特殊動作をすると増えるポイント
+    private _point: number) {
 
   }
 
@@ -50,7 +53,8 @@ export class User {
       lv: this._lv,
       resWait: this._resWait,
       lastTopic: this._lastTopic,
-      date: this._date
+      date: this._date,
+      point: this._point
     }
   }
 
@@ -101,7 +105,7 @@ export class User {
   }
 
   static fromDB(u: IUserDB): User {
-    return new User(u._id, u.sn, u.pass, u.lv, u.resWait, u.lastTopic, u.date);
+    return new User(u._id, u.sn, u.pass, u.lv, u.resWait, u.lastTopic, u.date, u.point);
   }
 
   get id(): ObjectID {
@@ -132,6 +136,15 @@ export class User {
     start('00 00 00,06,12,18 * * *', "h6");
     start('00 00 00,12 * * *', "h12");
     start('00 00 00 * * *', "d1");
+    new CronJob({
+      cronTime: '00 00 00 * * *',
+      onTick: async () => {
+        let db = await DB;
+        await db.collection("users").update({}, { $set: { point: 0 } }, { multi: true });
+      },
+      start: false,
+      timeZone: 'Asia/Tokyo'
+    }).start();
   }
 
   static create(sn: string, pass: string): User {
@@ -149,7 +162,8 @@ export class User {
       1,
       { last: now, m10: 0, m30: 0, h1: 0, h6: 0, h12: 0, d1: 0 },
       now,
-      now);
+      now,
+      0);
   }
 
   changePass(_authUser: IAuthUser, pass: string) {
@@ -164,8 +178,15 @@ export class User {
     if (this._pass === StringUtil.hashLong(pass + Config.salt.pass)) {
       return { id: this._id, pass: this._pass };
     } else {
-      throw new AtError(StatusCode.Unauthorized, "認証に失敗しました")
+      throw new AtError(StatusCode.Unauthorized, "認証に失敗しました");
     }
+  }
+
+  usePoint(val: number) {
+    if (this._lv < this._point + val) {
+      throw new AtError(StatusCode.Forbidden, "ポイントが足りません");
+    }
+    this._point += val;
   }
 
   changeLv(lv: number) {
