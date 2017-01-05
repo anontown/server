@@ -25,6 +25,12 @@ updateFunc.push((async () => {
     await user.createIndex({ sn: 1 }, { unique: true });
 }));
 
+updateFunc.push((async () => {
+    let db = await DB;
+
+    await db.collection("users").update({}, { $set: { point: 0 } }, { multi: true });
+}));
+
 
 export async function update() {
     let ver: number;
