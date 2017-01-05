@@ -21,7 +21,8 @@ import {
   ITokenAPI,
   IUserAPI,
   ITokenReqAPI,
-  IHistoryAPI
+  IHistoryAPI,
+  TopicType
 } from './models';
 import { ObjectID } from 'mongodb';
 import { Logger } from './logger';
@@ -466,19 +467,25 @@ import * as createDB from './create-db';
           },
           text: {
             type: "string"
+          },
+          type: {
+            type: "string",
+            enum: ["normal", "board"]
           }
         }
       },
       call: async (params: {
         title: string,
         category: string[],
-        text: string
+        text: string,
+        type: TopicType
       }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<ITopicAPI> => {
         let user = await User.findOne(authToken.user);
         let create = Topic.create(params.title,
           params.category,
           params.text,
           user,
+          params.type,
           authToken);
 
         await Topic.insert(create.topic);

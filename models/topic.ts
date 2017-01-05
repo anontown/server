@@ -16,7 +16,8 @@ interface ITopicDB {
   text: string,
   mdtext: string,
   update: Date,
-  date: Date
+  date: Date,
+  type: TopicType
 }
 
 export interface ITopicAPI {
@@ -27,8 +28,11 @@ export interface ITopicAPI {
   mdtext: string,
   update: string,
   date: string,
-  resCount: number
+  resCount: number,
+  type: TopicType
 }
+
+export type TopicType = "normal" | "board";
 
 export class Topic {
   private constructor(private _id: ObjectID,
@@ -38,7 +42,8 @@ export class Topic {
     private _mdtext: string,
     private _update: Date,
     private _date: Date,
-    private _resCount: number) {
+    private _resCount: number,
+    private _type: TopicType) {
 
   }
 
@@ -132,6 +137,9 @@ export class Topic {
 
   static async insert(topic: Topic): Promise<null> {
     let db = await DB;
+    if (topic._type === "board") {
+      await db.collection("boards").insert({ category: topic._category.join("/") });
+    }
     await db.collection("topics").insert(topic.toDB());
     return null;
   }
@@ -151,6 +159,7 @@ export class Topic {
       mdtext: this._mdtext,
       update: this._update,
       date: this._date,
+      type: this._type
     }
   }
 
@@ -163,12 +172,13 @@ export class Topic {
       mdtext: this._mdtext,
       update: this._update.toISOString(),
       date: this._date.toISOString(),
-      resCount: this._resCount
+      resCount: this._resCount,
+      type: this._type
     }
   }
 
   static fromDB(t: ITopicDB, resCount: number): Topic {
-    return new Topic(t._id, t.title, t.category, t.text, t.mdtext, t.update, t.date, resCount);
+    return new Topic(t._id, t.title, t.category, t.text, t.mdtext, t.update, t.date, resCount, t.type);
   }
 
 
@@ -180,9 +190,13 @@ export class Topic {
     this._update = update;
   }
 
-  static create(title: string, category: string[], text: string, user: User, authToken: IAuthToken): { topic: Topic, res: Res, history: History } {
+  static create(title: string, category: string[], text: string, user: User, type: TopicType, authToken: IAuthToken): { topic: Topic, res: Res, history: History } {
+    if (type === "board") {
+      user.usePoint(30);
+    }
+
     var now = new Date();
-    var topic = new Topic(new ObjectID(), title, category, text, marked.parse(text, { sanitize: true }), now, now, 1);
+    var topic = new Topic(new ObjectID(), title, category, text, marked.parse(text, { sanitize: true }), now, now, 1, type);
     var cd = topic.changeData(user, authToken, title, category, text);
     user.changeLastTopic(now);
     return { topic, history: cd.history, res: cd.res };
@@ -190,7 +204,7 @@ export class Topic {
 
   //{{setter
   changeData(user: User, authToken: IAuthToken, title: string, category: string[], text: string): { res: Res, history: History } {
-    user.usePoint(50);
+    user.usePoint(10);
 
     if (!title.match(Config.topic.title.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.topic.title.msg);
@@ -210,7 +224,9 @@ export class Topic {
     let date = new Date();
 
     this._title = title;
-    this._category = category;
+    if (this._type === "normal") {
+      this._category = category;
+    }
     this._text = text;
     this._mdtext = marked.parse(text, { sanitize: true });
 

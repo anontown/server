@@ -31,6 +31,13 @@ updateFunc.push((async () => {
     await db.collection("users").update({}, { $set: { point: 0 } }, { multi: true });
 }));
 
+updateFunc.push((async () => {
+    let db = await DB;
+
+    let board = await db.createCollection("boards");
+    await board.createIndex({ category: 1 }, { unique: true });
+    await db.collection("topics").update({}, { $set: { type: "normal" } }, { multi: true });
+}));
 
 export async function update() {
     let ver: number;
