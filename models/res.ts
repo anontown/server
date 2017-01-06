@@ -183,7 +183,7 @@ export class Res {
     let reses: IResDB[] = await db.collection("reses")
       .find({
         topic: topic.id,
-        reply: res._id
+        "reply.res": res._id
       })
       .sort({ date: -1 })
       .toArray();
@@ -197,7 +197,7 @@ export class Res {
       .aggregate([
         {
           $group: {
-            _id: "$reply", replyCount: { $sum: 1 }
+            _id: "$reply.res", replyCount: { $sum: 1 }
           }
         },
         {
