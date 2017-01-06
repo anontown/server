@@ -136,10 +136,9 @@ export class Res {
 
   static async findNotice(authToken: IAuthToken, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
     let db = await DB;
-    let ids = await this.findUserResList(authToken);
     let reses: IResDB[] = await db.collection("reses")
       .find({
-        reply: { $in: ids },
+        "reply.user": authToken.user,
         date: { [type === "after" ? (equal ? "$gte" : "$gt") : (equal ? "$lte" : "$lt")]: date }
       })
       .sort({ date: type === "after" ? 1 : -1 })
@@ -154,10 +153,9 @@ export class Res {
 
   static async findNoticeNew(authToken: IAuthToken, limit: number): Promise<Res[]> {
     let db = await DB;
-    let ids = await this.findUserResList(authToken);
     let reses: IResDB[] = await db.collection("reses")
       .find({
-        reply: { $in: ids }
+        "reply.user": authToken.user
       })
       .sort({ date: -1 })
       .skip(0)
@@ -165,14 +163,6 @@ export class Res {
       .toArray();
 
     return this.aggregate(reses);
-  }
-
-  private static async findUserResList(authToken: IAuthToken): Promise<ObjectID[]> {
-    var db = await DB;
-    var find: { _id: ObjectID }[] = await db.collection("reses")
-      .find({ user: authToken.user }, { _id: 1 })
-      .toArray();
-    return find.map(x => x._id);
   }
 
   static async findHash(topic: Topic, hash: string): Promise<Res[]> {
