@@ -41,7 +41,8 @@ export interface IResAPI {
   hash: string,
   profile: string | null,
   replyCount: number,
-  isVote: boolean | null
+  isVote: boolean | null,
+  isReply: boolean | null
 }
 
 export type ResDeleteFlag = "active" | "self" | "vote" | "freeze";
@@ -295,7 +296,8 @@ export class Res {
       hash: this._hash,
       profile: this._profile !== null ? this._profile.toString() : null,
       replyCount: this._replyCount,
-      isVote
+      isVote,
+      isReply: authToken === null || this._reply === null ? null : authToken.user.equals(this._reply.user)
     };
   }
 
