@@ -78,6 +78,24 @@ updateFunc.push((async () => {
   await Promise.all(promises);
 }));
 
+updateFunc.push((async () => {
+  //HASHのイコール削除
+  let db = await DB;
+  let promises: Promise<any>[] = [];
+
+  let reses: { _id: ObjectID, hash: string }[] = await db.collection("reses").find().toArray();
+  reses.forEach(r => {
+    promises.push(db.collection("reses").update({ _id: r._id }, { $set: { hash: r.hash.replace(/=/, "") } }))
+  });
+
+  let histories: { _id: ObjectID, hash: string }[] = await db.collection("histories").find().toArray();
+  histories.forEach(h => {
+    promises.push(db.collection("histories").update({ _id: h._id }, { $set: { hash: h.hash.replace(/=/, "") } }))
+  });
+
+  await Promise.all(promises);
+}));
+
 export async function update() {
   let ver: number;
   try {

@@ -265,7 +265,7 @@ export class Topic {
       this._id +
 
       //ソルト依存
-      Config.salt.hash);
+      Config.salt.hash).replace(/=/, "");
   }
 
   inCategory(category: string[]): boolean {
