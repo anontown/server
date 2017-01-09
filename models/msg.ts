@@ -1,9 +1,9 @@
 import { ObjectID } from 'mongodb';
-import * as marked from 'marked';
 import { User } from './user';
 import { DB } from '../db';
 import { IAuthToken } from '../auth';
 import { AtError, StatusCode } from '../at-error';
+import { StringUtil } from '../util';
 
 interface IMsgDB {
   _id: ObjectID,
@@ -133,7 +133,7 @@ export class Msg {
     return new Msg(new ObjectID(),
       receiver !== null ? receiver.id : null,
       text,
-      marked.parse(text, { sanitize: true }),
+      StringUtil.md(text),
       new Date());
   }
 }

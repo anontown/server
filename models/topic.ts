@@ -1,4 +1,3 @@
-import * as marked from 'marked';
 import { ObjectID, WriteError } from 'mongodb';
 import { User } from './user';
 import { Res } from './res';
@@ -214,7 +213,7 @@ export class Topic {
     }
 
     var now = new Date();
-    var topic = new Topic(new ObjectID(), title, category, text, marked.parse(text, { sanitize: true }), now, now, 1, type);
+    var topic = new Topic(new ObjectID(), title, category, text, StringUtil.md(text), now, now, 1, type);
     var cd = topic.changeData(user, authToken, title, category, text);
     user.changeLastTopic(now);
     return { topic, history: cd.history, res: cd.res };
@@ -246,7 +245,7 @@ export class Topic {
       this._category = category;
     }
     this._text = text;
-    this._mdtext = marked.parse(text, { sanitize: true });
+    this._mdtext = StringUtil.md(text);
 
     let history = History.create(this, date, this.hash(date, user), user);
     let res = Res.create(this, user, authToken, "", "トピックデータ", "トピックデータが編集されました", null, null);

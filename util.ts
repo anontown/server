@@ -1,11 +1,12 @@
 var crypto = require("crypto");
+import * as marked from 'marked';
 export class StringUtil {
     static line(str: string, after: string = "\n"): string {
         return str.replace(/\r\n|\r|\n/, after);
     }
 
     static graphicEscape(str: string): string {
-        let hash:{ [key: string]: string; } = {
+        let hash: { [key: string]: string; } = {
             "★": "☆",
             "●": "○",
             "■": "□",
@@ -28,5 +29,9 @@ export class StringUtil {
 
     static hashLong(str: string): string {
         return this.hash("sha256", str);
+    }
+
+    static md(value: string): string {
+        return marked.parse(value, { sanitize: true, breaks: true });
     }
 }

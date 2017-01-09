@@ -1,4 +1,3 @@
-import * as marked from 'marked';
 import { ObjectID } from 'mongodb';
 import { User } from './user';
 import { Topic } from './topic';
@@ -351,7 +350,7 @@ export class Res {
       user.id,
       name,
       text,
-      marked.parse(text, { sanitize: true }),
+      StringUtil.md(text),
       reply !== null ? { res: reply._id, user: reply._user } : null,
       "active",
       0,

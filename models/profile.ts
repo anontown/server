@@ -1,5 +1,5 @@
 import { ObjectID } from 'mongodb';
-import * as marked from 'marked';
+import { StringUtil } from '../util';
 import { DB } from '../db';
 import { IAuthToken } from '../auth';
 import { AtError, StatusCode } from '../at-error'
@@ -133,7 +133,7 @@ export class Profile {
       authToken.user,
       name,
       text,
-      marked.parse(text, { sanitize: true }),
+      StringUtil.md(text),
       now,
       now);
   }
@@ -151,7 +151,7 @@ export class Profile {
 
     this._name = name;
     this._text = text;
-    this._mdtext = marked.parse(text, { sanitize: true });
+    this._mdtext = StringUtil.md(text);
     this._update = new Date();
   }
 }
