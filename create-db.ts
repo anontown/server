@@ -96,6 +96,46 @@ updateFunc.push((async () => {
   await Promise.all(promises);
 }));
 
+import { IResDB } from './models/res';
+import { IHistoryDB } from './models/history';
+import { StringUtil } from './util';
+import { Config } from './config';
+updateFunc.push((async () => {
+  //ハッシュをmd5→sha256に
+
+  //ハッシュ関数
+  let hashFunc = (user: ObjectID, topic: ObjectID, date: Date) =>
+    StringUtil.hash(
+      //ユーザー依存
+      user + " " +
+
+      //書き込み年月日依存
+      date.getFullYear() + " " + date.getMonth() + " " + date.getDate() + " " +
+
+      //トピ依存
+      topic +
+
+      //ソルト依存
+      Config.salt.hash);
+
+  //レス、履歴取得
+  let db = await DB;
+  let rdb = db.collection("reses");
+  let hdb = db.collection("histories");
+  let reses: IResDB[] = await rdb.find().toArray();
+  let histories: IHistoryDB[] = await hdb.find().toArray();
+
+  let promises: Promise<any>[] = [];
+  reses.forEach(r => {
+    promises.push(rdb.update({ _id: r._id }, { $set: { hash: hashFunc(r.user, r.topic, r.date) } }));
+  });
+  histories.forEach(h => {
+    promises.push(hdb.update({ _id: h._id }, { $set: { hash: hashFunc(h.user, h.topic, h.date) } }));
+  });
+
+  await Promise.all(promises);
+}));
+
 export async function update() {
   let ver: number;
   try {

@@ -9,7 +9,7 @@ import { AtError, StatusCode } from '../at-error'
 import { Config } from '../config';
 import { StringUtil } from '../util';
 
-interface IResDB {
+export interface IResDB {
   _id: ObjectID,
   topic: ObjectID,
   date: Date,

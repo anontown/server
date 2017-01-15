@@ -158,7 +158,7 @@ export class User {
     let now = new Date();
     return new User(new ObjectID(),
       sn,
-      StringUtil.hashLong(pass + Config.salt.pass),
+      StringUtil.hash(pass + Config.salt.pass),
       1,
       { last: now, m10: 0, m30: 0, h1: 0, h6: 0, h12: 0, d1: 0 },
       now,
@@ -171,11 +171,11 @@ export class User {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
     }
 
-    this._pass = StringUtil.hashLong(pass + Config.salt.pass);
+    this._pass = StringUtil.hash(pass + Config.salt.pass);
   }
 
   auth(pass: String): IAuthUser {
-    if (this._pass === StringUtil.hashLong(pass + Config.salt.pass)) {
+    if (this._pass === StringUtil.hash(pass + Config.salt.pass)) {
       return { id: this._id, pass: this._pass };
     } else {
       throw new AtError(StatusCode.Unauthorized, "認証に失敗しました");

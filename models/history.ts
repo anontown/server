@@ -4,7 +4,7 @@ import { Topic } from './topic';
 import { DB } from '../db';
 import { AtError, StatusCode } from '../at-error';
 
-interface IHistoryDB {
+export interface IHistoryDB {
   _id: ObjectID,
   topic: ObjectID,
   title: string,

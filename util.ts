@@ -1,5 +1,6 @@
 var crypto = require("crypto");
 import * as marked from 'marked';
+
 export class StringUtil {
     static line(str: string, after: string = "\n"): string {
         return str.replace(/\r\n|\r|\n/, after);
@@ -19,16 +20,8 @@ export class StringUtil {
         });
     }
 
-    private static hash(algo: string, str: string): string {
-        return (crypto.createHash(algo).update(str).digest('base64') as string).replace("=", "");
-    }
-
-    static hashShort(str: string): string {
-        return this.hash("md5", str);
-    }
-
-    static hashLong(str: string): string {
-        return this.hash("sha256", str);
+    static hash(str: string): string {
+        return (crypto.createHash("sha256").update(str).digest('base64') as string).replace(/=/g, "");
     }
 
     static md(value: string): string {

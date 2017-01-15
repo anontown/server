@@ -253,7 +253,7 @@ export class Topic {
     return { res, history };
   }
   hash(date: Date, user: User): string {
-    return StringUtil.hashShort(
+    return StringUtil.hash(
       //ユーザー依存
       user.id + " " +
 
@@ -264,7 +264,7 @@ export class Topic {
       this._id +
 
       //ソルト依存
-      Config.salt.hash).replace(/=/, "");
+      Config.salt.hash);
   }
 
   inCategory(category: string[]): boolean {

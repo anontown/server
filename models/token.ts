@@ -127,7 +127,7 @@ export class Token {
 
   static create(authUser: IAuthUser, client: Client): Token {
     return new Token(new ObjectID(),
-      StringUtil.hashLong(String(Math.random()) + Config.salt.token),
+      StringUtil.hash(String(Math.random()) + Config.salt.token),
       client.id,
       authUser.id,
       "",
@@ -141,7 +141,7 @@ export class Token {
       throw new AtError(StatusCode.Forbidden, "人のトークンは変えられません");
     }
     this._req = [];
-    this._key = StringUtil.hashLong(String(Math.random()) + Config.salt.token);
+    this._key = StringUtil.hash(String(Math.random()) + Config.salt.token);
   }
 
   auth(key: string): IAuthToken {
@@ -163,7 +163,7 @@ export class Token {
     let req: ITokenReq;
     do {
       req = {
-        key: StringUtil.hashLong(String(Math.random()) + Config.salt.tokenReq),
+        key: StringUtil.hash(String(Math.random()) + Config.salt.tokenReq),
         expireDate: new Date(now + 1000 * 60 * Config.user.token.req.expireMinute),
         active: true
       };
