@@ -23,7 +23,8 @@ export interface IResDB {
   voteUser: ObjectID[],
   lv: number,
   hash: string,
-  profile: ObjectID | null
+  profile: ObjectID | null,
+  age: boolean
 }
 
 export interface IResAPI {
@@ -64,7 +65,12 @@ export class Res {
     private _lv: number,
     private _hash: string,
     private _profile: ObjectID | null,
-    private _replyCount: number) {
+    private _replyCount: number,
+    private _age: boolean) {
+  }
+
+  get age(): boolean {
+    return this._age;
   }
 
   get id(): ObjectID {
@@ -243,8 +249,13 @@ export class Res {
       voteUser: this._voteUser,
       lv: this._lv,
       hash: this._hash,
-      profile: this._profile
+      profile: this._profile,
+      age: this._age
     };
+  }
+
+  get date(): Date {
+    return this._date;
   }
 
   toAPI(authToken: IAuthToken | null): IResAPI {
@@ -301,10 +312,10 @@ export class Res {
   }
 
   static fromDB(r: IResDB, replyCount: number): Res {
-    return new Res(r._id, r.topic, r.date, r.user, r.name, r.text, r.mdtext, r.reply, r.deleteFlag, r.vote, r.voteUser, r.lv, r.hash, r.profile, replyCount)
+    return new Res(r._id, r.topic, r.date, r.user, r.name, r.text, r.mdtext, r.reply, r.deleteFlag, r.vote, r.voteUser, r.lv, r.hash, r.profile, replyCount, r.age)
   }
 
-  static create(topic: Topic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null): Res {
+  static create(topic: Topic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean): Res {
     if (!name.match(Config.res.name.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.res.name.msg);
     }
@@ -343,8 +354,8 @@ export class Res {
     if (autoName === null) {
       user.changeLastRes(date);
     }
-    topic.update = date;
-    return new Res(new ObjectID(),
+
+    let result = new Res(new ObjectID(),
       topic.id,
       date,
       user.id,
@@ -358,7 +369,10 @@ export class Res {
       user.lv * 5,
       topic.hash(date, user),
       profile !== null ? profile.id : null,
-      0);
+      0,
+      age);
+    topic.resUpdate(result);
+    return result;
   }
 
   uv(resUser: User, user: User, _authToken: IAuthToken) {

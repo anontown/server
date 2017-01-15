@@ -1,6 +1,11 @@
 import { DB } from './db';
 import * as fs from 'fs';
 import { ObjectID } from 'mongodb';
+import { IResDB } from './models/res';
+import { IHistoryDB } from './models/history';
+import { StringUtil } from './util';
+import { Config } from './config';
+import { ITopicDB } from './models/topic';
 
 let updateFunc: (() => Promise<void>)[] = [];
 
@@ -95,11 +100,6 @@ updateFunc.push((async () => {
 
   await Promise.all(promises);
 }));
-
-import { IResDB } from './models/res';
-import { IHistoryDB } from './models/history';
-import { StringUtil } from './util';
-import { Config } from './config';
 updateFunc.push((async () => {
   //ハッシュをmd5→sha256に
 
@@ -136,6 +136,24 @@ updateFunc.push((async () => {
   await Promise.all(promises);
 }));
 
+updateFunc.push((async () => {
+  //topicにsage機能を実装するための修正
+  let db = await DB;
+  let promises: Promise<any>[] = [];
+
+  let topics: ITopicDB[] = await db.collection("topics").find().toArray();
+  topics.forEach(t => {
+    promises.push(db.collection("topics").update({ _id: t._id }, { $set: { ageUpdate: t.update } }))
+  });
+  promises.push(db.collection("reses").update({}, { $set: { age: true } }, { multi: true }))
+
+  await Promise.all(promises);
+}));
+
+
+/*
+  -----------------------------------------------------------------------------
+*/
 export async function update() {
   let ver: number;
   try {

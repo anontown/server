@@ -50,7 +50,7 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["topic", "name", "text", "reply", "profile"],
+        required: ["topic", "name", "text", "reply", "profile", "age"],
         properties: {
           topic: {
             type: "string"
@@ -66,6 +66,9 @@ import * as createDB from './create-db';
           },
           profile: {
             type: ["string", "null"]
+          },
+          age: {
+            type: "boolean"
           }
         }
       },
@@ -74,7 +77,8 @@ import * as createDB from './create-db';
         name: string,
         text: string,
         reply: string | null,
-        profile: string | null
+        profile: string | null,
+        age:boolean
       }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IResAPI> => {
         let val = await Promise.all([
           Topic.findOne(new ObjectID(params.topic)),
@@ -95,7 +99,8 @@ import * as createDB from './create-db';
           null,
           params.text,
           reply,
-          profile);
+          profile,
+          params.age);
 
         await Promise.all([
           Res.insert(res),
@@ -454,7 +459,7 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["title", "category", "text"],
+        required: ["title", "category", "text", "type"],
         properties: {
           title: {
             type: "string"

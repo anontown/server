@@ -8,7 +8,7 @@ import { AtError, StatusCode } from '../at-error'
 import { Config } from '../config';
 import { StringUtil } from '../util';
 
-interface ITopicDB {
+export interface ITopicDB {
   _id: ObjectID,
   title: string,
   category: string[],
@@ -16,7 +16,8 @@ interface ITopicDB {
   mdtext: string,
   update: Date,
   date: Date,
-  type: TopicType
+  type: TopicType,
+  ageUpdate: Date
 }
 
 export interface ITopicAPI {
@@ -42,7 +43,8 @@ export class Topic {
     private _update: Date,
     private _date: Date,
     private _resCount: number,
-    private _type: TopicType) {
+    private _type: TopicType,
+    private _ageUpdate: Date) {
 
   }
 
@@ -77,7 +79,7 @@ export class Topic {
     let db = await DB;
 
     let topics: ITopicDB[] = await db.collection("topics").find({ _id: { $in: ids } })
-      .sort({ update: -1 })
+      .sort({ ageUpdate: -1 })
       .toArray();
 
     if (topics.length !== ids.length) {
@@ -91,7 +93,7 @@ export class Topic {
     let db = await DB;
 
     let topics: ITopicDB[] = await db.collection("topics").find({ type: "board" })
-      .sort({ update: -1 })
+      .sort({ ageUpdate: -1 })
       .toArray();
 
     return this.aggregate(topics);
@@ -114,7 +116,7 @@ export class Topic {
 
         return query;
       })())
-      .sort({ update: -1 })
+      .sort({ ageUpdate: -1 })
       .skip(skip)
       .limit(limit)
       .toArray();
@@ -176,7 +178,8 @@ export class Topic {
       mdtext: this._mdtext,
       update: this._update,
       date: this._date,
-      type: this._type
+      type: this._type,
+      ageUpdate: this._ageUpdate
     }
   }
 
@@ -195,7 +198,7 @@ export class Topic {
   }
 
   static fromDB(t: ITopicDB, resCount: number): Topic {
-    return new Topic(t._id, t.title, t.category, t.text, t.mdtext, t.update, t.date, resCount, t.type);
+    return new Topic(t._id, t.title, t.category, t.text, t.mdtext, t.update, t.date, resCount, t.type, t.ageUpdate);
   }
 
 
@@ -203,8 +206,11 @@ export class Topic {
     return this._id;
   }
 
-  set update(update: Date) {
-    this._update = update;
+  resUpdate(res: Res) {
+    this._update = res.date;
+    if (res.age) {
+      this._ageUpdate = res.date;
+    }
   }
 
   static create(title: string, category: string[], text: string, user: User, type: TopicType, authToken: IAuthToken): { topic: Topic, res: Res, history: History } {
@@ -213,7 +219,7 @@ export class Topic {
     }
 
     var now = new Date();
-    var topic = new Topic(new ObjectID(), title, category, text, StringUtil.md(text), now, now, 1, type);
+    var topic = new Topic(new ObjectID(), title, category, text, StringUtil.md(text), now, now, 1, type, now);
     var cd = topic.changeData(user, authToken, title, category, text);
     user.changeLastTopic(now);
     return { topic, history: cd.history, res: cd.res };
@@ -248,7 +254,7 @@ export class Topic {
     this._mdtext = StringUtil.md(text);
 
     let history = History.create(this, date, this.hash(date, user), user);
-    let res = Res.create(this, user, authToken, "", "トピックデータ", "トピックデータが編集されました", null, null);
+    let res = Res.create(this, user, authToken, "", "トピックデータ", "トピックデータが編集されました", null, null, true);
 
     return { res, history };
   }
