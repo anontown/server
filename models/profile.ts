@@ -13,7 +13,8 @@ export interface IProfileDB {
   text: string,
   mdtext: string,
   date: Date,
-  update: Date
+  update: Date,
+  sn: string
 }
 
 export interface IProfileAPI {
@@ -23,7 +24,8 @@ export interface IProfileAPI {
   text: string,
   mdtext: string,
   date: string,
-  update: string
+  update: string,
+  sn: string
 }
 
 export class Profile {
@@ -33,7 +35,8 @@ export class Profile {
     private _text: string,
     private _mdtext: string,
     private _date: Date,
-    private _update: Date) {
+    private _update: Date,
+    private _sn: string) {
 
   }
 
@@ -92,7 +95,8 @@ export class Profile {
       text: this._text,
       mdtext: this._mdtext,
       date: this._date,
-      update: this._update
+      update: this._update,
+      sn: this._sn
     };
   }
 
@@ -104,12 +108,13 @@ export class Profile {
       text: this._text,
       mdtext: this._text,
       date: this._date.toISOString(),
-      update: this._update.toISOString()
+      update: this._update.toISOString(),
+      sn: this._sn
     }
   }
 
   static fromDB(p: IProfileDB): Profile {
-    return new Profile(p._id, p.user, p.name, p.text, p.mdtext, p.date, p.update);
+    return new Profile(p._id, p.user, p.name, p.text, p.mdtext, p.date, p.update, p.sn);
   }
 
   get id(): ObjectID {
@@ -120,12 +125,15 @@ export class Profile {
     return this._user;
   }
 
-  static create(authToken: IAuthToken, name: string, text: string): Profile {
+  static create(authToken: IAuthToken, name: string, text: string, sn: string): Profile {
     if (!name.match(Config.user.profile.name.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.name.msg);
     }
     if (!text.match(Config.user.profile.text.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.text.msg);
+    }
+    if (!sn.match(Config.user.profile.sn.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.sn.msg);
     }
 
     let now = new Date();
@@ -135,10 +143,11 @@ export class Profile {
       text,
       StringUtil.md(text),
       now,
-      now);
+      now,
+      sn);
   }
 
-  changeData(authToken: IAuthToken, name: string, text: string) {
+  changeData(authToken: IAuthToken, name: string, text: string, sn: string) {
     if (!authToken.user.equals(this._user)) {
       throw new AtError(StatusCode.MisdirectedRequest, "人のプロフィール変更は出来ません");
     }
@@ -148,9 +157,13 @@ export class Profile {
     if (!text.match(Config.user.profile.text.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.text.msg);
     }
+    if (!sn.match(Config.user.profile.sn.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.sn.msg);
+    }
 
     this._name = name;
     this._text = text;
+    this._sn = sn;
     this._mdtext = StringUtil.md(text);
     this._update = new Date();
   }

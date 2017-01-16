@@ -6,6 +6,7 @@ import { IHistoryDB } from './models/history';
 import { StringUtil } from './util';
 import { Config } from './config';
 import { ITopicDB } from './models/topic';
+import { IProfileDB } from './models/profile';
 
 let updateFunc: (() => Promise<void>)[] = [];
 
@@ -146,6 +147,18 @@ updateFunc.push((async () => {
     promises.push(db.collection("topics").update({ _id: t._id }, { $set: { ageUpdate: t.update } }))
   });
   promises.push(db.collection("reses").update({}, { $set: { age: true } }, { multi: true }))
+
+  await Promise.all(promises);
+}));
+
+updateFunc.push((async () => {
+  let db = await DB;
+  let promises: Promise<any>[] = [];
+
+  let profiles: IProfileDB[] = await db.collection("profiles").find().toArray();
+  profiles.forEach(p => {
+    promises.push(db.collection("profiles").update({ _id: p._id }, { $set: { sn: p._id.toString() } }))
+  });
 
   await Promise.all(promises);
 }));

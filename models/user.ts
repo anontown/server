@@ -152,7 +152,7 @@ export class User {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
     }
 
-    if (!sn.toString().match(Config.user.sn.regex)) {
+    if (!sn.match(Config.user.sn.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.sn.msg);
     }
     let now = new Date();
@@ -166,12 +166,16 @@ export class User {
       0);
   }
 
-  changePass(_authUser: IAuthUser, pass: string) {
+  change(_authUser: IAuthUser, pass: string, sn: string) {
     if (!pass.match(Config.user.pass.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
     }
+    if (!sn.match(Config.user.sn.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.sn.msg);
+    }
 
     this._pass = StringUtil.hash(pass + Config.salt.pass);
+    this._sn = sn;
   }
 
   auth(pass: String): IAuthUser {

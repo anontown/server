@@ -833,18 +833,21 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["name", "text"],
+        required: ["name", "text","sn"],
         properties: {
           name: {
             type: "string"
           },
           text: {
             type: "string"
+          },
+          sn:{
+            type:"string"
           }
         }
       },
-      call: async (params: { name: string, text: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IProfileAPI> => {
-        let profile = Profile.create(authToken, params.name, params.text);
+      call: async (params: { name: string, text: string,sn:string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IProfileAPI> => {
+        let profile = Profile.create(authToken, params.name, params.text,params.sn);
         await Profile.insert(profile);
         appLog("profile/create", ip, "profiles", profile.id);
         return profile.toAPI(authToken);
@@ -918,7 +921,7 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["id", "name", "text"],
+        required: ["id", "name", "text","sn"],
         properties: {
           id: {
             type: "string"
@@ -928,12 +931,15 @@ import * as createDB from './create-db';
           },
           text: {
             type: "string"
+          },
+          sn:{
+            type:"string"
           }
         }
       },
-      call: async (params: { id: string, name: string, text: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IProfileAPI> => {
+      call: async (params: { id: string, name: string, text: string,sn:string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IProfileAPI> => {
         let profile = await Profile.findOne(new ObjectID(params.id));
-        profile.changeData(authToken, params.name, params.text);
+        profile.changeData(authToken, params.name, params.text,params.sn);
         await Profile.update(profile);
         appLog("profile/update", ip, "profiles", profile.id);
         return profile.toAPI(authToken);
@@ -1193,16 +1199,19 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["pass"],
+        required: ["pass","sn"],
         properties: {
           pass: {
             type: "string"
+          },
+          sn:{
+            type:"string"
           }
         }
       },
-      call: async (params: { pass: string }, _authToken: IAuthToken | null, authUser: IAuthUser): Promise<IUserAPI> => {
+      call: async (params: { pass: string ,sn:string}, _authToken: IAuthToken | null, authUser: IAuthUser): Promise<IUserAPI> => {
         let user = await User.findOne(authUser.id);
-        user.changePass(authUser, params.pass);
+        user.change(authUser, params.pass,params.sn);
         User.update(user);
         return user.toAPI();
       }

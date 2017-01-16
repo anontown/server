@@ -27,6 +27,10 @@ interface IConfig {
             text: {
                 regex: string,
                 msg: string
+            },
+            sn: {
+                regex: string,
+                msg: string
             }
         },
         token: {
