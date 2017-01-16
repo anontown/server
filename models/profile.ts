@@ -121,6 +121,10 @@ export class Profile {
     return this._id;
   }
 
+  get sn():string{
+    return this._sn;
+  }
+
   get user(): ObjectID {
     return this._user;
   }

@@ -332,7 +332,7 @@ export class Res {
     }
 
     if (profile !== null) {
-      name += "●" + profile.id.toString();
+      name += "●" + profile.sn;
     }
 
     if (autoName !== null) {
