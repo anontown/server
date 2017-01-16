@@ -159,6 +159,7 @@ updateFunc.push((async () => {
   profiles.forEach(p => {
     promises.push(db.collection("profiles").update({ _id: p._id }, { $set: { sn: p._id.toString() } }))
   });
+  await db.collection("profiles").createIndex({ sn: 1 }, { unique: true });
 
   await Promise.all(promises);
 }));
