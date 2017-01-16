@@ -1,4 +1,4 @@
-import { ObjectID } from 'mongodb';
+import { ObjectID, WriteError } from 'mongodb';
 import { StringUtil } from '../util';
 import { DB } from '../db';
 import { IAuthToken } from '../auth';
@@ -77,13 +77,25 @@ export class Profile {
 
   static async insert(profile: Profile): Promise<null> {
     let db = await DB;
-    await db.collection("profiles").insert(profile.toDB());
+    await db.collection("profiles").insert(profile.toDB()).catch((e: WriteError) => {
+      if (e.code === 11000) {
+        throw new AtError(StatusCode.Conflict, "スクリーンネームが使われています");
+      } else {
+        throw e;
+      }
+    });
     return null;
   }
 
   static async update(profile: Profile): Promise<null> {
     let db = await DB;
-    await db.collection("profiles").update({ _id: profile._id }, profile.toDB());
+    await db.collection("profiles").update({ _id: profile._id }, profile.toDB()).catch((e: WriteError) => {
+      if (e.code === 11000) {
+        throw new AtError(StatusCode.Conflict, "スクリーンネームが使われています");
+      } else {
+        throw e;
+      }
+    });
     return null;
   }
 
@@ -121,7 +133,7 @@ export class Profile {
     return this._id;
   }
 
-  get sn():string{
+  get sn(): string {
     return this._sn;
   }
 

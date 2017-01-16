@@ -100,7 +100,13 @@ export class User {
 
   static async update(user: User): Promise<null> {
     let db = await DB;
-    await db.collection("users").update({ _id: user._id }, user.toDB());
+    await db.collection("users").update({ _id: user._id }, user.toDB()).catch((e: WriteError) => {
+      if (e.code === 11000) {
+        throw new AtError(StatusCode.Conflict, "スクリーンネームが使われています");
+      } else {
+        throw e;
+      }
+    });
     return null;
   }
 
