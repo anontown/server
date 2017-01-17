@@ -9,6 +9,12 @@ import { AtError, StatusCode } from '../at-error'
 import { Config } from '../config';
 import { StringUtil } from '../util';
 
+interface IVote {
+  user: ObjectID,
+  value: number,
+  lv: number
+}
+
 export interface IResDB {
   _id: ObjectID,
   topic: ObjectID,
@@ -19,8 +25,7 @@ export interface IResDB {
   mdtext: string,
   reply: { res: ObjectID, user: ObjectID } | null,
   deleteFlag: ResDeleteFlag,
-  vote: number,
-  voteUser: ObjectID[],
+  vote: IVote[],
   lv: number,
   hash: string,
   profile: ObjectID | null,
@@ -37,14 +42,16 @@ export interface IResAPI {
   mdtext: string,
   reply: string | null,
   deleteFlag: ResDeleteFlag,
-  vote: number,
+  uv: number,
+  dv: number,
   hash: string,
   profile: string | null,
   replyCount: number,
-  isVote: boolean | null,
+  voteFlag: VoteFlag | null,
   isReply: boolean | null
 }
 
+export type VoteFlag = "uv" | "dv" | "not";
 export type ResDeleteFlag = "active" | "self" | "vote" | "freeze";
 
 export class Res {
@@ -60,13 +67,22 @@ export class Res {
     private _mdtext: string,
     private _reply: { res: ObjectID, user: ObjectID } | null,
     private _deleteFlag: ResDeleteFlag,
-    private _vote: number,
-    private _voteUser: ObjectID[],
+    private _vote: IVote[],
     private _lv: number,
     private _hash: string,
     private _profile: ObjectID | null,
     private _replyCount: number,
     private _age: boolean) {
+  }
+
+  get voteValue(): number {
+    if (this._vote.length === 0) {
+      return 0;
+    } else {
+      return this._vote
+        .map(x => x.value)
+        .reduce((x, y) => x + y);
+    }
   }
 
   get age(): boolean {
@@ -246,7 +262,6 @@ export class Res {
       reply: this._reply,
       deleteFlag: this._deleteFlag,
       vote: this._vote,
-      voteUser: this._voteUser,
       lv: this._lv,
       hash: this._hash,
       profile: this._profile,
@@ -285,11 +300,16 @@ export class Res {
         break;
     }
 
-    let isVote: boolean | null;
+    let voteFlag: VoteFlag | null;
     if (authToken === null) {
-      isVote = null;
+      voteFlag = null;
     } else {
-      isVote = this._voteUser.find((id) => authToken.user.equals(id)) !== undefined;
+      let vote = this._vote.find((v) => authToken.user.equals(v.user));
+      if (vote === undefined) {
+        voteFlag = "not";
+      } else {
+        voteFlag = vote.value > 0 ? "uv" : "dv";
+      }
     }
 
     return {
@@ -302,17 +322,18 @@ export class Res {
       mdtext: mdtext,
       reply: this._reply !== null ? this._reply.res.toString() : null,
       deleteFlag: this._deleteFlag,
-      vote: this._vote,
+      uv: this._vote.filter(x => x.value > 0).length,
+      dv: this._vote.filter(x => x.value < 0).length,
       hash: this._hash,
       profile: this._profile !== null ? this._profile.toString() : null,
       replyCount: this._replyCount,
-      isVote,
+      voteFlag,
       isReply: authToken === null || this._reply === null ? null : authToken.user.equals(this._reply.user)
     };
   }
 
   static fromDB(r: IResDB, replyCount: number): Res {
-    return new Res(r._id, r.topic, r.date, r.user, r.name, r.text, r.mdtext, r.reply, r.deleteFlag, r.vote, r.voteUser, r.lv, r.hash, r.profile, replyCount, r.age)
+    return new Res(r._id, r.topic, r.date, r.user, r.name, r.text, r.mdtext, r.reply, r.deleteFlag, r.vote, r.lv, r.hash, r.profile, replyCount, r.age)
   }
 
   static create(topic: Topic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean): Res {
@@ -364,7 +385,6 @@ export class Res {
       StringUtil.md(text),
       reply !== null ? { res: reply._id, user: reply._user } : null,
       "active",
-      0,
       [],
       user.lv * 5,
       topic.hash(date, user),
@@ -379,34 +399,44 @@ export class Res {
     if (user.id.equals(this._user)) {
       throw new AtError(StatusCode.Forbidden, "自分に投票は出来ません");
     }
-    if (this._voteUser.find(x => x.equals(user.id)) !== undefined) {
-      throw new AtError(StatusCode.Forbidden, "投票は一回までです");
+    if (this._vote.find(x => x.user.equals(user.id)) !== undefined) {
+      throw new AtError(StatusCode.Forbidden, "既に投票しています");
     }
-    this._voteUser.push(user.id);
-    resUser.changeLv(resUser.lv + Math.floor(user.lv / 100) + 1);
-    this._vote += user.lv;
+    let lv = Math.floor(user.lv / 100) + 1;
+    this._vote.push({ user: user.id, value: user.lv, lv });
+    resUser.changeLv(resUser.lv + lv);
   }
 
   dv(resUser: User, user: User, _authToken: IAuthToken): Msg | null {
     if (user.id.equals(this._user)) {
       throw new AtError(StatusCode.Forbidden, "自分に投票は出来ません");
     }
-    if (this._voteUser.find(x => x.equals(user.id)) !== undefined) {
-      throw new AtError(StatusCode.Forbidden, "投票は一回までです");
+    if (this._vote.find(x => x.user.equals(user.id)) !== undefined) {
+      throw new AtError(StatusCode.Forbidden, "既に投票しています");
     }
-    this._voteUser.push(user.id);
-    resUser.changeLv(resUser.lv - Math.floor(user.lv / 100) - 1);
-    //低評価1回で削除されないように
-    this._vote -= Math.min(user.lv, Math.ceil(this._lv / 3));
+
+    let lv = -Math.floor(user.lv / 100) - 1;
+    this._vote.push({ user: user.id, value: -Math.min(user.lv, Math.ceil(this._lv / 3)), lv });
+    resUser.changeLv(resUser.lv + lv);
+
 
     let msg: Msg | null;
-    if (this._vote < -this._lv && (this._deleteFlag === "active" || this._deleteFlag === "self")) {
+    if (this.voteValue < -this._lv && (this._deleteFlag === "active" || this._deleteFlag === "self")) {
       this._deleteFlag = "vote";
       msg = Msg.create(resUser, "投票により書き込みが削除されました。");
     } else {
       msg = null;
     }
     return msg;
+  }
+
+  cv(resUser: User, user: User, _authToken: IAuthToken) {
+    let vote = this._vote.find(x => x.user.equals(user.id));
+    if (vote === undefined) {
+      throw new AtError(StatusCode.Forbidden, "投票していません");
+    }
+    this._vote.splice(this._vote.indexOf(vote), 1);
+    resUser.changeLv(resUser.lv - vote.value);
   }
 
   del(resUser: User, authToken: IAuthToken) {

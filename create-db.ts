@@ -164,6 +164,12 @@ updateFunc.push((async () => {
   await Promise.all(promises);
 }));
 
+updateFunc.push((async () => {
+  let db = await DB;
+
+  await db.collection("reses").update({}, { $set: { vote: [] }, $unset: { voteUser: 1 } }, { multi: true });
+}));
+
 
 /*
   -----------------------------------------------------------------------------

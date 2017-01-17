@@ -78,7 +78,7 @@ import * as createDB from './create-db';
         text: string,
         reply: string | null,
         profile: string | null,
-        age:boolean
+        age: boolean
       }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IResAPI> => {
         let val = await Promise.all([
           Topic.findOne(new ObjectID(params.topic)),
@@ -412,6 +412,48 @@ import * as createDB from './create-db';
         }
 
         await Promise.all(promise);
+
+        return res.toAPI(authToken);
+      }
+    });
+
+    api.addAPI({
+      url: "/res/cv",
+
+      isAuthUser: false,
+      isAuthToken: true,
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["id"],
+        properties: {
+          id: {
+            type: "string"
+          }
+        }
+      },
+      call: async (params: { id: string }, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<IResAPI> => {
+        let val = await Promise.all([
+          Res.findOne(new ObjectID(params.id)),
+          User.findOne(authToken.user)
+        ]);
+
+        //レス
+        let res = val[0];
+
+        //投票するユーザー
+        let user = val[1];
+
+        //レスを書き込んだユーザー
+        let resUser = await User.findOne(res.user);
+
+        res.cv(resUser, user, authToken);
+
+        await Promise.all([
+          Res.update(res),
+          User.update(resUser),
+          User.update(user)
+        ]);
 
         return res.toAPI(authToken);
       }
@@ -833,7 +875,7 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["name", "text","sn"],
+        required: ["name", "text", "sn"],
         properties: {
           name: {
             type: "string"
@@ -841,13 +883,13 @@ import * as createDB from './create-db';
           text: {
             type: "string"
           },
-          sn:{
-            type:"string"
+          sn: {
+            type: "string"
           }
         }
       },
-      call: async (params: { name: string, text: string,sn:string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IProfileAPI> => {
-        let profile = Profile.create(authToken, params.name, params.text,params.sn);
+      call: async (params: { name: string, text: string, sn: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IProfileAPI> => {
+        let profile = Profile.create(authToken, params.name, params.text, params.sn);
         await Profile.insert(profile);
         appLog("profile/create", ip, "profiles", profile.id);
         return profile.toAPI(authToken);
@@ -921,7 +963,7 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["id", "name", "text","sn"],
+        required: ["id", "name", "text", "sn"],
         properties: {
           id: {
             type: "string"
@@ -932,14 +974,14 @@ import * as createDB from './create-db';
           text: {
             type: "string"
           },
-          sn:{
-            type:"string"
+          sn: {
+            type: "string"
           }
         }
       },
-      call: async (params: { id: string, name: string, text: string,sn:string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IProfileAPI> => {
+      call: async (params: { id: string, name: string, text: string, sn: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IProfileAPI> => {
         let profile = await Profile.findOne(new ObjectID(params.id));
-        profile.changeData(authToken, params.name, params.text,params.sn);
+        profile.changeData(authToken, params.name, params.text, params.sn);
         await Profile.update(profile);
         appLog("profile/update", ip, "profiles", profile.id);
         return profile.toAPI(authToken);
@@ -1199,19 +1241,19 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["pass","sn"],
+        required: ["pass", "sn"],
         properties: {
           pass: {
             type: "string"
           },
-          sn:{
-            type:"string"
+          sn: {
+            type: "string"
           }
         }
       },
-      call: async (params: { pass: string ,sn:string}, _authToken: IAuthToken | null, authUser: IAuthUser): Promise<IUserAPI> => {
+      call: async (params: { pass: string, sn: string }, _authToken: IAuthToken | null, authUser: IAuthUser): Promise<IUserAPI> => {
         let user = await User.findOne(authUser.id);
-        user.change(authUser, params.pass,params.sn);
+        user.change(authUser, params.pass, params.sn);
         User.update(user);
         return user.toAPI();
       }
