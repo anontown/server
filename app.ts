@@ -517,7 +517,7 @@ import * as createDB from './create-db';
           },
           type: {
             type: "string",
-            enum: ["normal", "board"]
+            enum: ["normal", "board","one"]
           }
         }
       },
@@ -539,10 +539,11 @@ import * as createDB from './create-db';
         await Promise.all([
           User.update(user),
           Res.insert(create.res),
-          History.insert(create.history)
+          create.history?History.insert(create.history):Promise.resolve()
         ]);
-
-        appLog("topic/create", ip, "histories", create.history.id);
+        if(create.history){
+          appLog("topic/create", ip, "histories", create.history.id);
+        }
         return create.topic.toAPI();
       }
     });
@@ -614,7 +615,7 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["title", "category", "skip", "limit"],
+        required: ["title", "category", "skip", "limit","activeOnly"],
         properties: {
           title: {
             type: "string"
@@ -630,11 +631,14 @@ import * as createDB from './create-db';
           },
           limit: {
             type: "number"
+          },
+          activeOnly:{
+            type:"boolean"
           }
         }
       },
-      call: async (params: { title: string, category: string[], skip: number, limit: number }, _authToken: IAuthToken | null, _authUser: IAuthUser | null): Promise<ITopicAPI[]> => {
-        let topic = await Topic.find(params.title, params.category, params.skip, params.limit)
+      call: async (params: { title: string, category: string[], skip: number, limit: number,activeOnly:boolean }, _authToken: IAuthToken | null, _authUser: IAuthUser | null): Promise<ITopicAPI[]> => {
+        let topic = await Topic.find(params.title, params.category, params.skip, params.limit,params.activeOnly)
         return topic.map(t => t.toAPI());
       }
     });

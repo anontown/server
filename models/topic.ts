@@ -7,7 +7,7 @@ import { IAuthToken } from '../auth';
 import { AtError, StatusCode } from '../at-error'
 import { Config } from '../config';
 import { StringUtil } from '../util';
-
+import { CronJob } from 'cron';
 export interface ITopicDB {
   _id: ObjectID,
   title: string,
@@ -17,7 +17,8 @@ export interface ITopicDB {
   update: Date,
   date: Date,
   type: TopicType,
-  ageUpdate: Date
+  ageUpdate: Date,
+  active: boolean
 }
 
 export interface ITopicAPI {
@@ -29,10 +30,11 @@ export interface ITopicAPI {
   update: string,
   date: string,
   resCount: number,
-  type: TopicType
+  type: TopicType,
+  active: boolean
 }
 
-export type TopicType = "normal" | "board";
+export type TopicType = "one" | "normal" | "board";
 
 export class Topic {
   private constructor(private _id: ObjectID,
@@ -44,8 +46,13 @@ export class Topic {
     private _date: Date,
     private _resCount: number,
     private _type: TopicType,
-    private _ageUpdate: Date) {
+    private _ageUpdate: Date,
+    private _active: boolean) {
 
+  }
+
+  get active(): boolean {
+    return this._active;
   }
 
   get title(): string {
@@ -99,7 +106,7 @@ export class Topic {
     return this.aggregate(topics);
   }
 
-  static async find(title: string, category: string[], skip: number, limit: number): Promise<Topic[]> {
+  static async find(title: string, category: string[], skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
     let db = await DB;
 
     let topics: ITopicDB[] = await db.collection("topics")
@@ -112,7 +119,11 @@ export class Topic {
           query["category." + i] = v;
         });
 
-        query["type"] = "normal";
+        query["type"] = { $in: ["normal", "one"] };
+
+        if (activeOnly) {
+          query["active"] = true;
+        }
 
         return query;
       })())
@@ -179,7 +190,8 @@ export class Topic {
       update: this._update,
       date: this._date,
       type: this._type,
-      ageUpdate: this._ageUpdate
+      ageUpdate: this._ageUpdate,
+      active: this._active
     }
   }
 
@@ -193,12 +205,13 @@ export class Topic {
       update: this._update.toISOString(),
       date: this._date.toISOString(),
       resCount: this._resCount,
-      type: this._type
+      type: this._type,
+      active: this._active
     }
   }
 
   static fromDB(t: ITopicDB, resCount: number): Topic {
-    return new Topic(t._id, t.title, t.category, t.text, t.mdtext, t.update, t.date, resCount, t.type, t.ageUpdate);
+    return new Topic(t._id, t.title, t.category, t.text, t.mdtext, t.update, t.date, resCount, t.type, t.ageUpdate, t.active);
   }
 
 
@@ -207,28 +220,63 @@ export class Topic {
   }
 
   resUpdate(res: Res) {
+    if (!this._active) {
+      throw new AtError(StatusCode.Forbidden, "トピックが落ちているので書き込めません")
+    }
+
     this._update = res.date;
     if (res.age) {
       this._ageUpdate = res.date;
     }
   }
 
-  static create(title: string, category: string[], text: string, user: User, type: TopicType, authToken: IAuthToken): { topic: Topic, res: Res, history: History } {
+  static create(title: string, category: string[], text: string, user: User, type: TopicType, authToken: IAuthToken): { topic: Topic, res: Res, history: History | null } {
     if (type === "board") {
       user.usePoint(30);
     }
 
     var now = new Date();
-    var topic = new Topic(new ObjectID(), title, category, text, StringUtil.md(text), now, now, 1, type, now);
-    var cd = topic.changeData(user, authToken, title, category, text);
-    user.changeLastTopic(now);
+    var topic = new Topic(new ObjectID(), title, category, text, StringUtil.md(text), now, now, 1, type, now, true);
+    let cd: { history: History | null, res: Res };
+    if (type === "one") {
+      cd = {
+        history: null,
+        res: Res.create(topic, user, authToken, "", "トピ主", "トピックが建ちました", null, null, true)
+      };
+      user.changeLastOneTopic(now);
+    } else {
+      cd = topic.changeData(user, authToken, title, category, text);
+      user.changeLastTopic(now);
+    }
     return { topic, history: cd.history, res: cd.res };
+  }
+
+  static cron() {
+    //毎時間トピ落ちチェック
+    new CronJob({
+      cronTime: '00 00 * * * *',
+      onTick: async () => {
+        let db = await DB;
+        await db.collection("topics")
+          .update({ type: "one", update: { $lt: new Date(Date.now() - 1000 * 60 * 60 * 24) }, active: true },
+          { $set: { active: false } },
+          { multi: true });
+      },
+      start: false,
+      timeZone: 'Asia/Tokyo'
+    }).start();
   }
 
   //{{setter
   changeData(user: User, authToken: IAuthToken, title: string, category: string[], text: string): { res: Res, history: History } {
     user.usePoint(10);
 
+    if (this._type === "one") {
+      throw new AtError(StatusCode.Forbidden, "単発トピックは編集出来ません");
+    }
+    if (!this._active) {
+      throw new AtError(StatusCode.Forbidden, "トピックが落ちているので編集出来ません");
+    }
     if (!title.match(Config.topic.title.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.topic.title.msg);
     }

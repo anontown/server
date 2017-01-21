@@ -170,6 +170,12 @@ updateFunc.push((async () => {
   await db.collection("reses").update({}, { $set: { vote: [] }, $unset: { voteUser: 1 } }, { multi: true });
 }));
 
+updateFunc.push((async () => {
+  let db = await DB;
+
+  await db.collection("users").update({}, { $set: { lastOneTopic: new Date() } }, { multi: true });
+  await db.collection("topics").update({}, { $set: { active: true } }, { multi: true });
+}));
 
 /*
   -----------------------------------------------------------------------------

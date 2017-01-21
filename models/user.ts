@@ -15,6 +15,7 @@ interface IUserDB {
   lastTopic: Date,
   date: Date,
   point: number
+  lastOneTopic: Date
 }
 
 export interface IUserAPI {
@@ -41,7 +42,8 @@ export class User {
     private _lastTopic: Date,
     private _date: Date,
     //毎日リセットされ、特殊動作をすると増えるポイント
-    private _point: number) {
+    private _point: number,
+    private _lastOneTopic: Date) {
 
   }
 
@@ -54,7 +56,8 @@ export class User {
       resWait: this._resWait,
       lastTopic: this._lastTopic,
       date: this._date,
-      point: this._point
+      point: this._point,
+      lastOneTopic: this._lastOneTopic
     }
   }
 
@@ -111,7 +114,7 @@ export class User {
   }
 
   static fromDB(u: IUserDB): User {
-    return new User(u._id, u.sn, u.pass, u.lv, u.resWait, u.lastTopic, u.date, u.point);
+    return new User(u._id, u.sn, u.pass, u.lv, u.resWait, u.lastTopic, u.date, u.point, u.lastOneTopic);
   }
 
   get id(): ObjectID {
@@ -169,7 +172,8 @@ export class User {
       { last: now, m10: 0, m30: 0, h1: 0, h6: 0, h12: 0, d1: 0 },
       now,
       now,
-      0);
+      0,
+      now);
   }
 
   change(_authUser: IAuthUser, pass: string, sn: string) {
@@ -239,6 +243,13 @@ export class User {
     } else {
       throw new AtError(StatusCode.Forbidden, "連続書き込みはできません");
     }
+  }
 
+  changeLastOneTopic(lastTopic: Date) {
+    if (this._lastOneTopic.getTime() + 1000 * 60 * 10 < lastTopic.getTime()) {
+      this._lastOneTopic = lastTopic;
+    } else {
+      throw new AtError(StatusCode.Forbidden, "連続書き込みはできません");
+    }
   }
 }
