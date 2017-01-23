@@ -1398,4 +1398,5 @@ import * as createDB from './create-db';
 
   //cron
   User.cron();
+  Topic.cron();
 })();
