@@ -630,6 +630,26 @@ import * as createDB from './create-db';
     });
 
     api.addAPI({
+      url: "/topic/tags/find",
+
+      isAuthUser: false,
+      isAuthToken: false,
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["limit"],
+        properties: {
+          limit: {
+            type: "number"
+          }
+        }
+      },
+      call: async (params: { limit:number }, _authToken: IAuthToken | null, _authUser: IAuthUser | null): Promise<{name:string,count:number}[]> => {
+        return await Topic.findTags(params.limit)
+      }
+    });
+
+    api.addAPI({
       url: "/topic/update",
 
       isAuthUser: false,

@@ -96,18 +96,20 @@ export class Topic {
     return this.aggregate(topics);
   }
 
-  /*static async findTags(): Promise<{name:string,count:number}[]> {
+  static async findTags(limit: number): Promise<{ name: string, count: number }[]> {
     let db = await DB;
 
-    let data: any[] = await db.collection("topics")
+    let data: { _id: string, count: number }[] = await db.collection("topics")
       .aggregate([
-          {$unwind:"$tags"},
-          {$group: { _id:"$tags", count:{$sum:1} } },
-          {$out:"tagStats"}
-        ]);
+        { $unwind: "$tags" },
+        { $group: { _id: "$tags", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: limit }
+      ])
+      .toArray();
 
-    return this.aggregate(topics);
-  }*/
+    return data.map(x => ({ name: x._id, count: x.count }));
+  }
 
   static async find(title: string, tags: string[], skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
     let db = await DB;
@@ -118,7 +120,7 @@ export class Topic {
           title: new RegExp(title.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
         };
 
-        query["tags"]={$all:tags};
+        query["tags"] = { $all: tags };
 
         query["type"] = { $in: ["normal", "one"] };
 
@@ -223,8 +225,8 @@ export class Topic {
   }
 
   static create(title: string, tags: string[], text: string, user: User, type: TopicType, authToken: IAuthToken): { topic: Topic, res: Res, history: History | null } {
-    if(tags.length!==new Set(tags).size){
-      throw new AtError(StatusCode.MisdirectedRequest,"タグの重複があります");
+    if (tags.length !== new Set(tags).size) {
+      throw new AtError(StatusCode.MisdirectedRequest, "タグの重複があります");
     }
     var now = new Date();
     var topic = new Topic(new ObjectID(), title, tags, text, StringUtil.md(text), now, now, 1, type, now, true);
@@ -262,8 +264,8 @@ export class Topic {
   changeData(user: User, authToken: IAuthToken, title: string, tags: string[], text: string): { res: Res, history: History } {
     user.usePoint(10);
 
-    if(tags.length!==new Set(tags).size){
-      throw new AtError(StatusCode.MisdirectedRequest,"タグの重複があります");
+    if (tags.length !== new Set(tags).size) {
+      throw new AtError(StatusCode.MisdirectedRequest, "タグの重複があります");
     }
     if (this._type === "one") {
       throw new AtError(StatusCode.Forbidden, "単発トピックは編集出来ません");
