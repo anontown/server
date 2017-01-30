@@ -517,7 +517,7 @@ import * as createDB from './create-db';
           },
           type: {
             type: "string",
-            enum: ["normal", "board","one"]
+            enum: ["normal", "one"]
           }
         }
       },
