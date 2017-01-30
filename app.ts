@@ -630,7 +630,7 @@ import * as createDB from './create-db';
     });
 
     api.addAPI({
-      url: "/topic/tags/find",
+      url: "/topic/find/tags",
 
       isAuthUser: false,
       isAuthToken: false,
