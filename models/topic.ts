@@ -120,7 +120,9 @@ export class Topic {
           title: new RegExp(title.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
         };
 
-        query["tags"] = { $all: tags };
+        if(tags.length!==0){
+          query["tags"] = { $all: tags };
+        }
 
         query["type"] = { $in: ["normal", "one"] };
 
