@@ -8,7 +8,7 @@ export interface IHistoryDB {
   _id: ObjectID,
   topic: ObjectID,
   title: string,
-  category: string[],
+  tags: string[],
   text: string,
   mdtext: string,
   date: Date,
@@ -20,7 +20,7 @@ export interface IHistoryAPI {
   id: string,
   topic: string,
   title: string,
-  category: string[],
+  tags: string[],
   text: string,
   mdtext: string,
   date: string,
@@ -31,7 +31,7 @@ export class History {
   private constructor(private _id: ObjectID,
     private _topic: ObjectID,
     private _title: string,
-    private _category: string[],
+    private _tags: string[],
     private _text: string,
     private _mdtext: string,
     private _date: Date,
@@ -95,7 +95,7 @@ export class History {
       _id: this._id,
       topic: this._topic,
       title: this._title,
-      category: this._category,
+      tags: this._tags,
       text: this._text,
       mdtext: this._mdtext,
       date: this._date,
@@ -109,7 +109,7 @@ export class History {
       id: this._id.toString(),
       topic: this._topic.toString(),
       title: this._title,
-      category: this._category,
+      tags: this._tags,
       text: this._text,
       mdtext: this._mdtext,
       date: this._date.toISOString(),
@@ -118,10 +118,10 @@ export class History {
   }
 
   static fromDB(h: IHistoryDB): History {
-    return new History(h._id, h.topic, h.title, h.category, h.text, h.mdtext, h.date, h.hash, h.user);
+    return new History(h._id, h.topic, h.title, h.tags, h.text, h.mdtext, h.date, h.hash, h.user);
   }
 
   static create(topic: Topic, date: Date, hash: string, user: User): History {
-    return new History(new ObjectID(), topic.id, topic.title, topic.category, topic.text, topic.mdtext, date, hash, user.id);
+    return new History(new ObjectID(), topic.id, topic.title, topic.tags, topic.text, topic.mdtext, date, hash, user.id);
   }
 }

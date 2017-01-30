@@ -177,6 +177,15 @@ updateFunc.push((async () => {
   await db.collection("topics").update({}, { $set: { active: true } }, { multi: true });
 }));
 
+updateFunc.push((async () => {
+  let db = await DB;
+
+  await db.dropCollection("boards");
+  await db.collection("topics").update({type:"board"}, { $set:{type:"normal",active:false} }, { multi: true }); 
+  await db.collection("topics").update({}, { $rename:{category:"tags"} }, { multi: true });
+  await db.collection("histories").update({}, { $rename:{category:"tags"} }, { multi: true });
+}));
+
 /*
   -----------------------------------------------------------------------------
 */

@@ -58,7 +58,7 @@ interface IConfig {
             regex: string,
             msg: string
         },
-        category: {
+        tags: {
             regex: string,
             max: number,
             msg: string

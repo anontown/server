@@ -1,4 +1,4 @@
-import { ObjectID, WriteError } from 'mongodb';
+import { ObjectID } from 'mongodb';
 import { User } from './user';
 import { Res } from './res';
 import { History } from './history';
@@ -11,7 +11,7 @@ import { CronJob } from 'cron';
 export interface ITopicDB {
   _id: ObjectID,
   title: string,
-  category: string[],
+  tags: string[],
   text: string,
   mdtext: string,
   update: Date,
@@ -24,7 +24,7 @@ export interface ITopicDB {
 export interface ITopicAPI {
   id: string,
   title: string,
-  category: string[],
+  tags: string[],
   text: string,
   mdtext: string,
   update: string,
@@ -34,12 +34,12 @@ export interface ITopicAPI {
   active: boolean
 }
 
-export type TopicType = "one" | "normal" | "board";
+export type TopicType = "one" | "normal";
 
 export class Topic {
   private constructor(private _id: ObjectID,
     private _title: string,
-    private _category: string[],
+    private _tags: string[],
     private _text: string,
     private _mdtext: string,
     private _update: Date,
@@ -59,8 +59,8 @@ export class Topic {
     return this._title;
   }
 
-  get category(): string[] {
-    return this._category;
+  get tags(): string[] {
+    return this._tags;
   }
 
   get text(): string {
@@ -96,17 +96,20 @@ export class Topic {
     return this.aggregate(topics);
   }
 
-  static async findBoard(): Promise<Topic[]> {
+  /*static async findTags(): Promise<{name:string,count:number}[]> {
     let db = await DB;
 
-    let topics: ITopicDB[] = await db.collection("topics").find({ type: "board" })
-      .sort({ ageUpdate: -1 })
-      .toArray();
+    let data: any[] = await db.collection("topics")
+      .aggregate([
+          {$unwind:"$tags"},
+          {$group: { _id:"$tags", count:{$sum:1} } },
+          {$out:"tagStats"}
+        ]);
 
     return this.aggregate(topics);
-  }
+  }*/
 
-  static async find(title: string, category: string[], skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
+  static async find(title: string, tags: string[], skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
     let db = await DB;
 
     let topics: ITopicDB[] = await db.collection("topics")
@@ -115,9 +118,7 @@ export class Topic {
           title: new RegExp(title.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
         };
 
-        category.forEach((v, i) => {
-          query["category." + i] = v;
-        });
+        query["tags"]={$all:tags};
 
         query["type"] = { $in: ["normal", "one"] };
 
@@ -161,15 +162,6 @@ export class Topic {
 
   static async insert(topic: Topic): Promise<null> {
     let db = await DB;
-    if (topic._type === "board") {
-      await db.collection("boards").insert({ category: topic._category.join("/") }).catch((e: WriteError) => {
-        if (e.code === 11000) {
-          throw new AtError(StatusCode.Conflict, "既に板が存在します");
-        } else {
-          throw e;
-        }
-      });
-    }
     await db.collection("topics").insert(topic.toDB());
     return null;
   }
@@ -184,7 +176,7 @@ export class Topic {
     return {
       _id: this._id,
       title: this._title,
-      category: this._category,
+      tags: this._tags,
       text: this._text,
       mdtext: this._mdtext,
       update: this._update,
@@ -199,7 +191,7 @@ export class Topic {
     return {
       id: this._id.toString(),
       title: this._title,
-      category: this._category,
+      tags: this._tags,
       text: this._text,
       mdtext: this._mdtext,
       update: this._update.toISOString(),
@@ -211,7 +203,7 @@ export class Topic {
   }
 
   static fromDB(t: ITopicDB, resCount: number): Topic {
-    return new Topic(t._id, t.title, t.category, t.text, t.mdtext, t.update, t.date, resCount, t.type, t.ageUpdate, t.active);
+    return new Topic(t._id, t.title, t.tags, t.text, t.mdtext, t.update, t.date, resCount, t.type, t.ageUpdate, t.active);
   }
 
 
@@ -230,13 +222,12 @@ export class Topic {
     }
   }
 
-  static create(title: string, category: string[], text: string, user: User, type: TopicType, authToken: IAuthToken): { topic: Topic, res: Res, history: History | null } {
-    if (type === "board") {
-      user.usePoint(30);
+  static create(title: string, tags: string[], text: string, user: User, type: TopicType, authToken: IAuthToken): { topic: Topic, res: Res, history: History | null } {
+    if(tags.length!==new Set(tags).size){
+      throw new AtError(StatusCode.MisdirectedRequest,"タグの重複があります");
     }
-
     var now = new Date();
-    var topic = new Topic(new ObjectID(), title, category, text, StringUtil.md(text), now, now, 1, type, now, true);
+    var topic = new Topic(new ObjectID(), title, tags, text, StringUtil.md(text), now, now, 1, type, now, true);
     let cd: { history: History | null, res: Res };
     if (type === "one") {
       cd = {
@@ -245,7 +236,7 @@ export class Topic {
       };
       user.changeLastOneTopic(now);
     } else {
-      cd = topic.changeData(user, authToken, title, category, text);
+      cd = topic.changeData(user, authToken, title, tags, text);
       user.changeLastTopic(now);
     }
     return { topic, history: cd.history, res: cd.res };
@@ -268,9 +259,12 @@ export class Topic {
   }
 
   //{{setter
-  changeData(user: User, authToken: IAuthToken, title: string, category: string[], text: string): { res: Res, history: History } {
+  changeData(user: User, authToken: IAuthToken, title: string, tags: string[], text: string): { res: Res, history: History } {
     user.usePoint(10);
 
+    if(tags.length!==new Set(tags).size){
+      throw new AtError(StatusCode.MisdirectedRequest,"タグの重複があります");
+    }
     if (this._type === "one") {
       throw new AtError(StatusCode.Forbidden, "単発トピックは編集出来ません");
     }
@@ -280,12 +274,12 @@ export class Topic {
     if (!title.match(Config.topic.title.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.topic.title.msg);
     }
-    if (category.length > Config.topic.category.max) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.topic.category.msg);
+    if (tags.length > Config.topic.tags.max) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.topic.tags.msg);
     }
-    category.forEach(x => {
-      if (!x.match(Config.topic.category.regex)) {
-        throw new AtError(StatusCode.MisdirectedRequest, Config.topic.category.msg);
+    tags.forEach(x => {
+      if (!x.match(Config.topic.tags.regex)) {
+        throw new AtError(StatusCode.MisdirectedRequest, Config.topic.tags.msg);
       }
     });
     if (!text.match(Config.topic.text.regex)) {
@@ -296,7 +290,7 @@ export class Topic {
 
     this._title = title;
     if (this._type === "normal") {
-      this._category = category;
+      this._tags = tags;
     }
     this._text = text;
     this._mdtext = StringUtil.md(text);
@@ -319,21 +313,5 @@ export class Topic {
 
       //ソルト依存
       Config.salt.hash);
-  }
-
-  inCategory(category: string[]): boolean {
-    if (category.length > this._category.length) {
-      //引数の方の長さが大きいなら
-      return false;
-    } else {
-      //長さが同じならもしくは引数の方が短い
-      for (let i = 0; i < category.length; i++) {
-        if (category[i] !== this._category[i]) {
-          return false;
-        }
-      }
-    }
-
-    return true;
   }
 }

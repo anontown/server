@@ -501,12 +501,12 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["title", "category", "text", "type"],
+        required: ["title", "tags", "text", "type"],
         properties: {
           title: {
             type: "string"
           },
-          category: {
+          tags: {
             type: "array",
             items: {
               "type": "string"
@@ -523,13 +523,13 @@ import * as createDB from './create-db';
       },
       call: async (params: {
         title: string,
-        category: string[],
+        tags: string[],
         text: string,
         type: TopicType
       }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<ITopicAPI> => {
         let user = await User.findOne(authToken.user);
         let create = Topic.create(params.title,
-          params.category,
+          params.tags,
           params.text,
           user,
           params.type,
@@ -594,20 +594,6 @@ import * as createDB from './create-db';
     });
 
     api.addAPI({
-      url: "/topic/find/board",
-
-      isAuthUser: false,
-      isAuthToken: false,
-      schema: {
-        type: "null"
-      },
-      call: async (_params: null, _authToken: IAuthToken | null, _authUser: IAuthUser | null): Promise<ITopicAPI[]> => {
-        let topics = await Topic.findBoard();
-        return topics.map(t => t.toAPI());
-      }
-    });
-
-    api.addAPI({
       url: "/topic/find",
 
       isAuthUser: false,
@@ -615,12 +601,12 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["title", "category", "skip", "limit","activeOnly"],
+        required: ["title", "tags", "skip", "limit","activeOnly"],
         properties: {
           title: {
             type: "string"
           },
-          category: {
+          tags: {
             type: "array",
             items: {
               "type": "string"
@@ -637,8 +623,8 @@ import * as createDB from './create-db';
           }
         }
       },
-      call: async (params: { title: string, category: string[], skip: number, limit: number,activeOnly:boolean }, _authToken: IAuthToken | null, _authUser: IAuthUser | null): Promise<ITopicAPI[]> => {
-        let topic = await Topic.find(params.title, params.category, params.skip, params.limit,params.activeOnly)
+      call: async (params: { title: string, tags: string[], skip: number, limit: number,activeOnly:boolean }, _authToken: IAuthToken | null, _authUser: IAuthUser | null): Promise<ITopicAPI[]> => {
+        let topic = await Topic.find(params.title, params.tags, params.skip, params.limit,params.activeOnly)
         return topic.map(t => t.toAPI());
       }
     });
@@ -651,7 +637,7 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["id", "title", "category", "text"],
+        required: ["id", "title", "tags", "text"],
         properties: {
           id: {
             type: "string"
@@ -659,7 +645,7 @@ import * as createDB from './create-db';
           title: {
             type: "string"
           },
-          category: {
+          tags: {
             type: "array",
             items: {
               "type": "string"
@@ -670,7 +656,7 @@ import * as createDB from './create-db';
           }
         }
       },
-      call: async (params: { id: string, title: string, category: string[], text: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip): Promise<ITopicAPI> => {
+      call: async (params: { id: string, title: string, tags: string[], text: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip): Promise<ITopicAPI> => {
         let val = await Promise.all([
           Topic.findOne(new ObjectID(params.id)),
           User.findOne(authToken.user)
@@ -679,7 +665,7 @@ import * as createDB from './create-db';
         let topic = val[0];
         let user = val[1];
 
-        let val2 = topic.changeData(user, authToken, params.title, params.category, params.text);
+        let val2 = topic.changeData(user, authToken, params.title, params.tags, params.text);
         let res = val2.res;
         let history = val2.history;
 
