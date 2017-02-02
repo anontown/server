@@ -167,7 +167,7 @@ export class User {
     }
 
     if(!(await new Promise<boolean>((resolve, reject)=>{
-      request.get("https://www.google.com/recaptcha/api/siteverify",{
+      request.post("https://www.google.com/recaptcha/api/siteverify",{
       form:{
           secret:Config.recaptcha.secretKey,
           response:recaptcha
