@@ -28,6 +28,7 @@ import { ObjectID } from 'mongodb';
 import { Logger } from './logger';
 import * as createDB from './create-db';
 
+
 (async () => {
   //ロガー
   function appLog(method: string, ip: string, idName: string, id: ObjectID) {
@@ -1215,11 +1216,14 @@ import * as createDB from './create-db';
           },
           pass: {
             type: "string"
+          },
+          recaptcha:{
+            type:"string"
           }
         }
       },
-      call: async (params: { sn: string, pass: string }, _authToken: IAuthToken | null, _authUser: IAuthUser | null): Promise<IUserAPI> => {
-        let user = User.create(params.sn, params.pass);
+      call: async (params: { sn: string, pass: string,recaptcha:string }, _authToken: IAuthToken | null, _authUser: IAuthUser | null): Promise<IUserAPI> => {
+        let user = await User.create(params.sn, params.pass,params.recaptcha);
         await User.insert(user);
         return user.toAPI();
       }

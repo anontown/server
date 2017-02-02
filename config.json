@@ -12,5 +12,9 @@
         "hash": "b",
         "token": "c",
         "tokenReq": "d"
+    },
+    "recaptcha":{
+        "siteKey":"6LeoFBQUAAAAAB0fiXvXvaBO9VyFC7igegEOlD7a",
+        "secretKey":"6LeoFBQUAAAAALiyXWzOMmO1fHtORt-rbG1krDgd"
     }
 }

@@ -14,6 +14,10 @@ interface IConfigFile {
         hash: string,
         token: string,
         tokenReq: string
+    },
+    recaptcha:{
+        siteKey:string,
+        secretKey:string
     }
 }
 
@@ -23,6 +27,7 @@ export const Config={
     server: config.server,
     db: config.db,
     salt: config.salt,
+    recaptcha:config.recaptcha,
     user: {
         sn: {
             regex: "^[a-zA-Z0-9_]{3,20}$",
