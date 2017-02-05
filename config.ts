@@ -15,19 +15,19 @@ interface IConfigFile {
         token: string,
         tokenReq: string
     },
-    recaptcha:{
-        siteKey:string,
-        secretKey:string
+    recaptcha: {
+        siteKey: string,
+        secretKey: string
     }
 }
 
 
-let config:IConfigFile=JSON.parse(fs.readFileSync("./config.json", "utf8"));
-export const Config={
+let config: IConfigFile = JSON.parse(fs.readFileSync("./config.json", "utf8"));
+export const Config = {
     server: config.server,
     db: config.db,
     salt: config.salt,
-    recaptcha:config.recaptcha,
+    recaptcha: config.recaptcha,
     user: {
         sn: {
             regex: "^[a-zA-Z0-9_]{3,20}$",
@@ -59,6 +59,10 @@ export const Config={
             },
             req: {
                 expireMinute: 5
+            },
+            storage: {
+                regex: "^[a-z0-9_]{1,20}$",
+                msg: "ストレージ名は半角英数字、アンダーバー1～20文字にして下さい"
             }
         },
         client: {

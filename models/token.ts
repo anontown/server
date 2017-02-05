@@ -5,7 +5,7 @@ import { IAuthToken, IAuthUser } from '../auth';
 import { AtError, StatusCode } from '../at-error'
 import { Config } from '../config';
 import { StringUtil } from '../util';
-
+import * as fs from 'fs-promise';
 
 export interface ITokenReq {
   key: string,
@@ -23,7 +23,6 @@ export interface ITokenDB {
   key: string,
   client: ObjectID,
   user: ObjectID,
-  storage: string,
   req: ITokenReq[],
   active: boolean,
   date: Date
@@ -43,19 +42,62 @@ export class Token {
     private _key: string,
     private _client: ObjectID,
     private _user: ObjectID,
-    private _storage: string,
     private _req: ITokenReq[],
     private _active: boolean,
     private _date: Date) {
 
   }
 
-  get storage(): string {
-    return this._storage;
+  get id():ObjectID{
+    return this._id;
   }
 
-  set storage(value: string) {
-    this._storage = value;
+  private getStorageFilePath(name: string) {
+    return "./storage/" + this._id.toString() + "/st-" + name;
+  }
+
+  async getStorage(name: string): Promise<string> {
+    if (!name.match(Config.user.token.storage.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.token.storage.msg);
+    }
+    try {
+      return await fs.readFile(this.getStorageFilePath(name), { encoding: "utf-8" });
+    } catch (_e) {
+      throw new AtError(StatusCode.NotFound, "ストレージが見つかりません");
+    }
+  }
+
+  async setStorage(name: string, value: string): Promise<void> {
+    if (!name.match(Config.user.token.storage.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.token.storage.msg);
+    }
+
+    try {
+      await fs.writeFile(this.getStorageFilePath(name), value, { encoding: "utf-8" });
+    } catch (_e) {
+      throw new Error();
+    }
+  }
+
+  async deleteStorage(name: string): Promise<void> {
+    if (!name.match(Config.user.token.storage.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.token.storage.msg);
+    }
+
+    try{
+      await fs.unlink(this.getStorageFilePath(name))
+    }catch(_e){
+      throw new AtError(StatusCode.NotFound, "ストレージが見つかりません");
+    }
+  }
+
+  async listStorage(): Promise<string[]> {
+    try{
+      let ls=await fs.readdir("./storage/" + this._id.toString() + "/");
+      return ls.map(s => s.substring(4));
+    }catch(_e){
+      throw new Error();
+    }
   }
 
   static async findOne(id: ObjectID): Promise<Token> {
@@ -103,7 +145,6 @@ export class Token {
       key: this._key,
       client: this._client,
       user: this._user,
-      storage: this._storage,
       req: this._req,
       active: this._active,
       date: this._date
@@ -122,7 +163,7 @@ export class Token {
   }
 
   static fromDB(t: ITokenDB): Token {
-    return new Token(t._id, t.key, t.client, t.user, t.storage, t.req, t.active, t.date);
+    return new Token(t._id, t.key, t.client, t.user, t.req, t.active, t.date);
   }
 
   static create(authUser: IAuthUser, client: Client): Token {
@@ -130,7 +171,6 @@ export class Token {
       StringUtil.hash(String(Math.random()) + Config.salt.token),
       client.id,
       authUser.id,
-      "",
       [],
       true,
       new Date());

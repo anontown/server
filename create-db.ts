@@ -1,5 +1,5 @@
 import { DB } from './db';
-import * as fs from 'fs';
+import * as fs from 'fs-promise';
 import { ObjectID } from 'mongodb';
 import { IResDB } from './models/res';
 import { IHistoryDB } from './models/history';
@@ -184,6 +184,23 @@ updateFunc.push((async () => {
   await db.collection("topics").update({type:"board"}, { $set:{type:"normal",active:false} }, { multi: true }); 
   await db.collection("topics").update({}, { $rename:{category:"tags"} }, { multi: true });
   await db.collection("histories").update({}, { $rename:{category:"tags"} }, { multi: true });
+}));
+
+updateFunc.push((async () => {
+  let db = await DB;
+
+  let ts:{_id:ObjectID,storage:string}[]=await db.collection("tokens").find().toArray();
+  let ps:Promise<void>[]=[];
+  ts.forEach(t=>{
+    let dir="./storage/"+t._id.toString()+"/";
+    ps.push((async()=>{
+      await fs.mkdir(dir);
+      await fs.writeFile(dir+"st-main",t.storage);
+    })());
+  });
+  await Promise.all(ps);
+
+  await db.collection("tokens").update({}, { $unset: { storage: 1 } }, { multi: true });
 }));
 
 /*

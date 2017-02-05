@@ -1127,17 +1127,19 @@ import * as createDB from './create-db';
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["value"],
+        required: ["name","value"],
         properties: {
+          name: {
+            type: "string"
+          },
           value: {
             type: "string"
           }
         }
       },
-      call: async (params: { value: "string" }, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<null> => {
+      call: async (params: { name:string,value: string }, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<null> => {
         let token = await Token.findOne(authToken.id);
-        token.storage = params.value;
-        Token.update(token);
+        await token.setStorage(params.name,params.value);
         return null;
       }
     });
@@ -1148,11 +1150,54 @@ import * as createDB from './create-db';
       isAuthUser: false,
       isAuthToken: true,
       schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["name"],
+        properties: {
+          name: {
+            type: "string"
+          }
+        }
+      },
+      call: async (params: {name:string}, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<string> => {
+        let token = await Token.findOne(authToken.id);
+        return await token.getStorage(params.name);
+      }
+    });
+
+    api.addAPI({
+      url: "/token/storage/delete",
+
+      isAuthUser: false,
+      isAuthToken: true,
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["name"],
+        properties: {
+          name: {
+            type: "string"
+          }
+        }
+      },
+      call: async (params: {name:string}, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<null> => {
+        let token = await Token.findOne(authToken.id);
+        await token.deleteStorage(params.name);
+        return null;
+      }
+    });
+
+    api.addAPI({
+      url: "/token/storage/list",
+
+      isAuthUser: false,
+      isAuthToken: true,
+      schema: {
         type: "null"
       },
-      call: async (_params: null, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<string> => {
+      call: async (_params: null, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<string[]> => {
         let token = await Token.findOne(authToken.id);
-        return token.storage;
+        return await token.listStorage();
       }
     });
 
