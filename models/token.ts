@@ -130,7 +130,7 @@ export class Token {
       }
     });
 
-    await fs.mkdir("./storage/" + token.toString());
+    await fs.mkdir("./storage/" + token.id.toString());
 
     return null;
   }
