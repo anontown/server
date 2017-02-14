@@ -227,9 +227,7 @@ export class Topic {
   }
 
   static create(title: string, tags: string[], text: string, user: User, type: TopicType, authToken: IAuthToken): { topic: Topic, res: Res, history: History | null } {
-    if (tags.length !== new Set(tags).size) {
-      throw new AtError(StatusCode.MisdirectedRequest, "タグの重複があります");
-    }
+    Topic.checkData(title,tags,text);
     var now = new Date();
     var topic = new Topic(new ObjectID(), title, tags, text, StringUtil.md(text), now, now, 1, type, now, true);
     let cd: { history: History | null, res: Res };
@@ -262,18 +260,9 @@ export class Topic {
     }).start();
   }
 
-  //{{setter
-  changeData(user: User, authToken: IAuthToken, title: string, tags: string[], text: string): { res: Res, history: History } {
-    user.usePoint(10);
-
+  private static checkData(title: string, tags: string[], text: string){
     if (tags.length !== new Set(tags).size) {
       throw new AtError(StatusCode.MisdirectedRequest, "タグの重複があります");
-    }
-    if (this._type === "one") {
-      throw new AtError(StatusCode.Forbidden, "単発トピックは編集出来ません");
-    }
-    if (!this._active) {
-      throw new AtError(StatusCode.Forbidden, "トピックが落ちているので編集出来ません");
     }
     if (!title.match(Config.topic.title.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.topic.title.msg);
@@ -288,6 +277,18 @@ export class Topic {
     });
     if (!text.match(Config.topic.text.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.topic.text.msg);
+    }
+  }
+
+  //{{setter
+  changeData(user: User, authToken: IAuthToken, title: string, tags: string[], text: string): { res: Res, history: History } {
+    user.usePoint(10);
+    Topic.checkData(title,tags,text);
+    if (this._type === "one") {
+      throw new AtError(StatusCode.Forbidden, "単発トピックは編集出来ません");
+    }
+    if (!this._active) {
+      throw new AtError(StatusCode.Forbidden, "トピックが落ちているので編集出来ません");
     }
 
     let date = new Date();
