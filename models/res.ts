@@ -135,8 +135,10 @@ export class Res {
       .sort({ date: type === "after" ? 1 : -1 })
       .skip(0)
       .limit(limit)
-      .sort({ date: -1 })
       .toArray();
+    if(type==="after"){
+      reses.reverse();
+    }
 
     return this.aggregate(reses);
   }
