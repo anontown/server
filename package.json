@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@types/body-parser": "0.0.33",
+    "@types/chai": "^3.4.35",
     "@types/cron": "^1.0.30",
     "@types/express": "^4.0.34",
     "@types/fs-promise": "^1.0.1",
@@ -27,13 +28,16 @@
     "@types/mongodb": "^2.1.35",
     "@types/node": "^6.0.51",
     "@types/request": "0.0.39",
+    "@types/sinon": "^1.16.35",
     "@types/socket.io": "^1.4.27",
+    "chai": "^3.5.0",
     "mocha": "^3.2.0",
+    "sinon": "^1.17.7",
     "typescript": "^2.1.4"
   },
   "scripts": {
     "start": "tsc && node ./bin/app.js",
     "pretest": "tsc",
-    "test": "mocha ./bin/test/*.js"
+    "test": "mocha ./bin/test/*.test.js"
   }
 }
