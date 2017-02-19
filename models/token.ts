@@ -168,14 +168,14 @@ export class Token {
     return new Token(t._id, t.key, t.client, t.user, t.req, t.active, t.date);
   }
 
-  static create(authUser: IAuthUser, client: Client): Token {
+  static create(authUser: IAuthUser, client: Client,now:Date): Token {
     return new Token(new ObjectID(),
       StringUtil.hash(String(Math.random()) + Config.salt.token),
       client.id,
       authUser.id,
       [],
       true,
-      new Date());
+      now);
   }
 
   keyChange(authUser: IAuthUser) {
@@ -194,11 +194,11 @@ export class Token {
     return { id: this._id, key: this._key, user: this._user };
   }
 
-  createReq(): ITokenReqAPI {
-    let now = Date.now();
+  createReq(now:Date): ITokenReqAPI {
+    let nowNum = now.getTime();
 
     //ゴミを削除
-    this._req = this._req.filter((r) => r.active && now < r.expireDate.getTime());
+    this._req = this._req.filter((r) => r.active && nowNum < r.expireDate.getTime());
 
 
     //キーの被り防止
@@ -206,7 +206,7 @@ export class Token {
     do {
       req = {
         key: StringUtil.hash(String(Math.random()) + Config.salt.tokenReq),
-        expireDate: new Date(now + 1000 * 60 * Config.user.token.req.expireMinute),
+        expireDate: new Date(nowNum + 1000 * 60 * Config.user.token.req.expireMinute),
         active: true
       };
     } while (this._req.find(x => x.key === req.key) !== undefined);
@@ -219,9 +219,9 @@ export class Token {
     }
   }
 
-  authReq(key: string): IAuthToken {
+  authReq(key: string,now:Date): IAuthToken {
     let req = this._req.find(x => x.key === key);
-    if (req === undefined || !req.active || req.expireDate.getTime() < Date.now()) {
+    if (req === undefined || !req.active || req.expireDate.getTime() < now.getTime()) {
       throw new AtError(StatusCode.NotFound, "トークンリクエストが見つかりません");
     }
 

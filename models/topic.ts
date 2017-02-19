@@ -226,19 +226,18 @@ export class Topic {
     }
   }
 
-  static create(title: string, tags: string[], text: string, user: User, type: TopicType, authToken: IAuthToken): { topic: Topic, res: Res, history: History | null } {
+  static create(title: string, tags: string[], text: string, user: User, type: TopicType, authToken: IAuthToken,now:Date): { topic: Topic, res: Res, history: History | null } {
     Topic.checkData(title,tags,text);
-    var now = new Date();
     var topic = new Topic(new ObjectID(), title, tags, text, StringUtil.md(text), now, now, 1, type, now, true);
     let cd: { history: History | null, res: Res };
     if (type === "one") {
       cd = {
         history: null,
-        res: Res.create(topic, user, authToken, "", "トピ主", "トピックが建ちました", null, null, true)
+        res: Res.create(topic, user, authToken, "", "トピ主", "トピックが建ちました", null, null, true,now)
       };
       user.changeLastOneTopic(now);
     } else {
-      cd = topic.changeData(user, authToken, title, tags, text);
+      cd = topic.changeData(user, authToken, title, tags, text,now);
       user.changeLastTopic(now);
     }
     return { topic, history: cd.history, res: cd.res };
@@ -281,7 +280,7 @@ export class Topic {
   }
 
   //{{setter
-  changeData(user: User, authToken: IAuthToken, title: string, tags: string[], text: string): { res: Res, history: History } {
+  changeData(user: User, authToken: IAuthToken, title: string, tags: string[], text: string,now:Date): { res: Res, history: History } {
     user.usePoint(10);
     Topic.checkData(title,tags,text);
     if (this._type === "one") {
@@ -291,7 +290,6 @@ export class Topic {
       throw new AtError(StatusCode.Forbidden, "トピックが落ちているので編集出来ません");
     }
 
-    let date = new Date();
 
     this._title = title;
     if (this._type === "normal") {
@@ -300,8 +298,8 @@ export class Topic {
     this._text = text;
     this._mdtext = StringUtil.md(text);
 
-    let history = History.create(this, date, this.hash(date, user), user);
-    let res = Res.create(this, user, authToken, "", "トピックデータ", "トピックデータが編集されました", null, null, true);
+    let history = History.create(this, now, this.hash(now, user), user);
+    let res = Res.create(this, user, authToken, "", "トピックデータ", "トピックデータが編集されました", null, null, true,now);
 
     return { res, history };
   }

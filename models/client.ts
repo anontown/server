@@ -111,15 +111,13 @@ export class Client {
     return new Client(c._id, c.name, c.url, c.user, c.date, c.update);
   }
 
-  static create(authUser: IAuthUser, name: string, url: string): Client {
+  static create(authUser: IAuthUser, name: string, url: string,now:Date): Client {
     if (!name.match(Config.user.client.name.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.name.msg);
     }
     if (!url.match(Config.user.client.url.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.url.msg);
     }
-
-    let now = new Date();
 
     return new Client(new ObjectID(),
       name,
@@ -129,7 +127,7 @@ export class Client {
       now);
   }
 
-  changeData(authUser: IAuthUser, name: string, url: string) {
+  changeData(authUser: IAuthUser, name: string, url: string,now:Date) {
     if (!authUser.id.equals(this._user)) {
       throw new AtError(StatusCode.MisdirectedRequest, "人のクライアント変更は出来ません");
     }
@@ -142,6 +140,6 @@ export class Client {
 
     this._name = name;
     this._url = url;
-    this._update = new Date();
+    this._update =now;
   }
 }

@@ -79,7 +79,7 @@ import * as createDB from './create-db';
         reply: string | null,
         profile: string | null,
         age: boolean
-      }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IResAPI> => {
+      }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string,now:Date): Promise<IResAPI> => {
         let val = await Promise.all([
           Topic.findOne(new ObjectID(params.topic)),
           User.findOne(authToken.user),
@@ -100,7 +100,8 @@ import * as createDB from './create-db';
           params.text,
           reply,
           profile,
-          params.age);
+          params.age,
+          now);
 
         await Promise.all([
           Res.insert(res),
@@ -386,7 +387,7 @@ import * as createDB from './create-db';
           }
         }
       },
-      call: async (params: { id: string }, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<IResAPI> => {
+      call: async (params: { id: string }, authToken: IAuthToken, _authUser: IAuthUser | null,_ip:string,now:Date): Promise<IResAPI> => {
         let val = await Promise.all([
           Res.findOne(new ObjectID(params.id)),
           User.findOne(authToken.user)
@@ -400,7 +401,7 @@ import * as createDB from './create-db';
         //レスを書き込んだユーザー
         let resUser = await User.findOne(res.user);
 
-        let msg = res.dv(resUser, user, authToken);
+        let msg = res.dv(resUser, user, authToken,now);
 
         let promise = [
           Res.update(res),
@@ -526,14 +527,15 @@ import * as createDB from './create-db';
         tags: string[],
         text: string,
         type: TopicType
-      }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<ITopicAPI> => {
+      }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string,now:Date): Promise<ITopicAPI> => {
         let user = await User.findOne(authToken.user);
         let create = Topic.create(params.title,
           params.tags,
           params.text,
           user,
           params.type,
-          authToken);
+          authToken,
+          now);
 
         await Topic.insert(create.topic);
         await Promise.all([
@@ -676,7 +678,7 @@ import * as createDB from './create-db';
           }
         }
       },
-      call: async (params: { id: string, title: string, tags: string[], text: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip): Promise<ITopicAPI> => {
+      call: async (params: { id: string, title: string, tags: string[], text: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip,now): Promise<ITopicAPI> => {
         let val = await Promise.all([
           Topic.findOne(new ObjectID(params.id)),
           User.findOne(authToken.user)
@@ -685,7 +687,7 @@ import * as createDB from './create-db';
         let topic = val[0];
         let user = val[1];
 
-        let val2 = topic.changeData(user, authToken, params.title, params.tags, params.text);
+        let val2 = topic.changeData(user, authToken, params.title, params.tags, params.text,now);
         let res = val2.res;
         let history = val2.history;
 
@@ -898,8 +900,8 @@ import * as createDB from './create-db';
           }
         }
       },
-      call: async (params: { name: string, text: string, sn: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IProfileAPI> => {
-        let profile = Profile.create(authToken, params.name, params.text, params.sn);
+      call: async (params: { name: string, text: string, sn: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip,now): Promise<IProfileAPI> => {
+        let profile = Profile.create(authToken, params.name, params.text, params.sn,now);
         await Profile.insert(profile);
         appLog("profile/create", ip, "profiles", profile.id);
         return profile.toAPI(authToken);
@@ -989,9 +991,9 @@ import * as createDB from './create-db';
           }
         }
       },
-      call: async (params: { id: string, name: string, text: string, sn: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip: string): Promise<IProfileAPI> => {
+      call: async (params: { id: string, name: string, text: string, sn: string }, authToken: IAuthToken, _authUser: IAuthUser | null, ip,now): Promise<IProfileAPI> => {
         let profile = await Profile.findOne(new ObjectID(params.id));
-        profile.changeData(authToken, params.name, params.text, params.sn);
+        profile.changeData(authToken, params.name, params.text, params.sn,now);
         await Profile.update(profile);
         appLog("profile/update", ip, "profiles", profile.id);
         return profile.toAPI(authToken);
@@ -1109,9 +1111,9 @@ import * as createDB from './create-db';
           }
         }
       },
-      call: async (params: { client: string }, _authToken: IAuthToken | null, authUser: IAuthUser): Promise<ITokenAPI> => {
+      call: async (params: { client: string }, _authToken: IAuthToken | null, authUser: IAuthUser,_ip,now): Promise<ITokenAPI> => {
         let client = await Client.findOne(new ObjectID(params.client));
-        let token = Token.create(authUser, client);
+        let token = Token.create(authUser, client,now);
         await Token.insert(token);
 
         return token.toAPI();
@@ -1208,9 +1210,9 @@ import * as createDB from './create-db';
       schema: {
         type: "null"
       },
-      call: async (_params: null, authToken: IAuthToken, _authUser: IAuthUser | null): Promise<ITokenReqAPI> => {
+      call: async (_params: null, authToken: IAuthToken, _authUser,_ip,now): Promise<ITokenReqAPI> => {
         let token = await Token.findOne(authToken.id);
-        let req = token.createReq();
+        let req = token.createReq(now);
 
         await Token.update(token);
 
@@ -1236,9 +1238,9 @@ import * as createDB from './create-db';
           }
         }
       },
-      call: async (params: { id: string, key: string }, _authToken: IAuthToken | null, _authUser: IAuthUser | null): Promise<ITokenAPI> => {
+      call: async (params: { id: string, key: string }, _authToken: IAuthToken | null, _authUser,_ip,now): Promise<ITokenAPI> => {
         let token = await Token.findOne(new ObjectID(params.id));
-        token.authReq(params.key);
+        token.authReq(params.key,now);
         return token.toAPI();
       }
     });
@@ -1266,8 +1268,8 @@ import * as createDB from './create-db';
           }
         }
       },
-      call: async (params: { sn: string, pass: string,recaptcha:string }, _authToken: IAuthToken | null, _authUser: IAuthUser | null): Promise<IUserAPI> => {
-        let user = await User.create(params.sn, params.pass,params.recaptcha);
+      call: async (params: { sn: string, pass: string,recaptcha:string }, _authToken: IAuthToken | null, _authUser: IAuthUser | null,_ip,now): Promise<IUserAPI> => {
+        let user = await User.create(params.sn, params.pass,params.recaptcha,now);
         await User.insert(user);
         return user.toAPI();
       }
@@ -1337,8 +1339,8 @@ import * as createDB from './create-db';
           }
         }
       },
-      call: async (params: { name: string, url: string }, _authToken: IAuthToken | null, authUser: IAuthUser, ip: string): Promise<IClientAPI> => {
-        let client = Client.create(authUser, params.name, params.url);
+      call: async (params: { name: string, url: string }, _authToken: IAuthToken | null, authUser: IAuthUser, ip,now): Promise<IClientAPI> => {
+        let client = Client.create(authUser, params.name, params.url,now);
         await Client.insert(client);
         appLog("client/create", ip, "clients", client.id);
         return client.toAPI(authUser);
@@ -1366,9 +1368,9 @@ import * as createDB from './create-db';
           }
         }
       },
-      call: async (params: { id: string, name: string, url: string }, _authToken: IAuthToken | null, authUser: IAuthUser, ip: string): Promise<IClientAPI> => {
+      call: async (params: { id: string, name: string, url: string }, _authToken, authUser: IAuthUser, ip,now): Promise<IClientAPI> => {
         let client = await Client.findOne(new ObjectID(params.id));
-        client.changeData(authUser, params.name, params.url);
+        client.changeData(authUser, params.name, params.url,now);
         await Client.update(client);
         appLog("client/update", ip, "clients", client.id);
         return client.toAPI(authUser);

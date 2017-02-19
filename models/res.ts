@@ -338,7 +338,7 @@ export class Res {
     return new Res(r._id, r.topic, r.date, r.user, r.name, r.text, r.mdtext, r.reply, r.deleteFlag, r.vote, r.lv, r.hash, r.profile, replyCount, r.age)
   }
 
-  static create(topic: Topic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean): Res {
+  static create(topic: Topic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean,now:Date): Res {
     if (!name.match(Config.res.name.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.res.name.msg);
     }
@@ -346,7 +346,6 @@ export class Res {
       throw new AtError(StatusCode.MisdirectedRequest, Config.res.text.msg);
     }
 
-    let date = new Date();
 
     //名前生成
     name = StringUtil.graphicEscape(name);
@@ -375,12 +374,12 @@ export class Res {
     }
 
     if (autoName === null) {
-      user.changeLastRes(date);
+      user.changeLastRes(now);
     }
 
     let result = new Res(new ObjectID(),
       topic.id,
-      date,
+      now,
       user.id,
       name,
       text,
@@ -389,7 +388,7 @@ export class Res {
       "active",
       [],
       user.lv * 5,
-      topic.hash(date, user),
+      topic.hash(now, user),
       profile !== null ? profile.id : null,
       0,
       age);
@@ -409,7 +408,7 @@ export class Res {
     resUser.changeLv(resUser.lv + lv);
   }
 
-  dv(resUser: User, user: User, _authToken: IAuthToken): Msg | null {
+  dv(resUser: User, user: User, _authToken: IAuthToken,now:Date): Msg | null {
     if (user.id.equals(this._user)) {
       throw new AtError(StatusCode.Forbidden, "自分に投票は出来ません");
     }
@@ -425,7 +424,7 @@ export class Res {
     let msg: Msg | null;
     if (this.voteValue < -this._lv && (this._deleteFlag === "active" || this._deleteFlag === "self")) {
       this._deleteFlag = "vote";
-      msg = Msg.create(resUser, "投票により書き込みが削除されました。");
+      msg = Msg.create(resUser, "投票により書き込みが削除されました。",now);
     } else {
       msg = null;
     }

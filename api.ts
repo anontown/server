@@ -30,7 +30,7 @@ export class API {
     schema: Object,
     isAuthToken: boolean,
     isAuthUser: boolean,
-    call: (params: any, authToken: IAuthToken | null, authUser: IAuthUser | null, ip: string) => Promise<any>
+    call: (params: any, authToken: IAuthToken | null, authUser: IAuthUser | null, ip: string,now:Date) => Promise<any>
   }) {
     this.app.post(url, async (req: express.Request, res: express.Response) => {
       let errorFunc = function (error: AtError) {
@@ -96,7 +96,7 @@ export class API {
               Promise.resolve(null)) as Promise<IAuthUser | null>
           ]);
 
-          let result = await call(params, auth[0], auth[1], req.headers["X-Real-IP"] || req.connection.remoteAddress);
+          let result = await call(params, auth[0], auth[1], req.headers["X-Real-IP"] || req.connection.remoteAddress,new Date());
           resultFunc(200, result);
           console.log("成功");
         } else {

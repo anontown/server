@@ -129,11 +129,11 @@ export class Msg {
     return new Msg(m._id, m.receiver, m.text, m.mdtext, m.date);
   }
 
-  static create(receiver: User | null, text: string): Msg {
+  static create(receiver: User | null, text: string,now:Date): Msg {
     return new Msg(new ObjectID(),
       receiver !== null ? receiver.id : null,
       text,
       StringUtil.md(text),
-      new Date());
+      now);
   }
 }

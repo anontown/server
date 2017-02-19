@@ -157,7 +157,7 @@ export class User {
     }).start();
   }
 
-  static async create(sn: string, pass: string,recaptcha:string): Promise<User> {
+  static async create(sn: string, pass: string,recaptcha:string,now:Date): Promise<User> {
     if (!pass.match(Config.user.pass.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
     }
@@ -183,7 +183,6 @@ export class User {
       throw new AtError(StatusCode.Forbidden,"キャプチャ認証に失敗");
     }
 
-    let now = new Date();
     return new User(new ObjectID(),
       sn,
       StringUtil.hash(pass + Config.salt.pass),

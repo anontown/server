@@ -141,7 +141,7 @@ export class Profile {
     return this._user;
   }
 
-  static create(authToken: IAuthToken, name: string, text: string, sn: string): Profile {
+  static create(authToken: IAuthToken, name: string, text: string, sn: string,now:Date): Profile {
     if (!name.match(Config.user.profile.name.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.name.msg);
     }
@@ -152,7 +152,6 @@ export class Profile {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.sn.msg);
     }
 
-    let now = new Date();
     return new Profile(new ObjectID(),
       authToken.user,
       name,
@@ -163,7 +162,7 @@ export class Profile {
       sn);
   }
 
-  changeData(authToken: IAuthToken, name: string, text: string, sn: string) {
+  changeData(authToken: IAuthToken, name: string, text: string, sn: string,now:Date) {
     if (!authToken.user.equals(this._user)) {
       throw new AtError(StatusCode.MisdirectedRequest, "人のプロフィール変更は出来ません");
     }
@@ -181,6 +180,6 @@ export class Profile {
     this._text = text;
     this._sn = sn;
     this._mdtext = StringUtil.md(text);
-    this._update = new Date();
+    this._update = now;
   }
 }
