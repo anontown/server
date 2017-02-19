@@ -28,7 +28,6 @@ import { ObjectID } from 'mongodb';
 import { Logger } from './logger';
 import * as createDB from './create-db';
 
-
 (async () => {
   //ロガー
   function appLog(method: string, ip: string, idName: string, id: ObjectID) {

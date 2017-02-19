@@ -4,9 +4,11 @@
     "outDir": "./bin",
     "sourceMap": true,
     "target": "es6",
+    "rootDir":"./",
     "lib": [
       "es6"
     ],
+    "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictNullChecks": true,

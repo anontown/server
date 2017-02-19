@@ -1,3 +1,7 @@
 .vscode/
 bin/
 node_modules/
+storage/
+logs/
+db-version.json
+npm-debug.log

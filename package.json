@@ -23,13 +23,17 @@
     "@types/jsonschema": "0.0.4",
     "@types/log4js": "0.0.32",
     "@types/marked": "0.0.28",
+    "@types/mocha": "^2.2.39",
     "@types/mongodb": "^2.1.35",
     "@types/node": "^6.0.51",
     "@types/request": "0.0.39",
     "@types/socket.io": "^1.4.27",
+    "mocha": "^3.2.0",
     "typescript": "^2.1.4"
   },
   "scripts": {
-    "start": "tsc && node ./bin/app.js"
+    "start": "tsc && node ./bin/app.js",
+    "pretest": "tsc",
+    "test": "mocha ./bin/test/*.js"
   }
 }
