@@ -5,7 +5,6 @@ import { AtError, StatusCode } from '../at-error'
 import { Config } from '../config';
 import { StringUtil } from '../util';
 import { CronJob } from 'cron';
-import * as request from 'request';
 
 interface IUserDB {
   _id: ObjectID,
@@ -157,30 +156,13 @@ export class User {
     }).start();
   }
 
-  static async create(sn: string, pass: string,recaptcha:string,now:Date): Promise<User> {
+  static async create(sn: string, pass: string,now:Date): Promise<User> {
     if (!pass.match(Config.user.pass.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
     }
 
     if (!sn.match(Config.user.sn.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.sn.msg);
-    }
-
-    if(!(await new Promise<boolean>((resolve, reject)=>{
-      request.post("https://www.google.com/recaptcha/api/siteverify",{
-      form:{
-          secret:Config.recaptcha.secretKey,
-          response:recaptcha
-        }
-      },
-      (err, _res, body)=>{
-        if(err){
-          reject("キャプチャAPIでエラー");
-        }
-        resolve(JSON.parse(body).success);
-      });
-    }))){
-      throw new AtError(StatusCode.Forbidden,"キャプチャ認証に失敗");
     }
 
     return new User(new ObjectID(),

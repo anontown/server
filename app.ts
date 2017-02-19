@@ -1277,13 +1277,13 @@ import * as createDB from './create-db';
   {
     api.addAPI<{
       sn: string,
-      pass: string,
-      recaptcha: string
+      pass: string
     }>({
       url: "/user/create",
 
       isAuthUser: false,
       isAuthToken: false,
+      isRecaptcha: true,
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1294,14 +1294,11 @@ import * as createDB from './create-db';
           },
           pass: {
             type: "string"
-          },
-          recaptcha: {
-            type: "string"
           }
         }
       },
       call: async ({params, now}): Promise<IUserAPI> => {
-        let user = await User.create(params.sn, params.pass, params.recaptcha, now);
+        let user = await User.create(params.sn, params.pass, now);
         await User.insert(user);
         return user.toAPI();
       }

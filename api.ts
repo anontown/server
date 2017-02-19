@@ -9,6 +9,8 @@ import * as http from 'http';
 import * as socketio from 'socket.io';
 import { Res } from './models/res';
 import { Logger } from './logger';
+import * as request from 'request';
+import { Config } from './config';
 
 export interface IAPICallParams<T> {
   params: T,
@@ -33,11 +35,12 @@ export class API {
     this.app.use(Logger.express);
   }
 
-  addAPI<T>({url, isAuthUser, isAuthToken, schema, call}: {
+  addAPI<T>({url, isAuthUser, isAuthToken, isRecaptcha = false, schema, call}: {
     url: string,
     schema: Object,
     isAuthToken: boolean,
     isAuthUser: boolean,
+    isRecaptcha?: boolean
     call: (params: IAPICallParams<T>) => Promise<any>
   }) {
     this.app.post(url, async (req: express.Request, res: express.Response) => {
@@ -73,6 +76,9 @@ export class API {
                 }
               }
             },
+            recaptcha: {
+              type: isRecaptcha ? "string" : ["string", "null"]
+            },
             authToken: {
               type: isAuthToken ? "object" : ["object", "null"],
               additionalProperties: false,
@@ -92,6 +98,7 @@ export class API {
         if (paramsCheck.errors.length === 0) {
           let authUser: { id: string, pass: string } = req.body.authUser;
           let authToken: { id: string, key: string } = req.body.authToken;
+          let recaptcha: string|null = req.body.recaptcha;
           let params: any = req.body.params;
 
           //認証
@@ -101,7 +108,27 @@ export class API {
               Promise.resolve(null)) as Promise<IAuthToken | null>,
             (authUser !== null ?
               User.findOne(new ObjectID(authUser.id)).then(user => user.auth(authUser.pass)) :
-              Promise.resolve(null)) as Promise<IAuthUser | null>
+              Promise.resolve(null)) as Promise<IAuthUser | null>,
+            (isRecaptcha !== null ?
+              new Promise<void>((resolve, reject) => {
+                request.post("https://www.google.com/recaptcha/api/siteverify", {
+                  form: {
+                    secret: Config.recaptcha.secretKey,
+                    response: recaptcha
+                  }
+                },
+                  (err, _res, body) => {
+                    if (err) {
+                      reject("キャプチャAPIでエラー");
+                    }
+                    if (JSON.parse(body).success) {
+                      resolve();
+                    } else {
+                      reject(new AtError(StatusCode.Forbidden, "キャプチャ認証に失敗"));
+                    }
+                  });
+              }) :
+              Promise.resolve(null)) as Promise<void>,
           ]);
 
           let result = await call({
