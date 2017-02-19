@@ -10,6 +10,14 @@ import * as socketio from 'socket.io';
 import { Res } from './models/res';
 import { Logger } from './logger';
 
+export interface IAPICallParams<T> {
+  params: T,
+  authToken: IAuthToken | null,
+  authUser: IAuthUser | null,
+  ip: string,
+  now: Date
+}
+
 export class API {
   private static valid = new Validator();
   private app: express.Express;
@@ -25,12 +33,12 @@ export class API {
     this.app.use(Logger.express);
   }
 
-  addAPI({url, isAuthUser, isAuthToken, schema, call}: {
+  addAPI<T>({url, isAuthUser, isAuthToken, schema, call}: {
     url: string,
     schema: Object,
     isAuthToken: boolean,
     isAuthUser: boolean,
-    call: (params: any, authToken: IAuthToken | null, authUser: IAuthUser | null, ip: string,now:Date) => Promise<any>
+    call: (params: IAPICallParams<T>) => Promise<any>
   }) {
     this.app.post(url, async (req: express.Request, res: express.Response) => {
       let errorFunc = function (error: AtError) {
@@ -87,7 +95,7 @@ export class API {
           let params: any = req.body.params;
 
           //認証
-          let auth = await Promise.all([
+          let [authTokenObj, authUserObj] = await Promise.all([
             (authToken !== null ?
               Token.findOne(new ObjectID(authToken.id)).then(token => token.auth(authToken.key)) :
               Promise.resolve(null)) as Promise<IAuthToken | null>,
@@ -96,7 +104,13 @@ export class API {
               Promise.resolve(null)) as Promise<IAuthUser | null>
           ]);
 
-          let result = await call(params, auth[0], auth[1], req.headers["X-Real-IP"] || req.connection.remoteAddress,new Date());
+          let result = await call({
+            params,
+            authToken: authTokenObj,
+            authUser: authUserObj,
+            ip: req.headers["X-Real-IP"] || req.connection.remoteAddress,
+            now: new Date()
+          });
           resultFunc(200, result);
           console.log("成功");
         } else {
