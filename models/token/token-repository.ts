@@ -3,7 +3,8 @@ import { DB } from '../../db';
 import { AtError, StatusCode } from '../../at-error'
 import * as fs from 'fs-promise';
 import { Token, ITokenDB } from './token';
-import { IAuthUser } from '../../auth';
+import { IAuthUser,IAuthToken } from '../../auth';
+import { Config } from '../../config';
 
 export class TokenRepository {
   static async findOne(id: ObjectID): Promise<Token> {
@@ -45,5 +46,53 @@ export class TokenRepository {
     let db = await DB;
     await db.collection("tokens").update({ _id: token.id }, token.toDB());
     return null;
+  }
+
+  private static getStorageFilePath(token:IAuthToken,name: string) {
+    return "./storage/" + token.id.toString() + "/st-" + name;
+  }
+
+  static async getStorage(token:IAuthToken,name: string): Promise<string> {
+    if (!name.match(Config.user.token.storage.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.token.storage.msg);
+    }
+    try {
+      return await fs.readFile(this.getStorageFilePath(token,name), { encoding: "utf-8" });
+    } catch (_e) {
+      throw new AtError(StatusCode.NotFound, "ストレージが見つかりません");
+    }
+  }
+
+  static async setStorage(token:IAuthToken,name: string, value: string): Promise<void> {
+    if (!name.match(Config.user.token.storage.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.token.storage.msg);
+    }
+
+    try {
+      await fs.writeFile(this.getStorageFilePath(token,name), value, { encoding: "utf-8" });
+    } catch (_e) {
+      throw new Error();
+    }
+  }
+
+  static async deleteStorage(token:IAuthToken,name: string): Promise<void> {
+    if (!name.match(Config.user.token.storage.regex)) {
+      throw new AtError(StatusCode.MisdirectedRequest, Config.user.token.storage.msg);
+    }
+
+    try{
+      await fs.unlink(this.getStorageFilePath(token,name))
+    }catch(_e){
+      throw new AtError(StatusCode.NotFound, "ストレージが見つかりません");
+    }
+  }
+
+  static async listStorage(token:IAuthToken): Promise<string[]> {
+    try{
+      let ls=await fs.readdir("./storage/" + token.id.toString() + "/");
+      return ls.map(s => s.substring(4));
+    }catch(_e){
+      throw new Error();
+    }
   }
 }

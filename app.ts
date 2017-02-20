@@ -1173,8 +1173,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<null> => {
-        let token = await TokenRepository.findOne(authToken!.id);
-        await token.setStorage(params.name, params.value);
+        await TokenRepository.setStorage(authToken!,params.name, params.value);
         return null;
       }
     });
@@ -1195,8 +1194,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<string> => {
-        let token = await TokenRepository.findOne(authToken!.id);
-        return await token.getStorage(params.name);
+        return await TokenRepository.getStorage(authToken!,params.name);
       }
     });
 
@@ -1216,8 +1214,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<null> => {
-        let token = await TokenRepository.findOne(authToken!.id);
-        await token.deleteStorage(params.name);
+        await TokenRepository.deleteStorage(authToken!,params.name);
         return null;
       }
     });
@@ -1231,8 +1228,7 @@ import * as createDB from './create-db';
         type: "null"
       },
       call: async ({authToken}): Promise<string[]> => {
-        let token = await TokenRepository.findOne(authToken!.id);
-        return await token.listStorage();
+        return await TokenRepository.listStorage(authToken!);
       }
     });
 
