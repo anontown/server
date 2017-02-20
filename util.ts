@@ -1,4 +1,4 @@
-var crypto = require("crypto");
+import * as CryptoJS from 'crypto-js';
 import * as marked from 'marked';
 
 export class StringUtil {
@@ -21,7 +21,9 @@ export class StringUtil {
     }
 
     static hash(str: string): string {
-        return (crypto.createHash("sha256").update(str).digest('base64') as string).replace(/=/g, "");
+        return (CryptoJS.SHA256(str) as any)
+            .toString(CryptoJS.enc.Base64)
+            .replace(/=/g, "");
     }
 
     static md(value: string): string {
