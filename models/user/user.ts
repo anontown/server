@@ -1,12 +1,12 @@
 import { ObjectID, WriteError } from 'mongodb';
-import { DB } from '../db';
-import { IAuthUser } from '../auth';
-import { AtError, StatusCode } from '../at-error'
-import { Config } from '../config';
-import { StringUtil } from '../util';
+import { DB } from '../../db';
+import { IAuthUser } from '../../auth';
+import { AtError, StatusCode } from '../../at-error'
+import { Config } from '../../config';
+import { StringUtil } from '../../util';
 import { CronJob } from 'cron';
 
-interface IUserDB {
+export interface IUserDB {
   _id: ObjectID,
   sn: string,
   pass: string,
@@ -23,7 +23,7 @@ export interface IUserAPI {
   sn: string
 }
 
-interface IResWait {
+export interface IResWait {
   last: Date,
   m10: number,
   m30: number,

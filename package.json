@@ -37,7 +37,6 @@
   },
   "scripts": {
     "start": "tsc && node ./bin/app.js",
-    "pretest": "tsc",
-    "test": "mocha ./bin/test/*.test.js"
+    "test": "tsc&&set NODE_ENV=test&&mocha ./bin/test/*.test.js&&set NODE_ENV="
   }
 }

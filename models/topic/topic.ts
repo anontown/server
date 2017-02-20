@@ -1,13 +1,14 @@
 import { ObjectID } from 'mongodb';
-import { User } from './user';
-import { Res } from './res';
-import { History } from './history';
-import { DB } from '../db';
-import { IAuthToken } from '../auth';
-import { AtError, StatusCode } from '../at-error'
-import { Config } from '../config';
-import { StringUtil } from '../util';
+import { User } from '../user';
+import { Res } from '../res';
+import { History } from '../history';
+import { DB } from '../../db';
+import { IAuthToken } from '../../auth';
+import { AtError, StatusCode } from '../../at-error'
+import { Config } from '../../config';
+import { StringUtil } from '../../util';
 import { CronJob } from 'cron';
+
 export interface ITopicDB {
   _id: ObjectID,
   title: string,

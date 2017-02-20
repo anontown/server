@@ -1,15 +1,15 @@
 import { ObjectID } from 'mongodb';
-import { User } from './user';
-import { Topic } from './topic';
-import { Profile } from './profile';
-import { Msg } from './msg';
-import { DB } from '../db';
-import { IAuthToken } from '../auth';
-import { AtError, StatusCode } from '../at-error'
-import { Config } from '../config';
-import { StringUtil } from '../util';
+import { User } from '../user';
+import { Topic } from '../topic';
+import { Profile } from '../profile';
+import { Msg } from '../msg';
+import { DB } from '../../db';
+import { IAuthToken } from '../../auth';
+import { AtError, StatusCode } from '../../at-error'
+import { Config } from '../../config';
+import { StringUtil } from '../../util';
 
-interface IVote {
+export interface IVote {
   user: ObjectID,
   value: number,
   lv: number

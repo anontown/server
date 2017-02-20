@@ -1,8 +1,8 @@
 import { ObjectID } from 'mongodb';
-import { User } from './user';
-import { Topic } from './topic';
-import { DB } from '../db';
-import { AtError, StatusCode } from '../at-error';
+import { User } from '../user';
+import { Topic } from '../topic';
+import { DB } from '../../db';
+import { AtError, StatusCode } from '../../at-error';
 
 export interface IHistoryDB {
   _id: ObjectID,

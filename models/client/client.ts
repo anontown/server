@@ -1,8 +1,8 @@
-import { IAuthUser } from '../auth'
-import { Config } from '../config';
-import { AtError, StatusCode } from '../at-error'
+import { IAuthUser } from '../../auth'
+import { Config } from '../../config';
+import { AtError, StatusCode } from '../../at-error'
 import { ObjectID } from 'mongodb';
-import { DB } from '../db';
+import { DB } from '../../db';
 
 export interface IClientDB {
   _id: ObjectID,

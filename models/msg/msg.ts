@@ -1,11 +1,11 @@
 import { ObjectID } from 'mongodb';
-import { User } from './user';
-import { DB } from '../db';
-import { IAuthToken } from '../auth';
-import { AtError, StatusCode } from '../at-error';
-import { StringUtil } from '../util';
+import { User } from '../user';
+import { DB } from '../../db';
+import { IAuthToken } from '../../auth';
+import { AtError, StatusCode } from '../../at-error';
+import { StringUtil } from '../../util';
 
-interface IMsgDB {
+export interface IMsgDB {
   _id: ObjectID,
   receiver: ObjectID | null,
   text: string,

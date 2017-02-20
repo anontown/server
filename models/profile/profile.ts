@@ -1,9 +1,9 @@
 import { ObjectID, WriteError } from 'mongodb';
-import { StringUtil } from '../util';
-import { DB } from '../db';
-import { IAuthToken } from '../auth';
-import { AtError, StatusCode } from '../at-error'
-import { Config } from '../config';
+import { StringUtil } from '../../util';
+import { DB } from '../../db';
+import { IAuthToken } from '../../auth';
+import { AtError, StatusCode } from '../../at-error'
+import { Config } from '../../config';
 
 
 export interface IProfileDB {

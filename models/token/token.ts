@@ -1,10 +1,10 @@
 import { ObjectID, WriteError } from 'mongodb';
-import { Client } from './client';
-import { DB } from '../db';
-import { IAuthToken, IAuthUser } from '../auth';
-import { AtError, StatusCode } from '../at-error'
-import { Config } from '../config';
-import { StringUtil } from '../util';
+import { Client } from '..//client';
+import { DB } from '../../db';
+import { IAuthToken, IAuthUser } from '../../auth';
+import { AtError, StatusCode } from '../../at-error'
+import { Config } from '../../config';
+import { StringUtil } from '../../util';
 import * as fs from 'fs-promise';
 
 export interface ITokenReq {
