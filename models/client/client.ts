@@ -2,7 +2,6 @@ import { IAuthUser } from '../../auth'
 import { Config } from '../../config';
 import { AtError, StatusCode } from '../../at-error'
 import { ObjectID } from 'mongodb';
-import { DB } from '../../db';
 
 export interface IClientDB {
   _id: ObjectID,
@@ -30,55 +29,6 @@ export class Client {
     private _date: Date,
     private _update: Date) {
 
-  }
-
-  static async findOne(id: ObjectID): Promise<Client> {
-    let db = await DB;
-    let client: IClientDB | null = await db.collection("clients")
-      .findOne({ _id: id });
-
-    if (client === null) {
-      throw new AtError(StatusCode.NotFound, "クライアントが存在しません");
-    }
-    return this.fromDB(client);
-  }
-
-  static async findIn(ids: ObjectID[]): Promise<Client[]> {
-    let db = await DB;
-    let clients: IClientDB[] = await db.collection("clients")
-      .find({ _id: { $in: ids } })
-      .sort({ date: -1 })
-      .toArray();
-
-    if (clients.length !== ids.length) {
-      throw new AtError(StatusCode.NotFound, "クライアントが存在しません");
-    }
-
-    return clients.map(c => this.fromDB(c));
-  }
-
-  static async findAll(authUser: IAuthUser): Promise<Client[]> {
-    let db = await DB;
-    let clients: IClientDB[] = await db.collection("clients")
-      .find({ user: authUser.id })
-      .sort({ date: -1 })
-      .toArray();
-    return clients.map(c => this.fromDB(c));
-  }
-
-  static async insert(client: Client): Promise<null> {
-    let db = await DB;
-
-    await db.collection("clients")
-      .insert(client.toDB());
-
-    return null;
-  }
-
-  static async update(client: Client): Promise<null> {
-    let db = await DB;
-    await db.collection("clients").update({ _id: client._id }, client.toDB());
-    return null;
   }
 
   get id(): ObjectID {

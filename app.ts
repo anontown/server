@@ -5,13 +5,19 @@ import { API } from './api';
 import { Config } from './config';
 import {
   User,
+  UserRepository,
   Token,
+  TokenRepository,
   Client,
+  ClientRepository,
   Topic,
+  TopicRepository,
   Res,
-  History,
-  Msg,
+  ResRepository,
+  HistoryRepository,
+  MsgRepository,
   Profile,
+  ProfileRepository,
   IClientAPI,
   IResAPI,
   ITopicAPI,
@@ -80,10 +86,10 @@ import * as createDB from './create-db';
       },
       call: async ({params, authToken, ip, now}): Promise<IResAPI> => {
         let val = await Promise.all([
-          Topic.findOne(new ObjectID(params.topic)),
-          User.findOne(authToken!.user),
-          params.reply !== null ? Res.findOne(new ObjectID(params.reply)) : Promise.resolve(null),
-          params.profile !== null ? Profile.findOne(new ObjectID(params.profile)) : Promise.resolve(null)
+          TopicRepository.findOne(new ObjectID(params.topic)),
+          UserRepository.findOne(authToken!.user),
+          params.reply !== null ? ResRepository.findOne(new ObjectID(params.reply)) : Promise.resolve(null),
+          params.profile !== null ? ProfileRepository.findOne(new ObjectID(params.profile)) : Promise.resolve(null)
         ]);
 
         let topic = val[0];
@@ -102,9 +108,9 @@ import * as createDB from './create-db';
           now);
 
         await Promise.all([
-          Res.insert(res),
-          Topic.update(topic),
-          User.update(user)
+          ResRepository.insert(res),
+          TopicRepository.update(topic),
+          UserRepository.update(user)
         ]);
 
         appLog("create/res", ip, "reses", res.id)
@@ -128,7 +134,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IResAPI> => {
-        let res = await Res.findOne(new ObjectID(params.id));
+        let res = await ResRepository.findOne(new ObjectID(params.id));
         return res.toAPI(authToken);
       }
     });
@@ -152,7 +158,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IResAPI[]> => {
-        let reses = await Res.findIn(params.ids.map(id => new ObjectID(id)));
+        let reses = await ResRepository.findIn(params.ids.map(id => new ObjectID(id)));
         return reses.map(r => r.toAPI(authToken));
       }
     });
@@ -193,8 +199,8 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IResAPI[]> => {
-        let topic = await Topic.findOne(new ObjectID(params.topic));
-        let reses = await Res.find(topic, params.type, params.equal, new Date(params.date), params.limit);
+        let topic = await TopicRepository.findOne(new ObjectID(params.topic));
+        let reses = await ResRepository.find(topic, params.type, params.equal, new Date(params.date), params.limit);
         return reses.map(r => r.toAPI(authToken));
       }
     });
@@ -218,8 +224,8 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IResAPI[]> => {
-        let topic = await Topic.findOne(new ObjectID(params.topic));
-        let reses = await Res.findNew(topic, params.limit);
+        let topic = await TopicRepository.findOne(new ObjectID(params.topic));
+        let reses = await ResRepository.findNew(topic, params.limit);
         return reses.map(r => r.toAPI(authToken));
       }
     });
@@ -243,8 +249,8 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IResAPI[]> => {
-        let topic = await Topic.findOne(new ObjectID(params.topic));
-        let reses = await Res.findHash(topic, params.hash);
+        let topic = await TopicRepository.findOne(new ObjectID(params.topic));
+        let reses = await ResRepository.findHash(topic, params.hash);
         return reses.map(r => r.toAPI(authToken));
       }
     });
@@ -269,14 +275,14 @@ import * as createDB from './create-db';
       },
       call: async ({params, authToken}): Promise<IResAPI[]> => {
         let val = await Promise.all([
-          Topic.findOne(new ObjectID(params.topic)),
-          Res.findOne(new ObjectID(params.reply))
+          TopicRepository.findOne(new ObjectID(params.topic)),
+          ResRepository.findOne(new ObjectID(params.reply))
         ]);
 
         let topic = val[0];
         let res = val[1];
 
-        let reses = await Res.findReply(topic, res);
+        let reses = await ResRepository.findReply(topic, res);
         return reses.map(r => r.toAPI(authToken));
       }
     });
@@ -313,7 +319,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IResAPI[]> => {
-        let res = await Res.findNotice(authToken!, params.type, params.equal, new Date(params.date), params.limit);
+        let res = await ResRepository.findNotice(authToken!, params.type, params.equal, new Date(params.date), params.limit);
         return res.map(x => x.toAPI(authToken));
       }
     });
@@ -334,7 +340,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IResAPI[]> => {
-        let res = await Res.findNoticeNew(authToken!, params.limit);
+        let res = await ResRepository.findNoticeNew(authToken!, params.limit);
         return res.map(x => x.toAPI(authToken));
       }
     });
@@ -356,8 +362,8 @@ import * as createDB from './create-db';
       },
       call: async ({params, authToken}): Promise<IResAPI> => {
         let val = await Promise.all([
-          Res.findOne(new ObjectID(params.id)),
-          User.findOne(authToken!.user)
+          ResRepository.findOne(new ObjectID(params.id)),
+          UserRepository.findOne(authToken!.user)
         ]);
 
         //レス
@@ -367,14 +373,14 @@ import * as createDB from './create-db';
         let user = val[1];
 
         //レスを書き込んだユーザー
-        let resUser = await User.findOne(res.user);
+        let resUser = await UserRepository.findOne(res.user);
 
         res.uv(resUser, user, authToken!);
 
         await Promise.all([
-          Res.update(res),
-          User.update(resUser),
-          User.update(user)
+          ResRepository.update(res),
+          UserRepository.update(resUser),
+          UserRepository.update(user)
         ]);
 
         return res.toAPI(authToken);
@@ -398,8 +404,8 @@ import * as createDB from './create-db';
       },
       call: async ({params, authToken, now}): Promise<IResAPI> => {
         let val = await Promise.all([
-          Res.findOne(new ObjectID(params.id)),
-          User.findOne(authToken!.user)
+          ResRepository.findOne(new ObjectID(params.id)),
+          UserRepository.findOne(authToken!.user)
         ]);
 
         let res = val[0];
@@ -408,17 +414,17 @@ import * as createDB from './create-db';
         let user = val[1];
 
         //レスを書き込んだユーザー
-        let resUser = await User.findOne(res.user);
+        let resUser = await UserRepository.findOne(res.user);
 
         let msg = res.dv(resUser, user, authToken!, now);
 
         let promise = [
-          Res.update(res),
-          User.update(resUser),
-          User.update(user)
+          ResRepository.update(res),
+          UserRepository.update(resUser),
+          UserRepository.update(user)
         ];
         if (msg !== null) {
-          promise.push(Msg.insert(msg));
+          promise.push(MsgRepository.insert(msg));
         }
 
         await Promise.all(promise);
@@ -444,8 +450,8 @@ import * as createDB from './create-db';
       },
       call: async ({params, authToken}): Promise<IResAPI> => {
         let val = await Promise.all([
-          Res.findOne(new ObjectID(params.id)),
-          User.findOne(authToken!.user)
+          ResRepository.findOne(new ObjectID(params.id)),
+          UserRepository.findOne(authToken!.user)
         ]);
 
         //レス
@@ -455,14 +461,14 @@ import * as createDB from './create-db';
         let user = val[1];
 
         //レスを書き込んだユーザー
-        let resUser = await User.findOne(res.user);
+        let resUser = await UserRepository.findOne(res.user);
 
         res.cv(resUser, user, authToken!);
 
         await Promise.all([
-          Res.update(res),
-          User.update(resUser),
-          User.update(user)
+          ResRepository.update(res),
+          UserRepository.update(resUser),
+          UserRepository.update(user)
         ]);
 
         return res.toAPI(authToken);
@@ -486,15 +492,15 @@ import * as createDB from './create-db';
       },
       call: async ({params, authToken}): Promise<IResAPI> => {
         //レス
-        let res = await Res.findOne(new ObjectID(params.id));
+        let res = await ResRepository.findOne(new ObjectID(params.id));
         //レスを書き込んだユーザー
-        let resUser = await User.findOne(res.user);
+        let resUser = await UserRepository.findOne(res.user);
 
         res.del(resUser, authToken!);
 
         await Promise.all([
-          Res.update(res),
-          User.update(resUser)
+          ResRepository.update(res),
+          UserRepository.update(resUser)
         ]);
 
         return res.toAPI(authToken);
@@ -537,7 +543,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
-        let user = await User.findOne(authToken!.user);
+        let user = await UserRepository.findOne(authToken!.user);
         let create = Topic.create(params.title,
           params.tags,
           params.text,
@@ -546,11 +552,11 @@ import * as createDB from './create-db';
           authToken!,
           now);
 
-        await Topic.insert(create.topic);
+        await TopicRepository.insert(create.topic);
         await Promise.all([
-          User.update(user),
-          Res.insert(create.res),
-          create.history ? History.insert(create.history) : Promise.resolve()
+          UserRepository.update(user),
+          ResRepository.insert(create.res),
+          create.history ? HistoryRepository.insert(create.history) : Promise.resolve()
         ]);
         if (create.history) {
           appLog("topic/create", ip, "histories", create.history.id);
@@ -575,7 +581,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params}): Promise<ITopicAPI> => {
-        let topic = await Topic.findOne(new ObjectID(params.id));
+        let topic = await TopicRepository.findOne(new ObjectID(params.id));
         return topic.toAPI();
       }
     });
@@ -599,7 +605,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params}): Promise<ITopicAPI[]> => {
-        let topics = await Topic.findIn(params.ids.map(id => new ObjectID(id)));
+        let topics = await TopicRepository.findIn(params.ids.map(id => new ObjectID(id)));
         return topics.map(t => t.toAPI());
       }
     });
@@ -641,7 +647,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params}): Promise<ITopicAPI[]> => {
-        let topic = await Topic.find(params.title, params.tags, params.skip, params.limit, params.activeOnly)
+        let topic = await TopicRepository.find(params.title, params.tags, params.skip, params.limit, params.activeOnly)
         return topic.map(t => t.toAPI());
       }
     });
@@ -662,7 +668,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params}): Promise<{ name: string, count: number }[]> => {
-        return await Topic.findTags(params.limit)
+        return await TopicRepository.findTags(params.limit)
       }
     });
 
@@ -700,8 +706,8 @@ import * as createDB from './create-db';
       },
       call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
         let val = await Promise.all([
-          Topic.findOne(new ObjectID(params.id)),
-          User.findOne(authToken!.user)
+          TopicRepository.findOne(new ObjectID(params.id)),
+          UserRepository.findOne(authToken!.user)
         ]);
 
         let topic = val[0];
@@ -712,10 +718,10 @@ import * as createDB from './create-db';
         let history = val2.history;
 
         await Promise.all([
-          Res.insert(res),
-          History.insert(history),
-          Topic.update(topic),
-          User.update(user)
+          ResRepository.insert(res),
+          HistoryRepository.insert(history),
+          TopicRepository.update(topic),
+          UserRepository.update(user)
         ]);
 
         appLog("topic/update", ip, "histories", history.id);
@@ -741,7 +747,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params}): Promise<IHistoryAPI> => {
-        return (await History.findOne(new ObjectID(params.id)))
+        return (await HistoryRepository.findOne(new ObjectID(params.id)))
           .toAPI();
       }
     });
@@ -765,7 +771,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params}): Promise<IHistoryAPI[]> => {
-        return (await History.findIn(params.ids.map(id => new ObjectID(id))))
+        return (await HistoryRepository.findIn(params.ids.map(id => new ObjectID(id))))
           .map(h => h.toAPI());
       }
     });
@@ -786,7 +792,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params}): Promise<IHistoryAPI[]> => {
-        return (await History.findAll(await Topic.findOne(new ObjectID(params.topic))))
+        return (await HistoryRepository.findAll(await TopicRepository.findOne(new ObjectID(params.topic))))
           .map(h => h.toAPI());
       }
     });
@@ -809,7 +815,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IMsgAPI> => {
-        let msg = await Msg.findOne(authToken!, new ObjectID(params.id));
+        let msg = await MsgRepository.findOne(authToken!, new ObjectID(params.id));
         return msg.toAPI();
       }
     });
@@ -833,7 +839,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IMsgAPI[]> => {
-        let msgs = await Msg.findIn(authToken!, params.ids.map(id => new ObjectID(id)));
+        let msgs = await MsgRepository.findIn(authToken!, params.ids.map(id => new ObjectID(id)));
         return msgs.map(m => m.toAPI());
       }
     });
@@ -870,7 +876,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IMsgAPI[]> => {
-        let msgs = await Msg.find(authToken!, params.type, params.equal, new Date(params.date), params.limit);
+        let msgs = await MsgRepository.find(authToken!, params.type, params.equal, new Date(params.date), params.limit);
         return msgs.map(m => m.toAPI());
       }
     });
@@ -891,7 +897,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IMsgAPI[]> => {
-        let msgs = await Msg.findNew(authToken!, params.limit);
+        let msgs = await MsgRepository.findNew(authToken!, params.limit);
         return msgs.map(m => m.toAPI());
       }
     });
@@ -925,7 +931,7 @@ import * as createDB from './create-db';
       },
       call: async ({params, authToken, ip, now}): Promise<IProfileAPI> => {
         let profile = Profile.create(authToken!, params.name, params.text, params.sn, now);
-        await Profile.insert(profile);
+        await ProfileRepository.insert(profile);
         appLog("profile/create", ip, "profiles", profile.id);
         return profile.toAPI(authToken);
       }
@@ -947,7 +953,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IProfileAPI> => {
-        let profile = await Profile.findOne(new ObjectID(params.id));
+        let profile = await ProfileRepository.findOne(new ObjectID(params.id));
         return profile.toAPI(authToken);
       }
     });
@@ -971,7 +977,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<IProfileAPI[]> => {
-        let profiles = await Profile.findIn(params.ids.map(id => new ObjectID(id)));
+        let profiles = await ProfileRepository.findIn(params.ids.map(id => new ObjectID(id)));
         return profiles.map(p => p.toAPI(authToken));
       }
     });
@@ -985,7 +991,7 @@ import * as createDB from './create-db';
         type: "null"
       },
       call: async ({authToken}): Promise<IProfileAPI[]> => {
-        let profiles = await Profile.findAll(authToken!);
+        let profiles = await ProfileRepository.findAll(authToken!);
         return profiles.map(p => p.toAPI(authToken));
       }
     });
@@ -1020,9 +1026,9 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken, ip, now}): Promise<IProfileAPI> => {
-        let profile = await Profile.findOne(new ObjectID(params.id));
+        let profile = await ProfileRepository.findOne(new ObjectID(params.id));
         profile.changeData(authToken!, params.name, params.text, params.sn, now);
-        await Profile.update(profile);
+        await ProfileRepository.update(profile);
         appLog("profile/update", ip, "profiles", profile.id);
         return profile.toAPI(authToken);
       }
@@ -1039,7 +1045,7 @@ import * as createDB from './create-db';
         type: "null"
       },
       call: async ({authToken}): Promise<ITokenAPI> => {
-        let token = await Token.findOne(authToken!.id);
+        let token = await TokenRepository.findOne(authToken!.id);
         return token.toAPI();
       }
     });
@@ -1053,7 +1059,7 @@ import * as createDB from './create-db';
         type: "null"
       },
       call: async ({authUser}): Promise<ITokenAPI[]> => {
-        let tokens = await Token.findAll(authUser!);
+        let tokens = await TokenRepository.findAll(authUser!);
         return tokens.map(t => t.toAPI());
       }
     });
@@ -1074,7 +1080,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authUser}): Promise<ITokenAPI> => {
-        let token = await Token.findOne(new ObjectID(params.id));
+        let token = await TokenRepository.findOne(new ObjectID(params.id));
         await token.enable(authUser!);
         return token.toAPI();
       }
@@ -1096,7 +1102,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authUser}): Promise<ITokenAPI> => {
-        let token = await Token.findOne(new ObjectID(params.id));
+        let token = await TokenRepository.findOne(new ObjectID(params.id));
         await token.disable(authUser!);
         return token.toAPI();
       }
@@ -1118,7 +1124,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authUser}): Promise<ITokenAPI> => {
-        let token = await Token.findOne(new ObjectID(params.id));
+        let token = await TokenRepository.findOne(new ObjectID(params.id));
         await token.keyChange(authUser!);
         return token.toAPI();
       }
@@ -1140,9 +1146,9 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authUser, now}): Promise<ITokenAPI> => {
-        let client = await Client.findOne(new ObjectID(params.client));
+        let client = await ClientRepository.findOne(new ObjectID(params.client));
         let token = Token.create(authUser!, client, now);
-        await Token.insert(token);
+        await TokenRepository.insert(token);
 
         return token.toAPI();
       }
@@ -1167,7 +1173,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<null> => {
-        let token = await Token.findOne(authToken!.id);
+        let token = await TokenRepository.findOne(authToken!.id);
         await token.setStorage(params.name, params.value);
         return null;
       }
@@ -1189,7 +1195,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<string> => {
-        let token = await Token.findOne(authToken!.id);
+        let token = await TokenRepository.findOne(authToken!.id);
         return await token.getStorage(params.name);
       }
     });
@@ -1210,7 +1216,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<null> => {
-        let token = await Token.findOne(authToken!.id);
+        let token = await TokenRepository.findOne(authToken!.id);
         await token.deleteStorage(params.name);
         return null;
       }
@@ -1225,7 +1231,7 @@ import * as createDB from './create-db';
         type: "null"
       },
       call: async ({authToken}): Promise<string[]> => {
-        let token = await Token.findOne(authToken!.id);
+        let token = await TokenRepository.findOne(authToken!.id);
         return await token.listStorage();
       }
     });
@@ -1239,10 +1245,10 @@ import * as createDB from './create-db';
         type: "null"
       },
       call: async ({authToken, now}): Promise<ITokenReqAPI> => {
-        let token = await Token.findOne(authToken!.id);
+        let token = await TokenRepository.findOne(authToken!.id);
         let req = token.createReq(now);
 
-        await Token.update(token);
+        await TokenRepository.update(token);
 
         return req;
       }
@@ -1267,7 +1273,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, now}): Promise<ITokenAPI> => {
-        let token = await Token.findOne(new ObjectID(params.id));
+        let token = await TokenRepository.findOne(new ObjectID(params.id));
         token.authReq(params.key, now);
         return token.toAPI();
       }
@@ -1299,7 +1305,7 @@ import * as createDB from './create-db';
       },
       call: async ({params, now}): Promise<IUserAPI> => {
         let user = await User.create(params.sn, params.pass, now);
-        await User.insert(user);
+        await UserRepository.insert(user);
         return user.toAPI();
       }
     });
@@ -1319,7 +1325,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params}): Promise<string> => {
-        return (await User.findID(params.sn)).toString();
+        return (await UserRepository.findID(params.sn)).toString();
       }
     });
     api.addAPI<{ pass: string, sn: string }>({
@@ -1341,9 +1347,9 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authUser}): Promise<IUserAPI> => {
-        let user = await User.findOne(authUser!.id);
+        let user = await UserRepository.findOne(authUser!.id);
         user.change(authUser!, params.pass, params.sn);
-        User.update(user);
+        UserRepository.update(user);
         return user.toAPI();
       }
     });
@@ -1370,7 +1376,7 @@ import * as createDB from './create-db';
       },
       call: async ({params, authUser, ip, now}): Promise<IClientAPI> => {
         let client = Client.create(authUser!, params.name, params.url, now);
-        await Client.insert(client);
+        await ClientRepository.insert(client);
         appLog("client/create", ip, "clients", client.id);
         return client.toAPI(authUser);
       }
@@ -1402,9 +1408,9 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authUser, ip, now}): Promise<IClientAPI> => {
-        let client = await Client.findOne(new ObjectID(params.id));
+        let client = await ClientRepository.findOne(new ObjectID(params.id));
         client.changeData(authUser!, params.name, params.url, now);
-        await Client.update(client);
+        await ClientRepository.update(client);
         appLog("client/update", ip, "clients", client.id);
         return client.toAPI(authUser);
       }
@@ -1426,7 +1432,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authUser}): Promise<IClientAPI> => {
-        let client = await Client.findOne(new ObjectID(params.id));
+        let client = await ClientRepository.findOne(new ObjectID(params.id));
         return client.toAPI(authUser);
       }
     });
@@ -1450,7 +1456,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authUser}): Promise<IClientAPI[]> => {
-        let clients = await Client.findIn(params.ids.map(id => new ObjectID(id)));
+        let clients = await ClientRepository.findIn(params.ids.map(id => new ObjectID(id)));
         return clients.map(c => c.toAPI(authUser));
       }
     });
@@ -1464,7 +1470,7 @@ import * as createDB from './create-db';
         type: "null",
       },
       call: async ({authUser}): Promise<IClientAPI[]> => {
-        let clients = await Client.findAll(authUser!);
+        let clients = await ClientRepository.findAll(authUser!);
         return clients.map(c => c.toAPI(authUser));
       }
     });

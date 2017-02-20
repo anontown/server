@@ -1,4 +1,4 @@
-import { ObjectID, WriteError } from 'mongodb';
+import { ObjectID } from 'mongodb';
 import { DB } from '../../db';
 import { IAuthUser } from '../../auth';
 import { AtError, StatusCode } from '../../at-error'
@@ -68,51 +68,6 @@ export class User {
     }
   }
 
-  static async findOne(id: ObjectID): Promise<User> {
-    let db = await DB;
-    let user: IUserDB | null = await db.collection("users").findOne({ _id: id });
-
-    if (user === null) {
-      throw new AtError(StatusCode.NotFound, "ユーザーが存在しません");
-    }
-
-    return this.fromDB(user);
-  }
-
-  static async findID(sn: string): Promise<ObjectID> {
-    let db = await DB;
-    let user: IUserDB | null = await db.collection("users").findOne({ sn });
-
-    if (user === null) {
-      throw new AtError(StatusCode.NotFound, "ユーザーが存在しません");
-    }
-
-    return user._id;
-  }
-  static async insert(user: User): Promise<null> {
-    let db = await DB;
-    await db.collection("users").insert(user.toDB()).catch((e: WriteError) => {
-      if (e.code === 11000) {
-        throw new AtError(StatusCode.Conflict, "スクリーンネームが使われています");
-      } else {
-        throw e;
-      }
-    });
-    return null;
-  }
-
-  static async update(user: User): Promise<null> {
-    let db = await DB;
-    await db.collection("users").update({ _id: user._id }, user.toDB()).catch((e: WriteError) => {
-      if (e.code === 11000) {
-        throw new AtError(StatusCode.Conflict, "スクリーンネームが使われています");
-      } else {
-        throw e;
-      }
-    });
-    return null;
-  }
-
   static fromDB(u: IUserDB): User {
     return new User(u._id, u.sn, u.pass, u.lv, u.resWait, u.lastTopic, u.date, u.point, u.lastOneTopic);
   }
@@ -156,7 +111,7 @@ export class User {
     }).start();
   }
 
-  static async create(sn: string, pass: string,now:Date): Promise<User> {
+  static async create(sn: string, pass: string, now: Date): Promise<User> {
     if (!pass.match(Config.user.pass.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
     }

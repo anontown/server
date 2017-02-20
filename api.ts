@@ -3,7 +3,7 @@ import * as bodyParser from 'body-parser';
 import { IAuthToken, IAuthUser } from './auth';
 import { Validator } from 'jsonschema';
 import { AtError, StatusCode } from './at-error';
-import { User, Token } from './models';
+import { TokenRepository,UserRepository } from './models';
 import { ObjectID } from 'mongodb';
 import * as http from 'http';
 import * as socketio from 'socket.io';
@@ -104,10 +104,10 @@ export class API {
           //認証
           let [authTokenObj, authUserObj] = await Promise.all([
             (authToken !== null ?
-              Token.findOne(new ObjectID(authToken.id)).then(token => token.auth(authToken.key)) :
+              TokenRepository.findOne(new ObjectID(authToken.id)).then(token => token.auth(authToken.key)) :
               Promise.resolve(null)) as Promise<IAuthToken | null>,
             (authUser !== null ?
-              User.findOne(new ObjectID(authUser.id)).then(user => user.auth(authUser.pass)) :
+              UserRepository.findOne(new ObjectID(authUser.id)).then(user => user.auth(authUser.pass)) :
               Promise.resolve(null)) as Promise<IAuthUser | null>,
             (isRecaptcha !== null ?
               new Promise<void>((resolve, reject) => {
