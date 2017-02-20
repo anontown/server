@@ -2,12 +2,10 @@ import { ObjectID } from 'mongodb';
 import { User } from '../user';
 import { Res } from '../res';
 import { History } from '../history';
-import { DB } from '../../db';
 import { IAuthToken } from '../../auth';
 import { AtError, StatusCode } from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
-import { CronJob } from 'cron';
 
 export interface ITopicDB {
   _id: ObjectID,
@@ -139,21 +137,7 @@ export class Topic {
     return { topic, history: cd.history, res: cd.res };
   }
 
-  static cron() {
-    //毎時間トピ落ちチェック
-    new CronJob({
-      cronTime: '00 00 * * * *',
-      onTick: async () => {
-        let db = await DB;
-        await db.collection("topics")
-          .update({ type: "one", update: { $lt: new Date(Date.now() - 1000 * 60 * 60 * 24) }, active: true },
-          { $set: { active: false } },
-          { multi: true });
-      },
-      start: false,
-      timeZone: 'Asia/Tokyo'
-    }).start();
-  }
+  
 
   private static checkData(title: string, tags: string[], text: string){
     if (tags.length !== new Set(tags).size) {

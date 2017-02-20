@@ -1,10 +1,8 @@
 import { ObjectID } from 'mongodb';
-import { DB } from '../../db';
 import { IAuthUser } from '../../auth';
 import { AtError, StatusCode } from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
-import { CronJob } from 'cron';
 
 export interface IUserDB {
   _id: ObjectID,
@@ -78,37 +76,6 @@ export class User {
 
   get lv(): number {
     return this._lv;
-  }
-
-  static cron() {
-    let start = (cronTime: string, field: string) => {
-      new CronJob({
-        cronTime,
-        onTick: async () => {
-          console.log("UserCron", field);
-          let db = await DB;
-          await db.collection("users").update({}, { $set: { ["resWait." + field]: 0 } }, { multi: true });
-        },
-        start: false,
-        timeZone: 'Asia/Tokyo'
-      }).start();
-    }
-
-    start('00 00,10,20,30,40,50 * * * *', "m10");
-    start('00 00,30 * * * *', "m30");
-    start('00 00 * * * *', "h1");
-    start('00 00 00,06,12,18 * * *', "h6");
-    start('00 00 00,12 * * *', "h12");
-    start('00 00 00 * * *', "d1");
-    new CronJob({
-      cronTime: '00 00 00 * * *',
-      onTick: async () => {
-        let db = await DB;
-        await db.collection("users").update({}, { $set: { point: 0 } }, { multi: true });
-      },
-      start: false,
-      timeZone: 'Asia/Tokyo'
-    }).start();
   }
 
   static async create(sn: string, pass: string, now: Date): Promise<User> {

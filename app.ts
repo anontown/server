@@ -1492,6 +1492,6 @@ import * as createDB from './create-db';
   api.run();
 
   //cron
-  User.cron();
-  Topic.cron();
+  UserRepository.cron();
+  TopicRepository.cron();
 })();

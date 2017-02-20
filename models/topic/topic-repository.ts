@@ -2,6 +2,8 @@ import { ObjectID } from 'mongodb';
 import { DB } from '../../db';
 import { AtError, StatusCode } from '../../at-error'
 import { Topic,ITopicDB } from './topic';
+import { CronJob } from 'cron';
+
 
 export class TopicRepository{
       static async findOne(id: ObjectID): Promise<Topic> {
@@ -95,6 +97,22 @@ export class TopicRepository{
 
     return topics.map(t => Topic.fromDB(t, count.has(t._id.toString()) ? count.get(t._id.toString()) as number : 0));
 
+  }
+
+  static cron() {
+    //毎時間トピ落ちチェック
+    new CronJob({
+      cronTime: '00 00 * * * *',
+      onTick: async () => {
+        let db = await DB;
+        await db.collection("topics")
+          .update({ type: "one", update: { $lt: new Date(Date.now() - 1000 * 60 * 60 * 24) }, active: true },
+          { $set: { active: false } },
+          { multi: true });
+      },
+      start: false,
+      timeZone: 'Asia/Tokyo'
+    }).start();
   }
 
   static async insert(topic: Topic): Promise<null> {
