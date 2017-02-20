@@ -12,7 +12,7 @@ export class StringUtil {
             "●": "○",
             "■": "□",
             "▼": "▽",
-            "▲": "▲",
+            "▲": "△",
             "◆": "◇"
         };
         return str.replace(/[★●■▼▲◆]/g, function (match) {
