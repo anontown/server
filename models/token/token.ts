@@ -4,6 +4,7 @@ import { IAuthToken, IAuthUser } from '../../auth';
 import { AtError, StatusCode } from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
+import { IGenerator } from '../../generator';
 
 export interface ITokenReq {
   key: string,
@@ -77,8 +78,8 @@ export class Token {
     return new Token(t._id, t.key, t.client, t.user, t.req, t.active, t.date);
   }
 
-  static create(authUser: IAuthUser, client: Client, now: Date, random: string): Token {
-    return new Token(new ObjectID(),
+  static create(objidGenerator:IGenerator<ObjectID>,authUser: IAuthUser, client: Client, now: Date, random: string): Token {
+    return new Token(objidGenerator.get(),
       StringUtil.hash(random + Config.salt.token),
       client.id,
       authUser.id,

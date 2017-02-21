@@ -32,6 +32,7 @@ import {
 import { ObjectID } from 'mongodb';
 import { Logger } from './logger';
 import * as createDB from './create-db';
+import { ObjectIDGenerator } from './generator';
 
 (async () => {
   //ロガー
@@ -96,7 +97,8 @@ import * as createDB from './create-db';
         let user = val[1];
         let reply = val[2];
         let profile = val[3];
-        let res = Res.create(topic,
+        let res = Res.create(ObjectIDGenerator,
+          topic,
           user,
           authToken!,
           params.name,
@@ -416,7 +418,7 @@ import * as createDB from './create-db';
         //レスを書き込んだユーザー
         let resUser = await UserRepository.findOne(res.user);
 
-        let msg = res.dv(resUser, user, authToken!, now);
+        let msg = res.dv(ObjectIDGenerator,resUser, user, authToken!, now);
 
         let promise = [
           ResRepository.update(res),
@@ -544,7 +546,8 @@ import * as createDB from './create-db';
       },
       call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
         let user = await UserRepository.findOne(authToken!.user);
-        let create = Topic.create(params.title,
+        let create = Topic.create(ObjectIDGenerator,
+        params.title,
           params.tags,
           params.text,
           user,
@@ -713,7 +716,7 @@ import * as createDB from './create-db';
         let topic = val[0];
         let user = val[1];
 
-        let val2 = topic.changeData(user, authToken!, params.title, params.tags, params.text, now);
+        let val2 = topic.changeData(ObjectIDGenerator,user, authToken!, params.title, params.tags, params.text, now);
         let res = val2.res;
         let history = val2.history;
 
@@ -930,7 +933,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken, ip, now}): Promise<IProfileAPI> => {
-        let profile = Profile.create(authToken!, params.name, params.text, params.sn, now);
+        let profile = Profile.create(ObjectIDGenerator,authToken!, params.name, params.text, params.sn, now);
         await ProfileRepository.insert(profile);
         appLog("profile/create", ip, "profiles", profile.id);
         return profile.toAPI(authToken);
@@ -1125,7 +1128,7 @@ import * as createDB from './create-db';
       },
       call: async ({params, authUser}): Promise<ITokenAPI> => {
         let token = await TokenRepository.findOne(new ObjectID(params.id));
-        await token.keyChange(authUser!,String(Math.random()));
+        await token.keyChange(authUser!, String(Math.random()));
         return token.toAPI();
       }
     });
@@ -1147,7 +1150,7 @@ import * as createDB from './create-db';
       },
       call: async ({params, authUser, now}): Promise<ITokenAPI> => {
         let client = await ClientRepository.findOne(new ObjectID(params.client));
-        let token = Token.create(authUser!, client, now,String(Math.random()));
+        let token = Token.create(ObjectIDGenerator,authUser!, client, now, String(Math.random()));
         await TokenRepository.insert(token);
 
         return token.toAPI();
@@ -1173,7 +1176,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<null> => {
-        await TokenRepository.setStorage(authToken!,params.name, params.value);
+        await TokenRepository.setStorage(authToken!, params.name, params.value);
         return null;
       }
     });
@@ -1194,7 +1197,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<string> => {
-        return await TokenRepository.getStorage(authToken!,params.name);
+        return await TokenRepository.getStorage(authToken!, params.name);
       }
     });
 
@@ -1214,7 +1217,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authToken}): Promise<null> => {
-        await TokenRepository.deleteStorage(authToken!,params.name);
+        await TokenRepository.deleteStorage(authToken!, params.name);
         return null;
       }
     });
@@ -1242,7 +1245,7 @@ import * as createDB from './create-db';
       },
       call: async ({authToken, now}): Promise<ITokenReqAPI> => {
         let token = await TokenRepository.findOne(authToken!.id);
-        let req = token.createReq(now,String(Math.random()));
+        let req = token.createReq(now, String(Math.random()));
 
         await TokenRepository.update(token);
 
@@ -1300,7 +1303,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, now}): Promise<IUserAPI> => {
-        let user = await User.create(params.sn, params.pass, now);
+        let user = await User.create(ObjectIDGenerator,params.sn, params.pass, now);
         await UserRepository.insert(user);
         return user.toAPI();
       }
@@ -1371,7 +1374,7 @@ import * as createDB from './create-db';
         }
       },
       call: async ({params, authUser, ip, now}): Promise<IClientAPI> => {
-        let client = Client.create(authUser!, params.name, params.url, now);
+        let client = Client.create(ObjectIDGenerator,authUser!, params.name, params.url, now);
         await ClientRepository.insert(client);
         appLog("client/create", ip, "clients", client.id);
         return client.toAPI(authUser);

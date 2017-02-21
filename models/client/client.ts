@@ -2,6 +2,7 @@ import { IAuthUser } from '../../auth'
 import { Config } from '../../config';
 import { AtError, StatusCode } from '../../at-error'
 import { ObjectID } from 'mongodb';
+import { IGenerator } from '../../generator';
 
 export interface IClientDB {
   _id: ObjectID,
@@ -61,7 +62,7 @@ export class Client {
     return new Client(c._id, c.name, c.url, c.user, c.date, c.update);
   }
 
-  static create(authUser: IAuthUser, name: string, url: string,now:Date): Client {
+  static create(objidGenerator:IGenerator<ObjectID>,authUser: IAuthUser, name: string, url: string,now:Date): Client {
     if (!name.match(Config.user.client.name.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.name.msg);
     }
@@ -69,7 +70,7 @@ export class Client {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.url.msg);
     }
 
-    return new Client(new ObjectID(),
+    return new Client(objidGenerator.get(),
       name,
       url,
       authUser.id,

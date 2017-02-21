@@ -1,6 +1,7 @@
 import { ObjectID } from 'mongodb';
 import { User } from '../user';
 import { StringUtil } from '../../util';
+import { IGenerator } from '../../generator';
 
 export interface IMsgDB {
   _id: ObjectID,
@@ -55,8 +56,8 @@ export class Msg {
     return new Msg(m._id, m.receiver, m.text, m.mdtext, m.date);
   }
 
-  static create(receiver: User | null, text: string, now: Date): Msg {
-    return new Msg(new ObjectID(),
+  static create(objidGenerator:IGenerator<ObjectID>,receiver: User | null, text: string, now: Date): Msg {
+    return new Msg(objidGenerator.get(),
       receiver !== null ? receiver.id : null,
       text,
       StringUtil.md(text),

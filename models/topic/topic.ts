@@ -6,6 +6,7 @@ import { IAuthToken } from '../../auth';
 import { AtError, StatusCode } from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
+import { IGenerator } from '../../generator';
 
 export interface ITopicDB {
   _id: ObjectID,
@@ -120,18 +121,18 @@ export class Topic {
     }
   }
 
-  static create(title: string, tags: string[], text: string, user: User, type: TopicType, authToken: IAuthToken,now:Date): { topic: Topic, res: Res, history: History | null } {
+  static create(objidGenerator:IGenerator<ObjectID>,title: string, tags: string[], text: string, user: User, type: TopicType, authToken: IAuthToken,now:Date): { topic: Topic, res: Res, history: History | null } {
     Topic.checkData(title,tags,text);
-    var topic = new Topic(new ObjectID(), title, tags, text, StringUtil.md(text), now, now, 1, type, now, true);
+    var topic = new Topic(objidGenerator.get(), title, tags, text, StringUtil.md(text), now, now, 1, type, now, true);
     let cd: { history: History | null, res: Res };
     if (type === "one") {
       cd = {
         history: null,
-        res: Res.create(topic, user, authToken, "", "トピ主", "トピックが建ちました", null, null, true,now)
+        res: Res.create(objidGenerator,topic, user, authToken, "", "トピ主", "トピックが建ちました", null, null, true,now)
       };
       user.changeLastOneTopic(now);
     } else {
-      cd = topic.changeData(user, authToken, title, tags, text,now);
+      cd = topic.changeData(objidGenerator,user, authToken, title, tags, text,now);
       user.changeLastTopic(now);
     }
     return { topic, history: cd.history, res: cd.res };
@@ -160,7 +161,7 @@ export class Topic {
   }
 
   //{{setter
-  changeData(user: User, authToken: IAuthToken, title: string, tags: string[], text: string,now:Date): { res: Res, history: History } {
+  changeData(objidGenerator:IGenerator<ObjectID>,user: User, authToken: IAuthToken, title: string, tags: string[], text: string,now:Date): { res: Res, history: History } {
     user.usePoint(10);
     Topic.checkData(title,tags,text);
     if (this._type === "one") {
@@ -178,8 +179,8 @@ export class Topic {
     this._text = text;
     this._mdtext = StringUtil.md(text);
 
-    let history = History.create(this, now, this.hash(now, user), user);
-    let res = Res.create(this, user, authToken, "", "トピックデータ", "トピックデータが編集されました", null, null, true,now);
+    let history = History.create(objidGenerator,this, now, this.hash(now, user), user);
+    let res = Res.create(objidGenerator,this, user, authToken, "", "トピックデータ", "トピックデータが編集されました", null, null, true,now);
 
     return { res, history };
   }

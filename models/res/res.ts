@@ -7,6 +7,7 @@ import { IAuthToken } from '../../auth';
 import { AtError, StatusCode } from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
+import { IGenerator } from '../../generator';
 
 export interface IVote {
   user: ObjectID,
@@ -186,7 +187,7 @@ export class Res {
     return new Res(r._id, r.topic, r.date, r.user, r.name, r.text, r.mdtext, r.reply, r.deleteFlag, r.vote, r.lv, r.hash, r.profile, replyCount, r.age)
   }
 
-  static create(topic: Topic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean,now:Date): Res {
+  static create(objidGenerator: IGenerator<ObjectID>, topic: Topic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean, now: Date): Res {
     if (!name.match(Config.res.name.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.res.name.msg);
     }
@@ -225,7 +226,7 @@ export class Res {
       user.changeLastRes(now);
     }
 
-    let result = new Res(new ObjectID(),
+    let result = new Res(objidGenerator.get(),
       topic.id,
       now,
       user.id,
@@ -256,7 +257,7 @@ export class Res {
     resUser.changeLv(resUser.lv + lv);
   }
 
-  dv(resUser: User, user: User, _authToken: IAuthToken,now:Date): Msg | null {
+  dv(objidGenerator: IGenerator<ObjectID>, resUser: User, user: User, _authToken: IAuthToken, now: Date): Msg | null {
     if (user.id.equals(this._user)) {
       throw new AtError(StatusCode.Forbidden, "自分に投票は出来ません");
     }
@@ -272,7 +273,7 @@ export class Res {
     let msg: Msg | null;
     if (this.voteValue < -this._lv && (this._deleteFlag === "active" || this._deleteFlag === "self")) {
       this._deleteFlag = "vote";
-      msg = Msg.create(resUser, "投票により書き込みが削除されました。",now);
+      msg = Msg.create(objidGenerator, resUser, "投票により書き込みが削除されました。", now);
     } else {
       msg = null;
     }

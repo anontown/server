@@ -3,7 +3,7 @@ import { StringUtil } from '../../util';
 import { IAuthToken } from '../../auth';
 import { AtError, StatusCode } from '../../at-error'
 import { Config } from '../../config';
-
+import { IGenerator } from '../../generator';
 
 export interface IProfileDB {
   _id: ObjectID,
@@ -81,7 +81,7 @@ export class Profile {
     return this._user;
   }
 
-  static create(authToken: IAuthToken, name: string, text: string, sn: string,now:Date): Profile {
+  static create(objidGenerator:IGenerator<ObjectID>,authToken: IAuthToken, name: string, text: string, sn: string,now:Date): Profile {
     if (!name.match(Config.user.profile.name.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.name.msg);
     }
@@ -92,7 +92,7 @@ export class Profile {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.sn.msg);
     }
 
-    return new Profile(new ObjectID(),
+    return new Profile(objidGenerator.get(),
       authToken.user,
       name,
       text,

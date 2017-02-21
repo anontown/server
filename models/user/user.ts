@@ -3,6 +3,7 @@ import { IAuthUser } from '../../auth';
 import { AtError, StatusCode } from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
+import { IGenerator } from '../../generator';
 
 export interface IUserDB {
   _id: ObjectID,
@@ -78,7 +79,7 @@ export class User {
     return this._lv;
   }
 
-  static async create(sn: string, pass: string, now: Date): Promise<User> {
+  static async create(objidGenerator:IGenerator<ObjectID>,sn: string, pass: string, now: Date): Promise<User> {
     if (!pass.match(Config.user.pass.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
     }
@@ -87,7 +88,7 @@ export class User {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.sn.msg);
     }
 
-    return new User(new ObjectID(),
+    return new User(objidGenerator.get(),
       sn,
       StringUtil.hash(pass + Config.salt.pass),
       1,
