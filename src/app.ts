@@ -1303,7 +1303,7 @@ import { ObjectIDGenerator,RandomGenerator } from './generator';
         }
       },
       call: async ({params, now}): Promise<IUserAPI> => {
-        let user = await User.create(ObjectIDGenerator,params.sn, params.pass, now);
+        let user = User.create(ObjectIDGenerator,params.sn, params.pass, now);
         await UserRepository.insert(user);
         return user.toAPI();
       }

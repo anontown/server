@@ -106,7 +106,7 @@ export class User {
     return new User(u._id, u.sn, u.pass, u.lv, u.resWait, u.lastTopic, u.date, u.point, u.lastOneTopic);
   }
 
-  static async create(objidGenerator: IGenerator<ObjectID>, sn: string, pass: string, now: Date): Promise<User> {
+  static create(objidGenerator: IGenerator<ObjectID>, sn: string, pass: string, now: Date): User {
     if (!pass.match(Config.user.pass.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
     }
