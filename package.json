@@ -32,12 +32,16 @@
     "@types/sinon": "^1.16.35",
     "@types/socket.io": "^1.4.27",
     "chai": "^3.5.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
+    "remap-istanbul": "^0.9.1",
     "sinon": "^1.17.7",
     "typescript": "^2.1.4"
   },
   "scripts": {
     "start": "tsc&&node ./dist/scripts/app.js",
-    "test": "tsc&&set NODE_ENV=test&&mocha ./dist/tests/*.test.js&&set NODE_ENV="
+    "pretest": "set NODE_ENV=test&&tsc",
+    "test": "node node_modules\\istanbul\\lib\\cli.js cover node_modules\\mocha\\bin\\_mocha -- ./dist/tests/**/*.test.js",
+    "posttest": "cd coverage && remap-istanbul -i coverage.json -o html-report -t html&&set NODE_ENV="
   }
 }
