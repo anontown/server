@@ -102,9 +102,9 @@ export class Token {
     return new Token(t._id, t.key, t.client, t.user, t.req, t.active, t.date);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, authUser: IAuthUser, client: Client, now: Date, random: string): Token {
+  static create(objidGenerator: IGenerator<ObjectID>, authUser: IAuthUser, client: Client, now: Date, randomGenerator: IGenerator<string>): Token {
     return new Token(objidGenerator.get(),
-      StringUtil.hash(random + Config.salt.token),
+      StringUtil.hash(randomGenerator.get() + Config.salt.token),
       client.id,
       authUser.id,
       [],
@@ -112,12 +112,12 @@ export class Token {
       now);
   }
 
-  keyChange(authUser: IAuthUser, random: string) {
+  keyChange(authUser: IAuthUser, randomGenerator: IGenerator<string>) {
     if (!authUser.id.equals(this._user)) {
       throw new AtError(StatusCode.Forbidden, "人のトークンは変えられません");
     }
     this._req = [];
-    this._key = StringUtil.hash(random + Config.salt.token);
+    this._key = StringUtil.hash(randomGenerator.get() + Config.salt.token);
   }
 
   auth(key: string): IAuthToken {
@@ -128,7 +128,7 @@ export class Token {
     return { id: this._id, key: this._key, user: this._user };
   }
 
-  createReq(now: Date, random: string): ITokenReqAPI {
+  createReq(now: Date, randomGenerator: IGenerator<string>): ITokenReqAPI {
     let nowNum = now.getTime();
 
     //ゴミを削除
@@ -139,7 +139,7 @@ export class Token {
     let req: ITokenReq;
     do {
       req = {
-        key: StringUtil.hash(random + Config.salt.tokenReq),
+        key: StringUtil.hash(randomGenerator.get() + Config.salt.tokenReq),
         expireDate: new Date(nowNum + 1000 * 60 * Config.user.token.req.expireMinute),
         active: true
       };

@@ -9,3 +9,9 @@ export const ObjectIDGenerator: IGenerator<ObjectID> = {
         return new ObjectID();
     }
 }
+
+export const RandomGenerator: IGenerator<string> = {
+    get: function () {
+        return String(Math.random());
+    }
+}

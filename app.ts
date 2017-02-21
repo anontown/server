@@ -32,7 +32,7 @@ import {
 import { ObjectID } from 'mongodb';
 import { Logger } from './logger';
 import * as createDB from './create-db';
-import { ObjectIDGenerator } from './generator';
+import { ObjectIDGenerator,RandomGenerator } from './generator';
 
 (async () => {
   //ロガー
@@ -1128,7 +1128,7 @@ import { ObjectIDGenerator } from './generator';
       },
       call: async ({params, authUser}): Promise<ITokenAPI> => {
         let token = await TokenRepository.findOne(new ObjectID(params.id));
-        await token.keyChange(authUser!, String(Math.random()));
+        await token.keyChange(authUser!, RandomGenerator);
         return token.toAPI();
       }
     });
@@ -1150,7 +1150,7 @@ import { ObjectIDGenerator } from './generator';
       },
       call: async ({params, authUser, now}): Promise<ITokenAPI> => {
         let client = await ClientRepository.findOne(new ObjectID(params.client));
-        let token = Token.create(ObjectIDGenerator,authUser!, client, now, String(Math.random()));
+        let token = Token.create(ObjectIDGenerator,authUser!, client, now, RandomGenerator);
         await TokenRepository.insert(token);
 
         return token.toAPI();
@@ -1245,7 +1245,7 @@ import { ObjectIDGenerator } from './generator';
       },
       call: async ({authToken, now}): Promise<ITokenReqAPI> => {
         let token = await TokenRepository.findOne(authToken!.id);
-        let req = token.createReq(now, String(Math.random()));
+        let req = token.createReq(now, RandomGenerator);
 
         await TokenRepository.update(token);
 
