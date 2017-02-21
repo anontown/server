@@ -39,6 +39,38 @@ export class Profile {
 
   }
 
+  get id() {
+    return this._id;
+  }
+
+  get user() {
+    return this._user;
+  }
+
+  get name() {
+    return this._name;
+  }
+
+  get text() {
+    return this._text;
+  }
+
+  get mdtext() {
+    return this._mdtext;
+  }
+
+  get date() {
+    return this._date;
+  }
+
+  get update() {
+    return this._update;
+  }
+
+  get sn() {
+    return this._sn;
+  }
+
   toDB(): IProfileDB {
     return {
       _id: this._id,
@@ -69,19 +101,7 @@ export class Profile {
     return new Profile(p._id, p.user, p.name, p.text, p.mdtext, p.date, p.update, p.sn);
   }
 
-  get id(): ObjectID {
-    return this._id;
-  }
-
-  get sn(): string {
-    return this._sn;
-  }
-
-  get user(): ObjectID {
-    return this._user;
-  }
-
-  static create(objidGenerator:IGenerator<ObjectID>,authToken: IAuthToken, name: string, text: string, sn: string,now:Date): Profile {
+  static create(objidGenerator: IGenerator<ObjectID>, authToken: IAuthToken, name: string, text: string, sn: string, now: Date): Profile {
     if (!name.match(Config.user.profile.name.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.name.msg);
     }
@@ -102,7 +122,7 @@ export class Profile {
       sn);
   }
 
-  changeData(authToken: IAuthToken, name: string, text: string, sn: string,now:Date) {
+  changeData(authToken: IAuthToken, name: string, text: string, sn: string, now: Date) {
     if (!authToken.user.equals(this._user)) {
       throw new AtError(StatusCode.MisdirectedRequest, "人のプロフィール変更は出来ません");
     }

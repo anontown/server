@@ -23,7 +23,7 @@ export interface IResDB {
   name: string,
   text: string,
   mdtext: string,
-  reply: { res: ObjectID, user: ObjectID } | null,
+  reply: IReply | null,
   deleteFlag: ResDeleteFlag,
   vote: IVote[],
   lv: number,
@@ -53,10 +53,13 @@ export interface IResAPI {
 
 export type VoteFlag = "uv" | "dv" | "not";
 export type ResDeleteFlag = "active" | "self" | "vote" | "freeze";
+export interface IReply{
+  res: ObjectID;
+  user: ObjectID;
+}
 
 export class Res {
   static writeListener = new Set<(res: Res) => void>();
-
 
   private constructor(private _id: ObjectID,
     private _topic: ObjectID,
@@ -65,7 +68,7 @@ export class Res {
     private _name: string,
     private _text: string,
     private _mdtext: string,
-    private _reply: { res: ObjectID, user: ObjectID } | null,
+    private _reply: IReply | null,
     private _deleteFlag: ResDeleteFlag,
     private _vote: IVote[],
     private _lv: number,
@@ -73,6 +76,66 @@ export class Res {
     private _profile: ObjectID | null,
     private _replyCount: number,
     private _age: boolean) {
+  }
+
+  get id() {
+    return this._id;
+  }
+
+  get topic() {
+    return this._topic;
+  }
+
+  get date() {
+    return this._date;
+  }
+
+  get user() {
+    return this._user;
+  }
+
+  get name() {
+    return this._name;
+  }
+
+  get text(){
+    return this._text;
+  }
+
+  get mdtext(){
+    return this._mdtext;
+  }
+
+  get reply(){
+    return this._reply;
+  }
+
+  get deleteFlag(){
+    return this._deleteFlag;
+  }
+
+  get vote(){
+    return this._vote;
+  }
+
+  get lv(){
+    return this._lv;
+  }
+
+  get hash(){
+    return this._hash;
+  }
+
+  get profile(){
+    return this._profile;
+  }
+
+  get replyCount(){
+    return this._replyCount;
+  }
+
+  get age(){
+    return this._age;
   }
 
   get voteValue(): number {
@@ -83,22 +146,6 @@ export class Res {
         .map(x => x.value)
         .reduce((x, y) => x + y);
     }
-  }
-
-  get age(): boolean {
-    return this._age;
-  }
-
-  get id(): ObjectID {
-    return this._id;
-  }
-
-  get user(): ObjectID {
-    return this._user;
-  }
-
-  get topic(): ObjectID {
-    return this._topic;
   }
 
   toDB(): IResDB {
@@ -118,10 +165,6 @@ export class Res {
       profile: this._profile,
       age: this._age
     };
-  }
-
-  get date(): Date {
-    return this._date;
   }
 
   toAPI(authToken: IAuthToken | null): IResAPI {

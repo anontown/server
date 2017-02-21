@@ -39,8 +39,40 @@ export class History {
 
   }
 
-  get id(): ObjectID {
+  get id() {
     return this._id;
+  }
+
+  get topic(){
+    return this._topic;
+  }
+
+  get title(){
+    return this._title;
+  }
+
+  get tags(){
+    return this._tags;
+  }
+
+  get text(){
+    return this._text;
+  }
+
+  get mdtext(){
+    return this._mdtext;
+  }
+
+  get date(){
+    return this._date;
+  }
+
+  get hash(){
+    return this._hash;
+  }
+
+  get user(){
+    return this._user;
   }
 
   toDB(): IHistoryDB {

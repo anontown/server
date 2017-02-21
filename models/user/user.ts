@@ -43,7 +43,42 @@ export class User {
     //毎日リセットされ、特殊動作をすると増えるポイント
     private _point: number,
     private _lastOneTopic: Date) {
+  }
 
+  get id() {
+    return this._id;
+  }
+
+  get sn() {
+    return this._sn;
+  }
+
+  get pass() {
+    return this._pass;
+  }
+
+  get lv() {
+    return this._lv;
+  }
+
+  get resWait() {
+    return this._resWait;
+  }
+
+  get lastTopic() {
+    return this._lastTopic;
+  }
+
+  get date() {
+    return this._date;
+  }
+
+  get point() {
+    return this._point;
+  }
+
+  get lastOneTopic() {
+    return this._lastOneTopic;
   }
 
   toDB(): IUserDB {
@@ -71,15 +106,7 @@ export class User {
     return new User(u._id, u.sn, u.pass, u.lv, u.resWait, u.lastTopic, u.date, u.point, u.lastOneTopic);
   }
 
-  get id(): ObjectID {
-    return this._id;
-  }
-
-  get lv(): number {
-    return this._lv;
-  }
-
-  static async create(objidGenerator:IGenerator<ObjectID>,sn: string, pass: string, now: Date): Promise<User> {
+  static async create(objidGenerator: IGenerator<ObjectID>, sn: string, pass: string, now: Date): Promise<User> {
     if (!pass.match(Config.user.pass.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
     }

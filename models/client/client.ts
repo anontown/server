@@ -32,8 +32,28 @@ export class Client {
 
   }
 
-  get id(): ObjectID {
+  get id() {
     return this._id;
+  }
+
+  get name() {
+    return this._name;
+  }
+
+  get url() {
+    return this._url;
+  }
+
+  get user() {
+    return this._user;
+  }
+
+  get date() {
+    return this._date;
+  }
+
+  get update() {
+    return this._update;
   }
 
   toDB(): IClientDB {
@@ -62,7 +82,7 @@ export class Client {
     return new Client(c._id, c.name, c.url, c.user, c.date, c.update);
   }
 
-  static create(objidGenerator:IGenerator<ObjectID>,authUser: IAuthUser, name: string, url: string,now:Date): Client {
+  static create(objidGenerator: IGenerator<ObjectID>, authUser: IAuthUser, name: string, url: string, now: Date): Client {
     if (!name.match(Config.user.client.name.regex)) {
       throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.name.msg);
     }
@@ -78,7 +98,7 @@ export class Client {
       now);
   }
 
-  changeData(authUser: IAuthUser, name: string, url: string,now:Date) {
+  changeData(authUser: IAuthUser, name: string, url: string, now: Date) {
     if (!authUser.id.equals(this._user)) {
       throw new AtError(StatusCode.MisdirectedRequest, "人のクライアント変更は出来ません");
     }
@@ -91,6 +111,6 @@ export class Client {
 
     this._name = name;
     this._url = url;
-    this._update =now;
+    this._update = now;
   }
 }

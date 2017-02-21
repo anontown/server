@@ -51,24 +51,48 @@ export class Topic {
 
   }
 
-  get active(): boolean {
-    return this._active;
+  get id() {
+    return this._id;
   }
 
-  get title(): string {
+  get title() {
     return this._title;
   }
 
-  get tags(): string[] {
+  get tags() {
     return this._tags;
   }
 
-  get text(): string {
+  get text() {
     return this._text;
   }
 
-  get mdtext(): string {
+  get mdtext() {
     return this._mdtext;
+  }
+
+  get update() {
+    return this._update;
+  }
+
+  get date() {
+    return this._date;
+  }
+
+  get resCount() {
+    return this._resCount;
+  }
+
+  get type() {
+    return this._type;
+  }
+
+  get ageUpdate() {
+    return this._ageUpdate;
+  }
+
+  get active() {
+    return this._active;
   }
 
   toDB(): ITopicDB {
@@ -101,13 +125,9 @@ export class Topic {
     }
   }
 
+
   static fromDB(t: ITopicDB, resCount: number): Topic {
     return new Topic(t._id, t.title, t.tags, t.text, t.mdtext, t.update, t.date, resCount, t.type, t.ageUpdate, t.active);
-  }
-
-
-  get id(): ObjectID {
-    return this._id;
   }
 
   resUpdate(res: Res) {
@@ -121,26 +141,26 @@ export class Topic {
     }
   }
 
-  static create(objidGenerator:IGenerator<ObjectID>,title: string, tags: string[], text: string, user: User, type: TopicType, authToken: IAuthToken,now:Date): { topic: Topic, res: Res, history: History | null } {
-    Topic.checkData(title,tags,text);
+  static create(objidGenerator: IGenerator<ObjectID>, title: string, tags: string[], text: string, user: User, type: TopicType, authToken: IAuthToken, now: Date): { topic: Topic, res: Res, history: History | null } {
+    Topic.checkData(title, tags, text);
     var topic = new Topic(objidGenerator.get(), title, tags, text, StringUtil.md(text), now, now, 1, type, now, true);
     let cd: { history: History | null, res: Res };
     if (type === "one") {
       cd = {
         history: null,
-        res: Res.create(objidGenerator,topic, user, authToken, "", "トピ主", "トピックが建ちました", null, null, true,now)
+        res: Res.create(objidGenerator, topic, user, authToken, "", "トピ主", "トピックが建ちました", null, null, true, now)
       };
       user.changeLastOneTopic(now);
     } else {
-      cd = topic.changeData(objidGenerator,user, authToken, title, tags, text,now);
+      cd = topic.changeData(objidGenerator, user, authToken, title, tags, text, now);
       user.changeLastTopic(now);
     }
     return { topic, history: cd.history, res: cd.res };
   }
 
-  
 
-  private static checkData(title: string, tags: string[], text: string){
+
+  private static checkData(title: string, tags: string[], text: string) {
     if (tags.length !== new Set(tags).size) {
       throw new AtError(StatusCode.MisdirectedRequest, "タグの重複があります");
     }
@@ -161,9 +181,9 @@ export class Topic {
   }
 
   //{{setter
-  changeData(objidGenerator:IGenerator<ObjectID>,user: User, authToken: IAuthToken, title: string, tags: string[], text: string,now:Date): { res: Res, history: History } {
+  changeData(objidGenerator: IGenerator<ObjectID>, user: User, authToken: IAuthToken, title: string, tags: string[], text: string, now: Date): { res: Res, history: History } {
     user.usePoint(10);
-    Topic.checkData(title,tags,text);
+    Topic.checkData(title, tags, text);
     if (this._type === "one") {
       throw new AtError(StatusCode.Forbidden, "単発トピックは編集出来ません");
     }
@@ -179,8 +199,8 @@ export class Topic {
     this._text = text;
     this._mdtext = StringUtil.md(text);
 
-    let history = History.create(objidGenerator,this, now, this.hash(now, user), user);
-    let res = Res.create(objidGenerator,this, user, authToken, "", "トピックデータ", "トピックデータが編集されました", null, null, true,now);
+    let history = History.create(objidGenerator, this, now, this.hash(now, user), user);
+    let res = Res.create(objidGenerator, this, user, authToken, "", "トピックデータ", "トピックデータが編集されました", null, null, true, now);
 
     return { res, history };
   }

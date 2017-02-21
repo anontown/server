@@ -28,8 +28,24 @@ export class Msg {
 
   }
 
-  get id(): ObjectID {
+  get id() {
     return this._id;
+  }
+
+  get receiver() {
+    return this._receiver;
+  }
+
+  get text(){
+    return this._text;
+  }
+
+  get mdtext(){
+    return this._mdtext;
+  }
+
+  get date(){
+    return this._date;
   }
 
   toDB(): IMsgDB {
@@ -56,7 +72,7 @@ export class Msg {
     return new Msg(m._id, m.receiver, m.text, m.mdtext, m.date);
   }
 
-  static create(objidGenerator:IGenerator<ObjectID>,receiver: User | null, text: string, now: Date): Msg {
+  static create(objidGenerator: IGenerator<ObjectID>, receiver: User | null, text: string, now: Date): Msg {
     return new Msg(objidGenerator.get(),
       receiver !== null ? receiver.id : null,
       text,

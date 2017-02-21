@@ -47,8 +47,32 @@ export class Token {
 
   }
 
-  get id(): ObjectID {
+  get id() {
     return this._id;
+  }
+
+  get key() {
+    return this._key;
+  }
+
+  get client() {
+    return this._client;
+  }
+
+  get user() {
+    return this._user;
+  }
+
+  get req() {
+    return this._req;
+  }
+
+  get active() {
+    return this._active;
+  }
+
+  get date() {
+    return this._date;
   }
 
   toDB(): ITokenDB {
@@ -78,7 +102,7 @@ export class Token {
     return new Token(t._id, t.key, t.client, t.user, t.req, t.active, t.date);
   }
 
-  static create(objidGenerator:IGenerator<ObjectID>,authUser: IAuthUser, client: Client, now: Date, random: string): Token {
+  static create(objidGenerator: IGenerator<ObjectID>, authUser: IAuthUser, client: Client, now: Date, random: string): Token {
     return new Token(objidGenerator.get(),
       StringUtil.hash(random + Config.salt.token),
       client.id,
