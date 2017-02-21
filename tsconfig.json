@@ -6,6 +6,11 @@
     "lib": [
       "es6"
     ],
+    "outDir": "./dist",
+    "rootDirs": [
+      "./scripts",
+      "./tests"
+    ],
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

@@ -37,7 +37,7 @@
     "typescript": "^2.1.4"
   },
   "scripts": {
-    "start": "tsc -p ./src && node ./bin/app.js",
-    "test": "tsc -p ./src&&tsc -p ./tests&&set NODE_ENV=test&&mocha ./bin/tests/*.test.js&&set NODE_ENV="
+    "start": "tsc&&node ./dist/scripts/app.js",
+    "test": "tsc&&set NODE_ENV=test&&mocha ./dist/tests/*.test.js&&set NODE_ENV="
   }
 }
