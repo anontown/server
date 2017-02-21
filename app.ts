@@ -1125,7 +1125,7 @@ import * as createDB from './create-db';
       },
       call: async ({params, authUser}): Promise<ITokenAPI> => {
         let token = await TokenRepository.findOne(new ObjectID(params.id));
-        await token.keyChange(authUser!);
+        await token.keyChange(authUser!,String(Math.random()));
         return token.toAPI();
       }
     });
@@ -1147,7 +1147,7 @@ import * as createDB from './create-db';
       },
       call: async ({params, authUser, now}): Promise<ITokenAPI> => {
         let client = await ClientRepository.findOne(new ObjectID(params.client));
-        let token = Token.create(authUser!, client, now);
+        let token = Token.create(authUser!, client, now,String(Math.random()));
         await TokenRepository.insert(token);
 
         return token.toAPI();
@@ -1242,7 +1242,7 @@ import * as createDB from './create-db';
       },
       call: async ({authToken, now}): Promise<ITokenReqAPI> => {
         let token = await TokenRepository.findOne(authToken!.id);
-        let req = token.createReq(now);
+        let req = token.createReq(now,String(Math.random()));
 
         await TokenRepository.update(token);
 
