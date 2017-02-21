@@ -4,7 +4,7 @@
     "outDir": "./bin",
     "sourceMap": true,
     "target": "es6",
-    "rootDir":"./",
+    "rootDir":"./src",
     "lib": [
       "es6"
     ],
