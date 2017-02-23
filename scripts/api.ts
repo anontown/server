@@ -109,7 +109,7 @@ export class API {
             (authUser !== null ?
               UserRepository.findOne(new ObjectID(authUser.id)).then(user => user.auth(authUser.pass)) :
               Promise.resolve(null)) as Promise<IAuthUser | null>,
-            (isRecaptcha !== null ?
+            (recaptcha !== null ?
               new Promise<void>((resolve, reject) => {
                 request.post("https://www.google.com/recaptcha/api/siteverify", {
                   form: {

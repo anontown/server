@@ -67,7 +67,7 @@ export const Config = {
         },
         client: {
             name: {
-                regex: "^.{0,30}$",
+                regex: "^.{1,30}$",
                 msg: "名前は1～30文字にして下さい"
             },
             url: {
