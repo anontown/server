@@ -1,11 +1,11 @@
-import { History,IHistoryDB } from './history';
+import { History, IHistoryDB } from './history';
 import { DB } from '../../db';
-import { AtError, StatusCode } from '../../at-error';
+import { AtNotFoundError, AtNotFoundPartError } from '../../at-error';
 import { ObjectID } from 'mongodb';
 import { Topic } from '../topic';
 
-export class HistoryRepository{
-    static async insert(history: History): Promise<null> {
+export class HistoryRepository {
+  static async insert(history: History): Promise<null> {
     let db = await DB;
     await db.collection("histories").insert(history.toDB());
     return null;
@@ -21,7 +21,7 @@ export class HistoryRepository{
     let db = await DB;
     let history: IHistoryDB | null = await db.collection("histories").findOne({ _id: id });
     if (history === null) {
-      throw new AtError(StatusCode.NotFound, "編集履歴が存在しません");
+      throw new AtNotFoundError("編集履歴が存在しません");
     }
 
     return History.fromDB(history);
@@ -35,7 +35,8 @@ export class HistoryRepository{
       .toArray();
 
     if (histories.length !== ids.length) {
-      throw new AtError(StatusCode.NotFound, "編集履歴が存在しません");
+      throw new AtNotFoundPartError("編集履歴が存在しません",
+        histories.map(x => x._id.toString()));
     }
 
     return histories.map(h => History.fromDB(h));

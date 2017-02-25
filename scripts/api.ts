@@ -2,8 +2,13 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import { IAuthToken, IAuthUser } from './auth';
 import { Validator } from 'jsonschema';
-import { AtError, StatusCode } from './at-error';
-import { TokenRepository,UserRepository } from './models';
+import {
+  AtError,
+  AtParamTypeError,
+  AtServerError,
+  AtCaptchaError
+} from './at-error';
+import { TokenRepository, UserRepository } from './models';
 import { ObjectID } from 'mongodb';
 import * as http from 'http';
 import * as socketio from 'socket.io';
@@ -45,7 +50,7 @@ export class API {
   }) {
     this.app.post(url, async (req: express.Request, res: express.Response) => {
       let errorFunc = function (error: AtError) {
-        resultFunc(error.statusCode, { message: error.message });
+        resultFunc(error.statusCode, error.toJSON());
       };
 
       let resultFunc = function (status: number, data: any) {
@@ -98,7 +103,7 @@ export class API {
         if (paramsCheck.errors.length === 0) {
           let authUser: { id: string, pass: string } = req.body.authUser;
           let authToken: { id: string, key: string } = req.body.authToken;
-          let recaptcha: string|null = req.body.recaptcha;
+          let recaptcha: string | null = req.body.recaptcha;
           let params: any = req.body.params;
 
           //認証
@@ -124,7 +129,7 @@ export class API {
                     if (JSON.parse(body).success) {
                       resolve();
                     } else {
-                      reject(new AtError(StatusCode.Forbidden, "キャプチャ認証に失敗"));
+                      reject(new AtCaptchaError());
                     }
                   });
               }) :
@@ -141,14 +146,14 @@ export class API {
           resultFunc(200, result);
           console.log("成功");
         } else {
-          throw new AtError(StatusCode.MisdirectedRequest, "パラメーターが不正です");
+          throw new AtParamTypeError(paramsCheck.errors);
         }
       })().catch(e => {
         if (e instanceof AtError) {
           errorFunc(e);
         } else {
           Logger.error.error("サーバー内部エラー", e);
-          errorFunc(new AtError(StatusCode.InternalServerError, "サーバー内部エラー"));
+          errorFunc(new AtServerError());
         }
       });
     });

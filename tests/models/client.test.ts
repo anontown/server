@@ -4,65 +4,110 @@ import {
   AtError,
   IAuthUser
 } from '../../scripts';
-import * as assert from 'assert';
+import * as assert from 'power-assert';
 import { ObjectID } from 'mongodb';
 
 describe('Client', () => {
   describe('create', () => {
-    it('正常にnew出来るか', () => {
-      [
-        { name: 'name', url: 'http://localhost' },
-        { name: 'name', url: 'https://localhost' },
-        { name: 'name', url: 'http://localhost.com' },
-        { name: 'name', url: 'https://hoge.hoge.localhost.com' },
-      ].forEach(val => {
-        assert.throws(() => {
-          Client.create(
-            ObjectIDGenerator,
-            {
-              id: new ObjectID(),
-              pass: ''
-            },
-            val.name,
-            val.name,
-            new Date()
-          );
-        }, (e: any) => e instanceof AtError, '名前を長くしてもエラーにならない');
-      });
+    it('http:// から始まるURLで正常に呼び出せるか', () => {
+      Client.create(
+        ObjectIDGenerator,
+        {
+          id: new ObjectID(),
+          pass: ''
+        },
+        'hoge',
+        'http://hoge.com',
+        new Date()
+      );
     });
 
-    it('名前を不正にしたらエラーになるか', () => {
-      ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', ''].forEach(name => {
-        assert.throws(() => {
-          Client.create(
-            ObjectIDGenerator,
-            {
-              id: new ObjectID(),
-              pass: ''
-            },
-            name,
-            'http://hoge',
-            new Date()
-          );
-        }, (e: any) => e instanceof AtError, '名前を不正にしてもエラーにならない');
-      });
+    it('https:// から始まるURLで正常に呼び出せるか', () => {
+      Client.create(
+        ObjectIDGenerator,
+        {
+          id: new ObjectID(),
+          pass: ''
+        },
+        'hoge',
+        'https://hoge.com',
+        new Date()
+      );
     });
 
-    it('URLを不正にしたらエラーになるか', () => {
-      ['hogehttp://', 'hoge', 'hogehttps://', 'http://', 'https://', ''].forEach(url => {
-        assert.throws(() => {
-          Client.create(
-            ObjectIDGenerator,
-            {
-              id: new ObjectID(),
-              pass: ''
-            },
-            'a',
-            url,
-            new Date()
-          );
-        }, (e: any) => e instanceof AtError, 'URLが不正なのにエラーにならない');
-      })
+    it('長い名前でエラーになるか', () => {
+      assert.throws(() => {
+        Client.create(
+          ObjectIDGenerator,
+          {
+            id: new ObjectID(),
+            pass: ''
+          },
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          'http://hoge',
+          new Date()
+        );
+      }, (e: any) => e instanceof AtError);
+    });
+
+    it('名前が空文字でエラーになるか', () => {
+      assert.throws(() => {
+        Client.create(
+          ObjectIDGenerator,
+          {
+            id: new ObjectID(),
+            pass: ''
+          },
+          '',
+          'http://hoge',
+          new Date()
+        );
+      }, (e: any) => e instanceof AtError);
+    });
+
+    it('URLスキーマを不正にしたらエラーになるか', () => {
+      assert.throws(() => {
+        Client.create(
+          ObjectIDGenerator,
+          {
+            id: new ObjectID(),
+            pass: ''
+          },
+          'hoge',
+          'hogehttp://hoge.com',
+          new Date()
+        );
+      }, (e: any) => e instanceof AtError);
+    });
+
+    it('URLのホストなしでエラーになるか', () => {
+      assert.throws(() => {
+        Client.create(
+          ObjectIDGenerator,
+          {
+            id: new ObjectID(),
+            pass: ''
+          },
+          'http://',
+          '',
+          new Date()
+        );
+      }, (e: any) => e instanceof AtError);
+    });
+
+    it('URLが空でエラーになるか', () => {
+      assert.throws(() => {
+        Client.create(
+          ObjectIDGenerator,
+          {
+            id: new ObjectID(),
+            pass: ''
+          },
+          'hoge',
+          '',
+          new Date()
+        );
+      }, (e: any) => e instanceof AtError);
     });
   });
 
@@ -79,8 +124,64 @@ describe('Client', () => {
         "https://a",
         new Date());
 
-      client.changeData(auth,"name","http://hoge",new Date());
+      client.changeData(auth, "name", "http://hoge", new Date());
+    });
+
+    it("違うユーザーが変更しようとしたらエラーになるか", () => {
+      assert.throws(() => {
+        let auth: IAuthUser = {
+          id: new ObjectID(),
+          pass: ""
+        };
+
+        let client = Client.create(ObjectIDGenerator,
+          auth,
+          "hoge",
+          "http://hoge",
+          new Date());
+
+        client.changeData({
+          id: new ObjectID(),
+          pass: ""
+        }, "foo", "http://foo", new Date());
+      }, (e: any) => e instanceof AtError);
+    });
+
+
+    it("長い名前でエラーになるか", () => {
+      assert.throws(() => {
+        let auth: IAuthUser = {
+          id: new ObjectID(),
+          pass: ""
+        };
+
+        let client = Client.create(ObjectIDGenerator,
+          auth,
+          "hoge",
+          "http://hoge",
+          new Date());
+
+        client.changeData(auth, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "http://foo", new Date());
+      }, (e: any) => e instanceof AtError);
+    });
+
+    it("不正なURLでエラーになるか", () => {
+      assert.throws(() => {
+        let auth: IAuthUser = {
+          id: new ObjectID(),
+          pass: ""
+        };
+
+        let client = Client.create(ObjectIDGenerator,
+          auth,
+          "hoge",
+          "hogehttp://hoge",
+          new Date());
+
+        client.changeData(auth, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "http://foo", new Date());
+      }, (e: any) => e instanceof AtError);
     });
   });
+
 
 });

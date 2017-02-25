@@ -1,9 +1,9 @@
 import { ObjectID, WriteError } from 'mongodb';
 import { DB } from '../../db';
-import { AtError, StatusCode } from '../../at-error'
+import { AtNotFoundError, AtConflictError, paramsErrorMaker } from '../../at-error'
 import * as fs from 'fs-promise';
 import { Token, ITokenDB } from './token';
-import { IAuthUser,IAuthToken } from '../../auth';
+import { IAuthUser, IAuthToken } from '../../auth';
 import { Config } from '../../config';
 
 export class TokenRepository {
@@ -11,7 +11,7 @@ export class TokenRepository {
     let db = await DB;
     let token: ITokenDB | null = await db.collection("tokens").findOne({ _id: id });
     if (token === null) {
-      throw new AtError(StatusCode.NotFound, "トークンが存在しません");
+      throw new AtNotFoundError("トークンが存在しません");
     }
 
     return Token.fromDB(token);
@@ -31,7 +31,7 @@ export class TokenRepository {
     let db = await DB;
     await db.collection("tokens").insert(token.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
-        throw new AtError(StatusCode.Conflict, "トークンが存在しません");
+        throw new AtConflictError("トークンが既にあります");
       } else {
         throw e;
       }
@@ -48,50 +48,65 @@ export class TokenRepository {
     return null;
   }
 
-  private static getStorageFilePath(token:IAuthToken,name: string) {
+  private static getStorageFilePath(token: IAuthToken, name: string) {
     return "./storage/" + token.id.toString() + "/st-" + name;
   }
 
-  static async getStorage(token:IAuthToken,name: string): Promise<string> {
-    if (!name.match(Config.user.token.storage.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.token.storage.msg);
-    }
+  static async getStorage(token: IAuthToken, name: string): Promise<string> {
+    paramsErrorMaker([
+      {
+        field: "name",
+        val: name,
+        regex: Config.user.token.storage.regex,
+        message: Config.user.token.storage.msg
+      },
+    ]);
     try {
-      return await fs.readFile(this.getStorageFilePath(token,name), { encoding: "utf-8" });
+      return await fs.readFile(this.getStorageFilePath(token, name), { encoding: "utf-8" });
     } catch (_e) {
-      throw new AtError(StatusCode.NotFound, "ストレージが見つかりません");
+      throw new AtNotFoundError("ストレージが見つかりません");
     }
   }
 
-  static async setStorage(token:IAuthToken,name: string, value: string): Promise<void> {
-    if (!name.match(Config.user.token.storage.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.token.storage.msg);
-    }
+  static async setStorage(token: IAuthToken, name: string, value: string): Promise<void> {
+    paramsErrorMaker([
+      {
+        field: "name",
+        val: name,
+        regex: Config.user.token.storage.regex,
+        message: Config.user.token.storage.msg
+      },
+    ]);
 
     try {
-      await fs.writeFile(this.getStorageFilePath(token,name), value, { encoding: "utf-8" });
+      await fs.writeFile(this.getStorageFilePath(token, name), value, { encoding: "utf-8" });
     } catch (_e) {
       throw new Error();
     }
   }
 
-  static async deleteStorage(token:IAuthToken,name: string): Promise<void> {
-    if (!name.match(Config.user.token.storage.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.token.storage.msg);
-    }
+  static async deleteStorage(token: IAuthToken, name: string): Promise<void> {
+    paramsErrorMaker([
+      {
+        field: "name",
+        val: name,
+        regex: Config.user.token.storage.regex,
+        message: Config.user.token.storage.msg
+      },
+    ]);
 
-    try{
-      await fs.unlink(this.getStorageFilePath(token,name))
-    }catch(_e){
-      throw new AtError(StatusCode.NotFound, "ストレージが見つかりません");
+    try {
+      await fs.unlink(this.getStorageFilePath(token, name))
+    } catch (_e) {
+      throw new AtNotFoundError("ストレージが見つかりません");
     }
   }
 
-  static async listStorage(token:IAuthToken): Promise<string[]> {
-    try{
-      let ls=await fs.readdir("./storage/" + token.id.toString() + "/");
+  static async listStorage(token: IAuthToken): Promise<string[]> {
+    try {
+      let ls = await fs.readdir("./storage/" + token.id.toString() + "/");
       return ls.map(s => s.substring(4));
-    }catch(_e){
+    } catch (_e) {
       throw new Error();
     }
   }

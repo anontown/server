@@ -1,17 +1,17 @@
 import { ObjectID } from 'mongodb';
 import { DB } from '../../db';
-import { AtError, StatusCode } from '../../at-error'
-import { Topic,ITopicDB } from './topic';
+import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
+import { Topic, ITopicDB } from './topic';
 import { CronJob } from 'cron';
 
 
-export class TopicRepository{
-      static async findOne(id: ObjectID): Promise<Topic> {
+export class TopicRepository {
+  static async findOne(id: ObjectID): Promise<Topic> {
     let db = await DB;
     let topic: ITopicDB | null = await db.collection("topics").findOne({ _id: id });
 
     if (topic === null) {
-      throw new AtError(StatusCode.NotFound, "トピックが存在しません");
+      throw new AtNotFoundError("トピックが存在しません");
     }
 
     return (await this.aggregate([topic]))[0];
@@ -25,7 +25,8 @@ export class TopicRepository{
       .toArray();
 
     if (topics.length !== ids.length) {
-      throw new AtError(StatusCode.NotFound, "トピックが存在しません");
+      throw new AtNotFoundPartError("トピックが存在しません",
+        topics.map(x => x._id.toString()));
     }
 
     return this.aggregate(topics);
@@ -55,7 +56,7 @@ export class TopicRepository{
           title: new RegExp(title.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
         };
 
-        if(tags.length!==0){
+        if (tags.length !== 0) {
           query["tags"] = { $all: tags };
         }
 

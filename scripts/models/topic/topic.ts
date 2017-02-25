@@ -3,7 +3,7 @@ import { User } from '../user';
 import { Res } from '../res';
 import { History } from '../history';
 import { IAuthToken } from '../../auth';
-import { AtError, StatusCode } from '../../at-error'
+import { AtPrerequisiteError, paramsErrorMaker } from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
 import { IGenerator } from '../../generator';
@@ -132,7 +132,7 @@ export class Topic {
 
   resUpdate(res: Res) {
     if (!this._active) {
-      throw new AtError(StatusCode.Forbidden, "トピックが落ちているので書き込めません")
+      throw new AtPrerequisiteError("トピックが落ちているので書き込めません")
     }
 
     this._update = res.date;
@@ -161,23 +161,46 @@ export class Topic {
 
 
   private static checkData(title: string, tags: string[], text: string) {
-    if (tags.length !== new Set(tags).size) {
-      throw new AtError(StatusCode.MisdirectedRequest, "タグの重複があります");
-    }
-    if (!title.match(Config.topic.title.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.topic.title.msg);
-    }
-    if (tags.length > Config.topic.tags.max) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.topic.tags.msg);
-    }
-    tags.forEach(x => {
-      if (!x.match(Config.topic.tags.regex)) {
-        throw new AtError(StatusCode.MisdirectedRequest, Config.topic.tags.msg);
-      }
-    });
-    if (!text.match(Config.topic.text.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.topic.text.msg);
-    }
+    paramsErrorMaker([
+      () => {
+        if (tags.length !== new Set(tags).size) {
+          return {
+            field: "tags",
+            message: "タグの重複があります"
+          }
+        } else {
+          return null;
+        }
+      },
+      () => {
+        if (tags.length > Config.topic.tags.max) {
+          return {
+            field: "tags",
+            message: Config.topic.tags.msg
+          };
+        } else {
+          return null;
+        }
+      },
+      {
+        field: "title",
+        val: title,
+        regex: Config.topic.title.regex,
+        message: Config.topic.title.msg
+      },
+      {
+        field: "text",
+        val: text,
+        regex: Config.topic.text.regex,
+        message: Config.topic.text.msg
+      },
+      ...tags.map((x, i) => ({
+        field: `tags[${i}]`,
+        val: x,
+        regex: Config.topic.tags.regex,
+        message: Config.topic.tags.msg
+      }))
+    ]);
   }
 
   //{{setter
@@ -185,10 +208,10 @@ export class Topic {
     user.usePoint(10);
     Topic.checkData(title, tags, text);
     if (this._type === "one") {
-      throw new AtError(StatusCode.Forbidden, "単発トピックは編集出来ません");
+      throw new AtPrerequisiteError("単発トピックは編集出来ません");
     }
     if (!this._active) {
-      throw new AtError(StatusCode.Forbidden, "トピックが落ちているので編集出来ません");
+      throw new AtPrerequisiteError("トピックが落ちているので編集出来ません");
     }
 
 

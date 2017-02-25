@@ -1,7 +1,7 @@
 import { ObjectID } from 'mongodb';
 import { Client } from '..//client';
 import { IAuthToken, IAuthUser } from '../../auth';
-import { AtError, StatusCode } from '../../at-error'
+import { AtRightError,AtTokenAuthError,AtNotFoundError } from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
 import { IGenerator } from '../../generator';
@@ -114,7 +114,7 @@ export class Token {
 
   keyChange(authUser: IAuthUser, randomGenerator: IGenerator<string>) {
     if (!authUser.id.equals(this._user)) {
-      throw new AtError(StatusCode.Forbidden, "人のトークンは変えられません");
+      throw new AtRightError("人のトークンは変えられません");
     }
     this._req = [];
     this._key = StringUtil.hash(randomGenerator.get() + Config.salt.token);
@@ -122,7 +122,7 @@ export class Token {
 
   auth(key: string): IAuthToken {
     if (this._key !== key) {
-      throw new AtError(StatusCode.Unauthorized, "認証に失敗しました");
+      throw new AtTokenAuthError();
     }
 
     return { id: this._id, key: this._key, user: this._user };
@@ -156,7 +156,7 @@ export class Token {
   authReq(key: string, now: Date): IAuthToken {
     let req = this._req.find(x => x.key === key);
     if (req === undefined || !req.active || req.expireDate.getTime() < now.getTime()) {
-      throw new AtError(StatusCode.NotFound, "トークンリクエストが見つかりません");
+      throw new AtNotFoundError("トークンリクエストが見つかりません");
     }
 
     return { id: this._id, key: this._key, user: this._user };
@@ -164,7 +164,7 @@ export class Token {
 
   enable(authUser: IAuthUser) {
     if (!authUser.id.equals(this._user)) {
-      throw new AtError(StatusCode.Forbidden, "人のトークンは変えられません");
+      throw new AtRightError("人のトークンは変えられません");
     }
 
     this._active = true;
@@ -172,7 +172,7 @@ export class Token {
 
   disable(authUser: IAuthUser) {
     if (!authUser.id.equals(this._user)) {
-      throw new AtError(StatusCode.Forbidden, "人のトークンは変えられません");
+      throw new AtRightError("人のトークンは変えられません");
     }
 
     this._active = false;

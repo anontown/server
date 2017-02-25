@@ -1,7 +1,7 @@
 import { ObjectID } from 'mongodb';
 import { StringUtil } from '../../util';
 import { IAuthToken } from '../../auth';
-import { AtError, StatusCode } from '../../at-error'
+import { AtRightError, paramsErrorMaker } from '../../at-error'
 import { Config } from '../../config';
 import { IGenerator } from '../../generator';
 
@@ -102,15 +102,26 @@ export class Profile {
   }
 
   static create(objidGenerator: IGenerator<ObjectID>, authToken: IAuthToken, name: string, text: string, sn: string, now: Date): Profile {
-    if (!name.match(Config.user.profile.name.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.name.msg);
-    }
-    if (!text.match(Config.user.profile.text.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.text.msg);
-    }
-    if (!sn.match(Config.user.profile.sn.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.sn.msg);
-    }
+    paramsErrorMaker([
+      {
+        field: "name",
+        val: name,
+        regex: Config.user.profile.name.regex,
+        message: Config.user.profile.name.msg
+      },
+      {
+        field: "text",
+        val: text,
+        regex: Config.user.profile.text.regex,
+        message: Config.user.profile.text.msg
+      },
+      {
+        field: "sn",
+        val: sn,
+        regex: Config.user.profile.sn.regex,
+        message: Config.user.profile.sn.msg
+      },
+    ]);
 
     return new Profile(objidGenerator.get(),
       authToken.user,
@@ -124,17 +135,28 @@ export class Profile {
 
   changeData(authToken: IAuthToken, name: string, text: string, sn: string, now: Date) {
     if (!authToken.user.equals(this._user)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "人のプロフィール変更は出来ません");
+      throw new AtRightError("人のプロフィール変更は出来ません");
     }
-    if (!name.match(Config.user.profile.name.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.name.msg);
-    }
-    if (!text.match(Config.user.profile.text.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.text.msg);
-    }
-    if (!sn.match(Config.user.profile.sn.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.profile.sn.msg);
-    }
+    paramsErrorMaker([
+      {
+        field: "name",
+        val: name,
+        regex: Config.user.profile.name.regex,
+        message: Config.user.profile.name.msg
+      },
+      {
+        field: "text",
+        val: text,
+        regex: Config.user.profile.text.regex,
+        message: Config.user.profile.text.msg
+      },
+      {
+        field: "sn",
+        val: sn,
+        regex: Config.user.profile.sn.regex,
+        message: Config.user.profile.sn.msg
+      },
+    ]);
 
     this._name = name;
     this._text = text;

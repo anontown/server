@@ -1,6 +1,6 @@
 import { IAuthUser } from '../../auth'
 import { Config } from '../../config';
-import { AtError, StatusCode } from '../../at-error'
+import { paramsErrorMaker, AtRightError } from '../../at-error'
 import { ObjectID } from 'mongodb';
 import { IGenerator } from '../../generator';
 
@@ -83,12 +83,20 @@ export class Client {
   }
 
   static create(objidGenerator: IGenerator<ObjectID>, authUser: IAuthUser, name: string, url: string, now: Date): Client {
-    if (!name.match(Config.user.client.name.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.name.msg);
-    }
-    if (!url.match(Config.user.client.url.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.url.msg);
-    }
+    paramsErrorMaker([
+      {
+        field: "name",
+        val: name,
+        regex: Config.user.client.name.regex,
+        message: Config.user.client.name.msg
+      },
+      {
+        field: "url",
+        val: url,
+        regex: Config.user.client.url.regex,
+        message: Config.user.client.url.msg
+      }
+    ]);
 
     return new Client(objidGenerator.get(),
       name,
@@ -100,14 +108,22 @@ export class Client {
 
   changeData(authUser: IAuthUser, name: string, url: string, now: Date) {
     if (!authUser.id.equals(this._user)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "人のクライアント変更は出来ません");
+      throw new AtRightError("人のクライアント変更は出来ません");
     }
-    if (!name.match(Config.user.client.name.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.name.msg);
-    }
-    if (!url.match(Config.user.client.url.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.client.url.msg);
-    }
+    paramsErrorMaker([
+      {
+        field: "name",
+        val: name,
+        regex: Config.user.client.name.regex,
+        message: Config.user.client.name.msg
+      },
+      {
+        field: "url",
+        val: url,
+        regex: Config.user.client.url.regex,
+        message: Config.user.client.url.msg
+      }
+    ]);
 
     this._name = name;
     this._url = url;

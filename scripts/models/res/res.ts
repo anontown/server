@@ -4,7 +4,9 @@ import { Topic } from '../topic';
 import { Profile } from '../profile';
 import { Msg } from '../msg';
 import { IAuthToken } from '../../auth';
-import { AtError, StatusCode } from '../../at-error'
+import { AtRightError, 
+  paramsErrorMaker ,
+AtPrerequisiteError} from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
 import { IGenerator } from '../../generator';
@@ -231,12 +233,20 @@ export class Res {
   }
 
   static create(objidGenerator: IGenerator<ObjectID>, topic: Topic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean, now: Date): Res {
-    if (!name.match(Config.res.name.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.res.name.msg);
-    }
-    if (!text.match(Config.res.text.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.res.text.msg);
-    }
+    paramsErrorMaker([
+      {
+        field: "name",
+        val: name,
+        regex: Config.res.name.regex,
+        message: Config.res.name.msg
+      },
+      {
+        field: "text",
+        val: text,
+        regex: Config.res.text.regex,
+        message: Config.res.text.msg
+      }
+    ]);
 
 
     //名前生成
@@ -256,13 +266,13 @@ export class Res {
     if (profile !== null) {
       //自分のプロフィールか？
       if (!profile.user.equals(user.id)) {
-        throw new AtError(StatusCode.MisdirectedRequest, "自分のプロフィールを指定して下さい。");
+        throw new AtRightError("自分のプロフィールを指定して下さい。");
       }
     }
 
     //もしリプ先があるかつ、トピックがリプ先と違えばエラー
     if (reply !== null && !reply.topic.equals(topic.id)) {
-      throw new AtError(StatusCode.MisdirectedRequest, "他のトピックのレスへのリプは出来ません");
+      throw new AtPrerequisiteError("他のトピックのレスへのリプは出来ません");
     }
 
     if (autoName === null) {
@@ -290,10 +300,10 @@ export class Res {
 
   uv(resUser: User, user: User, _authToken: IAuthToken) {
     if (user.id.equals(this._user)) {
-      throw new AtError(StatusCode.Forbidden, "自分に投票は出来ません");
+      throw new AtRightError("自分に投票は出来ません");
     }
     if (this._vote.find(x => x.user.equals(user.id)) !== undefined) {
-      throw new AtError(StatusCode.Forbidden, "既に投票しています");
+      throw new AtPrerequisiteError("既に投票しています");
     }
     let lv = Math.floor(user.lv / 100) + 1;
     this._vote.push({ user: user.id, value: user.lv, lv });
@@ -302,10 +312,10 @@ export class Res {
 
   dv(objidGenerator: IGenerator<ObjectID>, resUser: User, user: User, _authToken: IAuthToken, now: Date): Msg | null {
     if (user.id.equals(this._user)) {
-      throw new AtError(StatusCode.Forbidden, "自分に投票は出来ません");
+      throw new AtRightError("自分に投票は出来ません");
     }
     if (this._vote.find(x => x.user.equals(user.id)) !== undefined) {
-      throw new AtError(StatusCode.Forbidden, "既に投票しています");
+      throw new AtPrerequisiteError("既に投票しています");
     }
 
     let lv = -Math.floor(user.lv / 100) - 1;
@@ -326,7 +336,7 @@ export class Res {
   cv(resUser: User, user: User, _authToken: IAuthToken) {
     let vote = this._vote.find(x => x.user.equals(user.id));
     if (vote === undefined) {
-      throw new AtError(StatusCode.Forbidden, "投票していません");
+      throw new AtPrerequisiteError("投票していません");
     }
     this._vote.splice(this._vote.indexOf(vote), 1);
     resUser.changeLv(resUser.lv - vote.value);
@@ -334,11 +344,11 @@ export class Res {
 
   del(resUser: User, authToken: IAuthToken) {
     if (!authToken.user.equals(this._user)) {
-      throw new AtError(StatusCode.Forbidden, "人の書き込み削除は出来ません");
+      throw new AtRightError("人の書き込み削除は出来ません");
     }
 
     if (this._deleteFlag !== "active") {
-      throw new AtError(StatusCode.Conflict, "既に削除済みです");
+      throw new AtPrerequisiteError("既に削除済みです");
     }
 
     this._deleteFlag = "self";

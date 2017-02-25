@@ -1,6 +1,6 @@
 import { ObjectID, WriteError } from 'mongodb';
 import { DB } from '../../db';
-import { AtError, StatusCode } from '../../at-error'
+import { AtNotFoundError,AtConflictError } from '../../at-error'
 import { User, IUserDB } from './user';
 import { CronJob } from 'cron';
 
@@ -11,7 +11,7 @@ export class UserRepository {
     let user: IUserDB | null = await db.collection("users").findOne({ _id: id });
 
     if (user === null) {
-      throw new AtError(StatusCode.NotFound, "ユーザーが存在しません");
+      throw new AtNotFoundError("ユーザーが存在しません");
     }
 
     return User.fromDB(user);
@@ -22,7 +22,7 @@ export class UserRepository {
     let user: IUserDB | null = await db.collection("users").findOne({ sn });
 
     if (user === null) {
-      throw new AtError(StatusCode.NotFound, "ユーザーが存在しません");
+      throw new AtNotFoundError("ユーザーが存在しません");
     }
 
     return user._id;
@@ -31,7 +31,7 @@ export class UserRepository {
     let db = await DB;
     await db.collection("users").insert(user.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
-        throw new AtError(StatusCode.Conflict, "スクリーンネームが使われています");
+        throw new AtConflictError( "スクリーンネームが使われています");
       } else {
         throw e;
       }
@@ -43,7 +43,7 @@ export class UserRepository {
     let db = await DB;
     await db.collection("users").update({ _id: user.id }, user.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
-        throw new AtError(StatusCode.Conflict, "スクリーンネームが使われています");
+        throw new AtConflictError("スクリーンネームが使われています");
       } else {
         throw e;
       }

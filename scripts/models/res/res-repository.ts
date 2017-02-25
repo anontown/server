@@ -2,16 +2,16 @@ import { ObjectID } from 'mongodb';
 import { Topic } from '../topic';
 import { DB } from '../../db';
 import { IAuthToken } from '../../auth';
-import { AtError, StatusCode } from '../../at-error'
-import { Res,IResDB } from './res';
+import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
+import { Res, IResDB } from './res';
 
-export class ResRepository{
-      static async findOne(id: ObjectID): Promise<Res> {
+export class ResRepository {
+  static async findOne(id: ObjectID): Promise<Res> {
     let db = await DB;
     let res: IResDB | null = await db.collection("reses").findOne({ _id: id });
 
     if (res === null) {
-      throw new AtError(StatusCode.NotFound, "レスが存在しません");
+      throw new AtNotFoundError("レスが存在しません");
     }
 
     return (await this.aggregate([res]))[0];
@@ -24,7 +24,8 @@ export class ResRepository{
       .toArray();
 
     if (reses.length !== ids.length) {
-      throw new AtError(StatusCode.NotFound, "レスが存在しません");
+      throw new AtNotFoundPartError("レスが存在しません",
+        reses.map(x => x._id.toString()));
     }
 
     return this.aggregate(reses);
@@ -41,7 +42,7 @@ export class ResRepository{
       .skip(0)
       .limit(limit)
       .toArray();
-    if(type==="after"){
+    if (type === "after") {
       reses.reverse();
     }
 

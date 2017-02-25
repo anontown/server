@@ -1,6 +1,6 @@
 import { ObjectID } from 'mongodb';
 import { IAuthUser } from '../../auth';
-import { AtError, StatusCode } from '../../at-error'
+import { paramsErrorMaker, AtUserAuthError, AtPrerequisiteError } from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
 import { IGenerator } from '../../generator';
@@ -107,13 +107,20 @@ export class User {
   }
 
   static create(objidGenerator: IGenerator<ObjectID>, sn: string, pass: string, now: Date): User {
-    if (!pass.match(Config.user.pass.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
-    }
-
-    if (!sn.match(Config.user.sn.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.sn.msg);
-    }
+    paramsErrorMaker([
+      {
+        field: "pass",
+        val: pass,
+        regex: Config.user.pass.regex,
+        message: Config.user.pass.msg
+      },
+      {
+        field: "sn",
+        val: sn,
+        regex: Config.user.sn.regex,
+        message: Config.user.sn.msg
+      }
+    ]);
 
     return new User(objidGenerator.get(),
       sn,
@@ -127,12 +134,20 @@ export class User {
   }
 
   change(_authUser: IAuthUser, pass: string, sn: string) {
-    if (!pass.match(Config.user.pass.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.pass.msg);
-    }
-    if (!sn.match(Config.user.sn.regex)) {
-      throw new AtError(StatusCode.MisdirectedRequest, Config.user.sn.msg);
-    }
+    paramsErrorMaker([
+      {
+        field: "pass",
+        val: pass,
+        regex: Config.user.pass.regex,
+        message: Config.user.pass.msg
+      },
+      {
+        field: "sn",
+        val: sn,
+        regex: Config.user.sn.regex,
+        message: Config.user.sn.msg
+      }
+    ]);
 
     this._pass = StringUtil.hash(pass + Config.salt.pass);
     this._sn = sn;
@@ -142,13 +157,13 @@ export class User {
     if (this._pass === StringUtil.hash(pass + Config.salt.pass)) {
       return { id: this._id, pass: this._pass };
     } else {
-      throw new AtError(StatusCode.Unauthorized, "認証に失敗しました");
+      throw new AtUserAuthError();
     }
   }
 
   usePoint(val: number) {
     if (this._lv < this._point + val) {
-      throw new AtError(StatusCode.Forbidden, "ポイントが足りません");
+      throw new AtPrerequisiteError("LVが足りません");
     }
     this._point += val;
   }
@@ -184,14 +199,14 @@ export class User {
       this._resWait.m10++;
       this._resWait.last = lastRes;
     } else {
-      throw new AtError(StatusCode.Forbidden, "連続書き込みはできません");
+      throw new AtPrerequisiteError("連続書き込みはできません");
     }
   }
   changeLastTopic(lastTopic: Date) {
     if (this._lastTopic.getTime() + 1000 * 60 * 30 < lastTopic.getTime()) {
       this._lastTopic = lastTopic;
     } else {
-      throw new AtError(StatusCode.Forbidden, "連続書き込みはできません");
+      throw new AtPrerequisiteError("連続書き込みはできません");
     }
   }
 
@@ -199,7 +214,7 @@ export class User {
     if (this._lastOneTopic.getTime() + 1000 * 60 * 10 < lastTopic.getTime()) {
       this._lastOneTopic = lastTopic;
     } else {
-      throw new AtError(StatusCode.Forbidden, "連続書き込みはできません");
+      throw new AtPrerequisiteError("連続書き込みはできません");
     }
   }
 }

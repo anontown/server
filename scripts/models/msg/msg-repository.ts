@@ -1,10 +1,10 @@
 import { ObjectID } from 'mongodb';
 import { DB } from '../../db';
 import { IAuthToken } from '../../auth';
-import { AtError, StatusCode } from '../../at-error';
-import { IMsgDB,Msg } from './msg';
-export class MsgRepository{
-    static async findOne(authToken: IAuthToken, id: ObjectID): Promise<Msg> {
+import { AtNotFoundError, AtNotFoundPartError } from '../../at-error';
+import { IMsgDB, Msg } from './msg';
+export class MsgRepository {
+  static async findOne(authToken: IAuthToken, id: ObjectID): Promise<Msg> {
     let db = await DB;
     let msg: IMsgDB | null = await db.collection("msgs").findOne({
       _id: { $in: id },
@@ -12,7 +12,7 @@ export class MsgRepository{
     });
 
     if (msg === null) {
-      throw new AtError(StatusCode.NotFound, "メッセージが存在しません");
+      throw new AtNotFoundError("メッセージが存在しません");
     }
 
     return Msg.fromDB(msg);
@@ -27,7 +27,7 @@ export class MsgRepository{
       .toArray();
 
     if (msgs.length !== ids.length) {
-      throw new AtError(StatusCode.NotFound, "メッセージが存在しません");
+      throw new AtNotFoundPartError("メッセージが存在しません", msgs.map(x => x._id.toString()));
     }
 
     return msgs.map(m => Msg.fromDB(m));

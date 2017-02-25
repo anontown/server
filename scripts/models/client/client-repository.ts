@@ -1,17 +1,17 @@
 import { DB } from '../../db';
 import { ObjectID } from 'mongodb';
-import { AtError, StatusCode } from '../../at-error'
-import { IClientDB,Client } from './client';
+import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
+import { IClientDB, Client } from './client';
 import { IAuthUser } from '../../auth'
 
 export class ClientRepository {
-    static async findOne(id: ObjectID): Promise<Client> {
+  static async findOne(id: ObjectID): Promise<Client> {
     let db = await DB;
     let client: IClientDB | null = await db.collection("clients")
       .findOne({ _id: id });
 
     if (client === null) {
-      throw new AtError(StatusCode.NotFound, "クライアントが存在しません");
+      throw new AtNotFoundError("クライアントが存在しません");
     }
     return Client.fromDB(client);
   }
@@ -24,7 +24,8 @@ export class ClientRepository {
       .toArray();
 
     if (clients.length !== ids.length) {
-      throw new AtError(StatusCode.NotFound, "クライアントが存在しません");
+      throw new AtNotFoundPartError("クライアントが存在しません",
+        clients.map(x => x._id.toString()));
     }
 
     return clients.map(c => Client.fromDB(c));
