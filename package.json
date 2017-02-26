@@ -32,6 +32,7 @@
     "@types/request": "0.0.39",
     "@types/sinon": "^1.16.35",
     "@types/socket.io": "^1.4.27",
+    "intelli-espower-loader": "^1.0.1",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "remap-istanbul": "^0.9.1",
@@ -41,7 +42,10 @@
   "scripts": {
     "start": "tsc&&node ./dist/scripts/app.js",
     "pretest": "set NODE_ENV=test&&tsc",
-    "test": "node node_modules\\istanbul\\lib\\cli.js cover node_modules\\mocha\\bin\\_mocha -- ./dist/tests/**/*.test.js",
+    "test": "node node_modules\\istanbul\\lib\\cli.js cover node_modules\\mocha\\bin\\_mocha -- ./dist/tests/**/*.test.js --require intelli-espower-loader",
     "posttest": "cd coverage && remap-istanbul -i coverage.json -o html-report -t html&&set NODE_ENV="
+  },
+  "directories": {
+    "test": "dist/tests"
   }
 }

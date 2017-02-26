@@ -111,6 +111,28 @@ describe('Client', () => {
     });
   });
 
+  describe('fromDB', () => {
+    it('正常にインスタンス化出来るか', () => {
+      let db = {
+        _id: new ObjectID(),
+        name: 'name',
+        url: 'https://hoge.com',
+        user: new ObjectID(),
+        date: new Date(),
+        update: new Date()
+      };
+
+      let client = Client.fromDB(db);
+
+      assert(db._id.equals(client.id));
+      assert(db.name === client.name);
+      assert(db.url === client.url);
+      assert(db.user.equals(client.user));
+      assert(db.date.getTime() === client.date.getTime());
+      assert(db.update.getTime() === client.update.getTime());
+    });
+  });
+
   describe("#changeData", () => {
     it("正常に変更できるか", () => {
       let auth: IAuthUser = {
@@ -183,5 +205,43 @@ describe('Client', () => {
     });
   });
 
+  describe("#toAPI", () => {
+    let client = Client.fromDB({
+      _id: new ObjectID(),
+      name: 'name',
+      url: 'https://hoge.com',
+      user: new ObjectID(),
+      date: new Date(),
+      update: new Date()
+    });
 
+    it("認証あり(同一ユーザー)", () => {
+      let api = client.toAPI({
+        id: new ObjectID(client.user.toString()),
+        pass: "pass"
+      });
+
+      assert(client.id.toString() === api.id);
+      assert(client.name === api.name);
+      assert(client.url === api.url);
+      assert(client.user.toString() === api.user);
+      assert(client.date.toISOString() === api.date);
+      assert(client.update.toISOString() === api.update);
+    });
+
+    it("認証あり(別ユーザー)", () => {
+      let api = client.toAPI({
+        id: new ObjectID(),
+        pass: "pass"
+      });
+
+      assert(api.user === null);
+    });
+
+    it("認証無し", () => {
+      let api = client.toAPI(null);
+
+      assert(api.user === null);
+    });
+  });
 });

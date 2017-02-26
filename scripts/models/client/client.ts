@@ -72,7 +72,7 @@ export class Client {
       id: this._id.toString(),
       name: this._name,
       url: this._url,
-      user: (authUser !== null && authUser.id.equals(this._user) ? this._user.toString() : null),
+      user: authUser !== null && authUser.id.equals(this._user) ? this._user.toString() : null,
       date: this._date.toISOString(),
       update: this._date.toISOString()
     };
