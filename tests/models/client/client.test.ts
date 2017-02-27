@@ -3,7 +3,7 @@ import {
   ObjectIDGenerator,
   AtError,
   IAuthUser
-} from '../../scripts';
+} from '../../../scripts';
 import * as assert from 'power-assert';
 import { ObjectID } from 'mongodb';
 
