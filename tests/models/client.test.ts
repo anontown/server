@@ -205,7 +205,7 @@ describe('Client', () => {
     });
   });
 
-  describe("#toAPI", () => {
+  {
     let client = Client.fromDB({
       _id: new ObjectID(),
       name: 'name',
@@ -215,33 +215,48 @@ describe('Client', () => {
       update: new Date()
     });
 
-    it("認証あり(同一ユーザー)", () => {
-      let api = client.toAPI({
-        id: new ObjectID(client.user.toString()),
-        pass: "pass"
+    describe("#toAPI", () => {
+      it("認証あり(同一ユーザー)", () => {
+        let api = client.toAPI({
+          id: new ObjectID(client.user.toString()),
+          pass: "pass"
+        });
+
+        assert(client.id.toString() === api.id);
+        assert(client.name === api.name);
+        assert(client.url === api.url);
+        assert(client.user.toString() === api.user);
+        assert(client.date.toISOString() === api.date);
+        assert(client.update.toISOString() === api.update);
       });
 
-      assert(client.id.toString() === api.id);
-      assert(client.name === api.name);
-      assert(client.url === api.url);
-      assert(client.user.toString() === api.user);
-      assert(client.date.toISOString() === api.date);
-      assert(client.update.toISOString() === api.update);
-    });
+      it("認証あり(別ユーザー)", () => {
+        let api = client.toAPI({
+          id: new ObjectID(),
+          pass: "pass"
+        });
 
-    it("認証あり(別ユーザー)", () => {
-      let api = client.toAPI({
-        id: new ObjectID(),
-        pass: "pass"
+        assert(api.user === null);
       });
 
-      assert(api.user === null);
+      it("認証無し", () => {
+        let api = client.toAPI(null);
+
+        assert(api.user === null);
+      });
     });
 
-    it("認証無し", () => {
-      let api = client.toAPI(null);
-
-      assert(api.user === null);
+    describe("#toDB", () => {
+      it("正常に出力できるか", () => {
+        let db = client.toDB();
+        
+        assert(client.id.equals(db._id));
+        assert(client.name === db.name);
+        assert(client.url === db.url);
+        assert(client.user.equals(db.user));
+        assert(client.date.getTime() === db.date.getTime());
+        assert(client.update.getTime() === db.update.getTime())
+      });
     });
-  });
+  }
 });
