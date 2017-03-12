@@ -27,12 +27,12 @@ import {
   IUserAPI,
   ITokenReqAPI,
   IHistoryAPI,
-  TopicType
 } from './models';
 import { ObjectID } from 'mongodb';
 import { Logger } from './logger';
 import * as createDB from './create-db';
 import { ObjectIDGenerator,RandomGenerator } from './generator';
+import { AtPrerequisiteError } from './at-error';
 
 (async () => {
   //ロガー
@@ -514,17 +514,16 @@ import { ObjectIDGenerator,RandomGenerator } from './generator';
     api.addAPI<{
       title: string,
       tags: string[],
-      text: string,
-      type: TopicType
+      text: string
     }>({
-      url: "/topic/create",
+      url: "/topic/create/normal",
 
       isAuthUser: false,
       isAuthToken: true,
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["title", "tags", "text", "type"],
+        required: ["title", "tags", "text"],
         properties: {
           title: {
             type: "string"
@@ -537,21 +536,16 @@ import { ObjectIDGenerator,RandomGenerator } from './generator';
           },
           text: {
             type: "string"
-          },
-          type: {
-            type: "string",
-            enum: ["normal", "one"]
           }
         }
       },
       call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
         let user = await UserRepository.findOne(authToken!.user);
-        let create = Topic.create(ObjectIDGenerator,
+        let create = Topic.createNormal(ObjectIDGenerator,
         params.title,
           params.tags,
           params.text,
           user,
-          params.type,
           authToken!,
           now);
 
@@ -561,10 +555,112 @@ import { ObjectIDGenerator,RandomGenerator } from './generator';
           ResRepository.insert(create.res),
           create.history ? HistoryRepository.insert(create.history) : Promise.resolve()
         ]);
+        appLog("topic/create", ip, "topics", create.topic.id);
+        appLog("topic/create", ip, "reses", create.res.id);
         if (create.history) {
           appLog("topic/create", ip, "histories", create.history.id);
         }
-        return create.topic.toAPI();
+        return Topic.toAPI(create.topic);
+      }
+    });
+
+    api.addAPI<{
+      title: string,
+      tags: string[],
+      text: string
+    }>({
+      url: "/topic/create/one",
+
+      isAuthUser: false,
+      isAuthToken: true,
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["title", "tags", "text"],
+        properties: {
+          title: {
+            type: "string"
+          },
+          tags: {
+            type: "array",
+            items: {
+              "type": "string"
+            }
+          },
+          text: {
+            type: "string"
+          }
+        }
+      },
+      call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
+        let user = await UserRepository.findOne(authToken!.user);
+        let create = Topic.createOne(ObjectIDGenerator,
+        params.title,
+          params.tags,
+          params.text,
+          user,
+          authToken!,
+          now);
+
+        await TopicRepository.insert(create.topic);
+        await Promise.all([
+          UserRepository.update(user),
+          ResRepository.insert(create.res)
+        ]);
+
+        appLog("topic/create", ip, "topics", create.topic.id);
+        appLog("topic/create", ip, "reses", create.res.id);
+
+        return Topic.toAPI(create.topic);
+      }
+    });
+
+    api.addAPI<{
+      title: string,
+      parent:string
+    }>({
+      url: "/topic/create/fork",
+
+      isAuthUser: false,
+      isAuthToken: true,
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["title", "parent"],
+        properties: {
+          title: {
+            type: "string"
+          },
+          parent: {
+            type: "string"
+          }
+        }
+      },
+      call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
+        let user = await UserRepository.findOne(authToken!.user);
+        let parent=await TopicRepository.findOne(new ObjectID(params.parent));
+
+        if(parent.type!=='normal'){
+          throw new AtPrerequisiteError('通常トピック以外の派生トピックは作れません');
+        }
+
+        let create = Topic.createFork(ObjectIDGenerator,
+        params.title,
+          parent,
+          user,
+          authToken!,
+          now);
+
+        await TopicRepository.insert(create.topic);
+        await Promise.all([
+          UserRepository.update(user),
+          ResRepository.insert(create.res)
+        ]);
+
+        appLog("topic/create", ip, "topics", create.topic.id);
+        appLog("topic/create", ip, "reses", create.res.id);
+
+        return Topic.toAPI(create.topic);
       }
     });
 
@@ -585,7 +681,7 @@ import { ObjectIDGenerator,RandomGenerator } from './generator';
       },
       call: async ({params}): Promise<ITopicAPI> => {
         let topic = await TopicRepository.findOne(new ObjectID(params.id));
-        return topic.toAPI();
+        return Topic.toAPI(topic);
       }
     });
 
@@ -609,7 +705,7 @@ import { ObjectIDGenerator,RandomGenerator } from './generator';
       },
       call: async ({params}): Promise<ITopicAPI[]> => {
         let topics = await TopicRepository.findIn(params.ids.map(id => new ObjectID(id)));
-        return topics.map(t => t.toAPI());
+        return topics.map(t => Topic.toAPI(t));
       }
     });
 
@@ -651,7 +747,47 @@ import { ObjectIDGenerator,RandomGenerator } from './generator';
       },
       call: async ({params}): Promise<ITopicAPI[]> => {
         let topic = await TopicRepository.find(params.title, params.tags, params.skip, params.limit, params.activeOnly)
-        return topic.map(t => t.toAPI());
+        return topic.map(t => Topic.toAPI(t));
+      }
+    });
+
+    api.addAPI<{
+      parent: string,
+      skip: number,
+      limit: number,
+      activeOnly: boolean
+    }>({
+      url: "/topic/find/fork",
+
+      isAuthUser: false,
+      isAuthToken: false,
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["parent", "skip", "limit", "activeOnly"],
+        properties: {
+          parent: {
+            type: "string"
+          },
+          skip: {
+            type: "number"
+          },
+          limit: {
+            type: "number"
+          },
+          activeOnly: {
+            type: "boolean"
+          }
+        }
+      },
+      call: async ({params}): Promise<ITopicAPI[]> => {
+        let parent=await TopicRepository.findOne(new ObjectID(params.parent));
+        if(parent.type!=='normal'){
+          throw new AtPrerequisiteError('親トピックは通常トピックのみ指定できます');
+        }
+
+        let topic = await TopicRepository.findFork(parent, params.skip, params.limit, params.activeOnly)
+        return topic.map(t => Topic.toAPI(t));
       }
     });
 
@@ -708,27 +844,27 @@ import { ObjectIDGenerator,RandomGenerator } from './generator';
         }
       },
       call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
-        let val = await Promise.all([
+        let [topic,user] = await Promise.all([
           TopicRepository.findOne(new ObjectID(params.id)),
           UserRepository.findOne(authToken!.user)
         ]);
 
-        let topic = val[0];
-        let user = val[1];
+        if(topic.type!=='normal'){
+          throw new AtPrerequisiteError('通常トピック以外は編集出来ません');
+        }
 
-        let val2 = topic.changeData(ObjectIDGenerator,user, authToken!, params.title, params.tags, params.text, now);
-        let res = val2.res;
-        let history = val2.history;
+        let val = Topic.changeData(topic,ObjectIDGenerator,user, authToken!, params.title, params.tags, params.text, now);
 
         await Promise.all([
-          ResRepository.insert(res),
-          HistoryRepository.insert(history),
+          ResRepository.insert(val.res),
+          HistoryRepository.insert(val.history),
           TopicRepository.update(topic),
           UserRepository.update(user)
         ]);
 
-        appLog("topic/update", ip, "histories", history.id);
-        return topic.toAPI();
+        appLog("topic/update", ip, "reses", val.res.id);
+        appLog("topic/update", ip, "histories", val.history.id);
+        return Topic.toAPI(topic);
       }
     });
   }

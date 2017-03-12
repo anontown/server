@@ -46,7 +46,7 @@ describe("History", () => {
                 mdtext: '<p>text</p>',
                 update: new Date(),
                 date: new Date(),
-                type: 'one',
+                type: 'normal',
                 ageUpdate: new Date(),
                 active: true
             }, 10);

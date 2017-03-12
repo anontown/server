@@ -1,12 +1,14 @@
 import { ObjectID } from 'mongodb';
 import { User } from '../user';
-import { Topic } from '../topic';
+import { ITopic,Topic } from '../topic';
 import { Profile } from '../profile';
 import { Msg } from '../msg';
 import { IAuthToken } from '../../auth';
-import { AtRightError, 
-  paramsErrorMaker ,
-AtPrerequisiteError} from '../../at-error'
+import {
+  AtRightError,
+  paramsErrorMaker,
+  AtPrerequisiteError
+} from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
 import { IGenerator } from '../../generator';
@@ -55,7 +57,7 @@ export interface IResAPI {
 
 export type VoteFlag = "uv" | "dv" | "not";
 export type ResDeleteFlag = "active" | "self" | "vote" | "freeze";
-export interface IReply{
+export interface IReply {
   res: ObjectID;
   user: ObjectID;
 }
@@ -100,43 +102,43 @@ export class Res {
     return this._name;
   }
 
-  get text(){
+  get text() {
     return this._text;
   }
 
-  get mdtext(){
+  get mdtext() {
     return this._mdtext;
   }
 
-  get reply(){
+  get reply() {
     return this._reply;
   }
 
-  get deleteFlag(){
+  get deleteFlag() {
     return this._deleteFlag;
   }
 
-  get vote(){
+  get vote() {
     return this._vote;
   }
 
-  get lv(){
+  get lv() {
     return this._lv;
   }
 
-  get hash(){
+  get hash() {
     return this._hash;
   }
 
-  get profile(){
+  get profile() {
     return this._profile;
   }
 
-  get replyCount(){
+  get replyCount() {
     return this._replyCount;
   }
 
-  get age(){
+  get age() {
     return this._age;
   }
 
@@ -232,21 +234,23 @@ export class Res {
     return new Res(r._id, r.topic, r.date, r.user, r.name, r.text, r.mdtext, r.reply, r.deleteFlag, r.vote, r.lv, r.hash, r.profile, replyCount, r.age)
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, topic: Topic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean, now: Date): Res {
-    paramsErrorMaker([
-      {
-        field: "name",
-        val: name,
-        regex: Config.res.name.regex,
-        message: Config.res.name.msg
-      },
-      {
-        field: "text",
-        val: text,
-        regex: Config.res.text.regex,
-        message: Config.res.text.msg
-      }
-    ]);
+  static create(objidGenerator: IGenerator<ObjectID>, topic: ITopic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean, now: Date): Res {
+    if (autoName !== null) {
+      paramsErrorMaker([
+        {
+          field: "name",
+          val: name,
+          regex: Config.res.name.regex,
+          message: Config.res.name.msg
+        },
+        {
+          field: "text",
+          val: text,
+          regex: Config.res.text.regex,
+          message: Config.res.text.msg
+        }
+      ]);
+    }
 
 
     //名前生成
@@ -290,11 +294,11 @@ export class Res {
       "active",
       [],
       user.lv * 5,
-      topic.hash(now, user),
+      Topic.hash(topic,now, user),
       profile !== null ? profile.id : null,
       0,
       age);
-    topic.resUpdate(result);
+    Topic.resUpdate(topic,result);
     return result;
   }
 

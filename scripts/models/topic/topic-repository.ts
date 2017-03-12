@@ -1,12 +1,12 @@
 import { ObjectID } from 'mongodb';
 import { DB } from '../../db';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
-import { Topic, ITopicDB } from './topic';
+import { Topic, ITopicDB,ITopic,ITopicNormal } from './topic';
 import { CronJob } from 'cron';
 
 
 export class TopicRepository {
-  static async findOne(id: ObjectID): Promise<Topic> {
+  static async findOne(id: ObjectID): Promise<ITopic> {
     let db = await DB;
     let topic: ITopicDB | null = await db.collection("topics").findOne({ _id: id });
 
@@ -17,7 +17,7 @@ export class TopicRepository {
     return (await this.aggregate([topic]))[0];
   }
 
-  static async findIn(ids: ObjectID[]): Promise<Topic[]> {
+  static async findIn(ids: ObjectID[]): Promise<ITopic[]> {
     let db = await DB;
 
     let topics: ITopicDB[] = await db.collection("topics").find({ _id: { $in: ids } })
@@ -47,7 +47,7 @@ export class TopicRepository {
     return data.map(x => ({ name: x._id, count: x.count }));
   }
 
-  static async find(title: string, tags: string[], skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
+  static async find(title: string, tags: string[], skip: number, limit: number, activeOnly: boolean): Promise<ITopic[]> {
     let db = await DB;
 
     let topics: ITopicDB[] = await db.collection("topics")
@@ -76,7 +76,30 @@ export class TopicRepository {
     return this.aggregate(topics);
   }
 
-  private static async aggregate(topics: ITopicDB[]): Promise<Topic[]> {
+  static async findFork(parent:ITopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<ITopic[]> {
+    let db = await DB;
+
+    let topics: ITopicDB[] = await db.collection("topics")
+      .find((() => {
+        let query: any = {};
+
+        query['parent']=parent.id;
+        query["type"] = 'fork';
+        if (activeOnly) {
+          query["active"] = true;
+        }
+
+        return query;
+      })())
+      .sort({ ageUpdate: -1 })
+      .skip(skip)
+      .limit(limit)
+      .toArray();
+
+    return this.aggregate(topics);
+  }
+
+  private static async aggregate(topics: ITopicDB[]): Promise<ITopic[]> {
     let db = await DB;
     let countArr: { _id: ObjectID, resCount: number }[] = await db.collection("reses")
       .aggregate([
@@ -116,15 +139,15 @@ export class TopicRepository {
     }).start();
   }
 
-  static async insert(topic: Topic): Promise<null> {
+  static async insert(topic: ITopic): Promise<null> {
     let db = await DB;
-    await db.collection("topics").insert(topic.toDB());
+    await db.collection("topics").insert(Topic.toDB(topic));
     return null;
   }
 
-  static async update(topic: Topic): Promise<null> {
+  static async update(topic: ITopic): Promise<null> {
     let db = await DB;
-    await db.collection("topics").update({ _id: topic.id }, topic.toDB());
+    await db.collection("topics").update({ _id: topic.id }, Topic.toDB(topic));
     return null;
   }
 }

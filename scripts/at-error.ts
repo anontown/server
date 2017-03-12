@@ -60,7 +60,9 @@ export class AtParamsError extends AtError {
     }
 }
 
-export function paramsErrorMaker(fs: ((() => IParamErrorData | null) | { field: string, val: string, regex: RegExp, message: string })[]) {
+export type paramsErrorMakerData=(() => IParamErrorData | null) | { field: string, val: string, regex: RegExp, message: string };
+
+export function paramsErrorMaker(fs: paramsErrorMakerData[]) {
     let errors: IParamErrorData[] = [];
     fs.forEach(f => {
         if (typeof f === "function") {
