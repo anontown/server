@@ -660,6 +660,7 @@ import { AtPrerequisiteError } from './at-error';
 
         appLog("topic/create", ip, "topics", create.topic.id);
         appLog("topic/create", ip, "reses", create.res.id);
+        appLog("topic/create", ip, "reses", create.resParent.id);
 
         return Topic.toAPI(create.topic);
       }
