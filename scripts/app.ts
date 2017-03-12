@@ -654,7 +654,8 @@ import { AtPrerequisiteError } from './at-error';
         await TopicRepository.insert(create.topic);
         await Promise.all([
           UserRepository.update(user),
-          ResRepository.insert(create.res)
+          ResRepository.insert(create.res),
+          ResRepository.insert(create.resParent)
         ]);
 
         appLog("topic/create", ip, "topics", create.topic.id);

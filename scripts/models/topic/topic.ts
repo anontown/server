@@ -326,7 +326,7 @@ export module Topic {
     return { topic, res };
   }
 
-  export function createFork(objidGenerator: IGenerator<ObjectID>, title: string, parent: ITopicNormal, user: User, authToken: IAuthToken, now: Date): { topic: ITopicFork, res: Res } {
+  export function createFork(objidGenerator: IGenerator<ObjectID>, title: string, parent: ITopicNormal, user: User, authToken: IAuthToken, now: Date): { topic: ITopicFork, res: Res,resParent:Res } {
     checkData({ title });
     let topic: ITopicFork = {
       id: objidGenerator.get(),
@@ -341,9 +341,11 @@ export module Topic {
     };
 
     let res = Res.create(objidGenerator, topic, user, authToken, "", "トピ主", "トピックが建ちました", null, null, true, now);
+    //エスケープすること
+    let resParent = Res.create(objidGenerator, parent, user, authToken, "", "派生トピック", `[${title}](/topic/${parent.id.toString()})`, null, null, true, now);
     user.changeLastOneTopic(now);
 
-    return { topic, res };
+    return { topic, res ,resParent};
   }
 
 
