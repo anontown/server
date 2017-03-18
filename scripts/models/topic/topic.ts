@@ -58,7 +58,7 @@ export interface ITopicNormalAPI {
   update: string,
   date: string,
   resCount: number,
-  type: TopicType,
+  type: 'normal',
   active: boolean
 }
 
@@ -71,7 +71,7 @@ export interface ITopicOneAPI {
   update: string,
   date: string,
   resCount: number,
-  type: TopicType,
+  type: 'one',
   active: boolean
 }
 
@@ -81,7 +81,7 @@ export interface ITopicForkAPI {
   update: string,
   date: string,
   resCount: number,
-  type: TopicType,
+  type: 'fork',
   active: boolean,
   parent: string
 }
@@ -326,7 +326,7 @@ export module Topic {
     return { topic, res };
   }
 
-  export function createFork(objidGenerator: IGenerator<ObjectID>, title: string, parent: ITopicNormal, user: User, authToken: IAuthToken, now: Date): { topic: ITopicFork, res: Res,resParent:Res } {
+  export function createFork(objidGenerator: IGenerator<ObjectID>, title: string, parent: ITopicNormal, user: User, authToken: IAuthToken, now: Date): { topic: ITopicFork, res: Res, resParent: Res } {
     checkData({ title });
     let topic: ITopicFork = {
       id: objidGenerator.get(),
@@ -345,7 +345,7 @@ export module Topic {
     let resParent = Res.create(objidGenerator, parent, user, authToken, "", "派生トピック", `[${title}](/topic/${parent.id.toString()})`, null, null, true, now);
     user.changeLastOneTopic(now);
 
-    return { topic, res ,resParent};
+    return { topic, res, resParent };
   }
 
 

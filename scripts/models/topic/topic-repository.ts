@@ -1,7 +1,7 @@
 import { ObjectID } from 'mongodb';
 import { DB } from '../../db';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
-import { Topic, ITopicDB,ITopic,ITopicNormal } from './topic';
+import { Topic, ITopicDB, ITopic, ITopicNormal } from './topic';
 import { CronJob } from 'cron';
 
 
@@ -76,14 +76,14 @@ export class TopicRepository {
     return this.aggregate(topics);
   }
 
-  static async findFork(parent:ITopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<ITopic[]> {
+  static async findFork(parent: ITopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<ITopic[]> {
     let db = await DB;
 
     let topics: ITopicDB[] = await db.collection("topics")
       .find((() => {
         let query: any = {};
 
-        query['parent']=parent.id;
+        query['parent'] = parent.id;
         query["type"] = 'fork';
         if (activeOnly) {
           query["active"] = true;
@@ -130,7 +130,7 @@ export class TopicRepository {
       onTick: async () => {
         let db = await DB;
         await db.collection("topics")
-          .update({ type: "one", update: { $lt: new Date(Date.now() - 1000 * 60 * 60 * 24) }, active: true },
+          .update({ type: { $in: ["one", "fork"] }, update: { $lt: new Date(Date.now() - 1000 * 60 * 60 * 24) }, active: true },
           { $set: { active: false } },
           { multi: true });
       },
