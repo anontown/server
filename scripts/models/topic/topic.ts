@@ -342,7 +342,7 @@ export module Topic {
 
     let res = Res.create(objidGenerator, topic, user, authToken, "", "トピ主", "トピックが建ちました", null, null, true, now);
     //エスケープすること
-    let resParent = Res.create(objidGenerator, parent, user, authToken, "", "派生トピック", `[${title}](/topic/${parent.id.toString()})`, null, null, true, now);
+    let resParent = Res.create(objidGenerator, parent, user, authToken, "", "派生トピック", `[${title}](/topic/${topic.id.toString()})`, null, null, true, now);
     user.changeLastOneTopic(now);
 
     return { topic, res, resParent };
