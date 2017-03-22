@@ -1,7 +1,7 @@
 import {
     History,
     ObjectIDGenerator,
-    Topic,
+    TopicNormal,
     User
 } from '../../../scripts';
 import * as assert from 'power-assert';
@@ -38,7 +38,7 @@ describe("History", () => {
 
     describe("create", () => {
         it('正常に作れるか', () => {
-            let t = Topic.fromDB({
+            let t = TopicNormal.fromDB({
                 _id: new ObjectID(),
                 title: 'title',
                 tags: ['a'],

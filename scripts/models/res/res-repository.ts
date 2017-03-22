@@ -1,5 +1,5 @@
 import { ObjectID } from 'mongodb';
-import { ITopic } from '../topic';
+import { Topic } from '../topic';
 import { DB } from '../../db';
 import { IAuthToken } from '../../auth';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
@@ -31,7 +31,7 @@ export class ResRepository {
     return this.aggregate(reses);
   }
 
-  static async find(topic: ITopic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
+  static async find(topic:Topic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
     let db = await DB;
     let reses: IResDB[] = await db.collection("reses")
       .find({
@@ -49,7 +49,7 @@ export class ResRepository {
     return this.aggregate(reses);
   }
 
-  static async findNew(topic: ITopic, limit: number): Promise<Res[]> {
+  static async findNew(topic: Topic, limit: number): Promise<Res[]> {
     let db = await DB;
     let reses: IResDB[] = await db.collection("reses")
       .find({
@@ -95,7 +95,7 @@ export class ResRepository {
     return this.aggregate(reses);
   }
 
-  static async findHash(topic: ITopic, hash: string): Promise<Res[]> {
+  static async findHash(topic: Topic, hash: string): Promise<Res[]> {
     let db = await DB;
     let reses: IResDB[] = await db.collection("reses")
       .find({
@@ -108,7 +108,7 @@ export class ResRepository {
     return this.aggregate(reses);
   }
 
-  static async findReply(topic: ITopic, res: Res): Promise<Res[]> {
+  static async findReply(topic: Topic, res: Res): Promise<Res[]> {
     let db = await DB;
     let reses: IResDB[] = await db.collection("reses")
       .find({

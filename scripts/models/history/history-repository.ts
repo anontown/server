@@ -2,7 +2,7 @@ import { History, IHistoryDB } from './history';
 import { DB } from '../../db';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error';
 import { ObjectID } from 'mongodb';
-import { ITopic } from '../topic';
+import { Topic } from '../topic';
 
 export class HistoryRepository {
   static async insert(history: History): Promise<null> {
@@ -42,7 +42,7 @@ export class HistoryRepository {
     return histories.map(h => History.fromDB(h));
   }
 
-  static async findAll(topic: ITopic): Promise<History[]> {
+  static async findAll(topic: Topic): Promise<History[]> {
     let db = await DB;
     let histories: IHistoryDB[] = await db.collection("histories")
       .find({ topic: topic.id })

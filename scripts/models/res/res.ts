@@ -1,6 +1,6 @@
 import { ObjectID } from 'mongodb';
 import { User } from '../user';
-import { ITopic,Topic } from '../topic';
+import { Topic } from '../topic';
 import { Profile } from '../profile';
 import { Msg } from '../msg';
 import { IAuthToken } from '../../auth';
@@ -234,7 +234,7 @@ export class Res {
     return new Res(r._id, r.topic, r.date, r.user, r.name, r.text, r.mdtext, r.reply, r.deleteFlag, r.vote, r.lv, r.hash, r.profile, replyCount, r.age)
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, topic: ITopic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean, now: Date): Res {
+  static create(objidGenerator: IGenerator<ObjectID>, topic: Topic, user: User, _authToken: IAuthToken, name: string, autoName: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean, now: Date): Res {
     if (autoName !== null) {
       paramsErrorMaker([
         {
@@ -294,11 +294,11 @@ export class Res {
       "active",
       [],
       user.lv * 5,
-      Topic.hash(topic,now, user),
+      topic.hash(now, user),
       profile !== null ? profile.id : null,
       0,
       age);
-    Topic.resUpdate(topic,result);
+    topic.resUpdate(result);
     return result;
   }
 

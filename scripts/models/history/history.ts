@@ -1,6 +1,6 @@
 import { ObjectID } from 'mongodb';
 import { User } from '../user';
-import { ITopicNormal } from '../topic';
+import { TopicNormal } from '../topic';
 import { IGenerator } from '../../generator';
 
 export interface IHistoryDB {
@@ -31,7 +31,7 @@ export class History {
     return new History(h._id, h.topic, h.title, h.tags, h.text, h.mdtext, h.date, h.hash, h.user);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, topic: ITopicNormal, date: Date, hash: string, user: User): History {
+  static create(objidGenerator: IGenerator<ObjectID>, topic: TopicNormal, date: Date, hash: string, user: User): History {
     return new History(objidGenerator.get(), topic.id, topic.title, topic.tags, topic.text, topic.mdtext, date, hash, user.id);
   }
 

@@ -10,347 +10,145 @@ import { IGenerator } from '../../generator';
 
 export type ITopicDB = ITopicNormalDB | ITopicOneDB | ITopicForkDB;
 
-export interface ITopicNormalDB {
-  _id: ObjectID,
-  title: string,
-  tags: string[],
-  text: string,
-  mdtext: string,
-  update: Date,
-  date: Date,
-  type: 'normal',
-  ageUpdate: Date,
-  active: boolean
-}
-
-export interface ITopicOneDB {
-  _id: ObjectID,
-  title: string,
-  tags: string[],
-  text: string,
-  mdtext: string,
-  update: Date,
-  date: Date,
-  type: 'one',
-  ageUpdate: Date,
-  active: boolean
-}
-
-export interface ITopicForkDB {
+export interface ITopicBaseDB<T extends TopicType> {
   _id: ObjectID,
   title: string,
   update: Date,
   date: Date,
-  type: 'fork',
+  type: T,
   ageUpdate: Date,
   active: boolean,
+}
+
+export interface ITopicSearchBaseDB<T extends TopicSearchType> extends ITopicBaseDB<T> {
+  tags: string[],
+  text: string,
+  mdtext: string
+}
+
+export interface ITopicNormalDB extends ITopicSearchBaseDB<'normal'> {
+}
+
+export interface ITopicOneDB extends ITopicSearchBaseDB<'one'> {
+}
+
+export interface ITopicForkDB extends ITopicBaseDB<'fork'> {
   parent: ObjectID;
 }
 
 export type ITopicAPI = ITopicOneAPI | ITopicNormalAPI | ITopicForkAPI;
 
-export interface ITopicNormalAPI {
+export interface ITopicBaseAPI<T extends TopicType> {
   id: string,
   title: string,
-  tags: string[],
-  text: string,
-  mdtext: string,
   update: string,
   date: string,
   resCount: number,
-  type: 'normal',
+  type: T,
   active: boolean
 }
 
-export interface ITopicOneAPI {
-  id: string,
-  title: string,
+export interface ITopicSearchBaseAPI<T extends TopicSearchType> extends ITopicBaseAPI<T> {
   tags: string[],
   text: string,
   mdtext: string,
-  update: string,
-  date: string,
-  resCount: number,
-  type: 'one',
-  active: boolean
 }
 
-export interface ITopicForkAPI {
-  id: string,
-  title: string,
-  update: string,
-  date: string,
-  resCount: number,
-  type: 'fork',
-  active: boolean,
+export interface ITopicNormalAPI extends ITopicSearchBaseAPI<'normal'> {
+}
+
+export interface ITopicOneAPI extends ITopicSearchBaseAPI<'one'> {
+}
+
+export interface ITopicForkAPI extends ITopicBaseAPI<'fork'> {
   parent: string
 }
 
-export type TopicType = "one" | "normal" | "fork";
+export type TopicSearchType = "one" | "normal";
+export type TopicType = TopicSearchType | "fork";
 
-export type ITopic = ITopicNormal | ITopicOne | ITopicFork;
 
-export interface ITopicNormal {
-  id: ObjectID,
-  title: string,
-  tags: string[],
-  text: string,
-  mdtext: string,
-  update: Date,
-  date: Date,
-  resCount: number,
-  type: 'normal',
-  ageUpdate: Date,
-  active: boolean
-}
+export type Topic = TopicNormal | TopicOne | TopicFork;
 
-export interface ITopicOne {
-  id: ObjectID,
-  title: string,
-  tags: string[],
-  text: string,
-  mdtext: string,
-  update: Date,
-  date: Date,
-  resCount: number,
-  type: 'one',
-  ageUpdate: Date,
-  active: boolean
-}
-
-export interface ITopicFork {
-  id: ObjectID,
-  title: string,
-  update: Date,
-  date: Date,
-  resCount: number,
-  type: 'fork',
-  ageUpdate: Date,
-  active: boolean,
-  parent: ObjectID,
-}
-
-export module Topic {
-  export function toDB(topic: ITopicNormal): ITopicNormalDB;
-  export function toDB(topic: ITopicOne): ITopicOneDB;
-  export function toDB(topic: ITopicFork): ITopicForkDB;
-  export function toDB(topic: ITopic): ITopicDB;
-  export function toDB(topic: ITopic): ITopicDB {
-    switch (topic.type) {
-      case 'normal':
-        return {
-          _id: topic.id,
-          title: topic.title,
-          tags: topic.tags,
-          text: topic.text,
-          mdtext: topic.mdtext,
-          update: topic.update,
-          date: topic.date,
-          type: topic.type,
-          ageUpdate: topic.ageUpdate,
-          active: topic.active
-        };
-      case 'one':
-        return {
-          _id: topic.id,
-          title: topic.title,
-          tags: topic.tags,
-          text: topic.text,
-          mdtext: topic.mdtext,
-          update: topic.update,
-          date: topic.date,
-          type: topic.type,
-          ageUpdate: topic.ageUpdate,
-          active: topic.active
-        };
-      case 'fork':
-        return {
-          _id: topic.id,
-          title: topic.title,
-          update: topic.update,
-          date: topic.date,
-          type: topic.type,
-          ageUpdate: topic.ageUpdate,
-          active: topic.active,
-          parent: topic.parent
-        };
-    }
+export abstract class TopicBase<T extends TopicType> {
+  constructor(private _id: ObjectID,
+    protected _title: string,
+    private _update: Date,
+    private _date: Date,
+    private _resCount: number,
+    private _type: T,
+    private _ageUpdate: Date,
+    private _active: boolean) {
   }
 
-  export function toAPI(topic: ITopicNormal): ITopicNormalAPI;
-  export function toAPI(topic: ITopicOne): ITopicOneAPI;
-  export function toAPI(topic: ITopicFork): ITopicForkAPI;
-  export function toAPI(topic: ITopic): ITopicAPI;
-  export function toAPI(topic: ITopic): ITopicAPI {
-    switch (topic.type) {
-      case 'normal':
-        return {
-          id: topic.id.toString(),
-          title: topic.title,
-          tags: topic.tags,
-          text: topic.text,
-          mdtext: topic.mdtext,
-          update: topic.update.toISOString(),
-          date: topic.date.toISOString(),
-          resCount: topic.resCount,
-          type: topic.type,
-          active: topic.active
-        };
-      case 'one':
-        return {
-          id: topic.id.toString(),
-          title: topic.title,
-          tags: topic.tags,
-          text: topic.text,
-          mdtext: topic.mdtext,
-          update: topic.update.toISOString(),
-          date: topic.date.toISOString(),
-          resCount: topic.resCount,
-          type: topic.type,
-          active: topic.active
-        };
-      case 'fork':
-        return {
-          id: topic.id.toString(),
-          title: topic.title,
-          update: topic.update.toISOString(),
-          date: topic.date.toISOString(),
-          resCount: topic.resCount,
-          type: topic.type,
-          active: topic.active,
-          parent: topic.parent.toString()
-        };
-    }
+  get id() {
+    return this._id;
   }
 
-  export function fromDB(db: ITopicNormalDB, resCount: number): ITopicNormal;
-  export function fromDB(db: ITopicOneDB, resCount: number): ITopicOne;
-  export function fromDB(db: ITopicForkDB, resCount: number): ITopicFork;
-  export function fromDB(db: ITopicDB, resCount: number): ITopic;
-  export function fromDB(db: ITopicDB, resCount: number): ITopic {
-    switch (db.type) {
-      case 'normal':
-        return {
-          id: db._id,
-          title: db.title,
-          tags: db.tags,
-          text: db.text,
-          mdtext: db.mdtext,
-          update: db.update,
-          date: db.date,
-          resCount: resCount,
-          type: db.type,
-          ageUpdate: db.ageUpdate,
-          active: db.active
-        };
-      case 'one':
-        return {
-          id: db._id,
-          title: db.title,
-          tags: db.tags,
-          text: db.text,
-          mdtext: db.mdtext,
-          update: db.update,
-          date: db.date,
-          resCount: resCount,
-          type: db.type,
-          ageUpdate: db.ageUpdate,
-          active: db.active
-        };
-      case 'fork':
-        return {
-          id: db._id,
-          title: db.title,
-          update: db.update,
-          date: db.date,
-          resCount: resCount,
-          type: db.type,
-          ageUpdate: db.ageUpdate,
-          active: db.active,
-          parent: db.parent
-        };
-    }
+  get title() {
+    return this._title;
   }
 
-  export function resUpdate(topic: ITopic, res: Res) {
-    if (!topic.active) {
+  get update() {
+    return this._update;
+  }
+
+  get date() {
+    return this._date;
+  }
+
+  get resCount() {
+    return this._resCount;
+  }
+
+  get type() {
+    return this._type;
+  }
+
+  get ageUpdate() {
+    return this._ageUpdate;
+  }
+
+  get active() {
+    return this._active;
+  }
+
+  toDB(): ITopicBaseDB<T> {
+    return {
+      _id: this._id,
+      title: this._title,
+      update: this._update,
+      date: this._date,
+      type: this._type,
+      ageUpdate: this._ageUpdate,
+      active: this._active
+    };
+  }
+
+  toAPI(): ITopicBaseAPI<T> {
+    return {
+      id: this._id.toString(),
+      title: this._title,
+      update: this._update.toISOString(),
+      date: this._date.toISOString(),
+      resCount: this._resCount,
+      type: this._type,
+      active: this._active
+    };
+  }
+
+  resUpdate(res: Res) {
+    if (!this.active) {
       throw new AtPrerequisiteError("トピックが落ちているので書き込めません")
     }
 
-    topic.update = res.date;
+    this._update = res.date;
     if (res.age) {
-      topic.ageUpdate = res.date;
+      this._ageUpdate = res.date;
     }
   }
 
-  export function createNormal(objidGenerator: IGenerator<ObjectID>, title: string, tags: string[], text: string, user: User, authToken: IAuthToken, now: Date): { topic: ITopicNormal, res: Res, history: History } {
-    checkData({ title, tags, text });
-    let topic: ITopicNormal = {
-      id: objidGenerator.get(),
-      title: title,
-      tags: tags,
-      text: text,
-      mdtext: StringUtil.md(text),
-      update: now,
-      date: now,
-      resCount: 1,
-      type: 'normal',
-      ageUpdate: now,
-      active: true
-    };
-    let cd = changeData(topic, objidGenerator, user, authToken, title, tags, text, now);
-    user.changeLastTopic(now);
-
-    return { topic, history: cd.history, res: cd.res };
-  }
-
-  export function createOne(objidGenerator: IGenerator<ObjectID>, title: string, tags: string[], text: string, user: User, authToken: IAuthToken, now: Date): { topic: ITopicOne, res: Res } {
-    checkData({ title, tags, text });
-    let topic: ITopicOne = {
-      id: objidGenerator.get(),
-      title: title,
-      tags: tags,
-      text: text,
-      mdtext: StringUtil.md(text),
-      update: now,
-      date: now,
-      resCount: 1,
-      type: 'one',
-      ageUpdate: now,
-      active: true
-    };
-
-    let res = Res.create(objidGenerator, topic, user, authToken, "", "トピ主", text, null, null, true, now);
-    user.changeLastOneTopic(now);
-
-    return { topic, res };
-  }
-
-  export function createFork(objidGenerator: IGenerator<ObjectID>, title: string, parent: ITopicNormal, user: User, authToken: IAuthToken, now: Date): { topic: ITopicFork, res: Res, resParent: Res } {
-    checkData({ title });
-    let topic: ITopicFork = {
-      id: objidGenerator.get(),
-      title: title,
-      update: now,
-      date: now,
-      resCount: 1,
-      type: 'fork',
-      ageUpdate: now,
-      active: true,
-      parent: parent.id
-    };
-
-    let res = Res.create(objidGenerator, topic, user, authToken, "", "トピ主", "トピックが建ちました", null, null, true, now);
-    //エスケープすること
-    let resParent = Res.create(objidGenerator, parent, user, authToken, "", "派生トピック", `[${title}](/topic/${topic.id.toString()})`, null, null, true, now);
-    user.changeLastOneTopic(now);
-
-    return { topic, res, resParent };
-  }
-
-
-
-  function checkData({ title, tags, text }: { title?: string, tags?: string[], text?: string }) {
+  static checkData({ title, tags, text }: { title?: string, tags?: string[], text?: string }) {
     let data: paramsErrorMakerData[] = [];
     if (title !== undefined) {
       data.push({
@@ -402,22 +200,7 @@ export module Topic {
     paramsErrorMaker(data);
   }
 
-  export function changeData(topic: ITopicNormal, objidGenerator: IGenerator<ObjectID>, user: User, authToken: IAuthToken, title: string, tags: string[], text: string, now: Date): { res: Res, history: History } {
-    user.usePoint(10);
-    checkData({ title, tags, text });
-
-    topic.title = title;
-    topic.tags = tags;
-    topic.text = text;
-    topic.mdtext = StringUtil.md(text);
-
-    let history = History.create(objidGenerator, topic, now, hash(topic, now, user), user);
-    let res = Res.create(objidGenerator, topic, user, authToken, "", "トピックデータ", text, null, null, true, now);
-
-    return { res, history };
-  }
-
-  export function hash(topic: ITopic, date: Date, user: User): string {
+  hash(date: Date, user: User): string {
     return StringUtil.hash(
       //ユーザー依存
       user.id + " " +
@@ -426,9 +209,259 @@ export module Topic {
       date.getFullYear() + " " + date.getMonth() + " " + date.getDate() + " " +
 
       //トピ依存
-      topic.id.toString() +
+      this._id.toString() +
 
       //ソルト依存
       Config.salt.hash);
+  }
+}
+
+export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBase<T> {
+  constructor(id: ObjectID,
+    title: string,
+    protected _tags: string[],
+    protected _text: string,
+    protected _mdtext: string,
+    update: Date,
+    date: Date,
+    resCount: number,
+    type: T,
+    ageUpdate: Date,
+    active: boolean) {
+    super(id,
+      title,
+      update,
+      date,
+      resCount,
+      type,
+      ageUpdate,
+      active);
+  }
+
+
+  get tags() {
+    return this._tags;
+  }
+
+  get text() {
+    return this._text;
+  }
+
+  get mdtext() {
+    return this._mdtext;
+  }
+
+  toDB(): ITopicSearchBaseDB<T> {
+    return {
+      ...super.toDB(),
+      tags: this._tags,
+      text: this._text,
+      mdtext: this._mdtext
+    };
+  }
+
+  toAPI(): ITopicSearchBaseAPI<T> {
+    return {
+      ...super.toAPI(),
+      tags: this._tags,
+      text: this._text,
+      mdtext: this._mdtext
+    };
+  }
+}
+
+export class TopicNormal extends TopicSearchBase<'normal'> {
+  constructor(id: ObjectID,
+    title: string,
+    tags: string[],
+    text: string,
+    mdtext: string,
+    update: Date,
+    date: Date,
+    resCount: number,
+    ageUpdate: Date,
+    active: boolean) {
+    super(id,
+      title,
+      tags,
+      text,
+      mdtext,
+      update,
+      date,
+      resCount,
+      'normal',
+      ageUpdate,
+      active);
+  }
+
+  static fromDB(db: ITopicNormalDB, resCount: number): TopicNormal {
+    return new TopicNormal(db._id,
+      db.title,
+      db.tags,
+      db.text,
+      db.mdtext,
+      db.update,
+      db.date,
+      resCount,
+      db.ageUpdate,
+      db.active);
+  }
+
+  changeData(objidGenerator: IGenerator<ObjectID>, user: User, authToken: IAuthToken, title: string, tags: string[], text: string, now: Date): { res: Res, history: History } {
+    user.usePoint(10);
+    TopicBase.checkData({ title, tags, text });
+
+    this._title = title;
+    this._tags = tags;
+    this._text = text;
+    this._mdtext = StringUtil.md(text);
+
+    let history = History.create(objidGenerator, this, now, this.hash(now, user), user);
+    let res = Res.create(objidGenerator, this, user, authToken, "", "トピックデータ", text, null, null, true, now);
+
+    return { res, history };
+  }
+
+  static create(objidGenerator: IGenerator<ObjectID>, title: string, tags: string[], text: string, user: User, authToken: IAuthToken, now: Date): { topic: TopicNormal, res: Res, history: History } {
+    this.checkData({ title, tags, text });
+    let topic = new TopicNormal(objidGenerator.get(),
+      title,
+      tags,
+      text,
+      StringUtil.md(text),
+      now,
+      now,
+      1,
+      now,
+      true);
+    let cd = topic.changeData(objidGenerator, user, authToken, title, tags, text, now);
+    user.changeLastTopic(now);
+
+    return { topic, history: cd.history, res: cd.res };
+  }
+}
+
+export class TopicOne extends TopicSearchBase<'one'> {
+  constructor(id: ObjectID,
+    title: string,
+    tags: string[],
+    text: string,
+    mdtext: string,
+    update: Date,
+    date: Date,
+    resCount: number,
+    ageUpdate: Date,
+    active: boolean) {
+    super(id,
+      title,
+      tags,
+      text,
+      mdtext,
+      update,
+      date,
+      resCount,
+      'one',
+      ageUpdate,
+      active);
+  }
+
+  static fromDB(db: ITopicOneDB, resCount: number): TopicOne {
+    return new TopicOne(db._id,
+      db.title,
+      db.tags,
+      db.text,
+      db.mdtext,
+      db.update,
+      db.date,
+      resCount,
+      db.ageUpdate,
+      db.active);
+  }
+
+  static create(objidGenerator: IGenerator<ObjectID>, title: string, tags: string[], text: string, user: User, authToken: IAuthToken, now: Date): { topic: TopicOne, res: Res } {
+    this.checkData({ title, tags, text });
+    let topic = new TopicOne(objidGenerator.get(),
+      title,
+      tags,
+      text,
+      StringUtil.md(text),
+      now,
+      now,
+      1,
+      now,
+      true);
+
+    let res = Res.create(objidGenerator, topic, user, authToken, "", "トピ主", text, null, null, true, now);
+    user.changeLastOneTopic(now);
+
+    return { topic, res };
+  }
+}
+
+export class TopicFork extends TopicBase<'fork'> {
+  constructor(id: ObjectID,
+    title: string,
+    update: Date,
+    date: Date,
+    resCount: number,
+    ageUpdate: Date,
+    active: boolean,
+    private _parent: ObjectID) {
+    super(id,
+      title,
+      update,
+      date,
+      resCount,
+      'fork',
+      ageUpdate,
+      active);
+  }
+
+  get parent() {
+    return this._parent;
+  }
+
+  toDB(): ITopicForkDB {
+    return {
+      ...super.toDB(),
+      parent: this._parent
+    };
+  }
+
+  toAPI(): ITopicForkAPI {
+    return {
+      ...super.toAPI(),
+      parent: this._parent.toString()
+    };
+  }
+
+  static fromDB(db: ITopicForkDB, resCount: number): TopicFork {
+    return new TopicFork(db._id,
+      db.title,
+      db.update,
+      db.date,
+      resCount,
+      db.ageUpdate,
+      db.active,
+      db.parent);
+  }
+
+  static create(objidGenerator: IGenerator<ObjectID>, title: string, parent: TopicNormal, user: User, authToken: IAuthToken, now: Date): { topic: TopicFork, res: Res, resParent: Res } {
+    this.checkData({ title });
+    let topic = new TopicFork(objidGenerator.get(),
+      title,
+      now,
+      now,
+      1,
+      now,
+      true,
+      parent.id);
+
+    let res = Res.create(objidGenerator, topic, user, authToken, "", "トピ主", "トピックが建ちました", null, null, true, now);
+    //エスケープすること
+    let resParent = Res.create(objidGenerator, parent, user, authToken, "", "派生トピック", `[${title}](/topic/${topic.id.toString()})`, null, null, true, now);
+    user.changeLastOneTopic(now);
+
+    return { topic, res, resParent };
   }
 }

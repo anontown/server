@@ -10,7 +10,9 @@ import {
   TokenRepository,
   Client,
   ClientRepository,
-  Topic,
+  TopicNormal,
+  TopicOne,
+  TopicFork,
   TopicRepository,
   Res,
   ResRepository,
@@ -541,7 +543,7 @@ import { AtPrerequisiteError } from './at-error';
       },
       call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
         let user = await UserRepository.findOne(authToken!.user);
-        let create = Topic.createNormal(ObjectIDGenerator,
+        let create = TopicNormal.create(ObjectIDGenerator,
         params.title,
           params.tags,
           params.text,
@@ -560,7 +562,7 @@ import { AtPrerequisiteError } from './at-error';
         if (create.history) {
           appLog("topic/create", ip, "histories", create.history.id);
         }
-        return Topic.toAPI(create.topic);
+        return create.topic.toAPI();
       }
     });
 
@@ -594,7 +596,7 @@ import { AtPrerequisiteError } from './at-error';
       },
       call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
         let user = await UserRepository.findOne(authToken!.user);
-        let create = Topic.createOne(ObjectIDGenerator,
+        let create = TopicOne.create(ObjectIDGenerator,
         params.title,
           params.tags,
           params.text,
@@ -611,7 +613,7 @@ import { AtPrerequisiteError } from './at-error';
         appLog("topic/create", ip, "topics", create.topic.id);
         appLog("topic/create", ip, "reses", create.res.id);
 
-        return Topic.toAPI(create.topic);
+        return create.topic.toAPI();
       }
     });
 
@@ -644,7 +646,7 @@ import { AtPrerequisiteError } from './at-error';
           throw new AtPrerequisiteError('通常トピック以外の派生トピックは作れません');
         }
 
-        let create = Topic.createFork(ObjectIDGenerator,
+        let create = TopicFork.create(ObjectIDGenerator,
         params.title,
           parent,
           user,
@@ -662,7 +664,7 @@ import { AtPrerequisiteError } from './at-error';
         appLog("topic/create", ip, "reses", create.res.id);
         appLog("topic/create", ip, "reses", create.resParent.id);
 
-        return Topic.toAPI(create.topic);
+        return create.topic.toAPI();
       }
     });
 
@@ -683,7 +685,7 @@ import { AtPrerequisiteError } from './at-error';
       },
       call: async ({params}): Promise<ITopicAPI> => {
         let topic = await TopicRepository.findOne(new ObjectID(params.id));
-        return Topic.toAPI(topic);
+        return topic.toAPI();
       }
     });
 
@@ -707,7 +709,7 @@ import { AtPrerequisiteError } from './at-error';
       },
       call: async ({params}): Promise<ITopicAPI[]> => {
         let topics = await TopicRepository.findIn(params.ids.map(id => new ObjectID(id)));
-        return topics.map(t => Topic.toAPI(t));
+        return topics.map(t => t.toAPI());
       }
     });
 
@@ -749,7 +751,7 @@ import { AtPrerequisiteError } from './at-error';
       },
       call: async ({params}): Promise<ITopicAPI[]> => {
         let topic = await TopicRepository.find(params.title, params.tags, params.skip, params.limit, params.activeOnly)
-        return topic.map(t => Topic.toAPI(t));
+        return topic.map(t => t.toAPI());
       }
     });
 
@@ -789,7 +791,7 @@ import { AtPrerequisiteError } from './at-error';
         }
 
         let topic = await TopicRepository.findFork(parent, params.skip, params.limit, params.activeOnly)
-        return topic.map(t => Topic.toAPI(t));
+        return topic.map(t => t.toAPI());
       }
     });
 
@@ -855,7 +857,7 @@ import { AtPrerequisiteError } from './at-error';
           throw new AtPrerequisiteError('通常トピック以外は編集出来ません');
         }
 
-        let val = Topic.changeData(topic,ObjectIDGenerator,user, authToken!, params.title, params.tags, params.text, now);
+        let val = topic.changeData(ObjectIDGenerator,user, authToken!, params.title, params.tags, params.text, now);
 
         await Promise.all([
           ResRepository.insert(val.res),
@@ -866,7 +868,7 @@ import { AtPrerequisiteError } from './at-error';
 
         appLog("topic/update", ip, "reses", val.res.id);
         appLog("topic/update", ip, "histories", val.history.id);
-        return Topic.toAPI(topic);
+        return topic.toAPI();
       }
     });
   }

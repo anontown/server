@@ -1,12 +1,12 @@
 import { ObjectID } from 'mongodb';
 import { DB } from '../../db';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
-import { Topic, ITopicDB, ITopic, ITopicNormal } from './topic';
+import { Topic, ITopicDB, TopicNormal, TopicOne, TopicFork } from './topic';
 import { CronJob } from 'cron';
 
 
 export class TopicRepository {
-  static async findOne(id: ObjectID): Promise<ITopic> {
+  static async findOne(id: ObjectID): Promise<Topic> {
     let db = await DB;
     let topic: ITopicDB | null = await db.collection("topics").findOne({ _id: id });
 
@@ -17,7 +17,7 @@ export class TopicRepository {
     return (await this.aggregate([topic]))[0];
   }
 
-  static async findIn(ids: ObjectID[]): Promise<ITopic[]> {
+  static async findIn(ids: ObjectID[]): Promise<Topic[]> {
     let db = await DB;
 
     let topics: ITopicDB[] = await db.collection("topics").find({ _id: { $in: ids } })
@@ -47,7 +47,7 @@ export class TopicRepository {
     return data.map(x => ({ name: x._id, count: x.count }));
   }
 
-  static async find(title: string, tags: string[], skip: number, limit: number, activeOnly: boolean): Promise<ITopic[]> {
+  static async find(title: string, tags: string[], skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
     let db = await DB;
 
     let topics: ITopicDB[] = await db.collection("topics")
@@ -76,7 +76,7 @@ export class TopicRepository {
     return this.aggregate(topics);
   }
 
-  static async findFork(parent: ITopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<ITopic[]> {
+  static async findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
     let db = await DB;
 
     let topics: ITopicDB[] = await db.collection("topics")
@@ -99,7 +99,7 @@ export class TopicRepository {
     return this.aggregate(topics);
   }
 
-  private static async aggregate(topics: ITopicDB[]): Promise<ITopic[]> {
+  private static async aggregate(topics: ITopicDB[]): Promise<Topic[]> {
     let db = await DB;
     let countArr: { _id: ObjectID, resCount: number }[] = await db.collection("reses")
       .aggregate([
@@ -119,7 +119,17 @@ export class TopicRepository {
     let count = new Map<string, number>();
     countArr.forEach(c => count.set(c._id.toString(), c.resCount));
 
-    return topics.map(t => Topic.fromDB(t, count.has(t._id.toString()) ? count.get(t._id.toString()) as number : 0));
+    return topics.map(t => {
+      let c = count.has(t._id.toString()) ? count.get(t._id.toString()) as number : 0;
+      switch (t.type) {
+        case 'normal':
+          return TopicNormal.fromDB(t, c);
+        case 'one':
+          return TopicOne.fromDB(t, c);
+        case 'fork':
+          return TopicFork.fromDB(t, c);
+      }
+    });
 
   }
 
@@ -139,15 +149,15 @@ export class TopicRepository {
     }).start();
   }
 
-  static async insert(topic: ITopic): Promise<null> {
+  static async insert(topic: Topic): Promise<null> {
     let db = await DB;
-    await db.collection("topics").insert(Topic.toDB(topic));
+    await db.collection("topics").insert(topic.toDB());
     return null;
   }
 
-  static async update(topic: ITopic): Promise<null> {
+  static async update(topic: Topic): Promise<null> {
     let db = await DB;
-    await db.collection("topics").update({ _id: topic.id }, Topic.toDB(topic));
+    await db.collection("topics").update({ _id: topic.id }, topic.toDB());
     return null;
   }
 }
