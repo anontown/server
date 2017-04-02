@@ -6,7 +6,10 @@ import { Config } from './config';
 import {
   User,
   UserRepository,
-  Token,
+  TokenMaster,
+  TokenGeneral,
+  ITokenGeneralAPI,
+  ITokenMasterAPI,
   TokenRepository,
   Client,
   ClientRepository,
@@ -33,7 +36,7 @@ import {
 import { ObjectID } from 'mongodb';
 import { Logger } from './logger';
 import * as createDB from './create-db';
-import { ObjectIDGenerator,RandomGenerator } from './generator';
+import { ObjectIDGenerator, RandomGenerator } from './generator';
 import { AtPrerequisiteError } from './at-error';
 
 (async () => {
@@ -61,7 +64,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/create",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -87,10 +90,10 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken, ip, now}): Promise<IResAPI> => {
+      call: async ({ params, auth, ip, now }): Promise<IResAPI> => {
         let val = await Promise.all([
           TopicRepository.findOne(new ObjectID(params.topic)),
-          UserRepository.findOne(authToken!.user),
+          UserRepository.findOne(auth.token.user),
           params.reply !== null ? ResRepository.findOne(new ObjectID(params.reply)) : Promise.resolve(null),
           params.profile !== null ? ProfileRepository.findOne(new ObjectID(params.profile)) : Promise.resolve(null)
         ]);
@@ -102,7 +105,7 @@ import { AtPrerequisiteError } from './at-error';
         let res = Res.create(ObjectIDGenerator,
           topic,
           user,
-          authToken!,
+          auth.token,
           params.name,
           null,
           params.text,
@@ -118,7 +121,7 @@ import { AtPrerequisiteError } from './at-error';
         ]);
 
         appLog("create/res", ip, "reses", res.id)
-        return res.toAPI(authToken);
+        return res.toAPI(auth.token);
       }
     });
 
@@ -126,7 +129,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/find/one",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -137,9 +140,9 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IResAPI> => {
+      call: async ({ params, auth }): Promise<IResAPI> => {
         let res = await ResRepository.findOne(new ObjectID(params.id));
-        return res.toAPI(authToken);
+        return res.toAPI(auth.tokenOrNull);
       }
     });
 
@@ -147,7 +150,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/find/in",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -161,9 +164,9 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IResAPI[]> => {
+      call: async ({ params, auth }): Promise<IResAPI[]> => {
         let reses = await ResRepository.findIn(params.ids.map(id => new ObjectID(id)));
-        return reses.map(r => r.toAPI(authToken));
+        return reses.map(r => r.toAPI(auth.tokenOrNull));
       }
     });
 
@@ -177,7 +180,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/find",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -202,10 +205,10 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IResAPI[]> => {
+      call: async ({ params, auth }): Promise<IResAPI[]> => {
         let topic = await TopicRepository.findOne(new ObjectID(params.topic));
         let reses = await ResRepository.find(topic, params.type, params.equal, new Date(params.date), params.limit);
-        return reses.map(r => r.toAPI(authToken));
+        return reses.map(r => r.toAPI(auth.tokenOrNull));
       }
     });
 
@@ -213,7 +216,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/find/new",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -227,10 +230,10 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IResAPI[]> => {
+      call: async ({ params, auth }): Promise<IResAPI[]> => {
         let topic = await TopicRepository.findOne(new ObjectID(params.topic));
         let reses = await ResRepository.findNew(topic, params.limit);
-        return reses.map(r => r.toAPI(authToken));
+        return reses.map(r => r.toAPI(auth.tokenOrNull));
       }
     });
 
@@ -238,7 +241,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/find/hash",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -252,10 +255,10 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IResAPI[]> => {
+      call: async ({ params, auth }): Promise<IResAPI[]> => {
         let topic = await TopicRepository.findOne(new ObjectID(params.topic));
         let reses = await ResRepository.findHash(topic, params.hash);
-        return reses.map(r => r.toAPI(authToken));
+        return reses.map(r => r.toAPI(auth.tokenOrNull));
       }
     });
 
@@ -263,7 +266,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/find/reply",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -277,7 +280,7 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IResAPI[]> => {
+      call: async ({ params, auth }): Promise<IResAPI[]> => {
         let val = await Promise.all([
           TopicRepository.findOne(new ObjectID(params.topic)),
           ResRepository.findOne(new ObjectID(params.reply))
@@ -287,7 +290,7 @@ import { AtPrerequisiteError } from './at-error';
         let res = val[1];
 
         let reses = await ResRepository.findReply(topic, res);
-        return reses.map(r => r.toAPI(authToken));
+        return reses.map(r => r.toAPI(auth.tokenOrNull));
       }
     });
 
@@ -300,7 +303,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/find/notice",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -322,9 +325,9 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IResAPI[]> => {
-        let res = await ResRepository.findNotice(authToken!, params.type, params.equal, new Date(params.date), params.limit);
-        return res.map(x => x.toAPI(authToken));
+      call: async ({ params, auth }): Promise<IResAPI[]> => {
+        let res = await ResRepository.findNotice(auth.token, params.type, params.equal, new Date(params.date), params.limit);
+        return res.map(x => x.toAPI(auth.token));
       }
     });
 
@@ -332,7 +335,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/find/notice/new",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -343,9 +346,9 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IResAPI[]> => {
-        let res = await ResRepository.findNoticeNew(authToken!, params.limit);
-        return res.map(x => x.toAPI(authToken));
+      call: async ({ params, auth }): Promise<IResAPI[]> => {
+        let res = await ResRepository.findNoticeNew(auth.token, params.limit);
+        return res.map(x => x.toAPI(auth.token));
       }
     });
 
@@ -353,7 +356,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/uv",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -364,10 +367,10 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IResAPI> => {
+      call: async ({ params, auth }): Promise<IResAPI> => {
         let val = await Promise.all([
           ResRepository.findOne(new ObjectID(params.id)),
-          UserRepository.findOne(authToken!.user)
+          UserRepository.findOne(auth.token.user)
         ]);
 
         //レス
@@ -379,7 +382,7 @@ import { AtPrerequisiteError } from './at-error';
         //レスを書き込んだユーザー
         let resUser = await UserRepository.findOne(res.user);
 
-        res.uv(resUser, user, authToken!);
+        res.uv(resUser, user, auth.token);
 
         await Promise.all([
           ResRepository.update(res),
@@ -387,7 +390,7 @@ import { AtPrerequisiteError } from './at-error';
           UserRepository.update(user)
         ]);
 
-        return res.toAPI(authToken);
+        return res.toAPI(auth.token);
       }
     });
 
@@ -395,7 +398,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/dv",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -406,10 +409,10 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken, now}): Promise<IResAPI> => {
+      call: async ({ params, auth, now }): Promise<IResAPI> => {
         let val = await Promise.all([
           ResRepository.findOne(new ObjectID(params.id)),
-          UserRepository.findOne(authToken!.user)
+          UserRepository.findOne(auth.token.user)
         ]);
 
         let res = val[0];
@@ -420,7 +423,7 @@ import { AtPrerequisiteError } from './at-error';
         //レスを書き込んだユーザー
         let resUser = await UserRepository.findOne(res.user);
 
-        let msg = res.dv(ObjectIDGenerator,resUser, user, authToken!, now);
+        let msg = res.dv(ObjectIDGenerator, resUser, user, auth.token, now);
 
         let promise = [
           ResRepository.update(res),
@@ -433,7 +436,7 @@ import { AtPrerequisiteError } from './at-error';
 
         await Promise.all(promise);
 
-        return res.toAPI(authToken);
+        return res.toAPI(auth.token);
       }
     });
 
@@ -441,7 +444,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/cv",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -452,10 +455,10 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IResAPI> => {
+      call: async ({ params, auth }): Promise<IResAPI> => {
         let val = await Promise.all([
           ResRepository.findOne(new ObjectID(params.id)),
-          UserRepository.findOne(authToken!.user)
+          UserRepository.findOne(auth.token.user)
         ]);
 
         //レス
@@ -467,7 +470,7 @@ import { AtPrerequisiteError } from './at-error';
         //レスを書き込んだユーザー
         let resUser = await UserRepository.findOne(res.user);
 
-        res.cv(resUser, user, authToken!);
+        res.cv(resUser, user, auth.token);
 
         await Promise.all([
           ResRepository.update(res),
@@ -475,7 +478,7 @@ import { AtPrerequisiteError } from './at-error';
           UserRepository.update(user)
         ]);
 
-        return res.toAPI(authToken);
+        return res.toAPI(auth.token);
       }
     });
 
@@ -483,7 +486,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/res/del",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -494,20 +497,20 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IResAPI> => {
+      call: async ({ params, auth }): Promise<IResAPI> => {
         //レス
         let res = await ResRepository.findOne(new ObjectID(params.id));
         //レスを書き込んだユーザー
         let resUser = await UserRepository.findOne(res.user);
 
-        res.del(resUser, authToken!);
+        res.del(resUser, auth.token);
 
         await Promise.all([
           ResRepository.update(res),
           UserRepository.update(resUser)
         ]);
 
-        return res.toAPI(authToken);
+        return res.toAPI(auth.token);
       }
     });
   }
@@ -521,7 +524,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/topic/create/normal",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -541,14 +544,14 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
-        let user = await UserRepository.findOne(authToken!.user);
+      call: async ({ params, auth, ip, now }): Promise<ITopicAPI> => {
+        let user = await UserRepository.findOne(auth.token.user);
         let create = TopicNormal.create(ObjectIDGenerator,
-        params.title,
+          params.title,
           params.tags,
           params.text,
           user,
-          authToken!,
+          auth.token,
           now);
 
         await TopicRepository.insert(create.topic);
@@ -574,7 +577,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/topic/create/one",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -594,14 +597,14 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
-        let user = await UserRepository.findOne(authToken!.user);
+      call: async ({ params, auth, ip, now }): Promise<ITopicAPI> => {
+        let user = await UserRepository.findOne(auth.token.user);
         let create = TopicOne.create(ObjectIDGenerator,
-        params.title,
+          params.title,
           params.tags,
           params.text,
           user,
-          authToken!,
+          auth.token,
           now);
 
         await TopicRepository.insert(create.topic);
@@ -619,12 +622,12 @@ import { AtPrerequisiteError } from './at-error';
 
     api.addAPI<{
       title: string,
-      parent:string
+      parent: string
     }>({
       url: "/topic/create/fork",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -638,19 +641,19 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
-        let user = await UserRepository.findOne(authToken!.user);
-        let parent=await TopicRepository.findOne(new ObjectID(params.parent));
+      call: async ({ params, auth, ip, now }): Promise<ITopicAPI> => {
+        let user = await UserRepository.findOne(auth.token.user);
+        let parent = await TopicRepository.findOne(new ObjectID(params.parent));
 
-        if(parent.type!=='normal'){
+        if (parent.type !== 'normal') {
           throw new AtPrerequisiteError('通常トピック以外の派生トピックは作れません');
         }
 
         let create = TopicFork.create(ObjectIDGenerator,
-        params.title,
+          params.title,
           parent,
           user,
-          authToken!,
+          auth.token,
           now);
 
         await TopicRepository.insert(create.topic);
@@ -672,7 +675,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/topic/find/one",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -683,7 +686,7 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params}): Promise<ITopicAPI> => {
+      call: async ({ params }): Promise<ITopicAPI> => {
         let topic = await TopicRepository.findOne(new ObjectID(params.id));
         return topic.toAPI();
       }
@@ -693,7 +696,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/topic/find/in",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -707,7 +710,7 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params}): Promise<ITopicAPI[]> => {
+      call: async ({ params }): Promise<ITopicAPI[]> => {
         let topics = await TopicRepository.findIn(params.ids.map(id => new ObjectID(id)));
         return topics.map(t => t.toAPI());
       }
@@ -723,7 +726,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/topic/find",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -749,7 +752,7 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params}): Promise<ITopicAPI[]> => {
+      call: async ({ params }): Promise<ITopicAPI[]> => {
         let topic = await TopicRepository.find(params.title, params.tags, params.skip, params.limit, params.activeOnly)
         return topic.map(t => t.toAPI());
       }
@@ -764,7 +767,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/topic/find/fork",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -784,9 +787,9 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params}): Promise<ITopicAPI[]> => {
-        let parent=await TopicRepository.findOne(new ObjectID(params.parent));
-        if(parent.type!=='normal'){
+      call: async ({ params }): Promise<ITopicAPI[]> => {
+        let parent = await TopicRepository.findOne(new ObjectID(params.parent));
+        if (parent.type !== 'normal') {
           throw new AtPrerequisiteError('親トピックは通常トピックのみ指定できます');
         }
 
@@ -799,7 +802,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/topic/find/tags",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -810,7 +813,7 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params}): Promise<{ name: string, count: number }[]> => {
+      call: async ({ params }): Promise<{ name: string, count: number }[]> => {
         return await TopicRepository.findTags(params.limit)
       }
     });
@@ -824,7 +827,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/topic/update",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -847,17 +850,17 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken, ip, now}): Promise<ITopicAPI> => {
-        let [topic,user] = await Promise.all([
+      call: async ({ params, auth, ip, now }): Promise<ITopicAPI> => {
+        let [topic, user] = await Promise.all([
           TopicRepository.findOne(new ObjectID(params.id)),
-          UserRepository.findOne(authToken!.user)
+          UserRepository.findOne(auth.token.user)
         ]);
 
-        if(topic.type!=='normal'){
+        if (topic.type !== 'normal') {
           throw new AtPrerequisiteError('通常トピック以外は編集出来ません');
         }
 
-        let val = topic.changeData(ObjectIDGenerator,user, authToken!, params.title, params.tags, params.text, now);
+        let val = topic.changeData(ObjectIDGenerator, user, auth.token, params.title, params.tags, params.text, now);
 
         await Promise.all([
           ResRepository.insert(val.res),
@@ -878,7 +881,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/history/find/one",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -889,7 +892,7 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params}): Promise<IHistoryAPI> => {
+      call: async ({ params }): Promise<IHistoryAPI> => {
         return (await HistoryRepository.findOne(new ObjectID(params.id)))
           .toAPI();
       }
@@ -899,7 +902,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/history/find/in",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -913,7 +916,7 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params}): Promise<IHistoryAPI[]> => {
+      call: async ({ params }): Promise<IHistoryAPI[]> => {
         return (await HistoryRepository.findIn(params.ids.map(id => new ObjectID(id))))
           .map(h => h.toAPI());
       }
@@ -923,7 +926,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/history/find/all",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -934,7 +937,7 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params}): Promise<IHistoryAPI[]> => {
+      call: async ({ params }): Promise<IHistoryAPI[]> => {
         return (await HistoryRepository.findAll(await TopicRepository.findOne(new ObjectID(params.topic))))
           .map(h => h.toAPI());
       }
@@ -946,7 +949,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/msg/find/one",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -957,8 +960,8 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IMsgAPI> => {
-        let msg = await MsgRepository.findOne(authToken!, new ObjectID(params.id));
+      call: async ({ params, auth }): Promise<IMsgAPI> => {
+        let msg = await MsgRepository.findOne(auth.token, new ObjectID(params.id));
         return msg.toAPI();
       }
     });
@@ -967,7 +970,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/msg/find/in",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -981,8 +984,8 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IMsgAPI[]> => {
-        let msgs = await MsgRepository.findIn(authToken!, params.ids.map(id => new ObjectID(id)));
+      call: async ({ params, auth }): Promise<IMsgAPI[]> => {
+        let msgs = await MsgRepository.findIn(auth.token, params.ids.map(id => new ObjectID(id)));
         return msgs.map(m => m.toAPI());
       }
     });
@@ -996,7 +999,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/msg/find",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1018,8 +1021,8 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IMsgAPI[]> => {
-        let msgs = await MsgRepository.find(authToken!, params.type, params.equal, new Date(params.date), params.limit);
+      call: async ({ params, auth }): Promise<IMsgAPI[]> => {
+        let msgs = await MsgRepository.find(auth.token, params.type, params.equal, new Date(params.date), params.limit);
         return msgs.map(m => m.toAPI());
       }
     });
@@ -1028,7 +1031,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/msg/find/new",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1039,8 +1042,8 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IMsgAPI[]> => {
-        let msgs = await MsgRepository.findNew(authToken!, params.limit);
+      call: async ({ params, auth }): Promise<IMsgAPI[]> => {
+        let msgs = await MsgRepository.findNew(auth.token, params.limit);
         return msgs.map(m => m.toAPI());
       }
     });
@@ -1055,7 +1058,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/profile/create",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1072,11 +1075,11 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken, ip, now}): Promise<IProfileAPI> => {
-        let profile = Profile.create(ObjectIDGenerator,authToken!, params.name, params.text, params.sn, now);
+      call: async ({ params, auth, ip, now }): Promise<IProfileAPI> => {
+        let profile = Profile.create(ObjectIDGenerator, auth.token, params.name, params.text, params.sn, now);
         await ProfileRepository.insert(profile);
         appLog("profile/create", ip, "profiles", profile.id);
-        return profile.toAPI(authToken);
+        return profile.toAPI(auth.token);
       }
     });
 
@@ -1084,7 +1087,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/profile/find/one",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1095,9 +1098,9 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IProfileAPI> => {
+      call: async ({ params, auth }): Promise<IProfileAPI> => {
         let profile = await ProfileRepository.findOne(new ObjectID(params.id));
-        return profile.toAPI(authToken);
+        return profile.toAPI(auth.tokenOrNull);
       }
     });
 
@@ -1105,7 +1108,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/profile/find/in",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1119,9 +1122,9 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<IProfileAPI[]> => {
+      call: async ({ params, auth }): Promise<IProfileAPI[]> => {
         let profiles = await ProfileRepository.findIn(params.ids.map(id => new ObjectID(id)));
-        return profiles.map(p => p.toAPI(authToken));
+        return profiles.map(p => p.toAPI(auth.tokenOrNull));
       }
     });
 
@@ -1129,13 +1132,13 @@ import { AtPrerequisiteError } from './at-error';
       url: "/profile/find/all",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "null"
       },
-      call: async ({authToken}): Promise<IProfileAPI[]> => {
-        let profiles = await ProfileRepository.findAll(authToken!);
-        return profiles.map(p => p.toAPI(authToken));
+      call: async ({ auth }): Promise<IProfileAPI[]> => {
+        let profiles = await ProfileRepository.findAll(auth.token);
+        return profiles.map(p => p.toAPI(auth.token));
       }
     });
 
@@ -1148,7 +1151,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/profile/update",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1168,12 +1171,12 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken, ip, now}): Promise<IProfileAPI> => {
+      call: async ({ params, auth, ip, now }): Promise<IProfileAPI> => {
         let profile = await ProfileRepository.findOne(new ObjectID(params.id));
-        profile.changeData(authToken!, params.name, params.text, params.sn, now);
+        profile.changeData(auth.token, params.name, params.text, params.sn, now);
         await ProfileRepository.update(profile);
         appLog("profile/update", ip, "profiles", profile.id);
-        return profile.toAPI(authToken);
+        return profile.toAPI(auth.token);
       }
     });
   }
@@ -1183,12 +1186,12 @@ import { AtPrerequisiteError } from './at-error';
       url: "/token/find/one",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "null"
       },
-      call: async ({authToken}): Promise<ITokenAPI> => {
-        let token = await TokenRepository.findOne(authToken!.id);
+      call: async ({ auth }): Promise<ITokenAPI> => {
+        let token = await TokenRepository.findOne(auth.token.id);
         return token.toAPI();
       }
     });
@@ -1196,13 +1199,13 @@ import { AtPrerequisiteError } from './at-error';
     api.addAPI<null>({
       url: "/token/find/all",
 
-      isAuthUser: true,
-      isAuthToken: false,
+      isAuthUser: false,
+      isAuthToken: 'master',
       schema: {
         type: "null"
       },
-      call: async ({authUser}): Promise<ITokenAPI[]> => {
-        let tokens = await TokenRepository.findAll(authUser!);
+      call: async ({ auth }): Promise<ITokenAPI[]> => {
+        let tokens = await TokenRepository.findAll(auth.tokenMaster);
         return tokens.map(t => t.toAPI());
       }
     });
@@ -1210,8 +1213,8 @@ import { AtPrerequisiteError } from './at-error';
     api.addAPI<{ id: string }>({
       url: "/token/enable",
 
-      isAuthUser: true,
-      isAuthToken: false,
+      isAuthUser: false,
+      isAuthToken: 'master',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1222,9 +1225,12 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authUser}): Promise<ITokenAPI> => {
+      call: async ({ params, auth }): Promise<ITokenAPI> => {
         let token = await TokenRepository.findOne(new ObjectID(params.id));
-        await token.enable(authUser!);
+        if (token.type !== 'general') {
+          throw new AtPrerequisiteError('通常トークン以外では出来ません');
+        }
+        await token.enable(auth.tokenMaster);
         return token.toAPI();
       }
     });
@@ -1232,8 +1238,8 @@ import { AtPrerequisiteError } from './at-error';
     api.addAPI<{ id: string }>({
       url: "/token/disable",
 
-      isAuthUser: true,
-      isAuthToken: false,
+      isAuthUser: false,
+      isAuthToken: 'master',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1244,40 +1250,21 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authUser}): Promise<ITokenAPI> => {
+      call: async ({ params, auth }): Promise<ITokenAPI> => {
         let token = await TokenRepository.findOne(new ObjectID(params.id));
-        await token.disable(authUser!);
-        return token.toAPI();
-      }
-    });
-
-    api.addAPI<{ id: string }>({
-      url: "/token/update",
-
-      isAuthUser: true,
-      isAuthToken: false,
-      schema: {
-        type: "object",
-        additionalProperties: false,
-        required: ["id"],
-        properties: {
-          id: {
-            type: "string"
-          }
+        if (token.type !== 'general') {
+          throw new AtPrerequisiteError('通常トークン以外では出来ません');
         }
-      },
-      call: async ({params, authUser}): Promise<ITokenAPI> => {
-        let token = await TokenRepository.findOne(new ObjectID(params.id));
-        await token.keyChange(authUser!, RandomGenerator);
+        await token.disable(auth.tokenMaster);
         return token.toAPI();
       }
     });
 
     api.addAPI<{ client: string }>({
-      url: "/token/create",
+      url: "/token/create/general",
 
-      isAuthUser: true,
-      isAuthToken: false,
+      isAuthUser: false,
+      isAuthToken: 'master',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1288,9 +1275,25 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authUser, now}): Promise<ITokenAPI> => {
+      call: async ({ params, auth, now }): Promise<ITokenGeneralAPI> => {
         let client = await ClientRepository.findOne(new ObjectID(params.client));
-        let token = Token.create(ObjectIDGenerator,authUser!, client, now, RandomGenerator);
+        let token = TokenGeneral.create(ObjectIDGenerator, auth.tokenMaster, client, now, RandomGenerator);
+        await TokenRepository.insert(token);
+
+        return token.toAPI();
+      }
+    });
+
+    api.addAPI<null>({
+      url: "/token/create/master",
+
+      isAuthUser: true,
+      isAuthToken: 'no',
+      schema: {
+        type: "null"
+      },
+      call: async ({ auth, now }): Promise<ITokenMasterAPI> => {
+        let token = TokenMaster.create(ObjectIDGenerator, auth.user, now, RandomGenerator);
         await TokenRepository.insert(token);
 
         return token.toAPI();
@@ -1301,7 +1304,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/token/storage/set",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1315,8 +1318,8 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<null> => {
-        await TokenRepository.setStorage(authToken!, params.name, params.value);
+      call: async ({ params, auth }): Promise<null> => {
+        await TokenRepository.setStorage(auth.token, params.name, params.value);
         return null;
       }
     });
@@ -1325,7 +1328,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/token/storage/get",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1336,8 +1339,8 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<string> => {
-        return await TokenRepository.getStorage(authToken!, params.name);
+      call: async ({ params, auth }): Promise<string> => {
+        return await TokenRepository.getStorage(auth.token, params.name);
       }
     });
 
@@ -1345,7 +1348,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/token/storage/delete",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1356,8 +1359,8 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authToken}): Promise<null> => {
-        await TokenRepository.deleteStorage(authToken!, params.name);
+      call: async ({ params, auth }): Promise<null> => {
+        await TokenRepository.deleteStorage(auth.token, params.name);
         return null;
       }
     });
@@ -1366,12 +1369,12 @@ import { AtPrerequisiteError } from './at-error';
       url: "/token/storage/list",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "null"
       },
-      call: async ({authToken}): Promise<string[]> => {
-        return await TokenRepository.listStorage(authToken!);
+      call: async ({ auth }): Promise<string[]> => {
+        return await TokenRepository.listStorage(auth.token);
       }
     });
 
@@ -1379,12 +1382,15 @@ import { AtPrerequisiteError } from './at-error';
       url: "/token/req/create",
 
       isAuthUser: false,
-      isAuthToken: true,
+      isAuthToken: 'all',
       schema: {
         type: "null"
       },
-      call: async ({authToken, now}): Promise<ITokenReqAPI> => {
-        let token = await TokenRepository.findOne(authToken!.id);
+      call: async ({ auth, now }): Promise<ITokenReqAPI> => {
+        let token = await TokenRepository.findOne(auth.token.id);
+        if (token.type !== 'general') {
+          throw new AtPrerequisiteError('通常トークン以外では出来ません');
+        }
         let req = token.createReq(now, RandomGenerator);
 
         await TokenRepository.update(token);
@@ -1397,7 +1403,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/token/find/req",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1411,8 +1417,11 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, now}): Promise<ITokenAPI> => {
+      call: async ({ params, now }): Promise<ITokenGeneralAPI> => {
         let token = await TokenRepository.findOne(new ObjectID(params.id));
+        if (token.type !== 'general') {
+          throw new AtPrerequisiteError('通常トークン以外では出来ません');
+        }
         token.authReq(params.key, now);
         return token.toAPI();
       }
@@ -1427,7 +1436,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/user/create",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       isRecaptcha: true,
       schema: {
         type: "object",
@@ -1442,8 +1451,8 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, now}): Promise<IUserAPI> => {
-        let user = User.create(ObjectIDGenerator,params.sn, params.pass, now);
+      call: async ({ params, now }): Promise<IUserAPI> => {
+        let user = User.create(ObjectIDGenerator, params.sn, params.pass, now);
         await UserRepository.insert(user);
         return user.toAPI();
       }
@@ -1452,7 +1461,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/user/find/id",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1463,7 +1472,7 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params}): Promise<string> => {
+      call: async ({ params }): Promise<string> => {
         return (await UserRepository.findID(params.sn)).toString();
       }
     });
@@ -1471,7 +1480,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/user/update",
 
       isAuthUser: true,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1485,9 +1494,9 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authUser}): Promise<IUserAPI> => {
-        let user = await UserRepository.findOne(authUser!.id);
-        user.change(authUser!, params.pass, params.sn);
+      call: async ({ params, auth }): Promise<IUserAPI> => {
+        let user = await UserRepository.findOne(auth.user.id);
+        user.change(auth.user, params.pass, params.sn);
         UserRepository.update(user);
         return user.toAPI();
       }
@@ -1498,8 +1507,8 @@ import { AtPrerequisiteError } from './at-error';
     api.addAPI<{ name: string, url: string }>({
       url: "/client/create",
 
-      isAuthUser: true,
-      isAuthToken: false,
+      isAuthUser: false,
+      isAuthToken: 'master',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1513,11 +1522,11 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authUser, ip, now}): Promise<IClientAPI> => {
-        let client = Client.create(ObjectIDGenerator,authUser!, params.name, params.url, now);
+      call: async ({ params, auth, ip, now }): Promise<IClientAPI> => {
+        let client = Client.create(ObjectIDGenerator, auth.tokenMaster, params.name, params.url, now);
         await ClientRepository.insert(client);
         appLog("client/create", ip, "clients", client.id);
-        return client.toAPI(authUser);
+        return client.toAPI(auth.tokenMaster);
       }
     });
 
@@ -1528,8 +1537,8 @@ import { AtPrerequisiteError } from './at-error';
     }>({
       url: "/client/update",
 
-      isAuthUser: true,
-      isAuthToken: false,
+      isAuthUser: false,
+      isAuthToken: 'master',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1546,12 +1555,12 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authUser, ip, now}): Promise<IClientAPI> => {
+      call: async ({ params, auth, ip, now }): Promise<IClientAPI> => {
         let client = await ClientRepository.findOne(new ObjectID(params.id));
-        client.changeData(authUser!, params.name, params.url, now);
+        client.changeData(auth.tokenMaster, params.name, params.url, now);
         await ClientRepository.update(client);
         appLog("client/update", ip, "clients", client.id);
-        return client.toAPI(authUser);
+        return client.toAPI(auth.tokenMaster);
       }
     });
 
@@ -1559,7 +1568,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/client/find/one",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1570,9 +1579,9 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authUser}): Promise<IClientAPI> => {
+      call: async ({ params, auth }): Promise<IClientAPI> => {
         let client = await ClientRepository.findOne(new ObjectID(params.id));
-        return client.toAPI(authUser);
+        return client.toAPI(auth.TokenMasterOrNull);
       }
     });
 
@@ -1580,7 +1589,7 @@ import { AtPrerequisiteError } from './at-error';
       url: "/client/find/in",
 
       isAuthUser: false,
-      isAuthToken: false,
+      isAuthToken: 'no',
       schema: {
         type: "object",
         additionalProperties: false,
@@ -1594,23 +1603,23 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({params, authUser}): Promise<IClientAPI[]> => {
+      call: async ({ params, auth }): Promise<IClientAPI[]> => {
         let clients = await ClientRepository.findIn(params.ids.map(id => new ObjectID(id)));
-        return clients.map(c => c.toAPI(authUser));
+        return clients.map(c => c.toAPI(auth.TokenMasterOrNull));
       }
     });
 
     api.addAPI<null>({
       url: "/client/find/all",
 
-      isAuthUser: true,
-      isAuthToken: false,
+      isAuthUser: false,
+      isAuthToken: 'master',
       schema: {
         type: "null",
       },
-      call: async ({authUser}): Promise<IClientAPI[]> => {
-        let clients = await ClientRepository.findAll(authUser!);
-        return clients.map(c => c.toAPI(authUser));
+      call: async ({ auth }): Promise<IClientAPI[]> => {
+        let clients = await ClientRepository.findAll(auth.tokenMaster);
+        return clients.map(c => c.toAPI(auth.tokenMaster));
       }
     });
   }
@@ -1619,7 +1628,7 @@ import { AtPrerequisiteError } from './at-error';
     url: "/user/auth",
 
     isAuthUser: true,
-    isAuthToken: false,
+    isAuthToken: 'no',
     schema: {
       type: "null",
     },

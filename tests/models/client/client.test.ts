@@ -2,7 +2,7 @@ import {
   Client,
   ObjectIDGenerator,
   AtError,
-  IAuthUser
+  IAuthTokenMaster
 } from '../../../scripts';
 import * as assert from 'power-assert';
 import { ObjectID } from 'mongodb';
@@ -14,7 +14,9 @@ describe('Client', () => {
         ObjectIDGenerator,
         {
           id: new ObjectID(),
-          pass: ''
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
         },
         'hoge',
         'http://hoge.com',
@@ -27,7 +29,9 @@ describe('Client', () => {
         ObjectIDGenerator,
         {
           id: new ObjectID(),
-          pass: ''
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
         },
         'hoge',
         'https://hoge.com',
@@ -40,9 +44,11 @@ describe('Client', () => {
         Client.create(
           ObjectIDGenerator,
           {
-            id: new ObjectID(),
-            pass: ''
-          },
+          id: new ObjectID(),
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
+        },
           'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           'http://hoge',
           new Date()
@@ -55,9 +61,11 @@ describe('Client', () => {
         Client.create(
           ObjectIDGenerator,
           {
-            id: new ObjectID(),
-            pass: ''
-          },
+          id: new ObjectID(),
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
+        },
           '',
           'http://hoge',
           new Date()
@@ -70,9 +78,11 @@ describe('Client', () => {
         Client.create(
           ObjectIDGenerator,
           {
-            id: new ObjectID(),
-            pass: ''
-          },
+          id: new ObjectID(),
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
+        },
           'hoge',
           'hogehttp://hoge.com',
           new Date()
@@ -85,9 +95,11 @@ describe('Client', () => {
         Client.create(
           ObjectIDGenerator,
           {
-            id: new ObjectID(),
-            pass: ''
-          },
+          id: new ObjectID(),
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
+        },
           'http://',
           '',
           new Date()
@@ -100,9 +112,11 @@ describe('Client', () => {
         Client.create(
           ObjectIDGenerator,
           {
-            id: new ObjectID(),
-            pass: ''
-          },
+          id: new ObjectID(),
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
+        },
           'hoge',
           '',
           new Date()
@@ -135,10 +149,12 @@ describe('Client', () => {
 
   describe("#changeData", () => {
     it("正常に変更できるか", () => {
-      let auth: IAuthUser = {
-        id: new ObjectID(),
-        pass: ""
-      };
+      let auth:IAuthTokenMaster = {
+          id: new ObjectID(),
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
+        };
 
       let client = Client.create(ObjectIDGenerator,
         auth,
@@ -151,9 +167,11 @@ describe('Client', () => {
 
     it("違うユーザーが変更しようとしたらエラーになるか", () => {
       assert.throws(() => {
-        let auth: IAuthUser = {
+        let auth: IAuthTokenMaster = {
           id: new ObjectID(),
-          pass: ""
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
         };
 
         let client = Client.create(ObjectIDGenerator,
@@ -164,7 +182,9 @@ describe('Client', () => {
 
         client.changeData({
           id: new ObjectID(),
-          pass: ""
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
         }, "foo", "http://foo", new Date());
       }, (e: any) => e instanceof AtError);
     });
@@ -172,9 +192,11 @@ describe('Client', () => {
 
     it("長い名前でエラーになるか", () => {
       assert.throws(() => {
-        let auth: IAuthUser = {
+        let auth: IAuthTokenMaster = {
           id: new ObjectID(),
-          pass: ""
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
         };
 
         let client = Client.create(ObjectIDGenerator,
@@ -189,9 +211,11 @@ describe('Client', () => {
 
     it("不正なURLでエラーになるか", () => {
       assert.throws(() => {
-        let auth: IAuthUser = {
+        let auth: IAuthTokenMaster = {
           id: new ObjectID(),
-          pass: ""
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
         };
 
         let client = Client.create(ObjectIDGenerator,
@@ -218,8 +242,10 @@ describe('Client', () => {
     describe("#toAPI", () => {
       it("認証あり(同一ユーザー)", () => {
         let api = client.toAPI({
-          id: new ObjectID(client.user.toString()),
-          pass: "pass"
+          id: new ObjectID(),
+          key: '',
+          user: client.user,
+          type: 'master'
         });
 
         assert(client.id.toString() === api.id);
@@ -233,7 +259,9 @@ describe('Client', () => {
       it("認証あり(別ユーザー)", () => {
         let api = client.toAPI({
           id: new ObjectID(),
-          pass: "pass"
+          key: '',
+          user: new ObjectID(),
+          type: 'master'
         });
 
         assert(api.user === null);
@@ -249,7 +277,7 @@ describe('Client', () => {
     describe("#toDB", () => {
       it("正常に出力できるか", () => {
         let db = client.toDB();
-        
+
         assert(client.id.equals(db._id));
         assert(client.name === db.name);
         assert(client.url === db.url);

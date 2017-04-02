@@ -203,6 +203,12 @@ updateFunc.push((async () => {
   await db.collection("tokens").update({}, { $unset: { storage: 1 } }, { multi: true });
 }));
 
+updateFunc.push((async () => {
+  let db = await DB;
+
+  await db.collection("tokens").update({}, { $set: { type: 'general' } }, { multi: true });
+}));
+
 /*
   -----------------------------------------------------------------------------
 */

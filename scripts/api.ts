@@ -1,12 +1,13 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
-import { IAuthToken, IAuthUser } from './auth';
+import { IAuthToken, IAuthUser,IAuthTokenMaster } from './auth';
 import { Validator } from 'jsonschema';
 import {
   AtError,
   AtParamTypeError,
   AtServerError,
-  AtCaptchaError
+  AtCaptchaError,
+  AtTokenAuthError
 } from './at-error';
 import { TokenRepository, UserRepository } from './models';
 import { ObjectID } from 'mongodb';
@@ -19,10 +20,51 @@ import { Config } from './config';
 
 export interface IAPICallParams<T> {
   params: T,
-  authToken: IAuthToken | null,
-  authUser: IAuthUser | null,
+  auth: AuthContainer,
   ip: string,
   now: Date
+}
+
+export class AuthContainer {
+  constructor(private _token: IAuthToken | null,
+    private _user: IAuthUser | null) {
+  }
+
+  get token():IAuthToken{
+    if(this._token===null){
+      throw new Error();
+    }
+
+    return this._token;
+  }
+
+  get tokenMaster():IAuthTokenMaster{
+    let t=this.token;
+    if(t.type==='general'){
+      throw new Error();
+    }
+    return t;
+  }
+
+  get tokenOrNull():IAuthToken|null{
+    return this._token;
+  }
+
+  get TokenMasterOrNull():IAuthTokenMaster|null{
+    if(this._token!==null&&this._token.type==="general"){
+      return null;
+    }
+
+    return this._token;
+  }
+
+  get user():IAuthUser{
+    if(this._user===null){
+      throw new Error();
+    }
+
+    return this._user;
+  }
 }
 
 export class API {
@@ -40,10 +82,10 @@ export class API {
     this.app.use(Logger.express);
   }
 
-  addAPI<T>({url, isAuthUser, isAuthToken, isRecaptcha = false, schema, call}: {
+  addAPI<T>({ url, isAuthUser, isAuthToken, isRecaptcha = false, schema, call }: {
     url: string,
     schema: Object,
-    isAuthToken: boolean,
+    isAuthToken: 'master' | 'all' | 'no',
     isAuthUser: boolean,
     isRecaptcha?: boolean
     call: (params: IAPICallParams<T>) => Promise<any>
@@ -85,7 +127,7 @@ export class API {
               type: isRecaptcha ? "string" : ["string", "null"]
             },
             authToken: {
-              type: isAuthToken ? "object" : ["object", "null"],
+              type: isAuthToken !== 'no' ? "object" : ["object", "null"],
               additionalProperties: false,
               required: ["id", "key"],
               properties: {
@@ -136,10 +178,13 @@ export class API {
               Promise.resolve(null)) as Promise<void>,
           ]);
 
+          if (isAuthToken === 'master' && authTokenObj!.type !== 'master') {
+            throw new AtTokenAuthError();
+          }
+
           let result = await call({
             params,
-            authToken: authTokenObj,
-            authUser: authUserObj,
+            auth:new AuthContainer(authTokenObj,authUserObj),
             ip: req.headers["X-Real-IP"] || req.connection.remoteAddress,
             now: new Date()
           });

@@ -2,7 +2,7 @@ import { DB } from '../../db';
 import { ObjectID } from 'mongodb';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
 import { IClientDB, Client } from './client';
-import { IAuthUser } from '../../auth'
+import { IAuthTokenMaster } from '../../auth'
 
 export class ClientRepository {
   static async findOne(id: ObjectID): Promise<Client> {
@@ -31,10 +31,10 @@ export class ClientRepository {
     return clients.map(c => Client.fromDB(c));
   }
 
-  static async findAll(authUser: IAuthUser): Promise<Client[]> {
+  static async findAll(authToken: IAuthTokenMaster): Promise<Client[]> {
     let db = await DB;
     let clients: IClientDB[] = await db.collection("clients")
-      .find({ user: authUser.id })
+      .find({ user: authToken.user })
       .sort({ date: -1 })
       .toArray();
     return clients.map(c => Client.fromDB(c));

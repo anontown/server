@@ -1,7 +1,7 @@
 import { ObjectID } from 'mongodb';
 import { Client } from '..//client';
-import { IAuthToken, IAuthUser } from '../../auth';
-import { AtRightError,AtTokenAuthError,AtNotFoundError } from '../../at-error'
+import { IAuthTokenBase, IAuthTokenMaster, IAuthTokenGeneral,IAuthUser } from '../../auth';
+import { AtRightError, AtTokenAuthError, AtNotFoundError } from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
 import { IGenerator } from '../../generator';
@@ -17,33 +17,53 @@ export interface ITokenReqAPI {
   key: string
 }
 
-export interface ITokenDB {
+export type TokenType = "master" | "general";
+
+export type ITokenDB = ITokenGeneralDB | ITokenMasterDB;
+
+export interface ITokenBaseDB<T extends TokenType> {
   _id: ObjectID,
   key: string,
-  client: ObjectID,
+  type: T,
   user: ObjectID,
-  req: ITokenReq[],
-  active: boolean,
   date: Date
 }
 
-export interface ITokenAPI {
-  id: string,
-  key: string,
-  client: string,
-  user: string,
-  active: boolean,
-  date: string
+export interface ITokenMasterDB extends ITokenBaseDB<'master'> {
 }
 
-export class Token {
-  private constructor(private _id: ObjectID,
+export interface ITokenGeneralDB extends ITokenBaseDB<'general'> {
+  client: ObjectID,
+  req: ITokenReq[],
+  active: boolean,
+}
+
+export type ITokenAPI = ITokenGeneralAPI | ITokenMasterAPI;
+
+export interface ITokenBaseAPI<T extends TokenType> {
+  id: string,
+  key: string,
+  user: string,
+  date: string,
+  type: T
+}
+
+export interface ITokenMasterAPI extends ITokenBaseAPI<'master'> {
+}
+
+export interface ITokenGeneralAPI extends ITokenBaseAPI<'general'> {
+  client: string,
+  active: boolean,
+}
+
+export type Token = TokenMaster | TokenGeneral;
+
+export abstract class TokenBase<T extends TokenType> {
+  protected constructor(private _id: ObjectID,
     private _key: string,
-    private _client: ObjectID,
     private _user: ObjectID,
-    private _req: ITokenReq[],
-    private _active: boolean,
-    private _date: Date) {
+    private _date: Date,
+    private _type: T) {
 
   }
 
@@ -55,13 +75,94 @@ export class Token {
     return this._key;
   }
 
+  get user() {
+    return this._user;
+  }
+
+  get type() {
+    return this._type;
+  }
+
+  get date() {
+    return this._date;
+  }
+
+  toDB(): ITokenBaseDB<T> {
+    return {
+      _id: this._id,
+      key: this._key,
+      user: this._user,
+      date: this._date,
+      type: this._type
+    }
+  }
+
+  toAPI(): ITokenBaseAPI<T> {
+    return {
+      id: this._id.toString(),
+      key: this._key,
+      user: this._user.toString(),
+      date: this._date.toISOString(),
+      type: this._type
+    }
+  }
+
+  static createTokenKey(randomGenerator: IGenerator<string>): string {
+    return StringUtil.hash(randomGenerator.get() + Config.salt.token);
+  }
+
+  auth(key: string): IAuthTokenBase<T> {
+    if (this._key !== key) {
+      throw new AtTokenAuthError();
+    }
+
+    return { id: this._id, key: this._key, user: this._user, type: this._type };
+  }
+}
+
+export class TokenMaster extends TokenBase<"master"> {
+  private constructor(id: ObjectID,
+    key: string,
+    user: ObjectID,
+    date: Date) {
+    super(id, key, user, date, 'master');
+  }
+
+  toDB(): ITokenMasterDB {
+    return super.toDB();
+  }
+
+  toAPI(): ITokenMasterAPI {
+    return super.toAPI();
+  }
+
+  static fromDB(t: ITokenMasterDB): TokenMaster {
+    return new TokenMaster(t._id, t.key, t.user, t.date);
+  }
+
+  static create(objidGenerator: IGenerator<ObjectID>, authUser: IAuthUser, now: Date, randomGenerator: IGenerator<string>): TokenMaster {
+    return new TokenMaster(objidGenerator.get(),
+      TokenBase.createTokenKey(randomGenerator),
+      authUser.id,
+      now);
+  }
+}
+
+export class TokenGeneral extends TokenBase<'general'> {
+  private constructor(id: ObjectID,
+    key: string,
+    private _client: ObjectID,
+    user: ObjectID,
+    private _req: ITokenReq[],
+    private _active: boolean,
+    date: Date) {
+    super(id, key, user, date, 'general');
+  }
+
   get client() {
     return this._client;
   }
 
-  get user() {
-    return this._user;
-  }
 
   get req() {
     return this._req;
@@ -71,61 +172,35 @@ export class Token {
     return this._active;
   }
 
-  get date() {
-    return this._date;
-  }
-
-  toDB(): ITokenDB {
+  toDB(): ITokenGeneralDB {
     return {
-      _id: this._id,
-      key: this._key,
+      ...super.toDB(),
       client: this._client,
-      user: this._user,
       req: this._req,
-      active: this._active,
-      date: this._date
+      active: this._active
     }
   }
 
-  toAPI(): ITokenAPI {
+  toAPI(): ITokenGeneralAPI {
     return {
-      id: this._id.toString(),
-      key: this._key,
+      ...super.toAPI(),
       client: this._client.toString(),
-      user: this._user.toString(),
       active: this._active,
-      date: this._date.toISOString()
     }
   }
 
-  static fromDB(t: ITokenDB): Token {
-    return new Token(t._id, t.key, t.client, t.user, t.req, t.active, t.date);
+  static fromDB(t: ITokenGeneralDB): TokenGeneral {
+    return new TokenGeneral(t._id, t.key, t.client, t.user, t.req, t.active, t.date);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, authUser: IAuthUser, client: Client, now: Date, randomGenerator: IGenerator<string>): Token {
-    return new Token(objidGenerator.get(),
-      StringUtil.hash(randomGenerator.get() + Config.salt.token),
+  static create(objidGenerator: IGenerator<ObjectID>, authToken: IAuthTokenMaster, client: Client, now: Date, randomGenerator: IGenerator<string>): TokenGeneral {
+    return new TokenGeneral(objidGenerator.get(),
+      TokenBase.createTokenKey(randomGenerator),
       client.id,
-      authUser.id,
+      authToken.user,
       [],
       true,
       now);
-  }
-
-  keyChange(authUser: IAuthUser, randomGenerator: IGenerator<string>) {
-    if (!authUser.id.equals(this._user)) {
-      throw new AtRightError("人のトークンは変えられません");
-    }
-    this._req = [];
-    this._key = StringUtil.hash(randomGenerator.get() + Config.salt.token);
-  }
-
-  auth(key: string): IAuthToken {
-    if (this._key !== key) {
-      throw new AtTokenAuthError();
-    }
-
-    return { id: this._id, key: this._key, user: this._user };
   }
 
   createReq(now: Date, randomGenerator: IGenerator<string>): ITokenReqAPI {
@@ -139,7 +214,7 @@ export class Token {
     let req: ITokenReq;
     do {
       req = {
-        key: StringUtil.hash(randomGenerator.get() + Config.salt.tokenReq),
+        key: TokenBase.createTokenKey(randomGenerator),
         expireDate: new Date(nowNum + 1000 * 60 * Config.user.token.req.expireMinute),
         active: true
       };
@@ -148,30 +223,30 @@ export class Token {
     this._req.push(req);
 
     return {
-      token: this._id.toString(),
+      token: this.id.toString(),
       key: req.key
     }
   }
 
-  authReq(key: string, now: Date): IAuthToken {
+  authReq(key: string, now: Date): IAuthTokenGeneral {
     let req = this._req.find(x => x.key === key);
     if (req === undefined || !req.active || req.expireDate.getTime() < now.getTime()) {
       throw new AtNotFoundError("トークンリクエストが見つかりません");
     }
 
-    return { id: this._id, key: this._key, user: this._user };
+    return { id: this.id, key: this.key, user: this.user, type: 'general' };
   }
 
-  enable(authUser: IAuthUser) {
-    if (!authUser.id.equals(this._user)) {
+  enable(authToken: IAuthTokenMaster) {
+    if (!authToken.user.equals(this.user)) {
       throw new AtRightError("人のトークンは変えられません");
     }
 
     this._active = true;
   }
 
-  disable(authUser: IAuthUser) {
-    if (!authUser.id.equals(this._user)) {
+  disable(authToken: IAuthTokenMaster) {
+    if (!authToken.user.equals(this.user)) {
       throw new AtRightError("人のトークンは変えられません");
     }
 

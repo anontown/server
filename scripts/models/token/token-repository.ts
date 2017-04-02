@@ -2,8 +2,8 @@ import { ObjectID, WriteError } from 'mongodb';
 import { DB } from '../../db';
 import { AtNotFoundError, AtConflictError, paramsErrorMaker } from '../../at-error'
 import * as fs from 'fs-promise';
-import { Token, ITokenDB } from './token';
-import { IAuthUser, IAuthToken } from '../../auth';
+import { Token, ITokenDB, TokenGeneral, TokenMaster } from './token';
+import { IAuthTokenMaster, IAuthToken } from '../../auth';
 import { Config } from '../../config';
 
 export class TokenRepository {
@@ -14,17 +14,29 @@ export class TokenRepository {
       throw new AtNotFoundError("トークンが存在しません");
     }
 
-    return Token.fromDB(token);
+    switch (token.type) {
+      case 'general':
+        return TokenGeneral.fromDB(token);
+      case 'master':
+        return TokenMaster.fromDB(token);
+    }
   }
 
-  static async findAll(authUser: IAuthUser): Promise<Token[]> {
+  static async findAll(authToken: IAuthTokenMaster): Promise<Token[]> {
     let db = await DB;
     let tokens: ITokenDB[] = await db.collection("tokens")
-      .find({ user: authUser.id })
+      .find({ user: authToken.user })
       .sort({ date: -1 })
       .toArray();
 
-    return tokens.map(t => Token.fromDB(t));
+    return tokens.map(t => {
+      switch (t.type) {
+        case 'general':
+          return TokenGeneral.fromDB(t);
+        case 'master':
+          return TokenMaster.fromDB(t);
+      }
+    });
   }
 
   static async insert(token: Token): Promise<null> {

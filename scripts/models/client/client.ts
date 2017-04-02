@@ -1,4 +1,4 @@
-import { IAuthUser } from '../../auth'
+import { IAuthTokenMaster } from '../../auth'
 import { Config } from '../../config';
 import { paramsErrorMaker, AtRightError } from '../../at-error'
 import { ObjectID } from 'mongodb';
@@ -67,12 +67,12 @@ export class Client {
     }
   }
 
-  toAPI(authUser: IAuthUser | null): IClientAPI {
+  toAPI(authToken: IAuthTokenMaster | null): IClientAPI {
     return {
       id: this._id.toString(),
       name: this._name,
       url: this._url,
-      user: authUser !== null && authUser.id.equals(this._user) ? this._user.toString() : null,
+      user: authToken !== null && authToken.user.equals(this._user) ? this._user.toString() : null,
       date: this._date.toISOString(),
       update: this._date.toISOString()
     };
@@ -82,7 +82,7 @@ export class Client {
     return new Client(c._id, c.name, c.url, c.user, c.date, c.update);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, authUser: IAuthUser, name: string, url: string, now: Date): Client {
+  static create(objidGenerator: IGenerator<ObjectID>, authToken: IAuthTokenMaster, name: string, url: string, now: Date): Client {
     paramsErrorMaker([
       {
         field: "name",
@@ -101,13 +101,13 @@ export class Client {
     return new Client(objidGenerator.get(),
       name,
       url,
-      authUser.id,
+      authToken.user,
       now,
       now);
   }
 
-  changeData(authUser: IAuthUser, name: string, url: string, now: Date) {
-    if (!authUser.id.equals(this._user)) {
+  changeData(authToken: IAuthTokenMaster, name: string, url: string, now: Date) {
+    if (!authToken.user.equals(this._user)) {
       throw new AtRightError("人のクライアント変更は出来ません");
     }
     paramsErrorMaker([
