@@ -2,8 +2,9 @@ import { ObjectID, WriteError } from 'mongodb';
 import { DB } from '../../db';
 import { AtNotFoundError, AtConflictError, paramsErrorMaker } from '../../at-error'
 import { Token, ITokenDB, TokenGeneral, TokenMaster } from './token';
-import { IAuthTokenMaster, IAuthToken } from '../../auth';
+import { IAuthTokenMaster, IAuthToken, IAuthUser } from '../../auth';
 import { Config } from '../../config';
+import { Client, ClientRepository } from '../client';
 
 export interface IStorageDB {
   client: ObjectID | null,
@@ -142,5 +143,26 @@ export class TokenRepository {
       .find(this.createStorageFindQuery(token, null))
       .toArray();
     return ls.map(s => s.key);
+  }
+
+  static async listClient(token: IAuthTokenMaster): Promise<Client[]> {
+    let tokens = await this.findAll(token);
+    let clientIds = Array.from(new Set((tokens
+      .map(t => t.type === 'general' ? t.client.toString() : null)
+      .filter(x => x !== null) as string[])))
+      .map(x => new ObjectID(x));
+    return await ClientRepository.findIn(clientIds);
+  }
+
+  static async delClientToken(token: IAuthTokenMaster, client: Client): Promise<void> {
+    let db = await DB;
+    await db.collection("tokens")
+      .remove({ user: token.user, client: client.id });
+  }
+
+  static async delMasterToken(user: IAuthUser): Promise<void> {
+    let db = await DB;
+    await db.collection("tokens")
+      .remove({ user: user.id, type: 'master' });
   }
 }

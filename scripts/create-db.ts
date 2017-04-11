@@ -245,6 +245,9 @@ updateFunc.push((async () => {
       });
     }
   }
+
+  //トークン削除
+  await db.collection("tokens").remove({});
 }));
 
 /*

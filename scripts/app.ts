@@ -1210,53 +1210,38 @@ import { AtPrerequisiteError } from './at-error';
       }
     });
 
-    api.addAPI<{ id: string }>({
-      url: "/token/enable",
+    api.addAPI<{client:string}>({
+      url: "/token/client/delete",
 
       isAuthUser: false,
       isAuthToken: 'master',
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["id"],
+        required: ["client"],
         properties: {
-          id: {
+          client: {
             type: "string"
           }
         }
       },
-      call: async ({ params, auth }): Promise<ITokenAPI> => {
-        let token = await TokenRepository.findOne(new ObjectID(params.id));
-        if (token.type !== 'general') {
-          throw new AtPrerequisiteError('通常トークン以外では出来ません');
-        }
-        await token.enable(auth.tokenMaster);
-        return token.toAPI();
+      call: async ({ params,auth }): Promise<void> => {
+        let client=await ClientRepository.findOne(new ObjectID(params.client));
+        await TokenRepository.delClientToken(auth.tokenMaster,client);
       }
     });
 
-    api.addAPI<{ id: string }>({
-      url: "/token/disable",
+    api.addAPI<null>({
+      url: "/token/client/list",
 
       isAuthUser: false,
       isAuthToken: 'master',
       schema: {
-        type: "object",
-        additionalProperties: false,
-        required: ["id"],
-        properties: {
-          id: {
-            type: "string"
-          }
-        }
+        type: "null"
       },
-      call: async ({ params, auth }): Promise<ITokenAPI> => {
-        let token = await TokenRepository.findOne(new ObjectID(params.id));
-        if (token.type !== 'general') {
-          throw new AtPrerequisiteError('通常トークン以外では出来ません');
-        }
-        await token.disable(auth.tokenMaster);
-        return token.toAPI();
+      call: async ({ auth }): Promise<IClientAPI[]> => {
+        let clients=await TokenRepository.listClient(auth.tokenMaster);
+        return clients.map(c=>c.toAPI(auth.tokenMaster));
       }
     });
 
@@ -1497,7 +1482,8 @@ import { AtPrerequisiteError } from './at-error';
       call: async ({ params, auth }): Promise<IUserAPI> => {
         let user = await UserRepository.findOne(auth.user.id);
         user.change(auth.user, params.pass, params.sn);
-        UserRepository.update(user);
+        await UserRepository.update(user);
+        await TokenRepository.delMasterToken(auth.user);
         return user.toAPI();
       }
     });

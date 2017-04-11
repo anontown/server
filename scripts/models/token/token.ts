@@ -35,7 +35,6 @@ export interface ITokenMasterDB extends ITokenBaseDB<'master'> {
 export interface ITokenGeneralDB extends ITokenBaseDB<'general'> {
   client: ObjectID,
   req: ITokenReq[],
-  active: boolean,
 }
 
 export type ITokenAPI = ITokenGeneralAPI | ITokenMasterAPI;
@@ -53,7 +52,6 @@ export interface ITokenMasterAPI extends ITokenBaseAPI<'master'> {
 
 export interface ITokenGeneralAPI extends ITokenBaseAPI<'general'> {
   client: string,
-  active: boolean,
 }
 
 export type Token = TokenMaster | TokenGeneral;
@@ -154,7 +152,6 @@ export class TokenGeneral extends TokenBase<'general'> {
     private _client: ObjectID,
     user: ObjectID,
     private _req: ITokenReq[],
-    private _active: boolean,
     date: Date) {
     super(id, key, user, date, 'general');
   }
@@ -168,16 +165,11 @@ export class TokenGeneral extends TokenBase<'general'> {
     return this._req;
   }
 
-  get active() {
-    return this._active;
-  }
-
   toDB(): ITokenGeneralDB {
     return {
       ...super.toDB(),
       client: this._client,
-      req: this._req,
-      active: this._active
+      req: this._req
     }
   }
 
@@ -185,12 +177,11 @@ export class TokenGeneral extends TokenBase<'general'> {
     return {
       ...super.toAPI(),
       client: this._client.toString(),
-      active: this._active,
     }
   }
 
   static fromDB(t: ITokenGeneralDB): TokenGeneral {
-    return new TokenGeneral(t._id, t.key, t.client, t.user, t.req, t.active, t.date);
+    return new TokenGeneral(t._id, t.key, t.client, t.user, t.req, t.date);
   }
 
   static create(objidGenerator: IGenerator<ObjectID>, authToken: IAuthTokenMaster, client: Client, now: Date, randomGenerator: IGenerator<string>): TokenGeneral {
@@ -199,7 +190,6 @@ export class TokenGeneral extends TokenBase<'general'> {
       client.id,
       authToken.user,
       [],
-      true,
       now);
   }
 
@@ -243,21 +233,5 @@ export class TokenGeneral extends TokenBase<'general'> {
     }
 
     return { id: this.id, key: this.key, user: this.user, type: this.type, client: this._client };
-  }
-
-  enable(authToken: IAuthTokenMaster) {
-    if (!authToken.user.equals(this.user)) {
-      throw new AtRightError("人のトークンは変えられません");
-    }
-
-    this._active = true;
-  }
-
-  disable(authToken: IAuthTokenMaster) {
-    if (!authToken.user.equals(this.user)) {
-      throw new AtRightError("人のトークンは変えられません");
-    }
-
-    this._active = false;
   }
 }
