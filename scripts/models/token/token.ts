@@ -1,6 +1,6 @@
 import { ObjectID } from 'mongodb';
 import { Client } from '..//client';
-import { IAuthTokenBase, IAuthTokenMaster, IAuthTokenGeneral,IAuthUser } from '../../auth';
+import { IAuthTokenMaster, IAuthTokenGeneral, IAuthUser } from '../../auth';
 import { AtRightError, AtTokenAuthError, AtNotFoundError } from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
@@ -110,14 +110,6 @@ export abstract class TokenBase<T extends TokenType> {
   static createTokenKey(randomGenerator: IGenerator<string>): string {
     return StringUtil.hash(randomGenerator.get() + Config.salt.token);
   }
-
-  auth(key: string): IAuthTokenBase<T> {
-    if (this._key !== key) {
-      throw new AtTokenAuthError();
-    }
-
-    return { id: this._id, key: this._key, user: this._user, type: this._type };
-  }
 }
 
 export class TokenMaster extends TokenBase<"master"> {
@@ -145,6 +137,14 @@ export class TokenMaster extends TokenBase<"master"> {
       TokenBase.createTokenKey(randomGenerator),
       authUser.id,
       now);
+  }
+
+  auth(key: string): IAuthTokenMaster {
+    if (this.key !== key) {
+      throw new AtTokenAuthError();
+    }
+
+    return { id: this.id, key: this.key, user: this.user, type: this.type };
   }
 }
 
@@ -234,7 +234,15 @@ export class TokenGeneral extends TokenBase<'general'> {
       throw new AtNotFoundError("トークンリクエストが見つかりません");
     }
 
-    return { id: this.id, key: this.key, user: this.user, type: 'general' };
+    return { id: this.id, key: this.key, user: this.user, type: 'general', client: this._client };
+  }
+
+  auth(key: string): IAuthTokenGeneral {
+    if (this.key !== key) {
+      throw new AtTokenAuthError();
+    }
+
+    return { id: this.id, key: this.key, user: this.user, type: this.type, client: this._client };
   }
 
   enable(authToken: IAuthTokenMaster) {

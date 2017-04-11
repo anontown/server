@@ -74,7 +74,7 @@ updateFunc.push((async () => {
       {
         $set: {
           reply: {
-            res: x.reply, user: replyReses.find(y => x.reply.equals(y._id)) !.user
+            res: x.reply, user: replyReses.find(y => x.reply.equals(y._id))!.user
           }
         }
       }
@@ -181,21 +181,21 @@ updateFunc.push((async () => {
   let db = await DB;
 
   await db.dropCollection("boards");
-  await db.collection("topics").update({type:"board"}, { $set:{type:"normal",active:false} }, { multi: true }); 
-  await db.collection("topics").update({}, { $rename:{category:"tags"} }, { multi: true });
-  await db.collection("histories").update({}, { $rename:{category:"tags"} }, { multi: true });
+  await db.collection("topics").update({ type: "board" }, { $set: { type: "normal", active: false } }, { multi: true });
+  await db.collection("topics").update({}, { $rename: { category: "tags" } }, { multi: true });
+  await db.collection("histories").update({}, { $rename: { category: "tags" } }, { multi: true });
 }));
 
 updateFunc.push((async () => {
   let db = await DB;
 
-  let ts:{_id:ObjectID,storage:string}[]=await db.collection("tokens").find().toArray();
-  let ps:Promise<void>[]=[];
-  ts.forEach(t=>{
-    let dir="./storage/"+t._id.toString()+"/";
-    ps.push((async()=>{
+  let ts: { _id: ObjectID, storage: string }[] = await db.collection("tokens").find().toArray();
+  let ps: Promise<void>[] = [];
+  ts.forEach(t => {
+    let dir = "./storage/" + t._id.toString() + "/";
+    ps.push((async () => {
       await fs.mkdir(dir);
-      await fs.writeFile(dir+"st-main",t.storage);
+      await fs.writeFile(dir + "st-main", t.storage);
     })());
   });
   await Promise.all(ps);
@@ -207,6 +207,44 @@ updateFunc.push((async () => {
   let db = await DB;
 
   await db.collection("tokens").update({}, { $set: { type: 'general' } }, { multi: true });
+}));
+
+updateFunc.push((async () => {
+  let db = await DB;
+
+  let storages = await db.createCollection("storages");
+  await storages.createIndex({ client: 1, user: 1, key: 1 }, { unique: true });
+
+  //ユニークインデックス削除
+  db.collection("tokens").dropIndexes();
+
+  let tokenIDs = (await fs.readdir("./storage"))
+    .map(x => {
+      try {
+        return new ObjectID(x);
+      } catch (_e) {
+        return null;
+      }
+    }).filter(x => x !== null) as ObjectID[];
+  let tokens: { _id: ObjectID, client?: ObjectID, user: ObjectID }[] = await db.collection("tokens")
+    .find({ _id: { $in: tokenIDs } })
+    .toArray();
+
+  for (let token of tokens) {
+    let fileNames = (await fs.readdir('./storage/' + token._id.toString()));
+    for (let fileName of fileNames) {
+      let value = await fs.readFile("./storage/" + token._id.toString() + "/" + fileName, { encoding: "utf8" });
+      let key = fileName.substr(3);
+
+      await storages.insert({
+        _id: new ObjectID,
+        client: token.client ? token.client : null,
+        user: token.user,
+        key,
+        value
+      });
+    }
+  }
 }));
 
 /*

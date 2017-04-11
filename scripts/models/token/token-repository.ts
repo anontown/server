@@ -1,10 +1,16 @@
 import { ObjectID, WriteError } from 'mongodb';
 import { DB } from '../../db';
 import { AtNotFoundError, AtConflictError, paramsErrorMaker } from '../../at-error'
-import * as fs from 'fs-promise';
 import { Token, ITokenDB, TokenGeneral, TokenMaster } from './token';
 import { IAuthTokenMaster, IAuthToken } from '../../auth';
 import { Config } from '../../config';
+
+export interface IStorageDB {
+  client: ObjectID | null,
+  user: ObjectID,
+  key: string,
+  value: string
+}
 
 export class TokenRepository {
   static async findOne(id: ObjectID): Promise<Token> {
@@ -49,8 +55,6 @@ export class TokenRepository {
       }
     });
 
-    await fs.mkdir("./storage/" + token.id.toString());
-
     return null;
   }
 
@@ -60,8 +64,16 @@ export class TokenRepository {
     return null;
   }
 
-  private static getStorageFilePath(token: IAuthToken, name: string) {
-    return "./storage/" + token.id.toString() + "/st-" + name;
+  private static createStorageFindQuery(token: IAuthToken, name: string | null) {
+    let q = {
+      user: token.user,
+      client: token.type === 'general' ? token.client : null
+    };
+    if (name !== null) {
+      return { ...q, key: name };
+    } else {
+      return q;
+    }
   }
 
   static async getStorage(token: IAuthToken, name: string): Promise<string> {
@@ -73,11 +85,14 @@ export class TokenRepository {
         message: Config.user.token.storage.msg
       },
     ]);
-    try {
-      return await fs.readFile(this.getStorageFilePath(token, name), { encoding: "utf-8" });
-    } catch (_e) {
+
+    let db = await DB;
+    let storage: IStorageDB | null = await db.collection("storages")
+      .findOne(this.createStorageFindQuery(token, name));
+    if (storage === null) {
       throw new AtNotFoundError("ストレージが見つかりません");
     }
+    return storage.value;
   }
 
   static async setStorage(token: IAuthToken, name: string, value: string): Promise<void> {
@@ -90,11 +105,16 @@ export class TokenRepository {
       },
     ]);
 
-    try {
-      await fs.writeFile(this.getStorageFilePath(token, name), value, { encoding: "utf-8" });
-    } catch (_e) {
-      throw new Error();
+    let db = await DB;
+
+    let data: IStorageDB = {
+      user: token.user,
+      client: token.type === 'general' ? token.client : null,
+      key: name,
+      value
     }
+    await db.collection("storages")
+      .update(this.createStorageFindQuery(token, name), data, { upsert: true });
   }
 
   static async deleteStorage(token: IAuthToken, name: string): Promise<void> {
@@ -107,19 +127,20 @@ export class TokenRepository {
       },
     ]);
 
-    try {
-      await fs.unlink(this.getStorageFilePath(token, name))
-    } catch (_e) {
+    let db = await DB;
+
+    let r = await db.collection("storages")
+      .deleteOne(this.createStorageFindQuery(token, name));
+    if (r.deletedCount !== 1) {
       throw new AtNotFoundError("ストレージが見つかりません");
     }
   }
 
   static async listStorage(token: IAuthToken): Promise<string[]> {
-    try {
-      let ls = await fs.readdir("./storage/" + token.id.toString() + "/");
-      return ls.map(s => s.substring(4));
-    } catch (_e) {
-      throw new Error();
-    }
+    let db = await DB;
+    let ls: IStorageDB[] = await db.collection("storages")
+      .find(this.createStorageFindQuery(token, null))
+      .toArray();
+    return ls.map(s => s.key);
   }
 }
