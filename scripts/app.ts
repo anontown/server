@@ -1232,7 +1232,7 @@ import { AtPrerequisiteError } from './at-error';
     });
 
     api.addAPI<null>({
-      url: "/token/client/list",
+      url: "/token/find/client/all",
 
       isAuthUser: false,
       isAuthToken: 'master',
@@ -1459,6 +1459,25 @@ import { AtPrerequisiteError } from './at-error';
       },
       call: async ({ params }): Promise<string> => {
         return (await UserRepository.findID(params.sn)).toString();
+      }
+    });
+    api.addAPI<{ id: string }>({
+      url: "/user/find/sn",
+
+      isAuthUser: false,
+      isAuthToken: 'no',
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["id"],
+        properties: {
+          id: {
+            type: "string"
+          }
+        }
+      },
+      call: async ({ params }): Promise<string> => {
+        return (await UserRepository.findSN(new ObjectID(params.id)));
       }
     });
     api.addAPI<{ pass: string, sn: string }>({

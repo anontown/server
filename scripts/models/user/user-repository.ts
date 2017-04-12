@@ -1,6 +1,6 @@
 import { ObjectID, WriteError } from 'mongodb';
 import { DB } from '../../db';
-import { AtNotFoundError,AtConflictError } from '../../at-error'
+import { AtNotFoundError, AtConflictError } from '../../at-error'
 import { User, IUserDB } from './user';
 import { CronJob } from 'cron';
 
@@ -27,11 +27,21 @@ export class UserRepository {
 
     return user._id;
   }
+  static async findSN(id: ObjectID): Promise<string> {
+    let db = await DB;
+    let user: IUserDB | null = await db.collection("users").findOne({ _id: id });
+
+    if (user === null) {
+      throw new AtNotFoundError("ユーザーが存在しません");
+    }
+
+    return user.sn;
+  }
   static async insert(user: User): Promise<null> {
     let db = await DB;
     await db.collection("users").insert(user.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
-        throw new AtConflictError( "スクリーンネームが使われています");
+        throw new AtConflictError("スクリーンネームが使われています");
       } else {
         throw e;
       }
