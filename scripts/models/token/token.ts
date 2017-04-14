@@ -1,7 +1,7 @@
 import { ObjectID } from 'mongodb';
 import { Client } from '..//client';
 import { IAuthTokenMaster, IAuthTokenGeneral, IAuthUser } from '../../auth';
-import { AtRightError, AtTokenAuthError, AtNotFoundError } from '../../at-error'
+import { AtTokenAuthError, AtNotFoundError } from '../../at-error'
 import { Config } from '../../config';
 import { StringUtil } from '../../util';
 import { IGenerator } from '../../generator';
