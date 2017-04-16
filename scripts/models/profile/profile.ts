@@ -90,7 +90,7 @@ export class Profile {
       user: authToken !== null && authToken.user.equals(this._user) ? this._user.toString() : null,
       name: this._name,
       text: this._text,
-      mdtext: this._text,
+      mdtext: this._mdtext,
       date: this._date.toISOString(),
       update: this._update.toISOString(),
       sn: this._sn
