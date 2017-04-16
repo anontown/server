@@ -1,7 +1,5 @@
 import {
-  //ObjectIDGenerator,
-  Profile,
-  //IProfileDB
+  Profile
 } from '../../../scripts';
 import * as assert from 'power-assert';
 import { ObjectID } from 'mongodb';
@@ -71,4 +69,25 @@ describe("Profile", () => {
       }
     });
   }
+
+  describe('create', () => {
+    it('正常に作れるか', () => {
+      let user = new ObjectID().toString();
+      let id = new ObjectID().toString();
+      let date = Date.now();
+      let profile = Profile.create({ get: () => new ObjectID(id) }, {
+        type: 'master',
+        user: new ObjectID(user),
+        key: '',
+        id: new ObjectID()
+      }, '名前', '本文', 'test', new Date(date));
+      assert(profile.id.toString() === id);
+      assert(profile.user.toString() === user);
+      assert(profile.name === '名前');
+      assert(profile.text === '本文');
+      assert(profile.date.valueOf() === date);
+      assert(profile.update.valueOf() === date);
+      assert(profile.sn === 'sn');
+    });
+  });
 });
