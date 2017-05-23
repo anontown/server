@@ -1643,7 +1643,7 @@ import { AtPrerequisiteError } from './at-error';
     }
   });
 
-  api.addSocketAPI<{ id: string }, IResAPI>({
+  api.addSocketAPI<{ id: string }, { res: IResAPI, count: number }>({
     name: 'topic-update',
 
     isAuthUser: false,
@@ -1663,8 +1663,8 @@ import { AtPrerequisiteError } from './at-error';
       let topic = await TopicRepository.findOne(new ObjectID(params.id));
       return ResRepository
         .insertEvent
-        .filter(x => x.topic.equals(topic.id))
-        .map(x => x.toAPI(auth.tokenOrNull));
+        .filter(x => x.res.topic.equals(topic.id))
+        .map(x => ({ ...x, res: x.res.toAPI(auth.tokenOrNull) }));
     }
   });
 

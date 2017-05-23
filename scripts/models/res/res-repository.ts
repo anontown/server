@@ -1,5 +1,5 @@
 import { ObjectID } from 'mongodb';
-import { Topic } from '../topic';
+import { Topic, TopicRepository } from '../topic';
 import { DB } from '../../db';
 import { IAuthToken } from '../../auth';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
@@ -7,7 +7,7 @@ import { Res, IResDB } from './res';
 import { Subject } from "rxjs";
 
 export class ResRepository {
-  static insertEvent = new Subject<Res>();
+  static insertEvent = new Subject<{ res: Res, count: number }>();
 
   static async findOne(id: ObjectID): Promise<Res> {
     let db = await DB;
@@ -151,7 +151,10 @@ export class ResRepository {
   static async insert(res: Res): Promise<null> {
     let db = await DB;
     await db.collection("reses").insert(res.toDB());
-    ResRepository.insertEvent.next(res);
+
+    let topic = await TopicRepository.findOne(res.topic);
+    ResRepository.insertEvent.next({ res, count: topic.resCount });
+
     return null;
   }
 
