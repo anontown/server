@@ -4,8 +4,11 @@ import { DB } from '../../db';
 import { IAuthToken } from '../../auth';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
 import { Res, IResDB } from './res';
+import { Subject } from "rxjs";
 
 export class ResRepository {
+  static insertEvent = new Subject<Res>();
+
   static async findOne(id: ObjectID): Promise<Res> {
     let db = await DB;
     let res: IResDB | null = await db.collection("reses").findOne({ _id: id });
@@ -31,7 +34,7 @@ export class ResRepository {
     return this.aggregate(reses);
   }
 
-  static async find(topic:Topic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
+  static async find(topic: Topic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
     let db = await DB;
     let reses: IResDB[] = await db.collection("reses")
       .find({
@@ -148,7 +151,7 @@ export class ResRepository {
   static async insert(res: Res): Promise<null> {
     let db = await DB;
     await db.collection("reses").insert(res.toDB());
-    Res.writeListener.forEach(x => x(res));
+    ResRepository.insertEvent.next(res);
     return null;
   }
 

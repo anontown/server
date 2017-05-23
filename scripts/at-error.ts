@@ -60,7 +60,7 @@ export class AtParamsError extends AtError {
     }
 }
 
-export type paramsErrorMakerData=(() => IParamErrorData | null) | { field: string, val: string, regex: RegExp, message: string };
+export type paramsErrorMakerData = (() => IParamErrorData | null) | { field: string, val: string, regex: RegExp, message: string };
 
 export function paramsErrorMaker(fs: paramsErrorMakerData[]) {
     let errors: IParamErrorData[] = [];
@@ -119,6 +119,14 @@ export class AtTokenAuthError extends AtError {
         super(StatusCode.Unauthorized,
             "token_auth",
             [{ message: "認証に失敗しました", data: null }]);
+    }
+}
+
+export class AtAuthError extends AtError {
+    constructor(message: string) {
+        super(StatusCode.Unauthorized,
+            "auth",
+            [{ message, data: null }]);
     }
 }
 

@@ -1,5 +1,4 @@
 export * from './models';
-export * from './api';
 export * from './app';
 export * from './at-error';
 export * from './auth';

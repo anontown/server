@@ -63,8 +63,6 @@ export interface IReply {
 }
 
 export class Res {
-  static writeListener = new Set<(res: Res) => void>();
-
   private constructor(private _id: ObjectID,
     private _topic: ObjectID,
     private _date: Date,
