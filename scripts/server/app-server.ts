@@ -153,7 +153,11 @@ export class AppServer {
     //websocket
     this.wsServer.on('connection', async (ws) => {
       //urlを解析してクエリオブジェクトを取得
-      let query = url.parse(ws.url, true).query;
+      if (ws.upgradeReq.url === undefined) {
+        ws.close();
+        return;
+      }
+      let query = url.parse(ws.upgradeReq.url, true).query;
       if (typeof query !== 'object') {
         ws.close();
         return;
@@ -200,7 +204,7 @@ export class AppServer {
           now: new Date()
         })).subscribe(
           onNext => {
-            ws.emit(JSON.stringify(onNext));
+            ws.send(JSON.stringify(onNext));
           },
           _onError => {
             if (subscribe !== null) {

@@ -16,7 +16,7 @@
     "request": "^2.79.0",
     "rxjs": "^5.4.0",
     "source-map-support": "^0.4.6",
-    "ws": "^3.0.0"
+    "ws": "^2.3.1"
   },
   "devDependencies": {
     "@types/body-parser": "0.0.33",
