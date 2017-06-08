@@ -253,7 +253,7 @@ updateFunc.push((async () => {
 /*
   -----------------------------------------------------------------------------
 */
-export async function update() {
+(async () => {
   let ver: number;
   try {
     ver = JSON.parse(fs.readFileSync("./db-version.json", "utf8"));
@@ -269,4 +269,4 @@ export async function update() {
   fs.writeFileSync("./db-version.json", JSON.stringify(updateFunc.length), {
     encoding: "utf8"
   });
-}
+})();
