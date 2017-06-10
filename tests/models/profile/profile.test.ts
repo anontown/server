@@ -11,7 +11,6 @@ describe("Profile", () => {
       user: new ObjectID(),
       name: '名前',
       text: '本文',
-      mdtext: '<p>本文</p>',
       date: new Date(),
       update: new Date(),
       sn: 'sn'
@@ -24,7 +23,6 @@ describe("Profile", () => {
         assert(db.user.equals(profile.user));
         assert(db.name === profile.name);
         assert(db.text === profile.text);
-        assert(db.mdtext === profile.mdtext);
         assert(db.date.valueOf() === profile.date.valueOf());
         assert(db.update.valueOf() === profile.update.valueOf());
         assert(db.sn === profile.sn);
@@ -61,7 +59,6 @@ describe("Profile", () => {
           assert(api.user === data.apiUser);
           assert(api.name === profile.name);
           assert(api.text === profile.text);
-          assert(api.mdtext === profile.mdtext);
           assert(api.date === profile.date.toISOString());
           assert(api.update === profile.update.toISOString());
           assert(api.sn === profile.sn);
@@ -87,7 +84,7 @@ describe("Profile", () => {
       assert(profile.text === '本文');
       assert(profile.date.valueOf() === date);
       assert(profile.update.valueOf() === date);
-      assert(profile.sn === 'sn');
+      assert(profile.sn === 'test');
     });
   });
 });

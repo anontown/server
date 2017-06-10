@@ -92,7 +92,6 @@ export const Config = {
         }
     },
     res: {
-        defaultName: "anonymous",
         name: {
             regex: /^.{0,50}$/,
             msg: "名前は50文字以内にして下さい"

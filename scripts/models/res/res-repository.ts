@@ -3,7 +3,7 @@ import { Topic, TopicRepository } from '../topic';
 import { DB } from '../../db';
 import { IAuthToken } from '../../auth';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
-import { Res, IResDB } from './res';
+import { Res, IResDB, fromDBToRes } from './res';
 import { Subject } from "rxjs";
 
 export class ResRepository {
@@ -144,7 +144,7 @@ export class ResRepository {
     let count = new Map<string, number>();
     countArr.forEach(r => count.set(r._id.toString(), r.replyCount));
 
-    return reses.map(r => Res.fromDB(r,
+    return reses.map(r => fromDBToRes(r,
       count.has(r._id.toString()) ? count.get(r._id.toString()) as number : 0));
   }
 

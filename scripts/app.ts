@@ -17,7 +17,7 @@ import {
   TopicOne,
   TopicFork,
   TopicRepository,
-  Res,
+  ResNormal,
   ResRepository,
   HistoryRepository,
   MsgRepository,
@@ -98,12 +98,11 @@ import { AtPrerequisiteError } from './at-error';
         let user = val[1];
         let reply = val[2];
         let profile = val[3];
-        let res = Res.create(ObjectIDGenerator,
+        let res = ResNormal.create(ObjectIDGenerator,
           topic,
           user,
           auth.token,
           params.name,
-          null,
           params.text,
           reply,
           profile,
@@ -405,7 +404,7 @@ import { AtPrerequisiteError } from './at-error';
           }
         }
       },
-      call: async ({ params, auth, now }) => {
+      call: async ({ params, auth }) => {
         let val = await Promise.all([
           ResRepository.findOne(new ObjectID(params.id)),
           UserRepository.findOne(auth.token.user)
@@ -419,16 +418,13 @@ import { AtPrerequisiteError } from './at-error';
         //レスを書き込んだユーザー
         let resUser = await UserRepository.findOne(res.user);
 
-        let msg = res.dv(ObjectIDGenerator, resUser, user, auth.token, now);
+        res.dv(resUser, user, auth.token);
 
         let promise = [
           ResRepository.update(res),
           UserRepository.update(resUser),
           UserRepository.update(user)
         ];
-        if (msg !== null) {
-          promise.push(MsgRepository.insert(msg));
-        }
 
         await Promise.all(promise);
 
@@ -496,6 +492,11 @@ import { AtPrerequisiteError } from './at-error';
       call: async ({ params, auth }) => {
         //レス
         let res = await ResRepository.findOne(new ObjectID(params.id));
+
+        if (res.type !== "normal") {
+          throw new AtPrerequisiteError('通常レス以外は削除出来ません');
+        }
+
         //レスを書き込んだユーザー
         let resUser = await UserRepository.findOne(res.user);
 

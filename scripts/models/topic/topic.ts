@@ -1,6 +1,6 @@
 import { ObjectID } from 'mongodb';
 import { User } from '../user';
-import { Res } from '../res';
+import { Res, ResHistory, ResTopic, ResFork } from '../res';
 import { History } from '../history';
 import { IAuthToken } from '../../auth';
 import { AtPrerequisiteError, paramsErrorMaker, paramsErrorMakerData } from '../../at-error'
@@ -23,7 +23,6 @@ export interface ITopicBaseDB<T extends TopicType> {
 export interface ITopicSearchBaseDB<T extends TopicSearchType> extends ITopicBaseDB<T> {
   tags: string[],
   text: string,
-  mdtext: string
 }
 
 export interface ITopicNormalDB extends ITopicSearchBaseDB<'normal'> {
@@ -51,7 +50,6 @@ export interface ITopicBaseAPI<T extends TopicType> {
 export interface ITopicSearchBaseAPI<T extends TopicSearchType> extends ITopicBaseAPI<T> {
   tags: string[],
   text: string,
-  mdtext: string,
 }
 
 export interface ITopicNormalAPI extends ITopicSearchBaseAPI<'normal'> {
@@ -143,7 +141,7 @@ export abstract class TopicBase<T extends TopicType> {
     }
 
     this._update = res.date;
-    if (res.age) {
+    if (res.type === "normal" && res.age) {
       this._ageUpdate = res.date;
     }
   }
@@ -221,7 +219,6 @@ export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBa
     title: string,
     protected _tags: string[],
     protected _text: string,
-    protected _mdtext: string,
     update: Date,
     date: Date,
     resCount: number,
@@ -247,16 +244,11 @@ export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBa
     return this._text;
   }
 
-  get mdtext() {
-    return this._mdtext;
-  }
-
   toDB(): ITopicSearchBaseDB<T> {
     return {
       ...super.toDB(),
       tags: this._tags,
       text: this._text,
-      mdtext: this._mdtext
     };
   }
 
@@ -265,7 +257,6 @@ export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBa
       ...super.toAPI(),
       tags: this._tags,
       text: this._text,
-      mdtext: this._mdtext
     };
   }
 }
@@ -275,7 +266,6 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
     title: string,
     tags: string[],
     text: string,
-    mdtext: string,
     update: Date,
     date: Date,
     resCount: number,
@@ -285,7 +275,6 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
       title,
       tags,
       text,
-      mdtext,
       update,
       date,
       resCount,
@@ -299,7 +288,6 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
       db.title,
       db.tags,
       db.text,
-      db.mdtext,
       db.update,
       db.date,
       resCount,
@@ -307,17 +295,21 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
       db.active);
   }
 
-  changeData(objidGenerator: IGenerator<ObjectID>, user: User, authToken: IAuthToken, title: string, tags: string[], text: string, now: Date): { res: Res, history: History } {
+  changeData(objidGenerator: IGenerator<ObjectID>, user: User, authToken: IAuthToken, title: string, tags: string[], text: string, now: Date): { res: ResHistory, history: History } {
     user.usePoint(10);
     TopicBase.checkData({ title, tags, text });
 
     this._title = title;
     this._tags = tags;
     this._text = text;
-    this._mdtext = StringUtil.md(text);
 
     let history = History.create(objidGenerator, this, now, this.hash(now, user), user);
-    let res = Res.create(objidGenerator, this, user, authToken, "", "トピックデータ", text, null, null, true, now);
+    let res = ResHistory.create(objidGenerator,
+      this,
+      user,
+      authToken,
+      history,
+      now);
 
     return { res, history };
   }
@@ -328,7 +320,6 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
       title,
       tags,
       text,
-      StringUtil.md(text),
       now,
       now,
       1,
@@ -346,7 +337,6 @@ export class TopicOne extends TopicSearchBase<'one'> {
     title: string,
     tags: string[],
     text: string,
-    mdtext: string,
     update: Date,
     date: Date,
     resCount: number,
@@ -356,7 +346,6 @@ export class TopicOne extends TopicSearchBase<'one'> {
       title,
       tags,
       text,
-      mdtext,
       update,
       date,
       resCount,
@@ -370,7 +359,6 @@ export class TopicOne extends TopicSearchBase<'one'> {
       db.title,
       db.tags,
       db.text,
-      db.mdtext,
       db.update,
       db.date,
       resCount,
@@ -384,14 +372,17 @@ export class TopicOne extends TopicSearchBase<'one'> {
       title,
       tags,
       text,
-      StringUtil.md(text),
       now,
       now,
       1,
       now,
       true);
 
-    let res = Res.create(objidGenerator, topic, user, authToken, "", "トピ主", text, null, null, true, now);
+    let res = ResTopic.create(objidGenerator,
+      topic,
+      user,
+      authToken,
+      now);
     user.changeLastOneTopic(now);
 
     return { topic, res };
@@ -457,9 +448,18 @@ export class TopicFork extends TopicBase<'fork'> {
       true,
       parent.id);
 
-    let res = Res.create(objidGenerator, topic, user, authToken, "", "トピ主", "トピックが建ちました", null, null, true, now);
-    //エスケープすること
-    let resParent = Res.create(objidGenerator, parent, user, authToken, "", "派生トピック", `[${title}](/topic/${topic.id.toString()})`, null, null, true, now);
+    let res = ResTopic.create(objidGenerator,
+      topic,
+      user,
+      authToken,
+      now);
+
+    let resParent = ResFork.create(objidGenerator,
+      parent,
+      user,
+      authToken,
+      topic,
+      now);
     user.changeLastOneTopic(now);
 
     return { topic, res, resParent };

@@ -16,7 +16,6 @@ describe("History", () => {
                 title: 'title',
                 tags: ['a', 'b'],
                 text: 'text',
-                mdtext: '<p>text</p>',
                 date: new Date(),
                 hash: 'hogehogehogeaaa',
                 user: new ObjectID()
@@ -29,7 +28,6 @@ describe("History", () => {
             assert(db.title === h.title);
             assert.deepEqual(db.tags, h.tags);
             assert(db.text === h.text);
-            assert(db.mdtext === h.mdtext);
             assert(db.date.getTime() === h.date.getTime());
             assert(db.hash === h.hash);
             assert(db.user.equals(h.user));
@@ -43,7 +41,6 @@ describe("History", () => {
                 title: 'title',
                 tags: ['a'],
                 text: 'text',
-                mdtext: '<p>text</p>',
                 update: new Date(),
                 date: new Date(),
                 type: 'normal',
@@ -79,7 +76,6 @@ describe("History", () => {
             assert(h.title === t.title);
             assert.deepEqual(h.tags, t.tags);
             assert(h.text === t.text);
-            assert(h.mdtext === t.mdtext);
             assert(h.date.getTime() === date.getTime());
             assert(h.hash === hash);
             assert(h.user.equals(u.id));
@@ -93,7 +89,6 @@ describe("History", () => {
             title: 'title',
             tags: ['a', 'b'],
             text: 'text',
-            mdtext: '<p>text</p>',
             date: new Date(),
             hash: 'hogehogehogeaaa',
             user: new ObjectID()
@@ -107,7 +102,6 @@ describe("History", () => {
                 assert(db.title === h.title);
                 assert.deepEqual(db.tags, h.tags);
                 assert(db.text === h.text);
-                assert(db.mdtext === h.mdtext);
                 assert(db.date.getTime() === h.date.getTime());
                 assert(db.hash === h.hash);
                 assert(db.user.equals(h.user));
@@ -122,7 +116,6 @@ describe("History", () => {
                 assert(api.title === h.title);
                 assert.deepEqual(api.tags, h.tags);
                 assert(api.text === h.text);
-                assert(api.mdtext === h.mdtext);
                 assert(api.date === h.date.toISOString());
                 assert(api.hash === h.hash);
             });

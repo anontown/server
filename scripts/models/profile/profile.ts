@@ -1,5 +1,4 @@
 import { ObjectID } from 'mongodb';
-import { StringUtil } from '../../util';
 import { IAuthToken } from '../../auth';
 import { AtRightError, paramsErrorMaker } from '../../at-error'
 import { Config } from '../../config';
@@ -10,7 +9,6 @@ export interface IProfileDB {
   user: ObjectID,
   name: string,
   text: string,
-  mdtext: string,
   date: Date,
   update: Date,
   sn: string
@@ -21,7 +19,6 @@ export interface IProfileAPI {
   user: string | null,
   name: string,
   text: string,
-  mdtext: string,
   date: string,
   update: string,
   sn: string
@@ -32,7 +29,6 @@ export class Profile {
     private _user: ObjectID,
     private _name: string,
     private _text: string,
-    private _mdtext: string,
     private _date: Date,
     private _update: Date,
     private _sn: string) {
@@ -55,10 +51,6 @@ export class Profile {
     return this._text;
   }
 
-  get mdtext() {
-    return this._mdtext;
-  }
-
   get date() {
     return this._date;
   }
@@ -77,7 +69,6 @@ export class Profile {
       user: this._user,
       name: this._name,
       text: this._text,
-      mdtext: this._mdtext,
       date: this._date,
       update: this._update,
       sn: this._sn
@@ -90,7 +81,6 @@ export class Profile {
       user: authToken !== null && authToken.user.equals(this._user) ? this._user.toString() : null,
       name: this._name,
       text: this._text,
-      mdtext: this._mdtext,
       date: this._date.toISOString(),
       update: this._update.toISOString(),
       sn: this._sn
@@ -98,7 +88,7 @@ export class Profile {
   }
 
   static fromDB(p: IProfileDB): Profile {
-    return new Profile(p._id, p.user, p.name, p.text, p.mdtext, p.date, p.update, p.sn);
+    return new Profile(p._id, p.user, p.name, p.text, p.date, p.update, p.sn);
   }
 
   static create(objidGenerator: IGenerator<ObjectID>, authToken: IAuthToken, name: string, text: string, sn: string, now: Date): Profile {
@@ -127,7 +117,6 @@ export class Profile {
       authToken.user,
       name,
       text,
-      StringUtil.md(text),
       now,
       now,
       sn);
@@ -161,7 +150,6 @@ export class Profile {
     this._name = name;
     this._text = text;
     this._sn = sn;
-    this._mdtext = StringUtil.md(text);
     this._update = now;
   }
 }

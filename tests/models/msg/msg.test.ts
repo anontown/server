@@ -13,14 +13,12 @@ describe("Msg", () => {
         _id: new ObjectID(),
         receiver: new ObjectID(),
         text: "あいうえお",
-        mdtext: "<p>あいうえお</p>",
         date: new Date()
       }),
       Msg.fromDB({
         _id: new ObjectID(),
         receiver: null,
         text: "あいうえお",
-        mdtext: "<p>あいうえお</p>",
         date: new Date()
       })
     ];
@@ -34,7 +32,6 @@ describe("Msg", () => {
           assert((db.receiver === null && msg.receiver === null) ||
             (db.receiver !== null && msg.receiver !== null && db.receiver.equals(msg.receiver)));
           assert(db.text === msg.text);
-          assert(db.mdtext === msg.mdtext);
           assert(db.date.valueOf() === msg.date.valueOf());
         });
       });
@@ -49,7 +46,6 @@ describe("Msg", () => {
           assert((api.receiver === null && msg.receiver === null) ||
             (api.receiver !== null && msg.receiver !== null && api.receiver === msg.receiver.toString()));
           assert(api.text === msg.text);
-          assert(api.mdtext === msg.mdtext);
           assert(api.date.valueOf() === msg.date.toISOString());
         });
       });
@@ -62,14 +58,12 @@ describe("Msg", () => {
         _id: new ObjectID(),
         receiver: new ObjectID(),
         text: "a",
-        mdtext: "<p>a</p>",
         date: new Date()
       },
       {
         _id: new ObjectID(),
         receiver: null,
         text: "a",
-        mdtext: "<p>a</p>",
         date: new Date()
       }
     ];
@@ -82,7 +76,6 @@ describe("Msg", () => {
         assert((db.receiver === null && msg.receiver === null) ||
           (db.receiver !== null && msg.receiver !== null && db.receiver.equals(msg.receiver)));
         assert(msg.text === db.text);
-        assert(msg.mdtext === db.mdtext);
         assert(msg.date.valueOf() === db.date.valueOf());
       });
     });

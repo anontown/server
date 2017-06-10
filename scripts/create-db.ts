@@ -7,6 +7,7 @@ import { StringUtil } from './util';
 import { Config } from './config';
 import { ITopicDB } from './models/topic';
 import { IProfileDB } from './models/profile';
+import { IResForkDB, IResTopicDB, IResHistoryDB } from "./models/res";
 
 let updateFunc: (() => Promise<void>)[] = [];
 
@@ -248,6 +249,126 @@ updateFunc.push((async () => {
 
   //トークン削除
   await db.collection("tokens").remove({});
+}));
+
+updateFunc.push((async () => {
+  let db = await DB;
+
+  //mdtext削除
+  for (let col of ['topics', 'reses', 'profiles', 'msgs', 'histories']) {
+    await db.collection(col).update({}, { $unset: { mdtext: 1 } }, { multi: true });
+  }
+
+  let resesCol = db.collection('reses');
+
+  //投票による削除→active
+  await resesCol.update({ deleteFlag: 'vote' }, { $set: { deleteFlag: "active" } }, { multi: true });
+
+  //msgs削除
+  await db.collection('msgs').remove({});
+
+  //名無し→null
+  await resesCol.update({ name: 'anonymous' }, { $set: { name: null } }, { multi: true });
+
+  //名前の●プロフィール削除
+  {
+    //名前に●が付くレス
+    let reses: { name: string, _id: ObjectID }[] =
+      await resesCol.find({ name: /●/ }).toArray();
+    for (let res of reses) {
+      let [name] = res.name.split('●');
+      await resesCol.update({ _id: res._id }, { $set: { name: name.length === 0 ? null : name } });
+    }
+  }
+
+  //名前に■が付くレス
+  //fork or oneの1
+  {
+    let reses = await resesCol
+      .find({ name: "■トピ主" })
+      .toArray();
+    let topics = await db.collection("topics")
+      .find({ _id: { $in: reses.map(x => x.topic) } })
+      .toArray();
+    for (let res of reses) {
+      let db: IResTopicDB = {
+        _id: res._id,
+        topic: res.topic,
+        date: topics.find(x => x._id.equals(res.topic)).date,
+        user: res.user,
+        vote: res.vote,
+        lv: res.lv,
+        hash: res.hash,
+        type: "topic"
+      };
+
+      await resesCol.update({ _id: res._id }, db);
+    }
+  }
+
+  //normalの編集履歴通知
+  {
+    let reses = await resesCol
+      .find({ name: "■トピックデータ" })
+      .sort({ date: 1 })
+      .toArray();
+
+    let histories = await db.collection("histories")
+      .find({})
+      .sort({ date: 1 })
+      .toArray();
+
+    for (let i = 0; i < reses.length; i++) {
+      let res = reses[i];
+      let history = histories[i];
+
+      let db: IResHistoryDB = {
+        _id: res._id,
+        topic: res.topic,
+        date: history.date,
+        user: res.user,
+        vote: res.vote,
+        lv: res.lv,
+        hash: res.hash,
+        type: "history",
+        history: history._id
+      };
+
+      await resesCol.update({ _id: res._id }, db);
+    }
+  }
+
+  //forkの建て通知
+  {
+    let reses = await resesCol
+      .find({ name: "■派生トピック" })
+      .sort({ date: 1 })
+      .toArray();
+
+    let topics = await db.collection("topics")
+      .find({ type: "fork" })
+      .sort({ date: 1 })
+      .toArray();
+
+    for (let i = 0; i < reses.length; i++) {
+      let res = reses[i];
+      let topic = topics[i];
+
+      let db: IResForkDB = {
+        _id: res._id,
+        topic: res.topic,
+        date: topic.date,
+        user: res.user,
+        vote: res.vote,
+        lv: res.lv,
+        hash: res.hash,
+        type: "fork",
+        fork: topic._id
+      };
+
+      await resesCol.update({ _id: res._id }, db);
+    }
+  }
 }));
 
 /*

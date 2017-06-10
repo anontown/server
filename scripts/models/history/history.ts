@@ -9,7 +9,6 @@ export interface IHistoryDB {
   title: string,
   tags: string[],
   text: string,
-  mdtext: string,
   date: Date,
   hash: string,
   user: ObjectID
@@ -21,18 +20,17 @@ export interface IHistoryAPI {
   title: string,
   tags: string[],
   text: string,
-  mdtext: string,
   date: string,
   hash: string
 }
 
 export class History {
   static fromDB(h: IHistoryDB): History {
-    return new History(h._id, h.topic, h.title, h.tags, h.text, h.mdtext, h.date, h.hash, h.user);
+    return new History(h._id, h.topic, h.title, h.tags, h.text, h.date, h.hash, h.user);
   }
 
   static create(objidGenerator: IGenerator<ObjectID>, topic: TopicNormal, date: Date, hash: string, user: User): History {
-    return new History(objidGenerator.get(), topic.id, topic.title, topic.tags, topic.text, topic.mdtext, date, hash, user.id);
+    return new History(objidGenerator.get(), topic.id, topic.title, topic.tags, topic.text, date, hash, user.id);
   }
 
   private constructor(private _id: ObjectID,
@@ -40,7 +38,6 @@ export class History {
     private _title: string,
     private _tags: string[],
     private _text: string,
-    private _mdtext: string,
     private _date: Date,
     private _hash: string,
     private _user: ObjectID) {
@@ -67,10 +64,6 @@ export class History {
     return this._text;
   }
 
-  get mdtext() {
-    return this._mdtext;
-  }
-
   get date() {
     return this._date;
   }
@@ -90,7 +83,6 @@ export class History {
       title: this._title,
       tags: this._tags,
       text: this._text,
-      mdtext: this._mdtext,
       date: this._date,
       hash: this._hash,
       user: this._user
@@ -104,7 +96,6 @@ export class History {
       title: this._title,
       tags: this._tags,
       text: this._text,
-      mdtext: this._mdtext,
       date: this._date.toISOString(),
       hash: this._hash
     };
