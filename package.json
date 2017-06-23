@@ -41,6 +41,7 @@
     "typescript": "^2.2.1"
   },
   "scripts": {
+    "build": "tsc",
     "start": "tsc&&node ./dist/scripts/app.js",
     "pretest": "tsc",
     "test": "istanbul cover _mocha -- ./dist/tests/**/*.test.js --require intelli-espower-loader",
