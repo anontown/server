@@ -42,9 +42,9 @@
   },
   "scripts": {
     "start": "tsc&&node ./dist/scripts/app.js",
-    "pretest": "set NODE_ENV=test&&tsc",
-    "test": "node node_modules\\istanbul\\lib\\cli.js cover node_modules\\mocha\\bin\\_mocha -- ./dist/tests/**/*.test.js --require intelli-espower-loader",
-    "posttest": "cd coverage && remap-istanbul -i coverage.json -o html-report -t html&&set NODE_ENV="
+    "pretest": "tsc",
+    "test": "istanbul cover _mocha -- ./dist/tests/**/*.test.js --require intelli-espower-loader",
+    "posttest": "cd coverage && remap-istanbul -i coverage.json -o html-report -t html"
   },
   "directories": {
     "test": "dist/tests"
