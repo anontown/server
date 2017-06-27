@@ -192,6 +192,7 @@ updateFunc.push((async () => {
 
   let ts: { _id: ObjectID, storage: string }[] = await db.collection("tokens").find().toArray();
   let ps: Promise<void>[] = [];
+  await fs.mkdir('./storage');
   ts.forEach(t => {
     let dir = "./storage/" + t._id.toString() + "/";
     ps.push((async () => {
@@ -374,20 +375,21 @@ updateFunc.push((async () => {
 /*
   -----------------------------------------------------------------------------
 */
-(async () => {
+export async function createDB() {
   let ver: number;
   try {
-    ver = JSON.parse(fs.readFileSync("./db-version.json", "utf8"));
+    ver = JSON.parse(fs.readFileSync("./data/db-version.json", "utf8"));
   } catch (e) {
     //ファイルがなければ0
     ver = 0;
   }
 
   for (let i = ver; i < updateFunc.length; i++) {
+    console.log(`update:${i}`);
     await updateFunc[i]();
   }
 
-  fs.writeFileSync("./db-version.json", JSON.stringify(updateFunc.length), {
+  fs.writeFileSync("./data/db-version.json", JSON.stringify(updateFunc.length), {
     encoding: "utf8"
   });
-})();
+};

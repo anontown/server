@@ -1,33 +1,30 @@
-import * as fs from 'fs';
+let dbUser = process.env['DB_USER'] as string | undefined;
+let dbPass = process.env['DB_PASS'] as string | undefined;
 
-interface IConfigFile {
+
+export const Config = {
     server: {
-        port: number
+        port: Number(process.env['PORT'])
     },
     db: {
-        url: string,
-        user: string,
-        pass: string
+        url: process.env['DB_URL'] as string,
+        auth: dbUser !== undefined && dbPass !== undefined ?
+            {
+                user: dbUser,
+                pass: dbPass
+            } :
+            null
     },
     salt: {
-        pass: string,
-        hash: string,
-        token: string,
-        tokenReq: string
+        pass: process.env['SALT_PASS'] as string,
+        hash: process.env['SALT_HASH'] as string,
+        token: process.env['SALT_TOKEN'] as string,
+        tokenReq: process.env['SALT_TOKEN_REQ'] as string
     },
     recaptcha: {
-        siteKey: string,
-        secretKey: string
-    }
-}
-
-
-let config: IConfigFile = JSON.parse(fs.readFileSync("./config.json", "utf8"));
-export const Config = {
-    server: config.server,
-    db: config.db,
-    salt: config.salt,
-    recaptcha: config.recaptcha,
+        siteKey: process.env['RECAPTCHA_SITE_KET'] as string,
+        secretKey: process.env['RECAPTCHA_SECRET_KET'] as string
+    },
     user: {
         sn: {
             regex: /^[a-zA-Z0-9_]{3,20}$/,

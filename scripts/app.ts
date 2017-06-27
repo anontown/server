@@ -37,12 +37,15 @@ import { ObjectID } from 'mongodb';
 import { Logger } from './logger';
 import { ObjectIDGenerator, RandomGenerator } from './generator';
 import { AtPrerequisiteError } from './at-error';
+import { createDB } from "./create-db";
 
 (async () => {
   //ロガー
   function appLog(method: string, ip: string, idName: string, id: ObjectID) {
     Logger.app.info(method, ip, idName, id.toString());
   }
+
+  await createDB();
 
   const api = new AppServer(Config.server.port);
 

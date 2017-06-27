@@ -2,7 +2,8 @@
 dist/
 node_modules/
 coverage/
-storage/
 logs/
 db-version.json
 npm-debug.log
+.env
+data/
