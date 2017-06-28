@@ -54,7 +54,7 @@ import { createDB } from "./create-db";
   {
     api.addAPI<{
       topic: string,
-      name: string,
+      name: string | null,
       text: string,
       reply: string | null,
       profile: string | null,
@@ -73,7 +73,7 @@ import { createDB } from "./create-db";
             type: "string"
           },
           name: {
-            type: "string"
+            type: ["string", "null"]
           },
           text: {
             type: "string"

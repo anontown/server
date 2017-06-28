@@ -351,21 +351,27 @@ export class ResNormal extends ResBase<'normal'>{
       replyCount);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, topic: Topic, user: User, _authToken: IAuthToken, name: string, text: string, reply: Res | null, profile: Profile | null, age: boolean, now: Date): ResNormal {
-    paramsErrorMaker([
-      {
-        field: "name",
-        val: name,
-        regex: Config.res.name.regex,
-        message: Config.res.name.msg
-      },
-      {
-        field: "text",
-        val: text,
-        regex: Config.res.text.regex,
-        message: Config.res.text.msg
-      }
-    ]);
+  static create(objidGenerator: IGenerator<ObjectID>, topic: Topic, user: User, _authToken: IAuthToken, name: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean, now: Date): ResNormal {
+    let textCheck = {
+      field: "text",
+      val: text,
+      regex: Config.res.text.regex,
+      message: Config.res.text.msg
+    };
+
+    paramsErrorMaker(name !== null ?
+      [
+        textCheck,
+        {
+          field: "name",
+          val: name,
+          regex: Config.res.name.regex,
+          message: Config.res.name.msg
+        }
+      ] :
+      [
+        textCheck
+      ]);
 
     if (profile !== null) {
       //自分のプロフィールか？
