@@ -78,7 +78,7 @@ export type IResAPI = IResNormalAPI | IResHistoryAPI | IResTopicAPI | IResForkAP
 export interface IResBaseAPI<T extends ResAPIType> {
   id: string,
   topic: string,
-  date: string,
+  date: Date,
   user: string | null,
   uv: number,
   dv: number,
@@ -205,7 +205,7 @@ export abstract class ResBase<T extends ResType> {
     return {
       id: this._id.toString(),
       topic: this._topic.toString(),
-      date: this._date.toString(),
+      date: this._date,
       user: (authToken !== null && authToken.user.equals(this._user) ? this._user.toString() : null),
       uv: this._vote.filter(x => x.value > 0).length,
       dv: this._vote.filter(x => x.value < 0).length,
