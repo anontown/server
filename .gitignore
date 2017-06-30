@@ -7,3 +7,4 @@ db-version.json
 npm-debug.log
 .env
 data/
+data_bak/
