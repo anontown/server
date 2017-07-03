@@ -370,6 +370,11 @@ updateFunc.push((async () => {
       await resesCol.update({ _id: res._id }, db);
     }
   }
+
+  //type normalをセット
+  {
+    await resesCol.update({ type: { $exists: false } }, { $set: { type: 'normal' } }, { multi: true })
+  }
 }));
 
 /*
@@ -383,6 +388,7 @@ export async function createDB() {
     //ファイルがなければ0
     ver = 0;
   }
+  console.log(`現在のバージョン:${ver}`);
 
   for (let i = ver; i < updateFunc.length; i++) {
     console.log(`update:${i}`);

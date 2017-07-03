@@ -12,4 +12,4 @@ WORKDIR $APP_HOME
 RUN npm i
 RUN npm run build
 
-CMD node dist/scripts/create-db.js&&node dist/scripts/app.js
+CMD node dist/scripts/app.js
