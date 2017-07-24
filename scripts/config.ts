@@ -90,7 +90,7 @@ export const Config = {
     },
     res: {
         name: {
-            regex: /^.{1&&res.profile,50}$/,
+            regex: /^.{1,50}$/,
             msg: "名前は50文字以内にして下さい"
         },
         text: {
