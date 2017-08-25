@@ -14,7 +14,7 @@ services:
 #    depends_on:
 #      - mongo
   app:
-    build: .
+    build: ./app
     restart: always
     env_file: .env
     ports:
