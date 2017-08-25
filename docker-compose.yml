@@ -3,16 +3,16 @@ version: '2'
 services:
   mongo:
     restart: always
-    image: mongo
-#    volumes:
-#    - ./data/db:/data/db
-#  mongo-express:
-#    restart: always
-#    image: mongo-express
-#    ports:
-#      - "8081:8081"
-#    depends_on:
-#      - mongo
+    image: "mongo:3.0.15"
+    volumes:
+      - ./data/db:/data/db
+  mongo-express:
+    restart: always
+    image: "mongo-express:0.40.0"
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
   app:
     build: .
     restart: always
@@ -21,9 +21,22 @@ services:
       - "8080:8080"
     depends_on:
       - mongo
-#    args:
-#      TYPE: "test"
-#    volumes:
-#      - ./data/app/logs:/home/app/.anontown/logs
-#      - ./data/app/data:/home/app/.anontown/data
-#      - ./data/app/coverage:/home/app/.anontown/coverage
+      - es
+    args:
+      TYPE: "test"
+    volumes:
+      - ./data/app/logs:/home/app/.anontown/logs
+      - ./data/app/data:/home/app/.anontown/data
+      - ./data/app/coverage:/home/app/.anontown/coverage
+  es:
+    build: es/.
+    restart: always
+    volumes:
+      - ./data/es:/usr/share/elasticsearch/data
+  es-head:
+    image: "mobz/elasticsearch-head:5"
+    restart: always
+    ports:
+      - "9100:9100"
+    depends_on:
+      - es
