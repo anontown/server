@@ -4,15 +4,15 @@ services:
   mongo:
     restart: always
     image: mongo
-    volumes:
-    - ./data/db:/data/db
-  #mongo-express:
-  #  restart: always
-  #  image: mongo-express
-  #  ports:
-  #    - "8081:8081"
-  #  depends_on:
-  #    - mongo
+#    volumes:
+#    - ./data/db:/data/db
+#  mongo-express:
+#    restart: always
+#    image: mongo-express
+#    ports:
+#      - "8081:8081"
+#    depends_on:
+#      - mongo
   app:
     build: .
     restart: always
@@ -21,6 +21,6 @@ services:
       - "8080:8080"
     depends_on:
       - mongo
-    volumes:
-      - ./data/app/logs:/home/app/.anontown/logs
-      - ./data/app/data:/home/app/.anontown/data
+#    volumes:
+#      - ./data/app/logs:/home/app/.anontown/logs
+#      - ./data/app/data:/home/app/.anontown/data
