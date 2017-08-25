@@ -1,7 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { Config } from './config';
-
-
+import * as es from 'elasticsearch';
 
 export const DB = (async () => {
     let db = await MongoClient.connect(Config.db.url);
@@ -12,3 +11,5 @@ export const DB = (async () => {
     }
     return db;
 })();
+
+export const ES = new es.Client({ host: Config.es.url })

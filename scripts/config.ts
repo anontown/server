@@ -15,6 +15,9 @@ export const Config = {
             } :
             null
     },
+    es: {
+        url: process.env['ES_URL'] as string,
+    },
     salt: {
         pass: process.env['SALT_PASS'] as string,
         hash: process.env['SALT_HASH'] as string,
