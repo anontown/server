@@ -1,10 +1,4 @@
 .vscode/
-dist/
 node_modules/
-coverage/
-logs/
-db-version.json
-npm-debug.log
 .env
 data/
-data_bak/
