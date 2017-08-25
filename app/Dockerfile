@@ -1,5 +1,8 @@
 FROM node:8.1.2
 
+
+ARG TYPE=start
+
 ENV HOME=/home/app
 ENV APP_HOME=$HOME/.anontown
 
@@ -10,6 +13,5 @@ COPY package.json package-lock.json tsconfig.json $APP_HOME/
 WORKDIR $APP_HOME
 
 RUN npm i
-RUN npm run build
 
-CMD node dist/scripts/app.js
+CMD npm $TYPE
