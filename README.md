@@ -14,6 +14,7 @@ $ vi docker-compose up -d
 DB_USERとDB_PASSは消して大丈夫です(セキュリティが心配な場合はmongodbコンテナに入りユーザーを作成して設定して下さい)  
 SALT_PASS、SALT_HASH、SALT_TOKEN、SALT_TOKEN_REQを設定します。これはどのような文字列でも構いませんが、推測されないように出来るだけ長くし、記号や数字、アルファベット等を組み合わせて下さい。特にSALT_HASHはとても重要です。これが漏れると匿名掲示板ではなくなってしまいます。  
 RECAPTCHA_SITE_KET、RECAPTCHA_SECRET_KETはGoogleのサイトでキーを取得し設定しましょう。
+その他はそのままにしておいて下さい。
 
 # 公式サーバー
 https://anontown.com/  
