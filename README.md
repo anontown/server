@@ -16,6 +16,8 @@ SALT_PASS、SALT_HASH、SALT_TOKEN、SALT_TOKEN_REQを設定します。これ�
 RECAPTCHA_SITE_KET、RECAPTCHA_SECRET_KETはGoogleのサイトでキーを取得し設定しましょう。
 
 # 公式サーバー
+https://anontown.com/  
+実際にこのプログラムが動いているAPIのエンドポイントは↓です。   
 https://api.anontown.com/
 
 # 寄付
