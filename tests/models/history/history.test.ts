@@ -15,7 +15,7 @@ describe("History", () => {
                 topic: new ObjectID(),
                 title: 'title',
                 tags: ['a', 'b'],
-                text: 'text',
+                body: 'body',
                 date: new Date(),
                 hash: 'hogehogehogeaaa',
                 user: new ObjectID()
@@ -27,7 +27,7 @@ describe("History", () => {
             assert(db.topic.equals(h.topic));
             assert(db.title === h.title);
             assert.deepEqual(db.tags, h.tags);
-            assert(db.text === h.text);
+            assert(db.body === h.body);
             assert(db.date.getTime() === h.date.getTime());
             assert(db.hash === h.hash);
             assert(db.user.equals(h.user));
@@ -40,7 +40,7 @@ describe("History", () => {
                 _id: new ObjectID(),
                 title: 'title',
                 tags: ['a'],
-                text: 'text',
+                body: 'body',
                 update: new Date(),
                 date: new Date(),
                 type: 'normal',
@@ -75,7 +75,7 @@ describe("History", () => {
             assert(h.topic.equals(t.id));
             assert(h.title === t.title);
             assert.deepEqual(h.tags, t.tags);
-            assert(h.text === t.text);
+            assert(h.body === t.body);
             assert(h.date.getTime() === date.getTime());
             assert(h.hash === hash);
             assert(h.user.equals(u.id));
@@ -88,7 +88,7 @@ describe("History", () => {
             topic: new ObjectID(),
             title: 'title',
             tags: ['a', 'b'],
-            text: 'text',
+            body: 'body',
             date: new Date(),
             hash: 'hogehogehogeaaa',
             user: new ObjectID()
@@ -101,7 +101,7 @@ describe("History", () => {
                 assert(db.topic.equals(h.topic));
                 assert(db.title === h.title);
                 assert.deepEqual(db.tags, h.tags);
-                assert(db.text === h.text);
+                assert(db.body === h.body);
                 assert(db.date.getTime() === h.date.getTime());
                 assert(db.hash === h.hash);
                 assert(db.user.equals(h.user));
@@ -115,7 +115,7 @@ describe("History", () => {
                 assert(api.topic === h.topic.toString());
                 assert(api.title === h.title);
                 assert.deepEqual(api.tags, h.tags);
-                assert(api.text === h.text);
+                assert(api.body === h.body);
                 assert(api.date === h.date.toISOString());
                 assert(api.hash === h.hash);
             });

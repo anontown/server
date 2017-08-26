@@ -10,7 +10,7 @@ describe("Profile", () => {
       _id: new ObjectID(),
       user: new ObjectID(),
       name: '名前',
-      text: '本文',
+      body: '本文',
       date: new Date(),
       update: new Date(),
       sn: 'sn'
@@ -22,7 +22,7 @@ describe("Profile", () => {
         assert(db._id.equals(profile.id));
         assert(db.user.equals(profile.user));
         assert(db.name === profile.name);
-        assert(db.text === profile.text);
+        assert(db.body === profile.body);
         assert(db.date.valueOf() === profile.date.valueOf());
         assert(db.update.valueOf() === profile.update.valueOf());
         assert(db.sn === profile.sn);
@@ -58,7 +58,7 @@ describe("Profile", () => {
           assert(api.id === profile.id.toString());
           assert(api.user === data.apiUser);
           assert(api.name === profile.name);
-          assert(api.text === profile.text);
+          assert(api.body === profile.body);
           assert(api.date === profile.date.toISOString());
           assert(api.update === profile.update.toISOString());
           assert(api.sn === profile.sn);
@@ -81,7 +81,7 @@ describe("Profile", () => {
       assert(profile.id.toString() === id);
       assert(profile.user.toString() === user);
       assert(profile.name === '名前');
-      assert(profile.text === '本文');
+      assert(profile.body === '本文');
       assert(profile.date.valueOf() === date);
       assert(profile.update.valueOf() === date);
       assert(profile.sn === 'test');

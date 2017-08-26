@@ -8,7 +8,7 @@ export interface IProfileDB {
   _id: ObjectID,
   user: ObjectID,
   name: string,
-  text: string,
+  body: string,
   date: Date,
   update: Date,
   sn: string
@@ -18,7 +18,7 @@ export interface IProfileAPI {
   id: string,
   user: string | null,
   name: string,
-  text: string,
+  body: string,
   date: string,
   update: string,
   sn: string
@@ -28,7 +28,7 @@ export class Profile {
   private constructor(private _id: ObjectID,
     private _user: ObjectID,
     private _name: string,
-    private _text: string,
+    private _body: string,
     private _date: Date,
     private _update: Date,
     private _sn: string) {
@@ -47,8 +47,8 @@ export class Profile {
     return this._name;
   }
 
-  get text() {
-    return this._text;
+  get body() {
+    return this._body;
   }
 
   get date() {
@@ -68,7 +68,7 @@ export class Profile {
       _id: this._id,
       user: this._user,
       name: this._name,
-      text: this._text,
+      body: this._body,
       date: this._date,
       update: this._update,
       sn: this._sn
@@ -80,7 +80,7 @@ export class Profile {
       id: this._id.toString(),
       user: authToken !== null && authToken.user.equals(this._user) ? this._user.toString() : null,
       name: this._name,
-      text: this._text,
+      body: this._body,
       date: this._date.toISOString(),
       update: this._update.toISOString(),
       sn: this._sn
@@ -88,10 +88,10 @@ export class Profile {
   }
 
   static fromDB(p: IProfileDB): Profile {
-    return new Profile(p._id, p.user, p.name, p.text, p.date, p.update, p.sn);
+    return new Profile(p._id, p.user, p.name, p.body, p.date, p.update, p.sn);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, authToken: IAuthToken, name: string, text: string, sn: string, now: Date): Profile {
+  static create(objidGenerator: IGenerator<ObjectID>, authToken: IAuthToken, name: string, body: string, sn: string, now: Date): Profile {
     paramsErrorMaker([
       {
         field: "name",
@@ -100,10 +100,10 @@ export class Profile {
         message: Config.user.profile.name.msg
       },
       {
-        field: "text",
-        val: text,
-        regex: Config.user.profile.text.regex,
-        message: Config.user.profile.text.msg
+        field: "body",
+        val: body,
+        regex: Config.user.profile.body.regex,
+        message: Config.user.profile.body.msg
       },
       {
         field: "sn",
@@ -116,13 +116,13 @@ export class Profile {
     return new Profile(objidGenerator.get(),
       authToken.user,
       name,
-      text,
+      body,
       now,
       now,
       sn);
   }
 
-  changeData(authToken: IAuthToken, name: string, text: string, sn: string, now: Date) {
+  changeData(authToken: IAuthToken, name: string, body: string, sn: string, now: Date) {
     if (!authToken.user.equals(this._user)) {
       throw new AtRightError("人のプロフィール変更は出来ません");
     }
@@ -134,10 +134,10 @@ export class Profile {
         message: Config.user.profile.name.msg
       },
       {
-        field: "text",
-        val: text,
-        regex: Config.user.profile.text.regex,
-        message: Config.user.profile.text.msg
+        field: "body",
+        val: body,
+        regex: Config.user.profile.body.regex,
+        message: Config.user.profile.body.msg
       },
       {
         field: "sn",
@@ -148,7 +148,7 @@ export class Profile {
     ]);
 
     this._name = name;
-    this._text = text;
+    this._body = body;
     this._sn = sn;
     this._update = now;
   }

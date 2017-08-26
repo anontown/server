@@ -53,7 +53,7 @@ export interface IResBaseDB<T extends ResType> {
 
 export interface IResNormalDB extends IResBaseDB<"normal"> {
   name: string | null,
-  text: string,
+  body: string,
   reply: IReply | null,
   deleteFlag: ResDeleteFlag,
   profile: ObjectID | null,
@@ -90,7 +90,7 @@ export interface IResBaseAPI<T extends ResAPIType> {
 
 export interface IResNormalAPI extends IResBaseAPI<"normal"> {
   name: string | null,
-  text: string,
+  body: string,
   reply: string | null,
   profile: string | null,
   isReply: boolean | null
@@ -255,7 +255,7 @@ export type Res = ResNormal | ResHistory | ResTopic | ResFork;
 
 export class ResNormal extends ResBase<'normal'>{
   private constructor(private _name: string | null,
-    private _text: string,
+    private _body: string,
     private _reply: IReply | null,
     private _deleteFlag: ResDeleteFlag,
     private _profile: ObjectID | null,
@@ -283,8 +283,8 @@ export class ResNormal extends ResBase<'normal'>{
     return this._name;
   }
 
-  get text() {
-    return this._text;
+  get body() {
+    return this._body;
   }
 
   get reply() {
@@ -307,7 +307,7 @@ export class ResNormal extends ResBase<'normal'>{
     return {
       ...super.toBaseDB(),
       name: this._name,
-      text: this._text,
+      body: this._body,
       reply: this._reply,
       deleteFlag: this._deleteFlag,
       profile: this._profile,
@@ -320,7 +320,7 @@ export class ResNormal extends ResBase<'normal'>{
       return {
         ...super.toBaseAPI(authToken),
         name: this._name,
-        text: this._text,
+        body: this._body,
         reply: this._reply !== null ? this._reply.res.toString() : null,
         profile: this._profile !== null ? this._profile.toString() : null,
         isReply: authToken === null || this._reply === null ? null : authToken.user.equals(this._reply.user)
@@ -336,7 +336,7 @@ export class ResNormal extends ResBase<'normal'>{
 
   static fromDB(r: IResNormalDB, replyCount: number): ResNormal {
     return new ResNormal(r.name,
-      r.text,
+      r.body,
       r.reply,
       r.deleteFlag,
       r.profile,
@@ -351,17 +351,17 @@ export class ResNormal extends ResBase<'normal'>{
       replyCount);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, topic: Topic, user: User, _authToken: IAuthToken, name: string | null, text: string, reply: Res | null, profile: Profile | null, age: boolean, now: Date): ResNormal {
-    let textCheck = {
-      field: "text",
-      val: text,
-      regex: Config.res.text.regex,
-      message: Config.res.text.msg
+  static create(objidGenerator: IGenerator<ObjectID>, topic: Topic, user: User, _authToken: IAuthToken, name: string | null, body: string, reply: Res | null, profile: Profile | null, age: boolean, now: Date): ResNormal {
+    let bodyCheck = {
+      field: "body",
+      val: body,
+      regex: Config.res.body.regex,
+      message: Config.res.body.msg
     };
 
     paramsErrorMaker(name !== null ?
       [
-        textCheck,
+        bodyCheck,
         {
           field: "name",
           val: name,
@@ -370,7 +370,7 @@ export class ResNormal extends ResBase<'normal'>{
         }
       ] :
       [
-        textCheck
+        bodyCheck
       ]);
 
     if (profile !== null) {
@@ -388,7 +388,7 @@ export class ResNormal extends ResBase<'normal'>{
     user.changeLastRes(now);
 
     let result = new ResNormal(name,
-      text,
+      body,
       reply !== null ? { res: reply.id, user: reply.user } : null,
       "active",
       profile !== null ? profile.id : null,

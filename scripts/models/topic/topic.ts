@@ -22,7 +22,7 @@ export interface ITopicBaseDB<T extends TopicType> {
 
 export interface ITopicSearchBaseDB<T extends TopicSearchType> extends ITopicBaseDB<T> {
   tags: string[],
-  text: string,
+  body: string,
 }
 
 export interface ITopicNormalDB extends ITopicSearchBaseDB<'normal'> {
@@ -49,7 +49,7 @@ export interface ITopicBaseAPI<T extends TopicType> {
 
 export interface ITopicSearchBaseAPI<T extends TopicSearchType> extends ITopicBaseAPI<T> {
   tags: string[],
-  text: string,
+  body: string,
 }
 
 export interface ITopicNormalAPI extends ITopicSearchBaseAPI<'normal'> {
@@ -146,7 +146,7 @@ export abstract class TopicBase<T extends TopicType> {
     }
   }
 
-  static checkData({ title, tags, text }: { title?: string, tags?: string[], text?: string }) {
+  static checkData({ title, tags, body }: { title?: string, tags?: string[], body?: string }) {
     let data: paramsErrorMakerData[] = [];
     if (title !== undefined) {
       data.push({
@@ -186,12 +186,12 @@ export abstract class TopicBase<T extends TopicType> {
         message: Config.topic.tags.msg
       })));
     }
-    if (text !== undefined) {
+    if (body !== undefined) {
       data.push({
-        field: "text",
-        val: text,
-        regex: Config.topic.text.regex,
-        message: Config.topic.text.msg
+        field: "body",
+        val: body,
+        regex: Config.topic.body.regex,
+        message: Config.topic.body.msg
       });
     }
 
@@ -218,7 +218,7 @@ export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBa
   constructor(id: ObjectID,
     title: string,
     protected _tags: string[],
-    protected _text: string,
+    protected _body: string,
     update: Date,
     date: Date,
     resCount: number,
@@ -240,15 +240,15 @@ export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBa
     return this._tags;
   }
 
-  get text() {
-    return this._text;
+  get body() {
+    return this._body;
   }
 
   toDB(): ITopicSearchBaseDB<T> {
     return {
       ...super.toDB(),
       tags: this._tags,
-      text: this._text,
+      body: this._body,
     };
   }
 
@@ -256,7 +256,7 @@ export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBa
     return {
       ...super.toAPI(),
       tags: this._tags,
-      text: this._text,
+      body: this._body,
     };
   }
 }
@@ -265,7 +265,7 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
   constructor(id: ObjectID,
     title: string,
     tags: string[],
-    text: string,
+    body: string,
     update: Date,
     date: Date,
     resCount: number,
@@ -274,7 +274,7 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
     super(id,
       title,
       tags,
-      text,
+      body,
       update,
       date,
       resCount,
@@ -287,7 +287,7 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
     return new TopicNormal(db._id,
       db.title,
       db.tags,
-      db.text,
+      db.body,
       db.update,
       db.date,
       resCount,
@@ -295,13 +295,13 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
       db.active);
   }
 
-  changeData(objidGenerator: IGenerator<ObjectID>, user: User, authToken: IAuthToken, title: string, tags: string[], text: string, now: Date): { res: ResHistory, history: History } {
+  changeData(objidGenerator: IGenerator<ObjectID>, user: User, authToken: IAuthToken, title: string, tags: string[], body: string, now: Date): { res: ResHistory, history: History } {
     user.usePoint(10);
-    TopicBase.checkData({ title, tags, text });
+    TopicBase.checkData({ title, tags, body });
 
     this._title = title;
     this._tags = tags;
-    this._text = text;
+    this._body = body;
 
     let history = History.create(objidGenerator, this, now, this.hash(now, user), user);
     let res = ResHistory.create(objidGenerator,
@@ -314,18 +314,18 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
     return { res, history };
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, title: string, tags: string[], text: string, user: User, authToken: IAuthToken, now: Date): { topic: TopicNormal, res: Res, history: History } {
-    this.checkData({ title, tags, text });
+  static create(objidGenerator: IGenerator<ObjectID>, title: string, tags: string[], body: string, user: User, authToken: IAuthToken, now: Date): { topic: TopicNormal, res: Res, history: History } {
+    this.checkData({ title, tags, body });
     let topic = new TopicNormal(objidGenerator.get(),
       title,
       tags,
-      text,
+      body,
       now,
       now,
       1,
       now,
       true);
-    let cd = topic.changeData(objidGenerator, user, authToken, title, tags, text, now);
+    let cd = topic.changeData(objidGenerator, user, authToken, title, tags, body, now);
     user.changeLastTopic(now);
 
     return { topic, history: cd.history, res: cd.res };
@@ -336,7 +336,7 @@ export class TopicOne extends TopicSearchBase<'one'> {
   constructor(id: ObjectID,
     title: string,
     tags: string[],
-    text: string,
+    body: string,
     update: Date,
     date: Date,
     resCount: number,
@@ -345,7 +345,7 @@ export class TopicOne extends TopicSearchBase<'one'> {
     super(id,
       title,
       tags,
-      text,
+      body,
       update,
       date,
       resCount,
@@ -358,7 +358,7 @@ export class TopicOne extends TopicSearchBase<'one'> {
     return new TopicOne(db._id,
       db.title,
       db.tags,
-      db.text,
+      db.body,
       db.update,
       db.date,
       resCount,
@@ -366,12 +366,12 @@ export class TopicOne extends TopicSearchBase<'one'> {
       db.active);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, title: string, tags: string[], text: string, user: User, authToken: IAuthToken, now: Date): { topic: TopicOne, res: Res } {
-    this.checkData({ title, tags, text });
+  static create(objidGenerator: IGenerator<ObjectID>, title: string, tags: string[], body: string, user: User, authToken: IAuthToken, now: Date): { topic: TopicOne, res: Res } {
+    this.checkData({ title, tags, body });
     let topic = new TopicOne(objidGenerator.get(),
       title,
       tags,
-      text,
+      body,
       now,
       now,
       1,

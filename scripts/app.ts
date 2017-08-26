@@ -55,7 +55,7 @@ import { createDB } from "./create-db";
     api.addAPI<{
       topic: string,
       name: string | null,
-      text: string,
+      body: string,
       reply: string | null,
       profile: string | null,
       age: boolean
@@ -67,7 +67,7 @@ import { createDB } from "./create-db";
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["topic", "name", "text", "reply", "profile", "age"],
+        required: ["topic", "name", "body", "reply", "profile", "age"],
         properties: {
           topic: {
             type: "string"
@@ -75,7 +75,7 @@ import { createDB } from "./create-db";
           name: {
             type: ["string", "null"]
           },
-          text: {
+          body: {
             type: "string"
           },
           reply: {
@@ -106,7 +106,7 @@ import { createDB } from "./create-db";
           user,
           auth.token,
           params.name,
-          params.text,
+          params.body,
           reply,
           profile,
           params.age,
@@ -519,7 +519,7 @@ import { createDB } from "./create-db";
     api.addAPI<{
       title: string,
       tags: string[],
-      text: string
+      body: string
     }, ITopicAPI>({
       url: "/topic/create/normal",
 
@@ -528,7 +528,7 @@ import { createDB } from "./create-db";
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["title", "tags", "text"],
+        required: ["title", "tags", "body"],
         properties: {
           title: {
             type: "string"
@@ -539,7 +539,7 @@ import { createDB } from "./create-db";
               "type": "string"
             }
           },
-          text: {
+          body: {
             type: "string"
           }
         }
@@ -549,7 +549,7 @@ import { createDB } from "./create-db";
         let create = TopicNormal.create(ObjectIDGenerator,
           params.title,
           params.tags,
-          params.text,
+          params.body,
           user,
           auth.token,
           now);
@@ -572,7 +572,7 @@ import { createDB } from "./create-db";
     api.addAPI<{
       title: string,
       tags: string[],
-      text: string
+      body: string
     }, ITopicAPI>({
       url: "/topic/create/one",
 
@@ -581,7 +581,7 @@ import { createDB } from "./create-db";
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["title", "tags", "text"],
+        required: ["title", "tags", "body"],
         properties: {
           title: {
             type: "string"
@@ -592,7 +592,7 @@ import { createDB } from "./create-db";
               "type": "string"
             }
           },
-          text: {
+          body: {
             type: "string"
           }
         }
@@ -602,7 +602,7 @@ import { createDB } from "./create-db";
         let create = TopicOne.create(ObjectIDGenerator,
           params.title,
           params.tags,
-          params.text,
+          params.body,
           user,
           auth.token,
           now);
@@ -822,7 +822,7 @@ import { createDB } from "./create-db";
       id: string,
       title: string,
       tags: string[],
-      text: string
+      body: string
     }, ITopicAPI>({
       url: "/topic/update",
 
@@ -831,7 +831,7 @@ import { createDB } from "./create-db";
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["id", "title", "tags", "text"],
+        required: ["id", "title", "tags", "body"],
         properties: {
           id: {
             type: "string"
@@ -845,7 +845,7 @@ import { createDB } from "./create-db";
               "type": "string"
             }
           },
-          text: {
+          body: {
             type: "string"
           }
         }
@@ -860,7 +860,7 @@ import { createDB } from "./create-db";
           throw new AtPrerequisiteError('通常トピック以外は編集出来ません');
         }
 
-        let val = topic.changeData(ObjectIDGenerator, user, auth.token, params.title, params.tags, params.text, now);
+        let val = topic.changeData(ObjectIDGenerator, user, auth.token, params.title, params.tags, params.body, now);
 
         await Promise.all([
           ResRepository.insert(val.res),
@@ -1052,7 +1052,7 @@ import { createDB } from "./create-db";
   {
     api.addAPI<{
       name: string,
-      text: string,
+      body: string,
       sn: string
     }, IProfileAPI>({
       url: "/profile/create",
@@ -1062,12 +1062,12 @@ import { createDB } from "./create-db";
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["name", "text", "sn"],
+        required: ["name", "body", "sn"],
         properties: {
           name: {
             type: "string"
           },
-          text: {
+          body: {
             type: "string"
           },
           sn: {
@@ -1076,7 +1076,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth, ip, now }) => {
-        let profile = Profile.create(ObjectIDGenerator, auth.token, params.name, params.text, params.sn, now);
+        let profile = Profile.create(ObjectIDGenerator, auth.token, params.name, params.body, params.sn, now);
         await ProfileRepository.insert(profile);
         appLog("profile/create", ip, "profiles", profile.id);
         return profile.toAPI(auth.token);
@@ -1145,7 +1145,7 @@ import { createDB } from "./create-db";
     api.addAPI<{
       id: string,
       name: string,
-      text: string,
+      body: string,
       sn: string
     }, IProfileAPI>({
       url: "/profile/update",
@@ -1155,7 +1155,7 @@ import { createDB } from "./create-db";
       schema: {
         type: "object",
         additionalProperties: false,
-        required: ["id", "name", "text", "sn"],
+        required: ["id", "name", "body", "sn"],
         properties: {
           id: {
             type: "string"
@@ -1163,7 +1163,7 @@ import { createDB } from "./create-db";
           name: {
             type: "string"
           },
-          text: {
+          body: {
             type: "string"
           },
           sn: {
@@ -1173,7 +1173,7 @@ import { createDB } from "./create-db";
       },
       call: async ({ params, auth, ip, now }) => {
         let profile = await ProfileRepository.findOne(new ObjectID(params.id));
-        profile.changeData(auth.token, params.name, params.text, params.sn, now);
+        profile.changeData(auth.token, params.name, params.body, params.sn, now);
         await ProfileRepository.update(profile);
         appLog("profile/update", ip, "profiles", profile.id);
         return profile.toAPI(auth.token);

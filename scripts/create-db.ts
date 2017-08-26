@@ -377,6 +377,16 @@ updateFunc.push((async () => {
   }
 }));
 
+updateFunc.push(async () => {
+  let db = await DB;
+
+  await db.collection("histories").update({}, { $rename: { text: "body" } }, { multi: true });
+  await db.collection("msgs").update({}, { $rename: { text: "body" } }, { multi: true });
+  await db.collection("profiles").update({}, { $rename: { text: "body" } }, { multi: true });
+  await db.collection("reses").update({}, { $rename: { text: "body" } }, { multi: true });
+  await db.collection("topics").update({}, { $rename: { text: "body" } }, { multi: true });
+});
+
 /*
   -----------------------------------------------------------------------------
 */

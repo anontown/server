@@ -5,21 +5,21 @@ import { IGenerator } from '../../generator';
 export interface IMsgDB {
   _id: ObjectID,
   receiver: ObjectID | null,
-  text: string,
+  body: string,
   date: Date
 }
 
 export interface IMsgAPI {
   id: string,
   receiver: string | null,
-  text: string,
+  body: string,
   date: string
 }
 
 export class Msg {
   private constructor(private _id: ObjectID,
     private _receiver: ObjectID | null,
-    private _text: string,
+    private _body: string,
     private _date: Date) {
 
   }
@@ -32,11 +32,11 @@ export class Msg {
     return this._receiver;
   }
 
-  get text(){
-    return this._text;
+  get body() {
+    return this._body;
   }
 
-  get date(){
+  get date() {
     return this._date;
   }
 
@@ -44,7 +44,7 @@ export class Msg {
     return {
       _id: this._id,
       receiver: this._receiver,
-      text: this._text,
+      body: this._body,
       date: this._date
     }
   }
@@ -53,19 +53,19 @@ export class Msg {
     return {
       id: this._id.toString(),
       receiver: this._receiver !== null ? this._receiver.toString() : null,
-      text: this._text,
+      body: this._body,
       date: this._date.toISOString()
     }
   }
 
   static fromDB(m: IMsgDB): Msg {
-    return new Msg(m._id, m.receiver, m.text, m.date);
+    return new Msg(m._id, m.receiver, m.body, m.date);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, receiver: User | null, text: string, now: Date): Msg {
+  static create(objidGenerator: IGenerator<ObjectID>, receiver: User | null, body: string, now: Date): Msg {
     return new Msg(objidGenerator.get(),
       receiver !== null ? receiver.id : null,
-      text,
+      body,
       now);
   }
 }
