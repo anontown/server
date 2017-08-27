@@ -4,7 +4,7 @@ Dockerを使って動かすことが出来ます。
 
 # 使い方
 ```
-$ git clone https://github.com/kgtkr/anontown-server.git
+$ git clone https://github.com/anontown/server.git
 $ cp .env.sample .env
 $ vi .env #詳細は下記
 $ vi docker-compose up -d
