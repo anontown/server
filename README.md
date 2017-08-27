@@ -1,4 +1,6 @@
 # Anontown Server
+
+[![Join the chat at https://gitter.im/anontown/server](https://badges.gitter.im/anontown/server.svg)](https://gitter.im/anontown/server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Anontownのサーバープログラムです。  
 Dockerを使って動かすことが出来ます。
 
