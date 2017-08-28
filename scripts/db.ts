@@ -12,4 +12,4 @@ export const DB = (async () => {
     return db;
 })();
 
-export const ESClient = new es.Client({ host: Config.es.host, log: 'error' })
+export const ESClient = new es.Client({ host: Config.es.host, log: 'error' });
