@@ -1666,6 +1666,7 @@ import { createDB } from "./create-db";
       let topic = await TopicRepository.findOne(params.id);
       return ResRepository
         .insertEvent
+        .asObservable()
         .filter(x => x.res.topic === topic.id)
         .map(x => ({ ...x, res: x.res.toAPI(auth.tokenOrNull) }));
     }
