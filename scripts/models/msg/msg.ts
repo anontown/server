@@ -1,12 +1,15 @@
-import { ObjectID } from 'mongodb';
 import { User } from '../user';
 import { IGenerator } from '../../generator';
+import { IAuthToken } from "../../auth";
+import { AtRightError } from "../../at-error";
 
 export interface IMsgDB {
-  _id: ObjectID,
-  receiver: ObjectID | null,
-  body: string,
-  date: Date
+  id: string,
+  body: {
+    receiver: string | null,
+    body: string,
+    date: string
+  }
 }
 
 export interface IMsgAPI {
@@ -17,8 +20,8 @@ export interface IMsgAPI {
 }
 
 export class Msg {
-  private constructor(private _id: ObjectID,
-    private _receiver: ObjectID | null,
+  private constructor(private _id: string,
+    private _receiver: string | null,
     private _body: string,
     private _date: Date) {
 
@@ -42,27 +45,33 @@ export class Msg {
 
   toDB(): IMsgDB {
     return {
-      _id: this._id,
-      receiver: this._receiver,
-      body: this._body,
-      date: this._date
+      id: this._id,
+      body: {
+        receiver: this._receiver,
+        body: this._body,
+        date: this._date.toISOString()
+      }
     }
   }
 
-  toAPI(): IMsgAPI {
+  toAPI(authToken: IAuthToken): IMsgAPI {
+    if (this._receiver !== null && this._receiver !== authToken.user) {
+      throw new AtRightError("アクセス権がありません。");
+    }
+
     return {
-      id: this._id.toString(),
-      receiver: this._receiver !== null ? this._receiver.toString() : null,
+      id: this._id,
+      receiver: this._receiver,
       body: this._body,
       date: this._date.toISOString()
     }
   }
 
   static fromDB(m: IMsgDB): Msg {
-    return new Msg(m._id, m.receiver, m.body, m.date);
+    return new Msg(m.id, m.body.receiver, m.body.body, new Date(m.body.date));
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, receiver: User | null, body: string, now: Date): Msg {
+  static create(objidGenerator: IGenerator<string>, receiver: User | null, body: string, now: Date): Msg {
     return new Msg(objidGenerator.get(),
       receiver !== null ? receiver.id : null,
       body,

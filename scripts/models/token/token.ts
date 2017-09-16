@@ -57,9 +57,9 @@ export interface ITokenGeneralAPI extends ITokenBaseAPI<'general'> {
 export type Token = TokenMaster | TokenGeneral;
 
 export abstract class TokenBase<T extends TokenType> {
-  protected constructor(private _id: ObjectID,
+  protected constructor(private _id: string,
     private _key: string,
-    private _user: ObjectID,
+    private _user: string,
     private _date: Date,
     private _type: T) {
 
@@ -87,9 +87,9 @@ export abstract class TokenBase<T extends TokenType> {
 
   toDB(): ITokenBaseDB<T> {
     return {
-      _id: this._id,
+      _id: new ObjectID(this._id),
       key: this._key,
-      user: this._user,
+      user: new ObjectID(this._user),
       date: this._date,
       type: this._type
     }
@@ -97,9 +97,9 @@ export abstract class TokenBase<T extends TokenType> {
 
   toAPI(): ITokenBaseAPI<T> {
     return {
-      id: this._id.toString(),
+      id: this._id,
       key: this._key,
-      user: this._user.toString(),
+      user: this._user,
       date: this._date.toISOString(),
       type: this._type
     }
@@ -111,9 +111,9 @@ export abstract class TokenBase<T extends TokenType> {
 }
 
 export class TokenMaster extends TokenBase<"master"> {
-  private constructor(id: ObjectID,
+  private constructor(id: string,
     key: string,
-    user: ObjectID,
+    user: string,
     date: Date) {
     super(id, key, user, date, 'master');
   }
@@ -127,10 +127,10 @@ export class TokenMaster extends TokenBase<"master"> {
   }
 
   static fromDB(t: ITokenMasterDB): TokenMaster {
-    return new TokenMaster(t._id, t.key, t.user, t.date);
+    return new TokenMaster(t._id.toString(), t.key, t.user.toString(), t.date);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, authUser: IAuthUser, now: Date, randomGenerator: IGenerator<string>): TokenMaster {
+  static create(objidGenerator: IGenerator<string>, authUser: IAuthUser, now: Date, randomGenerator: IGenerator<string>): TokenMaster {
     return new TokenMaster(objidGenerator.get(),
       TokenBase.createTokenKey(randomGenerator),
       authUser.id,
@@ -147,10 +147,10 @@ export class TokenMaster extends TokenBase<"master"> {
 }
 
 export class TokenGeneral extends TokenBase<'general'> {
-  private constructor(id: ObjectID,
+  private constructor(id: string,
     key: string,
-    private _client: ObjectID,
-    user: ObjectID,
+    private _client: string,
+    user: string,
     private _req: ITokenReq[],
     date: Date) {
     super(id, key, user, date, 'general');
@@ -168,7 +168,7 @@ export class TokenGeneral extends TokenBase<'general'> {
   toDB(): ITokenGeneralDB {
     return {
       ...super.toDB(),
-      client: this._client,
+      client: new ObjectID(this._client),
       req: this._req
     }
   }
@@ -176,15 +176,15 @@ export class TokenGeneral extends TokenBase<'general'> {
   toAPI(): ITokenGeneralAPI {
     return {
       ...super.toAPI(),
-      client: this._client.toString(),
+      client: this._client,
     }
   }
 
   static fromDB(t: ITokenGeneralDB): TokenGeneral {
-    return new TokenGeneral(t._id, t.key, t.client, t.user, t.req, t.date);
+    return new TokenGeneral(t._id.toString(), t.key, t.client.toString(), t.user.toString(), t.req, t.date);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, authToken: IAuthTokenMaster, client: Client, now: Date, randomGenerator: IGenerator<string>): TokenGeneral {
+  static create(objidGenerator: IGenerator<string>, authToken: IAuthTokenMaster, client: Client, now: Date, randomGenerator: IGenerator<string>): TokenGeneral {
     return new TokenGeneral(objidGenerator.get(),
       TokenBase.createTokenKey(randomGenerator),
       client.id,
@@ -213,7 +213,7 @@ export class TokenGeneral extends TokenBase<'general'> {
     this._req.push(req);
 
     return {
-      token: this.id.toString(),
+      token: this.id,
       key: req.key
     }
   }

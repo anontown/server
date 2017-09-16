@@ -1,17 +1,18 @@
-import { ObjectID } from 'mongodb';
 import { User } from '../user';
 import { TopicNormal } from '../topic';
 import { IGenerator } from '../../generator';
 
 export interface IHistoryDB {
-  _id: ObjectID,
-  topic: ObjectID,
-  title: string,
-  tags: string[],
-  body: string,
-  date: Date,
-  hash: string,
-  user: ObjectID
+  id: string,
+  body: {
+    topic: string,
+    title: string,
+    tags: string[],
+    body: string,
+    date: string,
+    hash: string,
+    user: string
+  }
 }
 
 export interface IHistoryAPI {
@@ -26,21 +27,21 @@ export interface IHistoryAPI {
 
 export class History {
   static fromDB(h: IHistoryDB): History {
-    return new History(h._id, h.topic, h.title, h.tags, h.body, h.date, h.hash, h.user);
+    return new History(h.id, h.body.topic, h.body.title, h.body.tags, h.body.body, new Date(h.body.date), h.body.hash, h.body.user);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, topic: TopicNormal, date: Date, hash: string, user: User): History {
+  static create(objidGenerator: IGenerator<string>, topic: TopicNormal, date: Date, hash: string, user: User): History {
     return new History(objidGenerator.get(), topic.id, topic.title, topic.tags, topic.body, date, hash, user.id);
   }
 
-  private constructor(private _id: ObjectID,
-    private _topic: ObjectID,
+  private constructor(private _id: string,
+    private _topic: string,
     private _title: string,
     private _tags: string[],
     private _body: string,
     private _date: Date,
     private _hash: string,
-    private _user: ObjectID) {
+    private _user: string) {
 
   }
 
@@ -78,21 +79,23 @@ export class History {
 
   toDB(): IHistoryDB {
     return {
-      _id: this._id,
-      topic: this._topic,
-      title: this._title,
-      tags: this._tags,
-      body: this._body,
-      date: this._date,
-      hash: this._hash,
-      user: this._user
+      id: this._id,
+      body: {
+        topic: this._topic,
+        title: this._title,
+        tags: this._tags,
+        body: this._body,
+        date: this._date.toISOString(),
+        hash: this._hash,
+        user: this._user
+      }
     }
   }
 
   toAPI(): IHistoryAPI {
     return {
-      id: this._id.toString(),
-      topic: this._topic.toString(),
+      id: this._id,
+      topic: this._topic,
       title: this._title,
       tags: this._tags,
       body: this._body,

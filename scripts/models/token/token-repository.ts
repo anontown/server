@@ -14,9 +14,9 @@ export interface IStorageDB {
 }
 
 export class TokenRepository {
-  static async findOne(id: ObjectID): Promise<Token> {
+  static async findOne(id: string): Promise<Token> {
     let db = await DB;
-    let token: ITokenDB | null = await db.collection("tokens").findOne({ _id: id });
+    let token: ITokenDB | null = await db.collection("tokens").findOne({ _id: new ObjectID(id) });
     if (token === null) {
       throw new AtNotFoundError("トークンが存在しません");
     }
@@ -32,7 +32,7 @@ export class TokenRepository {
   static async findAll(authToken: IAuthTokenMaster): Promise<Token[]> {
     let db = await DB;
     let tokens: ITokenDB[] = await db.collection("tokens")
-      .find({ user: authToken.user })
+      .find({ user: new ObjectID(authToken.user) })
       .sort({ date: -1 })
       .toArray();
 
@@ -61,14 +61,14 @@ export class TokenRepository {
 
   static async update(token: Token): Promise<null> {
     let db = await DB;
-    await db.collection("tokens").update({ _id: token.id }, token.toDB());
+    await db.collection("tokens").update({ _id: new ObjectID(token.id) }, token.toDB());
     return null;
   }
 
   private static createStorageFindQuery(token: IAuthToken, name: string | null) {
     let q = {
-      user: token.user,
-      client: token.type === 'general' ? token.client : null
+      user: new ObjectID(token.user),
+      client: token.type === 'general' ? new ObjectID(token.client) : null
     };
     if (name !== null) {
       return { ...q, key: name };
@@ -109,8 +109,8 @@ export class TokenRepository {
     let db = await DB;
 
     let data: IStorageDB = {
-      user: token.user,
-      client: token.type === 'general' ? token.client : null,
+      user: new ObjectID(token.user),
+      client: token.type === 'general' ? new ObjectID(token.client) : null,
       key: name,
       value
     }
@@ -149,20 +149,19 @@ export class TokenRepository {
     let tokens = await this.findAll(token);
     let clientIds = Array.from(new Set((tokens
       .map(t => t.type === 'general' ? t.client.toString() : null)
-      .filter(x => x !== null) as string[])))
-      .map(x => new ObjectID(x));
+      .filter<string>((x): x is string => x !== null))));
     return await ClientRepository.findIn(clientIds);
   }
 
   static async delClientToken(token: IAuthTokenMaster, client: Client): Promise<void> {
     let db = await DB;
     await db.collection("tokens")
-      .remove({ user: token.user, client: client.id });
+      .remove({ user: new ObjectID(token.user), client: new ObjectID(client.id) });
   }
 
   static async delMasterToken(user: IAuthUser): Promise<void> {
     let db = await DB;
     await db.collection("tokens")
-      .remove({ user: user.id, type: 'master' });
+      .remove({ user: new ObjectID(user.id), type: 'master' });
   }
 }

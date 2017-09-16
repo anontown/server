@@ -1,133 +1,151 @@
-import { ObjectID } from 'mongodb';
-import { DB } from '../../db';
+import { ESClient } from '../../db';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
-import { Topic, ITopicDB, TopicNormal, TopicOne, TopicFork } from './topic';
+import { Topic, ITopicDB, TopicNormal, TopicOne, TopicFork, ITopicOneDB, ITopicNormalDB, ITopicForkDB } from './topic';
 import { CronJob } from 'cron';
-
+import { SearchResponse } from "elasticsearch";
 
 export class TopicRepository {
-  static async findOne(id: ObjectID): Promise<Topic> {
-    let db = await DB;
-    let topic: ITopicDB | null = await db.collection("topics").findOne({ _id: id });
+  static async findOne(id: string): Promise<Topic> {
+    let topics = await ESClient.search<ITopicDB["body"]>({
+      index: 'topics',
+      size: 1,
+      body: {
+        query: {
+          term: {
+            _id: id
+          }
+        }
+      }
+    });
 
-    if (topic === null) {
+    if (topics.hits.total === 0) {
       throw new AtNotFoundError("トピックが存在しません");
     }
 
-    return (await this.aggregate([topic]))[0];
+    return (await this.aggregate(topics))[0];
   }
 
-  static async findIn(ids: ObjectID[]): Promise<Topic[]> {
-    let db = await DB;
+  static async findIn(ids: string[]): Promise<Topic[]> {
+    let topics = await ESClient.search<ITopicDB["body"]>({
+      index: 'topics',
+      size: ids.length,
+      body: {
+        query: {
+          terms: {
+            _id: ids
+          }
+        },
+        sort: { ageUpdate: { order: "desc" } }
+      },
+    });
 
-    let topics: ITopicDB[] = await db.collection("topics").find({ _id: { $in: ids } })
-      .sort({ ageUpdate: -1 })
-      .toArray();
-
-    if (topics.length !== ids.length) {
+    if (topics.hits.total !== ids.length) {
       throw new AtNotFoundPartError("トピックが存在しません",
-        topics.map(x => x._id.toString()));
+        topics.hits.hits.map(t => t._id));
     }
 
     return this.aggregate(topics);
   }
 
   static async findTags(limit: number): Promise<{ name: string, count: number }[]> {
-    let db = await DB;
+    let data = await ESClient.search({
+      index: "topics",
+      size: 0,
+      body: {
+        aggs: {
+          tags_count: {
+            terms: {
+              field: "tags",
+              size: limit
+            }
+          }
+        }
+      }
+    })
 
-    let data: { _id: string, count: number }[] = await db.collection("topics")
-      .aggregate([
-        { $unwind: "$tags" },
-        { $group: { _id: "$tags", count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: limit }
-      ])
-      .toArray();
+    let tags: { key: string, doc_count: number }[] = data.aggregations.tags_count.buckets;
 
-    return data.map(x => ({ name: x._id, count: x.count }));
+    return tags.map(x => ({ name: x.key, count: x.doc_count }));
   }
 
-  static async find(title: string, tags: string[], skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
-    let db = await DB;
-
-    let topics: ITopicDB[] = await db.collection("topics")
-      .find((() => {
-        let query: any = {
-          title: new RegExp(title.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
-        };
-
-        if (tags.length !== 0) {
-          query["tags"] = { $all: tags };
-        }
-
-        query["type"] = { $in: ["normal", "one"] };
-
-        if (activeOnly) {
-          query["active"] = true;
-        }
-
-        return query;
-      })())
-      .sort({ ageUpdate: -1 })
-      .skip(skip)
-      .limit(limit)
-      .toArray();
+  static async find(titles: string[], tags: string[], skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
+    let topics = await ESClient.search<ITopicOneDB["body"] | ITopicNormalDB["body"]>({
+      index: "topics",
+      type: ["normal", "one"],
+      size: limit,
+      from: skip,
+      body: {
+        query: {
+          bool: {
+            filter: [
+              ...titles.map(t => ({ match: { title: t } })),
+              ...tags.map(t => ({ match: { tags: t } })),
+              ...activeOnly ? [{ match: { active: true } }] : []
+            ]
+          }
+        },
+        sort: { ageUpdate: { order: "desc" } }
+      }
+    })
 
     return this.aggregate(topics);
   }
 
   static async findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
-    let db = await DB;
-
-    let topics: ITopicDB[] = await db.collection("topics")
-      .find((() => {
-        let query: any = {};
-
-        query['parent'] = parent.id;
-        query["type"] = 'fork';
-        if (activeOnly) {
-          query["active"] = true;
-        }
-
-        return query;
-      })())
-      .sort({ ageUpdate: -1 })
-      .skip(skip)
-      .limit(limit)
-      .toArray();
+    let topics = await ESClient.search<ITopicForkDB["body"]>({
+      index: "topics",
+      type: "fork",
+      size: limit,
+      from: skip,
+      body: {
+        query: {
+          bool: {
+            filter: [
+              { match: { parent: parent.id } },
+              ...activeOnly ? [{ match: { active: true } }] : []
+            ]
+          }
+        },
+        sort: { ageUpdate: { order: "desc" } }
+      }
+    })
 
     return this.aggregate(topics);
   }
 
-  private static async aggregate(topics: ITopicDB[]): Promise<Topic[]> {
-    let db = await DB;
-    let countArr: { _id: ObjectID, resCount: number }[] = await db.collection("reses")
-      .aggregate([
-        {
-          $group: {
-            _id: "$topic", resCount: { $sum: 1 }
+  private static async aggregate(topics: SearchResponse<ITopicDB["body"]>): Promise<Topic[]> {
+    let data = await ESClient.search({
+      index: "reses",
+      size: 0,
+      body: {
+        query: {
+          terms: {
+            topic: topics.hits.hits.map(t => t._id)
           }
         },
-        {
-          $match: {
-            _id: { $in: topics.map(t => t._id) }
+        aggs: {
+          res_count: {
+            terms: {
+              field: "topic"
+            }
           }
         }
-      ])
-      .toArray();
+      }
+    });
 
-    let count = new Map<string, number>();
-    countArr.forEach(c => count.set(c._id.toString(), c.resCount));
+    let countArr: { key: string, doc_count: number }[] = data.aggregations.res_count.buckets;
+    let count = new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
 
-    return topics.map(t => {
-      let c = count.has(t._id.toString()) ? count.get(t._id.toString()) as number : 0;
-      switch (t.type) {
+    return topics.hits.hits.map(t => {
+      let c = count.get(t._id) || 0;
+      let dbObj = { id: t._id, type: t._type, body: t._source } as ITopicDB;
+      switch (dbObj.type) {
         case 'normal':
-          return TopicNormal.fromDB(t, c);
+          return TopicNormal.fromDB(dbObj, c);
         case 'one':
-          return TopicOne.fromDB(t, c);
+          return TopicOne.fromDB(dbObj, c);
         case 'fork':
-          return TopicFork.fromDB(t, c);
+          return TopicFork.fromDB(dbObj, c);
       }
     });
 
@@ -138,11 +156,22 @@ export class TopicRepository {
     new CronJob({
       cronTime: '00 00 * * * *',
       onTick: async () => {
-        let db = await DB;
-        await db.collection("topics")
-          .update({ type: { $in: ["one", "fork"] }, update: { $lt: new Date(Date.now() - 1000 * 60 * 60 * 24) }, active: true },
-          { $set: { active: false } },
-          { multi: true });
+        await ESClient.updateByQuery({
+          index: "topics",
+          type: ["one", "fork"],
+          body: {
+            script: {
+              inline: "ctx._source.active = false"
+            },
+            query: {
+              range: {
+                update: {
+                  lt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString()
+                }
+              }
+            }
+          }
+        })
       },
       start: false,
       timeZone: 'Asia/Tokyo'
@@ -150,14 +179,24 @@ export class TopicRepository {
   }
 
   static async insert(topic: Topic): Promise<null> {
-    let db = await DB;
-    await db.collection("topics").insert(topic.toDB());
+    let tDB = topic.toDB();
+    await ESClient.create({
+      index: "topics",
+      type: tDB.type,
+      id: tDB.id,
+      body: tDB.body
+    });
     return null;
   }
 
   static async update(topic: Topic): Promise<null> {
-    let db = await DB;
-    await db.collection("topics").update({ _id: topic.id }, topic.toDB());
+    let tDB = topic.toDB();
+    await ESClient.update({
+      index: "topics",
+      type: tDB.type,
+      id: tDB.id,
+      body: tDB.body
+    });
     return null;
   }
 }

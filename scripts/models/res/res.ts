@@ -1,4 +1,3 @@
-import { ObjectID } from 'mongodb';
 import { User } from '../user';
 import { Topic, TopicNormal, TopicOne, TopicFork } from '../topic';
 import { Profile } from '../profile';
@@ -13,7 +12,7 @@ import { IGenerator } from '../../generator';
 import { History } from "../history";
 
 export interface IVote {
-  user: ObjectID,
+  user: string,
   value: number,
   lv: number
 }
@@ -40,36 +39,37 @@ export function fromDBToRes(db: IResDB, replyCount: number): Res {
   }
 }
 
-export interface IResBaseDB<T extends ResType> {
-  _id: ObjectID,
-  topic: ObjectID,
-  date: Date,
-  user: ObjectID,
-  vote: IVote[],
-  lv: number,
-  hash: string,
-  type: T
+export interface IResBaseDB<T extends ResType, Body> {
+  id: string,
+  type: T,
+  body: {
+    topic: string,
+    date: string,
+    user: string,
+    vote: IVote[],
+    lv: number,
+    hash: string,
+  } & Body
 }
 
-export interface IResNormalDB extends IResBaseDB<"normal"> {
+export type IResNormalDB = IResBaseDB<"normal", {
   name: string | null,
   body: string,
   reply: IReply | null,
   deleteFlag: ResDeleteFlag,
-  profile: ObjectID | null,
+  profile: string | null,
   age: boolean
-}
+}>;
 
-export interface IResHistoryDB extends IResBaseDB<"history"> {
-  history: ObjectID
-}
+export type IResHistoryDB = IResBaseDB<"history", {
+  history: string
+}>;
 
-export interface IResTopicDB extends IResBaseDB<"topic"> {
-}
+export type IResTopicDB = IResBaseDB<"topic", {}>;
 
-export interface IResForkDB extends IResBaseDB<"fork"> {
-  fork: ObjectID;
-}
+export type IResForkDB = IResBaseDB<"fork", {
+  fork: string;
+}>;
 
 export type ResAPIType = ResType | "delete";
 
@@ -114,15 +114,15 @@ export interface IResDeleteAPI extends IResBaseAPI<"delete"> {
 export type VoteFlag = "uv" | "dv" | "not";
 export type ResDeleteFlag = "active" | "self" | "freeze";
 export interface IReply {
-  res: ObjectID;
-  user: ObjectID;
+  res: string;
+  user: string;
 }
 
 export abstract class ResBase<T extends ResType> {
-  constructor(private _id: ObjectID,
-    private _topic: ObjectID,
+  constructor(private _id: string,
+    private _topic: string,
     private _date: Date,
-    private _user: ObjectID,
+    private _user: string,
     private _vote: IVote[],
     private _lv: number,
     private _hash: string,
@@ -176,16 +176,18 @@ export abstract class ResBase<T extends ResType> {
     }
   }
 
-  protected toBaseDB(): IResBaseDB<T> {
+  protected toBaseDB<Body extends object>(body: Body): IResBaseDB<T, Body> {
     return {
-      _id: this._id,
-      topic: this._topic,
-      date: this._date,
-      user: this._user,
-      vote: this._vote,
-      lv: this._lv,
-      hash: this._hash,
-      type: this._type
+      id: this._id,
+      type: this._type,
+      body: Object.assign({}, body, {
+        topic: this._topic,
+        date: this._date.toISOString(),
+        user: this._user,
+        vote: this._vote,
+        lv: this._lv,
+        hash: this._hash
+      })
     };
   }
 
@@ -194,7 +196,7 @@ export abstract class ResBase<T extends ResType> {
     if (authToken === null) {
       voteFlag = null;
     } else {
-      let vote = this._vote.find((v) => authToken.user.equals(v.user));
+      let vote = this._vote.find((v) => authToken.user === v.user);
       if (vote === undefined) {
         voteFlag = "not";
       } else {
@@ -203,10 +205,10 @@ export abstract class ResBase<T extends ResType> {
     }
 
     return {
-      id: this._id.toString(),
-      topic: this._topic.toString(),
+      id: this._id,
+      topic: this._topic,
       date: this._date,
-      user: (authToken !== null && authToken.user.equals(this._user) ? this._user.toString() : null),
+      user: (authToken !== null && authToken.user === this._user ? this._user : null),
       uv: this._vote.filter(x => x.value > 0).length,
       dv: this._vote.filter(x => x.value < 0).length,
       hash: this._hash,
@@ -217,10 +219,10 @@ export abstract class ResBase<T extends ResType> {
   }
 
   uv(resUser: User, user: User, _authToken: IAuthToken) {
-    if (user.id.equals(this._user)) {
+    if (user.id === this._user) {
       throw new AtRightError("自分に投票は出来ません");
     }
-    if (this._vote.find(x => x.user.equals(user.id)) !== undefined) {
+    if (this._vote.find(x => x.user === user.id) !== undefined) {
       throw new AtPrerequisiteError("既に投票しています");
     }
     let lv = Math.floor(user.lv / 100) + 1;
@@ -229,10 +231,10 @@ export abstract class ResBase<T extends ResType> {
   }
 
   dv(resUser: User, user: User, _authToken: IAuthToken) {
-    if (user.id.equals(this._user)) {
+    if (user.id === this._user) {
       throw new AtRightError("自分に投票は出来ません");
     }
-    if (this._vote.find(x => x.user.equals(user.id)) !== undefined) {
+    if (this._vote.find(x => x.user === user.id) !== undefined) {
       throw new AtPrerequisiteError("既に投票しています");
     }
 
@@ -242,7 +244,7 @@ export abstract class ResBase<T extends ResType> {
   }
 
   cv(resUser: User, user: User, _authToken: IAuthToken) {
-    let vote = this._vote.find(x => x.user.equals(user.id));
+    let vote = this._vote.find(x => x.user === user.id);
     if (vote === undefined) {
       throw new AtPrerequisiteError("投票していません");
     }
@@ -258,12 +260,12 @@ export class ResNormal extends ResBase<'normal'>{
     private _body: string,
     private _reply: IReply | null,
     private _deleteFlag: ResDeleteFlag,
-    private _profile: ObjectID | null,
+    private _profile: string | null,
     private _age: boolean,
-    id: ObjectID,
-    topic: ObjectID,
+    id: string,
+    topic: string,
     date: Date,
-    user: ObjectID,
+    user: string,
     vote: IVote[],
     lv: number,
     hash: string,
@@ -304,15 +306,14 @@ export class ResNormal extends ResBase<'normal'>{
   }
 
   toDB(): IResNormalDB {
-    return {
-      ...super.toBaseDB(),
+    return super.toBaseDB({
       name: this._name,
       body: this._body,
       reply: this._reply,
       deleteFlag: this._deleteFlag,
       profile: this._profile,
       age: this._age
-    };
+    });
   }
 
   toAPI(authToken: IAuthToken | null): IResNormalAPI | IResDeleteAPI {
@@ -321,9 +322,9 @@ export class ResNormal extends ResBase<'normal'>{
         ...super.toBaseAPI(authToken),
         name: this._name,
         body: this._body,
-        reply: this._reply !== null ? this._reply.res.toString() : null,
-        profile: this._profile !== null ? this._profile.toString() : null,
-        isReply: authToken === null || this._reply === null ? null : authToken.user.equals(this._reply.user)
+        reply: this._reply !== null ? this._reply.res : null,
+        profile: this._profile !== null ? this._profile : null,
+        isReply: authToken === null || this._reply === null ? null : authToken.user === this._reply.user
       };
     } else {
       return {
@@ -335,23 +336,23 @@ export class ResNormal extends ResBase<'normal'>{
   }
 
   static fromDB(r: IResNormalDB, replyCount: number): ResNormal {
-    return new ResNormal(r.name,
-      r.body,
-      r.reply,
-      r.deleteFlag,
-      r.profile,
-      r.age,
-      r._id,
-      r.topic,
-      r.date,
-      r.user,
-      r.vote,
-      r.lv,
-      r.hash,
+    return new ResNormal(r.body.name,
+      r.body.body,
+      r.body.reply,
+      r.body.deleteFlag,
+      r.body.profile,
+      r.body.age,
+      r.id,
+      r.body.topic,
+      new Date(r.body.date),
+      r.body.user,
+      r.body.vote,
+      r.body.lv,
+      r.body.hash,
       replyCount);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, topic: Topic, user: User, _authToken: IAuthToken, name: string | null, body: string, reply: Res | null, profile: Profile | null, age: boolean, now: Date): ResNormal {
+  static create(objidGenerator: IGenerator<string>, topic: Topic, user: User, _authToken: IAuthToken, name: string | null, body: string, reply: Res | null, profile: Profile | null, age: boolean, now: Date): ResNormal {
     let bodyCheck = {
       field: "body",
       val: body,
@@ -375,13 +376,13 @@ export class ResNormal extends ResBase<'normal'>{
 
     if (profile !== null) {
       //自分のプロフィールか？
-      if (!profile.user.equals(user.id)) {
+      if (profile.user !== user.id) {
         throw new AtRightError("自分のプロフィールを指定して下さい。");
       }
     }
 
     //もしリプ先があるかつ、トピックがリプ先と違えばエラー
-    if (reply !== null && !reply.topic.equals(topic.id)) {
+    if (reply !== null && reply.topic !== topic.id) {
       throw new AtPrerequisiteError("他のトピックのレスへのリプは出来ません");
     }
 
@@ -407,7 +408,7 @@ export class ResNormal extends ResBase<'normal'>{
   }
 
   del(resUser: User, authToken: IAuthToken) {
-    if (!authToken.user.equals(this.user)) {
+    if (authToken.user !== this.user) {
       throw new AtRightError("人の書き込み削除は出来ません");
     }
 
@@ -421,11 +422,11 @@ export class ResNormal extends ResBase<'normal'>{
 }
 
 export class ResHistory extends ResBase<'history'>{
-  private constructor(private _history: ObjectID,
-    id: ObjectID,
-    topic: ObjectID,
+  private constructor(private _history: string,
+    id: string,
+    topic: string,
     date: Date,
-    user: ObjectID,
+    user: string,
     vote: IVote[],
     lv: number,
     hash: string,
@@ -446,32 +447,29 @@ export class ResHistory extends ResBase<'history'>{
   }
 
   toDB(): IResHistoryDB {
-    return {
-      ...super.toBaseDB(),
-      history: this._history
-    };
+    return super.toBaseDB({ history: this._history });
   }
 
   toAPI(authToken: IAuthToken | null): IResHistoryAPI {
     return {
       ...super.toBaseAPI(authToken),
-      history: this._history.toString()
+      history: this._history
     };
   }
 
   static fromDB(r: IResHistoryDB, replyCount: number): ResHistory {
-    return new ResHistory(r.history,
-      r._id,
-      r.topic,
-      r.date,
-      r.user,
-      r.vote,
-      r.lv,
-      r.hash,
+    return new ResHistory(r.body.history,
+      r.id,
+      r.body.topic,
+      new Date(r.body.date),
+      r.body.user,
+      r.body.vote,
+      r.body.lv,
+      r.body.hash,
       replyCount);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, topic: TopicNormal, user: User, _authToken: IAuthToken, history: History, now: Date): ResHistory {
+  static create(objidGenerator: IGenerator<string>, topic: TopicNormal, user: User, _authToken: IAuthToken, history: History, now: Date): ResHistory {
     let result = new ResHistory(history.id,
       objidGenerator.get(),
       topic.id,
@@ -488,10 +486,10 @@ export class ResHistory extends ResBase<'history'>{
 }
 
 export class ResTopic extends ResBase<"topic">{
-  private constructor(id: ObjectID,
-    topic: ObjectID,
+  private constructor(id: string,
+    topic: string,
     date: Date,
-    user: ObjectID,
+    user: string,
     vote: IVote[],
     lv: number,
     hash: string,
@@ -508,7 +506,7 @@ export class ResTopic extends ResBase<"topic">{
   }
 
   toDB(): IResTopicDB {
-    return super.toBaseDB();
+    return super.toBaseDB({});
   }
 
   toAPI(authToken: IAuthToken | null): IResTopicAPI {
@@ -516,17 +514,17 @@ export class ResTopic extends ResBase<"topic">{
   }
 
   static fromDB(r: IResTopicDB, replyCount: number): ResTopic {
-    return new ResTopic(r._id,
-      r.topic,
-      r.date,
-      r.user,
-      r.vote,
-      r.lv,
-      r.hash,
+    return new ResTopic(r.id,
+      r.body.topic,
+      new Date(r.body.date),
+      r.body.user,
+      r.body.vote,
+      r.body.lv,
+      r.body.hash,
       replyCount);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, topic: TopicOne | TopicFork, user: User, _authToken: IAuthToken, now: Date): ResTopic {
+  static create(objidGenerator: IGenerator<string>, topic: TopicOne | TopicFork, user: User, _authToken: IAuthToken, now: Date): ResTopic {
     let result = new ResTopic(objidGenerator.get(),
       topic.id,
       now,
@@ -542,11 +540,11 @@ export class ResTopic extends ResBase<"topic">{
 }
 
 export class ResFork extends ResBase<'fork'>{
-  private constructor(private _fork: ObjectID,
-    id: ObjectID,
-    topic: ObjectID,
+  private constructor(private _fork: string,
+    id: string,
+    topic: string,
     date: Date,
-    user: ObjectID,
+    user: string,
     vote: IVote[],
     lv: number,
     hash: string,
@@ -567,32 +565,29 @@ export class ResFork extends ResBase<'fork'>{
   }
 
   toDB(): IResForkDB {
-    return {
-      ...super.toBaseDB(),
-      fork: this._fork
-    };
+    return super.toBaseDB({ fork: this._fork });
   }
 
   toAPI(authToken: IAuthToken | null): IResForkAPI {
     return {
       ...super.toBaseAPI(authToken),
-      fork: this._fork.toString()
+      fork: this._fork
     };
   }
 
   static fromDB(r: IResForkDB, replyCount: number): ResFork {
-    return new ResFork(r.fork,
-      r._id,
-      r.topic,
-      r.date,
-      r.user,
-      r.vote,
-      r.lv,
-      r.hash,
+    return new ResFork(r.body.fork,
+      r.id,
+      r.body.topic,
+      new Date(r.body.date),
+      r.body.user,
+      r.body.vote,
+      r.body.lv,
+      r.body.hash,
       replyCount);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, topic: TopicNormal, user: User, _authToken: IAuthToken, fork: TopicFork, now: Date): ResFork {
+  static create(objidGenerator: IGenerator<string>, topic: TopicNormal, user: User, _authToken: IAuthToken, fork: TopicFork, now: Date): ResFork {
     let result = new ResFork(fork.id,
       objidGenerator.get(),
       topic.id,

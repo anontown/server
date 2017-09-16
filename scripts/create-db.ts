@@ -1,13 +1,9 @@
-import { DB } from './db';
+import { DB, ESClient } from './db';
 import * as fs from 'fs-promise';
 import { ObjectID } from 'mongodb';
-import { IResDB } from './models/res';
-import { IHistoryDB } from './models/history';
 import { StringUtil } from './util';
 import { Config } from './config';
-import { ITopicDB } from './models/topic';
 import { IProfileDB } from './models/profile';
-import { IResForkDB, IResTopicDB, IResHistoryDB } from "./models/res";
 
 let updateFunc: (() => Promise<void>)[] = [];
 
@@ -124,8 +120,8 @@ updateFunc.push((async () => {
   let db = await DB;
   let rdb = db.collection("reses");
   let hdb = db.collection("histories");
-  let reses: IResDB[] = await rdb.find().toArray();
-  let histories: IHistoryDB[] = await hdb.find().toArray();
+  let reses = await rdb.find().toArray();
+  let histories = await hdb.find().toArray();
 
   let promises: Promise<any>[] = [];
   reses.forEach(r => {
@@ -143,7 +139,7 @@ updateFunc.push((async () => {
   let db = await DB;
   let promises: Promise<any>[] = [];
 
-  let topics: ITopicDB[] = await db.collection("topics").find().toArray();
+  let topics = await db.collection("topics").find().toArray();
   topics.forEach(t => {
     promises.push(db.collection("topics").update({ _id: t._id }, { $set: { ageUpdate: t.update } }))
   });
@@ -292,7 +288,7 @@ updateFunc.push((async () => {
       .find({ _id: { $in: reses.map(x => x.topic) } })
       .toArray();
     for (let res of reses) {
-      let db: IResTopicDB = {
+      let db = {
         _id: res._id,
         topic: res.topic,
         date: topics.find(x => x._id.equals(res.topic)).date,
@@ -323,7 +319,7 @@ updateFunc.push((async () => {
       let res = reses[i];
       let history = histories[i];
 
-      let db: IResHistoryDB = {
+      let db = {
         _id: res._id,
         topic: res.topic,
         date: history.date,
@@ -355,7 +351,7 @@ updateFunc.push((async () => {
       let res = reses[i];
       let topic = topics[i];
 
-      let db: IResForkDB = {
+      let db = {
         _id: res._id,
         topic: res.topic,
         date: topic.date,
@@ -385,6 +381,215 @@ updateFunc.push(async () => {
   await db.collection("profiles").update({}, { $rename: { text: "body" } }, { multi: true });
   await db.collection("reses").update({}, { $rename: { text: "body" } }, { multi: true });
   await db.collection("topics").update({}, { $rename: { text: "body" } }, { multi: true });
+
+  let resBaseProps = {
+    topic: {
+      type: "keyword"
+    },
+    date: {
+      type: "date"
+    },
+    user: {
+      type: "keyword",
+    },
+    vote: {
+      type: "nested",
+      properties: {
+        user: {
+          type: "keyword",
+        },
+        value: {
+          type: "integer"
+        },
+        lv: {
+          type: "integer"
+        }
+      }
+    },
+    lv: {
+      type: "integer"
+    },
+    hash: {
+      type: "keyword",
+    },
+  };
+
+  await ESClient.indices.create({
+    index: 'reses',
+    body: {
+      mappings: {
+        normal: {
+          dynamic: "strict",
+          properties: {
+            ...resBaseProps,
+            name: {
+              type: "text"
+            },
+            body: {
+              type: "text"
+            },
+            reply: {
+              type: "nested",
+              properties: {
+                res: {
+                  type: "text"
+                },
+                user: {
+                  type: "text"
+                }
+              }
+            },
+            deleteFlag: {
+              type: "keyword",
+            },
+            profile: {
+              type: "keyword",
+            },
+            age: {
+              type: "boolean",
+            }
+          }
+        },
+        history: {
+          dynamic: "strict",
+          properties: {
+            ...resBaseProps,
+            history: {
+              type: "keyword",
+            }
+          }
+        },
+        topic: {
+          dynamic: "strict",
+          properties: {
+            ...resBaseProps,
+          }
+        },
+        fork: {
+          dynamic: "strict",
+          properties: {
+            ...resBaseProps,
+            fork: {
+              type: "keyword",
+            }
+          }
+        }
+      }
+    }
+  });
+
+  await ESClient.indices.create({
+    index: 'histories',
+    body: {
+      mappings: {
+        normal: {
+          dynamic: "strict",
+          properties: {
+            topic: {
+              type: "keyword"
+            },
+            title: {
+              type: "text"
+            },
+            tags: {
+              type: "keyword"
+            },
+            body: {
+              type: "text"
+            },
+            date: {
+              type: "date"
+            },
+            hash: {
+              type: "keyword"
+            },
+            user: {
+              type: "keyword"
+            }
+          }
+        }
+      }
+    }
+  });
+
+  await ESClient.indices.create({
+    index: 'msgs',
+    body: {
+      mappings: {
+        normal: {
+          dynamic: "strict",
+          properties: {
+            receiver: {
+              type: "keyword"
+            },
+            body: {
+              type: "text"
+            },
+            date: {
+              type: "date"
+            }
+          }
+        }
+      }
+    }
+  });
+
+  let topicBaseProps = {
+    title: {
+      type: "text"
+    },
+    update: {
+      type: "date"
+    },
+    date: {
+      type: "date"
+    },
+    ageUpdate: {
+      type: "date"
+    },
+    active: {
+      type: "boolean"
+    },
+  };
+
+  let topicSearchBaseProps = {
+    ...topicBaseProps,
+    tags: {
+      type: "keyword"
+    },
+    body: {
+      type: "text"
+    },
+  };
+
+  await ESClient.indices.create({
+    index: 'topics',
+    body: {
+      mappings: {
+        normal: {
+          dynamic: "strict",
+          properties: {
+            ...topicSearchBaseProps
+          }
+        },
+        one: {
+          dynamic: "strict",
+          properties: {
+            ...topicSearchBaseProps
+          }
+        },
+        fork: {
+          dynamic: "strict",
+          properties: {
+            ...topicBaseProps,
+            parent: {
+              type: "keyword"
+            }
+          }
+        },
+      }
+    }
+  })
 });
 
 /*

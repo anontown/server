@@ -25,8 +25,8 @@ export interface IProfileAPI {
 }
 
 export class Profile {
-  private constructor(private _id: ObjectID,
-    private _user: ObjectID,
+  private constructor(private _id: string,
+    private _user: string,
     private _name: string,
     private _body: string,
     private _date: Date,
@@ -65,8 +65,8 @@ export class Profile {
 
   toDB(): IProfileDB {
     return {
-      _id: this._id,
-      user: this._user,
+      _id: new ObjectID(this._id),
+      user: new ObjectID(this._user),
       name: this._name,
       body: this._body,
       date: this._date,
@@ -77,8 +77,8 @@ export class Profile {
 
   toAPI(authToken: IAuthToken | null): IProfileAPI {
     return {
-      id: this._id.toString(),
-      user: authToken !== null && authToken.user.equals(this._user) ? this._user.toString() : null,
+      id: this._id,
+      user: authToken !== null && authToken.user === this._user ? this._user : null,
       name: this._name,
       body: this._body,
       date: this._date.toISOString(),
@@ -88,10 +88,10 @@ export class Profile {
   }
 
   static fromDB(p: IProfileDB): Profile {
-    return new Profile(p._id, p.user, p.name, p.body, p.date, p.update, p.sn);
+    return new Profile(p._id.toString(), p.user.toString(), p.name, p.body, p.date, p.update, p.sn);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, authToken: IAuthToken, name: string, body: string, sn: string, now: Date): Profile {
+  static create(objidGenerator: IGenerator<string>, authToken: IAuthToken, name: string, body: string, sn: string, now: Date): Profile {
     paramsErrorMaker([
       {
         field: "name",
@@ -123,7 +123,7 @@ export class Profile {
   }
 
   changeData(authToken: IAuthToken, name: string, body: string, sn: string, now: Date) {
-    if (!authToken.user.equals(this._user)) {
+    if (authToken.user !== this._user) {
       throw new AtRightError("人のプロフィール変更は出来ません");
     }
     paramsErrorMaker([

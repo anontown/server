@@ -1,80 +1,124 @@
-import { ObjectID } from 'mongodb';
-import { DB } from '../../db';
+import { ESClient } from '../../db';
 import { IAuthToken } from '../../auth';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error';
 import { IMsgDB, Msg } from './msg';
 export class MsgRepository {
-  static async findOne(authToken: IAuthToken, id: ObjectID): Promise<Msg> {
-    let db = await DB;
-    let msg: IMsgDB | null = await db.collection("msgs").findOne({
-      _id: { $in: id },
-      $or: [{ receiver: authToken.user }, { receiver: null }]
+  static async findOne(id: string): Promise<Msg> {
+    let msgs = await ESClient.search<IMsgDB["body"]>({
+      index: 'msgs',
+      size: 1,
+      body: {
+        query: {
+          term: {
+            _id: id
+          }
+        }
+      }
     });
 
-    if (msg === null) {
+    if (msgs.hits.total === 0) {
       throw new AtNotFoundError("メッセージが存在しません");
     }
 
-    return Msg.fromDB(msg);
+    return Msg.fromDB(msgs.hits.hits.map(m => ({ id: m._id, body: m._source }))[0]);
   }
 
-  static async findIn(authToken: IAuthToken, ids: ObjectID[]): Promise<Msg[]> {
-    let db = await DB;
-    let msgs: IMsgDB[] = await db.collection("msgs").find({
-      _id: { $in: ids },
-      $or: [{ receiver: authToken.user }, { receiver: null }]
-    }).sort({ date: -1 })
-      .toArray();
+  static async findIn(ids: string[]): Promise<Msg[]> {
+    let msgs = await ESClient.search<IMsgDB["body"]>({
+      index: 'msgs',
+      size: ids.length,
+      body: {
+        query: {
+          terms: {
+            _id: ids
+          }
+        },
+        sort: { ageUpdate: { order: "desc" } }
+      },
+    });
 
-    if (msgs.length !== ids.length) {
-      throw new AtNotFoundPartError("メッセージが存在しません", msgs.map(x => x._id.toString()));
+    if (msgs.hits.total !== ids.length) {
+      throw new AtNotFoundPartError("メッセージが存在しません",
+        msgs.hits.hits.map(m => m._id));
     }
 
-    return msgs.map(m => Msg.fromDB(m));
+    return msgs.hits.hits.map(m => Msg.fromDB({ id: m._id, body: m._source }));
   }
 
   static async find(authToken: IAuthToken, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Msg[]> {
-    let db = await DB;
+    let msgs = await ESClient.search<IMsgDB["body"]>({
+      index: "msgs",
+      size: limit,
+      body: {
+        query: {
+          bool: {
+            filter: [
+              {
+                range: {
+                  [type === "after" ? (equal ? "gte" : "gt") : (equal ? "lte" : "lt")]: date.toISOString()
+                }
+              },
+              {
+                bool: {
+                  should: [
+                    { term: { receiver: null } },
+                    { term: { receiver: authToken.user } }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        sort: { date: { order: type === "after" ? "asc" : "desc" } }
+      }
+    });
 
-    let msgs: IMsgDB[] = await db.collection("msgs")
-      .find({
-        $or: [{ receiver: authToken.user }, { receiver: null }],
-        date: { [type === "after" ? (equal ? "$gte" : "$gt") : (equal ? "$lte" : "$lt")]: date }
-      })
-      .sort({ date: type === "after" ? 1 : -1 })
-      .skip(0)
-      .limit(limit)
-      .sort({ date: -1 })
-      .toArray();
-
-
-    return msgs.map(m => Msg.fromDB(m));
+    let result = msgs.hits.hits.map(m => Msg.fromDB({ id: m._id, body: m._source }));
+    if (type === "after") {
+      result.reverse();
+    }
+    return result;
   }
 
   static async findNew(authToken: IAuthToken, limit: number): Promise<Msg[]> {
-    let db = await DB;
+    let msgs = await ESClient.search<IMsgDB["body"]>({
+      index: "msgs",
+      size: limit,
+      body: {
+        query: {
+          bool: {
+            should: [
+              { term: { receiver: null } },
+              { term: { receiver: authToken.user } }
+            ]
+          }
+        },
+        sort: { date: { order: "desc" } }
+      },
+    });
 
-    let msgs: IMsgDB[] = await db.collection("msgs")
-      .find({
-        $or: [{ receiver: authToken.user }, { receiver: null }]
-      })
-      .sort({ date: -1 })
-      .skip(0)
-      .limit(limit)
-      .toArray();
-
-    return msgs.map(m => Msg.fromDB(m));
+    return msgs.hits.hits.map(m => Msg.fromDB({ id: m._id, body: m._source }));
   }
 
   static async insert(msg: Msg): Promise<null> {
-    let db = await DB;
-    await db.collection("msgs").insert(msg.toDB());
+    let mDB = msg.toDB();
+    await ESClient.create({
+      index: "msgs",
+      type: "normal",
+      id: mDB.id,
+      body: mDB.body
+    });
     return null;
   }
 
   static async update(msg: Msg): Promise<null> {
-    let db = await DB;
-    await db.collection("msgs").update({ _id: msg.id }, msg.toDB());
+    let mDB = msg.toDB();
+    await ESClient.update({
+      index: "msgs",
+      type: "normal",
+      id: mDB.id,
+      body: mDB.body
+    });
     return null;
   }
 }

@@ -15,6 +15,9 @@ export const Config = {
             } :
             null
     },
+    api: {
+        limit: 1000
+    },
     es: {
         host: process.env['ES_HOST'] as string,
     },

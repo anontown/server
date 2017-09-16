@@ -41,8 +41,8 @@ import { createDB } from "./create-db";
 
 (async () => {
   //ロガー
-  function appLog(method: string, ip: string, idName: string, id: ObjectID) {
-    Logger.app.info(method, ip, idName, id.toString());
+  function appLog(method: string, ip: string, idName: string, id: string) {
+    Logger.app.info(method, ip, idName, id);
   }
 
   await createDB();
@@ -91,10 +91,10 @@ import { createDB } from "./create-db";
       },
       call: async ({ params, auth, ip, now }) => {
         let val = await Promise.all([
-          TopicRepository.findOne(new ObjectID(params.topic)),
+          TopicRepository.findOne(params.topic),
           UserRepository.findOne(auth.token.user),
-          params.reply !== null ? ResRepository.findOne(new ObjectID(params.reply)) : Promise.resolve(null),
-          params.profile !== null ? ProfileRepository.findOne(new ObjectID(params.profile)) : Promise.resolve(null)
+          params.reply !== null ? ResRepository.findOne(params.reply) : Promise.resolve(null),
+          params.profile !== null ? ProfileRepository.findOne(params.profile) : Promise.resolve(null)
         ]);
 
         let topic = val[0];
@@ -139,7 +139,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth }) => {
-        let res = await ResRepository.findOne(new ObjectID(params.id));
+        let res = await ResRepository.findOne(params.id);
         return res.toAPI(auth.tokenOrNull);
       }
     });
@@ -163,7 +163,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth }) => {
-        let reses = await ResRepository.findIn(params.ids.map(id => new ObjectID(id)));
+        let reses = await ResRepository.findIn(params.ids);
         return reses.map(r => r.toAPI(auth.tokenOrNull));
       }
     });
@@ -204,7 +204,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth }) => {
-        let topic = await TopicRepository.findOne(new ObjectID(params.topic));
+        let topic = await TopicRepository.findOne(params.topic);
         let reses = await ResRepository.find(topic, params.type, params.equal, new Date(params.date), params.limit);
         return reses.map(r => r.toAPI(auth.tokenOrNull));
       }
@@ -229,7 +229,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth }) => {
-        let topic = await TopicRepository.findOne(new ObjectID(params.topic));
+        let topic = await TopicRepository.findOne(params.topic);
         let reses = await ResRepository.findNew(topic, params.limit);
         return reses.map(r => r.toAPI(auth.tokenOrNull));
       }
@@ -254,7 +254,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth }) => {
-        let topic = await TopicRepository.findOne(new ObjectID(params.topic));
+        let topic = await TopicRepository.findOne(params.topic);
         let reses = await ResRepository.findHash(topic, params.hash);
         return reses.map(r => r.toAPI(auth.tokenOrNull));
       }
@@ -280,8 +280,8 @@ import { createDB } from "./create-db";
       },
       call: async ({ params, auth }) => {
         let val = await Promise.all([
-          TopicRepository.findOne(new ObjectID(params.topic)),
-          ResRepository.findOne(new ObjectID(params.reply))
+          TopicRepository.findOne(params.topic),
+          ResRepository.findOne(params.reply)
         ]);
 
         let topic = val[0];
@@ -367,7 +367,7 @@ import { createDB } from "./create-db";
       },
       call: async ({ params, auth }) => {
         let val = await Promise.all([
-          ResRepository.findOne(new ObjectID(params.id)),
+          ResRepository.findOne(params.id),
           UserRepository.findOne(auth.token.user)
         ]);
 
@@ -409,7 +409,7 @@ import { createDB } from "./create-db";
       },
       call: async ({ params, auth }) => {
         let val = await Promise.all([
-          ResRepository.findOne(new ObjectID(params.id)),
+          ResRepository.findOne(params.id),
           UserRepository.findOne(auth.token.user)
         ]);
 
@@ -452,7 +452,7 @@ import { createDB } from "./create-db";
       },
       call: async ({ params, auth }) => {
         let val = await Promise.all([
-          ResRepository.findOne(new ObjectID(params.id)),
+          ResRepository.findOne(params.id),
           UserRepository.findOne(auth.token.user)
         ]);
 
@@ -494,7 +494,7 @@ import { createDB } from "./create-db";
       },
       call: async ({ params, auth }) => {
         //レス
-        let res = await ResRepository.findOne(new ObjectID(params.id));
+        let res = await ResRepository.findOne(params.id);
 
         if (res.type !== "normal") {
           throw new AtPrerequisiteError('通常レス以外は削除出来ません');
@@ -643,7 +643,7 @@ import { createDB } from "./create-db";
       },
       call: async ({ params, auth, ip, now }) => {
         let user = await UserRepository.findOne(auth.token.user);
-        let parent = await TopicRepository.findOne(new ObjectID(params.parent));
+        let parent = await TopicRepository.findOne(params.parent);
 
         if (parent.type !== 'normal') {
           throw new AtPrerequisiteError('通常トピック以外の派生トピックは作れません');
@@ -687,7 +687,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params }) => {
-        let topic = await TopicRepository.findOne(new ObjectID(params.id));
+        let topic = await TopicRepository.findOne(params.id);
         return topic.toAPI();
       }
     });
@@ -711,13 +711,13 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params }) => {
-        let topics = await TopicRepository.findIn(params.ids.map(id => new ObjectID(id)));
+        let topics = await TopicRepository.findIn(params.ids);
         return topics.map(t => t.toAPI());
       }
     });
 
     api.addAPI<{
-      title: string,
+      title: string[],
       tags: string[],
       skip: number,
       limit: number,
@@ -733,7 +733,10 @@ import { createDB } from "./create-db";
         required: ["title", "tags", "skip", "limit", "activeOnly"],
         properties: {
           title: {
-            type: "string"
+            type: "array",
+            items: {
+              "type": "string"
+            }
           },
           tags: {
             type: "array",
@@ -788,7 +791,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params }) => {
-        let parent = await TopicRepository.findOne(new ObjectID(params.parent));
+        let parent = await TopicRepository.findOne(params.parent);
         if (parent.type !== 'normal') {
           throw new AtPrerequisiteError('親トピックは通常トピックのみ指定できます');
         }
@@ -852,7 +855,7 @@ import { createDB } from "./create-db";
       },
       call: async ({ params, auth, ip, now }) => {
         let [topic, user] = await Promise.all([
-          TopicRepository.findOne(new ObjectID(params.id)),
+          TopicRepository.findOne(params.id),
           UserRepository.findOne(auth.token.user)
         ]);
 
@@ -893,7 +896,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params }) => {
-        return (await HistoryRepository.findOne(new ObjectID(params.id)))
+        return (await HistoryRepository.findOne(params.id))
           .toAPI();
       }
     });
@@ -917,7 +920,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params }) => {
-        return (await HistoryRepository.findIn(params.ids.map(id => new ObjectID(id))))
+        return (await HistoryRepository.findIn(params.ids))
           .map(h => h.toAPI());
       }
     });
@@ -938,7 +941,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params }) => {
-        return (await HistoryRepository.findAll(await TopicRepository.findOne(new ObjectID(params.topic))))
+        return (await HistoryRepository.findAll(await TopicRepository.findOne(params.topic)))
           .map(h => h.toAPI());
       }
     });
@@ -961,8 +964,8 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth }) => {
-        let msg = await MsgRepository.findOne(auth.token, new ObjectID(params.id));
-        return msg.toAPI();
+        let msg = await MsgRepository.findOne(params.id);
+        return msg.toAPI(auth.token);
       }
     });
 
@@ -985,8 +988,8 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth }) => {
-        let msgs = await MsgRepository.findIn(auth.token, params.ids.map(id => new ObjectID(id)));
-        return msgs.map(m => m.toAPI());
+        let msgs = await MsgRepository.findIn(params.ids);
+        return msgs.map(m => m.toAPI(auth.token));
       }
     });
 
@@ -1023,7 +1026,7 @@ import { createDB } from "./create-db";
       },
       call: async ({ params, auth }) => {
         let msgs = await MsgRepository.find(auth.token, params.type, params.equal, new Date(params.date), params.limit);
-        return msgs.map(m => m.toAPI());
+        return msgs.map(m => m.toAPI(auth.token));
       }
     });
 
@@ -1044,7 +1047,7 @@ import { createDB } from "./create-db";
       },
       call: async ({ params, auth }) => {
         let msgs = await MsgRepository.findNew(auth.token, params.limit);
-        return msgs.map(m => m.toAPI());
+        return msgs.map(m => m.toAPI(auth.token));
       }
     });
   }
@@ -1099,7 +1102,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth }) => {
-        let profile = await ProfileRepository.findOne(new ObjectID(params.id));
+        let profile = await ProfileRepository.findOne(params.id);
         return profile.toAPI(auth.tokenOrNull);
       }
     });
@@ -1123,7 +1126,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth }) => {
-        let profiles = await ProfileRepository.findIn(params.ids.map(id => new ObjectID(id)));
+        let profiles = await ProfileRepository.findIn(params.ids);
         return profiles.map(p => p.toAPI(auth.tokenOrNull));
       }
     });
@@ -1172,7 +1175,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth, ip, now }) => {
-        let profile = await ProfileRepository.findOne(new ObjectID(params.id));
+        let profile = await ProfileRepository.findOne(params.id);
         profile.changeData(auth.token, params.name, params.body, params.sn, now);
         await ProfileRepository.update(profile);
         appLog("profile/update", ip, "profiles", profile.id);
@@ -1226,7 +1229,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth }) => {
-        let client = await ClientRepository.findOne(new ObjectID(params.client));
+        let client = await ClientRepository.findOne(params.client);
         await TokenRepository.delClientToken(auth.tokenMaster, client);
         return null;
       }
@@ -1262,7 +1265,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth, now }) => {
-        let client = await ClientRepository.findOne(new ObjectID(params.client));
+        let client = await ClientRepository.findOne(params.client);
         let token = TokenGeneral.create(ObjectIDGenerator, auth.tokenMaster, client, now, RandomGenerator);
         await TokenRepository.insert(token);
 
@@ -1404,7 +1407,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, now }) => {
-        let token = await TokenRepository.findOne(new ObjectID(params.id));
+        let token = await TokenRepository.findOne(params.id);
         if (token.type !== 'general') {
           throw new AtPrerequisiteError('通常トークン以外では出来ません');
         }
@@ -1562,7 +1565,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth, ip, now }) => {
-        let client = await ClientRepository.findOne(new ObjectID(params.id));
+        let client = await ClientRepository.findOne(params.id);
         client.changeData(auth.tokenMaster, params.name, params.url, now);
         await ClientRepository.update(client);
         appLog("client/update", ip, "clients", client.id);
@@ -1586,7 +1589,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth }) => {
-        let client = await ClientRepository.findOne(new ObjectID(params.id));
+        let client = await ClientRepository.findOne(params.id);
         return client.toAPI(auth.TokenMasterOrNull);
       }
     });
@@ -1610,7 +1613,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params, auth }) => {
-        let clients = await ClientRepository.findIn(params.ids.map(id => new ObjectID(id)));
+        let clients = await ClientRepository.findIn(params.ids);
         return clients.map(c => c.toAPI(auth.TokenMasterOrNull));
       }
     });
@@ -1660,10 +1663,10 @@ import { createDB } from "./create-db";
       }
     },
     call: async ({ auth, params }) => {
-      let topic = await TopicRepository.findOne(new ObjectID(params.id));
+      let topic = await TopicRepository.findOne(params.id);
       return ResRepository
         .insertEvent
-        .filter(x => x.res.topic.equals(topic.id))
+        .filter(x => x.res.topic === topic.id)
         .map(x => ({ ...x, res: x.res.toAPI(auth.tokenOrNull) }));
     }
   });

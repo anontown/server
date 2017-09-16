@@ -1,54 +1,88 @@
 import { History, IHistoryDB } from './history';
-import { DB } from '../../db';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error';
-import { ObjectID } from 'mongodb';
 import { Topic } from '../topic';
+import { ESClient } from "../../db";
+import { Config } from "../../config";
 
 export class HistoryRepository {
   static async insert(history: History): Promise<null> {
-    let db = await DB;
-    await db.collection("histories").insert(history.toDB());
+    let hDB = history.toDB();
+    await ESClient.create({
+      index: "histories",
+      type: "normal",
+      id: hDB.id,
+      body: hDB.body
+    });
     return null;
   }
 
   static async update(history: History): Promise<null> {
-    let db = await DB;
-    await db.collection("histories").update({ _id: history.id }, history.toDB());
+    let hDB = history.toDB();
+    await ESClient.update({
+      index: "histories",
+      type: "normal",
+      id: hDB.id,
+      body: hDB.body
+    });
     return null;
   }
 
-  static async findOne(id: ObjectID): Promise<History> {
-    let db = await DB;
-    let history: IHistoryDB | null = await db.collection("histories").findOne({ _id: id });
-    if (history === null) {
+  static async findOne(id: string): Promise<History> {
+    let histories = await ESClient.search<IHistoryDB["body"]>({
+      index: 'histories',
+      size: 1,
+      body: {
+        query: {
+          term: {
+            _id: id
+          }
+        }
+      }
+    });
+
+    if (histories.hits.total === 0) {
       throw new AtNotFoundError("編集履歴が存在しません");
     }
 
-    return History.fromDB(history);
+    return History.fromDB(histories.hits.hits.map(h => ({ id: h._id, body: h._source }))[0]);
   }
 
-  static async findIn(ids: ObjectID[]): Promise<History[]> {
-    let db = await DB;
-    let histories: IHistoryDB[] = await db.collection("histories")
-      .find({ _id: { $in: ids } })
-      .sort({ date: -1 })
-      .toArray();
+  static async findIn(ids: string[]): Promise<History[]> {
+    let histories = await ESClient.search<IHistoryDB["body"]>({
+      index: 'histories',
+      size: ids.length,
+      body: {
+        query: {
+          terms: {
+            _id: ids
+          }
+        },
+        sort: { ageUpdate: { order: "desc" } }
+      },
+    });
 
-    if (histories.length !== ids.length) {
+    if (histories.hits.total !== ids.length) {
       throw new AtNotFoundPartError("編集履歴が存在しません",
-        histories.map(x => x._id.toString()));
+        histories.hits.hits.map(t => t._id));
     }
 
-    return histories.map(h => History.fromDB(h));
+    return histories.hits.hits.map(h => History.fromDB({ id: h._id, body: h._source }));
   }
 
   static async findAll(topic: Topic): Promise<History[]> {
-    let db = await DB;
-    let histories: IHistoryDB[] = await db.collection("histories")
-      .find({ topic: topic.id })
-      .sort({ date: -1 })
-      .toArray();
+    let histories = await ESClient.search<IHistoryDB["body"]>({
+      index: 'histories',
+      size: Config.api.limit,
+      body: {
+        query: {
+          terms: {
+            topic: topic.id
+          }
+        },
+        sort: { ageUpdate: { order: "desc" } }
+      },
+    });
 
-    return histories.map(h => History.fromDB(h));
+    return histories.hits.hits.map(h => History.fromDB({ id: h._id, body: h._source }));
   }
 }

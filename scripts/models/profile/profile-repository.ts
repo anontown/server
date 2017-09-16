@@ -1,14 +1,14 @@
 import { ObjectID, WriteError } from 'mongodb';
 import { DB } from '../../db';
 import { IAuthToken } from '../../auth';
-import { AtNotFoundError, AtNotFoundPartError,AtConflictError } from '../../at-error'
+import { AtNotFoundError, AtNotFoundPartError, AtConflictError } from '../../at-error'
 import { Profile, IProfileDB } from './profile';
 
 export class ProfileRepository {
-  static async findOne(id: ObjectID): Promise<Profile> {
+  static async findOne(id: string): Promise<Profile> {
     let db = await DB;
     let profile: IProfileDB | null = await db.collection("profiles")
-      .findOne({ _id: id });
+      .findOne({ _id: new ObjectID(id) });
 
     if (profile === null) {
       throw new AtNotFoundError("プロフィールが存在しません");
@@ -17,10 +17,10 @@ export class ProfileRepository {
     return Profile.fromDB(profile);
   }
 
-  static async findIn(ids: ObjectID[]): Promise<Profile[]> {
+  static async findIn(ids: string[]): Promise<Profile[]> {
     let db = await DB;
     let profiles: IProfileDB[] = await db.collection("profiles")
-      .find({ _id: { $in: ids } })
+      .find({ _id: { $in: ids.map(id => new ObjectID(id)) } })
       .sort({ date: -1 })
       .toArray();
 
@@ -35,7 +35,7 @@ export class ProfileRepository {
   static async findAll(authToken: IAuthToken): Promise<Profile[]> {
     let db = await DB;
     let profiles: IProfileDB[] = await db.collection("profiles")
-      .find({ user: authToken.user })
+      .find({ user: new ObjectID(authToken.user) })
       .sort({ date: -1 })
       .toArray();
     return profiles.map(p => Profile.fromDB(p));
@@ -55,7 +55,7 @@ export class ProfileRepository {
 
   static async update(profile: Profile): Promise<null> {
     let db = await DB;
-    await db.collection("profiles").update({ _id: profile.id }, profile.toDB()).catch((e: WriteError) => {
+    await db.collection("profiles").update({ _id: new ObjectID(profile.id) }, profile.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
         throw new AtConflictError("スクリーンネームが使われています");
       } else {

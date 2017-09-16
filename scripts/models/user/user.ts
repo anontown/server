@@ -33,7 +33,7 @@ export interface IResWait {
 }
 
 export class User {
-  private constructor(private _id: ObjectID,
+  private constructor(private _id: string,
     private _sn: string,
     private _pass: string,
     private _lv: number,
@@ -83,7 +83,7 @@ export class User {
 
   toDB(): IUserDB {
     return {
-      _id: this._id,
+      _id: new ObjectID(this._id),
       sn: this._sn,
       pass: this._pass,
       lv: this._lv,
@@ -97,16 +97,16 @@ export class User {
 
   toAPI(): IUserAPI {
     return {
-      id: this._id.toString(),
+      id: this._id,
       sn: this._sn
     }
   }
 
   static fromDB(u: IUserDB): User {
-    return new User(u._id, u.sn, u.pass, u.lv, u.resWait, u.lastTopic, u.date, u.point, u.lastOneTopic);
+    return new User(u._id.toString(), u.sn, u.pass, u.lv, u.resWait, u.lastTopic, u.date, u.point, u.lastOneTopic);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, sn: string, pass: string, now: Date): User {
+  static create(objidGenerator: IGenerator<string>, sn: string, pass: string, now: Date): User {
     paramsErrorMaker([
       {
         field: "pass",

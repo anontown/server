@@ -1,19 +1,17 @@
-import { ObjectID } from 'mongodb';
-
 export interface IAuthTokenBase<T extends 'master' | 'general'> {
-    id: ObjectID,
+    id: string,
     key: string,
-    user: ObjectID,
+    user: string,
     type: T
 }
 
 export type IAuthTokenMaster = IAuthTokenBase<'master'>;
-export interface IAuthTokenGeneral extends IAuthTokenBase<'general'>{
-    client:ObjectID
+export interface IAuthTokenGeneral extends IAuthTokenBase<'general'> {
+    client: string
 }
 export type IAuthToken = IAuthTokenMaster | IAuthTokenGeneral;
 
 export interface IAuthUser {
-    id: ObjectID,
+    id: string,
     pass: string;
 }

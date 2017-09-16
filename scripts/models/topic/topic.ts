@@ -1,4 +1,3 @@
-import { ObjectID } from 'mongodb';
 import { User } from '../user';
 import { Res, ResHistory, ResTopic, ResFork } from '../res';
 import { History } from '../history';
@@ -10,30 +9,30 @@ import { IGenerator } from '../../generator';
 
 export type ITopicDB = ITopicNormalDB | ITopicOneDB | ITopicForkDB;
 
-export interface ITopicBaseDB<T extends TopicType> {
-  _id: ObjectID,
-  title: string,
-  update: Date,
-  date: Date,
+export interface ITopicBaseDB<T extends TopicType, Body> {
+  id: string,
   type: T,
-  ageUpdate: Date,
-  active: boolean,
+  body: {
+    title: string,
+    update: string,
+    date: string,
+    ageUpdate: string,
+    active: boolean,
+  } & Body
 }
 
-export interface ITopicSearchBaseDB<T extends TopicSearchType> extends ITopicBaseDB<T> {
+export type ITopicSearchBaseDB<T extends TopicSearchType> = ITopicBaseDB<T, {
   tags: string[],
   body: string,
-}
+}>;
 
-export interface ITopicNormalDB extends ITopicSearchBaseDB<'normal'> {
-}
+export type ITopicNormalDB = ITopicSearchBaseDB<'normal'>;
 
-export interface ITopicOneDB extends ITopicSearchBaseDB<'one'> {
-}
+export type ITopicOneDB = ITopicSearchBaseDB<'one'>;
 
-export interface ITopicForkDB extends ITopicBaseDB<'fork'> {
-  parent: ObjectID;
-}
+export type ITopicForkDB = ITopicBaseDB<'fork', {
+  parent: string;
+}>;
 
 export type ITopicAPI = ITopicOneAPI | ITopicNormalAPI | ITopicForkAPI;
 
@@ -69,7 +68,7 @@ export type TopicType = TopicSearchType | "fork";
 export type Topic = TopicNormal | TopicOne | TopicFork;
 
 export abstract class TopicBase<T extends TopicType> {
-  constructor(private _id: ObjectID,
+  constructor(private _id: string,
     protected _title: string,
     private _update: Date,
     private _date: Date,
@@ -111,21 +110,23 @@ export abstract class TopicBase<T extends TopicType> {
     return this._active;
   }
 
-  toDB(): ITopicBaseDB<T> {
+  toBaseDB<Body extends object>(body: Body): ITopicBaseDB<T, Body> {
     return {
-      _id: this._id,
-      title: this._title,
-      update: this._update,
-      date: this._date,
+      id: this._id,
       type: this._type,
-      ageUpdate: this._ageUpdate,
-      active: this._active
+      body: Object.assign({}, body, {
+        title: this._title,
+        update: this._update.toISOString(),
+        date: this._date.toISOString(),
+        ageUpdate: this._ageUpdate.toISOString(),
+        active: this._active
+      })
     };
   }
 
   toAPI(): ITopicBaseAPI<T> {
     return {
-      id: this._id.toString(),
+      id: this._id,
       title: this._title,
       update: this._update.toISOString(),
       date: this._date.toISOString(),
@@ -207,7 +208,7 @@ export abstract class TopicBase<T extends TopicType> {
       date.getFullYear() + " " + date.getMonth() + " " + date.getDate() + " " +
 
       //トピ依存
-      this._id.toString() +
+      this._id +
 
       //ソルト依存
       Config.salt.hash);
@@ -215,7 +216,7 @@ export abstract class TopicBase<T extends TopicType> {
 }
 
 export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBase<T> {
-  constructor(id: ObjectID,
+  constructor(id: string,
     title: string,
     protected _tags: string[],
     protected _body: string,
@@ -245,11 +246,10 @@ export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBa
   }
 
   toDB(): ITopicSearchBaseDB<T> {
-    return {
-      ...super.toDB(),
+    return super.toBaseDB({
       tags: this._tags,
       body: this._body,
-    };
+    });
   }
 
   toAPI(): ITopicSearchBaseAPI<T> {
@@ -262,7 +262,7 @@ export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBa
 }
 
 export class TopicNormal extends TopicSearchBase<'normal'> {
-  constructor(id: ObjectID,
+  constructor(id: string,
     title: string,
     tags: string[],
     body: string,
@@ -284,18 +284,18 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
   }
 
   static fromDB(db: ITopicNormalDB, resCount: number): TopicNormal {
-    return new TopicNormal(db._id,
-      db.title,
-      db.tags,
-      db.body,
-      db.update,
-      db.date,
+    return new TopicNormal(db.id,
+      db.body.title,
+      db.body.tags,
+      db.body.body,
+      new Date(db.body.update),
+      new Date(db.body.date),
       resCount,
-      db.ageUpdate,
-      db.active);
+      new Date(db.body.ageUpdate),
+      db.body.active);
   }
 
-  changeData(objidGenerator: IGenerator<ObjectID>, user: User, authToken: IAuthToken, title: string, tags: string[], body: string, now: Date): { res: ResHistory, history: History } {
+  changeData(objidGenerator: IGenerator<string>, user: User, authToken: IAuthToken, title: string, tags: string[], body: string, now: Date): { res: ResHistory, history: History } {
     user.usePoint(10);
     TopicBase.checkData({ title, tags, body });
 
@@ -314,7 +314,7 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
     return { res, history };
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, title: string, tags: string[], body: string, user: User, authToken: IAuthToken, now: Date): { topic: TopicNormal, res: Res, history: History } {
+  static create(objidGenerator: IGenerator<string>, title: string, tags: string[], body: string, user: User, authToken: IAuthToken, now: Date): { topic: TopicNormal, res: Res, history: History } {
     this.checkData({ title, tags, body });
     let topic = new TopicNormal(objidGenerator.get(),
       title,
@@ -333,7 +333,7 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
 }
 
 export class TopicOne extends TopicSearchBase<'one'> {
-  constructor(id: ObjectID,
+  constructor(id: string,
     title: string,
     tags: string[],
     body: string,
@@ -355,18 +355,18 @@ export class TopicOne extends TopicSearchBase<'one'> {
   }
 
   static fromDB(db: ITopicOneDB, resCount: number): TopicOne {
-    return new TopicOne(db._id,
-      db.title,
-      db.tags,
-      db.body,
-      db.update,
-      db.date,
+    return new TopicOne(db.id,
+      db.body.title,
+      db.body.tags,
+      db.body.body,
+      new Date(db.body.update),
+      new Date(db.body.date),
       resCount,
-      db.ageUpdate,
-      db.active);
+      new Date(db.body.ageUpdate),
+      db.body.active);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, title: string, tags: string[], body: string, user: User, authToken: IAuthToken, now: Date): { topic: TopicOne, res: Res } {
+  static create(objidGenerator: IGenerator<string>, title: string, tags: string[], body: string, user: User, authToken: IAuthToken, now: Date): { topic: TopicOne, res: Res } {
     this.checkData({ title, tags, body });
     let topic = new TopicOne(objidGenerator.get(),
       title,
@@ -390,14 +390,14 @@ export class TopicOne extends TopicSearchBase<'one'> {
 }
 
 export class TopicFork extends TopicBase<'fork'> {
-  constructor(id: ObjectID,
+  constructor(id: string,
     title: string,
     update: Date,
     date: Date,
     resCount: number,
     ageUpdate: Date,
     active: boolean,
-    private _parent: ObjectID) {
+    private _parent: string) {
     super(id,
       title,
       update,
@@ -413,31 +413,28 @@ export class TopicFork extends TopicBase<'fork'> {
   }
 
   toDB(): ITopicForkDB {
-    return {
-      ...super.toDB(),
-      parent: this._parent
-    };
+    return super.toBaseDB({ parent: this._parent });
   }
 
   toAPI(): ITopicForkAPI {
     return {
       ...super.toAPI(),
-      parent: this._parent.toString()
+      parent: this._parent
     };
   }
 
   static fromDB(db: ITopicForkDB, resCount: number): TopicFork {
-    return new TopicFork(db._id,
-      db.title,
-      db.update,
-      db.date,
+    return new TopicFork(db.id,
+      db.body.title,
+      new Date(db.body.update),
+      new Date(db.body.date),
       resCount,
-      db.ageUpdate,
-      db.active,
-      db.parent);
+      new Date(db.body.ageUpdate),
+      db.body.active,
+      db.body.parent);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, title: string, parent: TopicNormal, user: User, authToken: IAuthToken, now: Date): { topic: TopicFork, res: Res, resParent: Res } {
+  static create(objidGenerator: IGenerator<string>, title: string, parent: TopicNormal, user: User, authToken: IAuthToken, now: Date): { topic: TopicFork, res: Res, resParent: Res } {
     this.checkData({ title });
     let topic = new TopicFork(objidGenerator.get(),
       title,

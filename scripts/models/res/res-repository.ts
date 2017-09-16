@@ -1,156 +1,227 @@
-import { ObjectID } from 'mongodb';
 import { Topic, TopicRepository } from '../topic';
-import { DB } from '../../db';
+import { ESClient } from '../../db';
 import { IAuthToken } from '../../auth';
 import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
-import { Res, IResDB, fromDBToRes } from './res';
+import { Res, IResDB, fromDBToRes, IResNormalDB } from './res';
 import { Subject } from "rxjs";
+import { Config } from "../../config";
+import { SearchResponse } from "elasticsearch";
 
 export class ResRepository {
   static insertEvent = new Subject<{ res: Res, count: number }>();
 
-  static async findOne(id: ObjectID): Promise<Res> {
-    let db = await DB;
-    let res: IResDB | null = await db.collection("reses").findOne({ _id: id });
+  static async findOne(id: string): Promise<Res> {
+    let reses = await ESClient.search<IResDB["body"]>({
+      index: 'reses',
+      size: 1,
+      body: {
+        query: {
+          term: {
+            _id: id
+          }
+        }
+      }
+    });
 
-    if (res === null) {
+    if (reses.hits.total === 0) {
       throw new AtNotFoundError("レスが存在しません");
     }
 
-    return (await this.aggregate([res]))[0];
+    return (await this.aggregate(reses))[0];
   }
 
-  static async findIn(ids: ObjectID[]): Promise<Res[]> {
-    let db = await DB;
-    let reses: IResDB[] = await db.collection("reses").find({ _id: { $in: ids } })
-      .sort({ date: -1 })
-      .toArray();
+  static async findIn(ids: string[]): Promise<Res[]> {
+    let reses = await ESClient.search<IResDB["body"]>({
+      index: 'reses',
+      size: ids.length,
+      body: {
+        query: {
+          terms: {
+            _id: ids
+          }
+        },
+        sort: { date: { order: "desc" } }
+      },
+    });
 
-    if (reses.length !== ids.length) {
+    if (reses.hits.total !== ids.length) {
       throw new AtNotFoundPartError("レスが存在しません",
-        reses.map(x => x._id.toString()));
+        reses.hits.hits.map(r => r._id));
     }
 
     return this.aggregate(reses);
   }
 
   static async find(topic: Topic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
-    let db = await DB;
-    let reses: IResDB[] = await db.collection("reses")
-      .find({
-        topic: topic.id,
-        date: { [type === "after" ? (equal ? "$gte" : "$gt") : (equal ? "$lte" : "$lt")]: date }
-      })
-      .sort({ date: type === "after" ? 1 : -1 })
-      .skip(0)
-      .limit(limit)
-      .toArray();
-    if (type === "after") {
-      reses.reverse();
-    }
+    let reses = await ESClient.search<IResDB["body"]>({
+      index: "reses",
+      size: limit,
+      body: {
+        query: {
+          bool: {
+            filter: [
+              {
+                range: {
+                  [type === "after" ? (equal ? "gte" : "gt") : (equal ? "lte" : "lt")]: date.toISOString()
+                }
+              },
+              {
+                term: {
+                  topic: topic.id
+                }
+              }
+            ]
+          }
+        },
+        sort: { date: { order: type === "after" ? "asc" : "desc" } }
+      }
+    });
 
-    return this.aggregate(reses);
+    let result = await this.aggregate(reses);
+    if (type === "after") {
+      result.reverse();
+    }
+    return result;
   }
 
   static async findNew(topic: Topic, limit: number): Promise<Res[]> {
-    let db = await DB;
-    let reses: IResDB[] = await db.collection("reses")
-      .find({
-        topic: topic.id,
-      })
-      .sort({ date: -1 })
-      .skip(0)
-      .limit(limit)
-      .toArray();
+    let reses = await ESClient.search<IResDB["body"]>({
+      index: "reses",
+      size: limit,
+      body: {
+        query: {
+          term: {
+            topic: topic.id
+          }
+        },
+        sort: { date: { order: "desc" } }
+      },
+    });
 
-
-    return this.aggregate(reses);
+    return await this.aggregate(reses);
   }
 
   static async findNotice(authToken: IAuthToken, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
-    let db = await DB;
-    let reses: IResDB[] = await db.collection("reses")
-      .find({
-        "reply.user": authToken.user,
-        date: { [type === "after" ? (equal ? "$gte" : "$gt") : (equal ? "$lte" : "$lt")]: date }
-      })
-      .sort({ date: type === "after" ? 1 : -1 })
-      .skip(0)
-      .limit(limit)
-      .sort({ date: -1 })
-      .toArray();
+    let reses = await ESClient.search<IResDB["body"]>({
+      index: "reses",
+      size: limit,
+      body: {
+        query: {
+          bool: {
+            filter: [
+              {
+                range: {
+                  [type === "after" ? (equal ? "gte" : "gt") : (equal ? "lte" : "lt")]: date.toISOString()
+                }
+              },
+              {
+                term: {
+                  "reply.user": authToken.user
+                }
+              }
+            ]
+          }
+        },
+        sort: { date: { order: type === "after" ? "asc" : "desc" } }
+      }
+    });
 
-
-    return this.aggregate(reses);
+    let result = await this.aggregate(reses);
+    if (type === "after") {
+      result.reverse();
+    }
+    return result;
   }
 
   static async findNoticeNew(authToken: IAuthToken, limit: number): Promise<Res[]> {
-    let db = await DB;
-    let reses: IResDB[] = await db.collection("reses")
-      .find({
-        "reply.user": authToken.user
-      })
-      .sort({ date: -1 })
-      .skip(0)
-      .limit(limit)
-      .toArray();
+    let reses = await ESClient.search<IResDB["body"]>({
+      index: "reses",
+      size: limit,
+      body: {
+        query: {
+          term: {
+            "reply.user": authToken.user
+          }
+        },
+        sort: { date: { order: "desc" } }
+      },
+    });
 
-    return this.aggregate(reses);
+    return await this.aggregate(reses);
   }
 
   static async findHash(topic: Topic, hash: string): Promise<Res[]> {
-    let db = await DB;
-    let reses: IResDB[] = await db.collection("reses")
-      .find({
-        topic: topic.id,
-        hash: hash
-      })
-      .sort({ date: -1 })
-      .toArray();
+    let reses = await ESClient.search<IResNormalDB["body"]>({
+      index: "reses",
+      type: "normal",
+      size: Config.api.limit,
+      body: {
+        query: {
+          term: {
+            topic: topic.id,
+            hash: hash
+          }
+        },
+        sort: { date: { order: "desc" } }
+      },
+    });
 
-    return this.aggregate(reses);
+    return await this.aggregate(reses);
   }
 
   static async findReply(topic: Topic, res: Res): Promise<Res[]> {
-    let db = await DB;
-    let reses: IResDB[] = await db.collection("reses")
-      .find({
-        topic: topic.id,
-        "reply.res": res.id
-      })
-      .sort({ date: -1 })
-      .toArray();
-
-    return this.aggregate(reses);
-  }
-
-  private static async aggregate(reses: IResDB[]): Promise<Res[]> {
-    let db = await DB;
-    let countArr: { _id: ObjectID, replyCount: number }[] = await db.collection("reses")
-      .aggregate([
-        {
-          $group: {
-            _id: "$reply.res", replyCount: { $sum: 1 }
+    let reses = await ESClient.search<IResNormalDB["body"]>({
+      index: "reses",
+      type: "normal",
+      size: Config.api.limit,
+      body: {
+        query: {
+          term: {
+            topic: topic.id,
+            "reply.res": res.id
           }
         },
-        {
-          $match: {
-            _id: { $in: reses.map(x => x._id) }
+        sort: { date: { order: "desc" } }
+      },
+    });
+
+    return await this.aggregate(reses);
+  }
+
+  private static async aggregate(reses: SearchResponse<IResDB["body"]>): Promise<Res[]> {
+    let data = await ESClient.search({
+      index: "reses",
+      size: 0,
+      body: {
+        query: {
+          terms: {
+            id: reses.hits.hits.map(r => r._id)
+          }
+        },
+        aggs: {
+          reply_count: {
+            terms: {
+              field: "reply.res"
+            }
           }
         }
-      ])
-      .toArray();
+      }
+    });
 
-    let count = new Map<string, number>();
-    countArr.forEach(r => count.set(r._id.toString(), r.replyCount));
+    let countArr: { key: string, doc_count: number }[] = data.aggregations.reply_count.buckets;
+    let count = new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
 
-    return reses.map(r => fromDBToRes(r,
-      count.has(r._id.toString()) ? count.get(r._id.toString()) as number : 0));
+    return reses.hits.hits.map(r => fromDBToRes({ id: r._id, type: r._type, body: r._source } as IResDB, count.get(r._id) || 0));
   }
 
   static async insert(res: Res): Promise<null> {
-    let db = await DB;
-    await db.collection("reses").insert(res.toDB());
+    let rDB = res.toDB();
+    await ESClient.create({
+      index: "reses",
+      type: rDB.type,
+      id: rDB.id,
+      body: rDB.body
+    });
 
     let topic = await TopicRepository.findOne(res.topic);
     ResRepository.insertEvent.next({ res, count: topic.resCount });
@@ -159,8 +230,13 @@ export class ResRepository {
   }
 
   static async update(res: Res): Promise<null> {
-    let db = await DB;
-    await db.collection("reses").update({ _id: res.id }, res.toDB());
+    let rDB = res.toDB();
+    await ESClient.update({
+      index: "reses",
+      type: rDB.type,
+      id: rDB.id,
+      body: rDB.body
+    });
     return null;
   }
 }

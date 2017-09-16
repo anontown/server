@@ -4,9 +4,9 @@ export interface IGenerator<T> {
     get(): T;
 }
 
-export const ObjectIDGenerator: IGenerator<ObjectID> = {
+export const ObjectIDGenerator: IGenerator<string> = {
     get: function () {
-        return new ObjectID();
+        return new ObjectID().toString();
     }
 }
 

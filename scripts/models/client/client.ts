@@ -23,10 +23,10 @@ export interface IClientAPI {
 }
 
 export class Client {
-  private constructor(private _id: ObjectID,
+  private constructor(private _id: string,
     private _name: string,
     private _url: string,
-    private _user: ObjectID,
+    private _user: string,
     private _date: Date,
     private _update: Date) {
 
@@ -58,10 +58,10 @@ export class Client {
 
   toDB(): IClientDB {
     return {
-      _id: this._id,
+      _id: new ObjectID(this._id),
       name: this._name,
       url: this._url,
-      user: this._user,
+      user: new ObjectID(this._user),
       date: this._date,
       update: this._update
     }
@@ -69,20 +69,20 @@ export class Client {
 
   toAPI(authToken: IAuthTokenMaster | null): IClientAPI {
     return {
-      id: this._id.toString(),
+      id: this._id,
       name: this._name,
       url: this._url,
-      user: authToken !== null && authToken.user.equals(this._user) ? this._user.toString() : null,
+      user: authToken !== null && authToken.user === this._user ? this._user : null,
       date: this._date.toISOString(),
       update: this._date.toISOString()
     };
   }
 
   static fromDB(c: IClientDB): Client {
-    return new Client(c._id, c.name, c.url, c.user, c.date, c.update);
+    return new Client(c._id.toString(), c.name, c.url, c.user.toString(), c.date, c.update);
   }
 
-  static create(objidGenerator: IGenerator<ObjectID>, authToken: IAuthTokenMaster, name: string, url: string, now: Date): Client {
+  static create(objidGenerator: IGenerator<string>, authToken: IAuthTokenMaster, name: string, url: string, now: Date): Client {
     paramsErrorMaker([
       {
         field: "name",
@@ -107,7 +107,7 @@ export class Client {
   }
 
   changeData(authToken: IAuthTokenMaster, name: string, url: string, now: Date) {
-    if (!authToken.user.equals(this._user)) {
+    if (authToken.user !== this._user) {
       throw new AtRightError("人のクライアント変更は出来ません");
     }
     paramsErrorMaker([

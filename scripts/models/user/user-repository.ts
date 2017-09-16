@@ -6,9 +6,9 @@ import { CronJob } from 'cron';
 
 
 export class UserRepository {
-  static async findOne(id: ObjectID): Promise<User> {
+  static async findOne(id: string): Promise<User> {
     let db = await DB;
-    let user: IUserDB | null = await db.collection("users").findOne({ _id: id });
+    let user: IUserDB | null = await db.collection("users").findOne({ _id: new ObjectID(id) });
 
     if (user === null) {
       throw new AtNotFoundError("ユーザーが存在しません");
@@ -51,7 +51,7 @@ export class UserRepository {
 
   static async update(user: User): Promise<null> {
     let db = await DB;
-    await db.collection("users").update({ _id: user.id }, user.toDB()).catch((e: WriteError) => {
+    await db.collection("users").update({ _id: new ObjectID(user.id) }, user.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
         throw new AtConflictError("スクリーンネームが使われています");
       } else {

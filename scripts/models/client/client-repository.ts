@@ -5,10 +5,10 @@ import { IClientDB, Client } from './client';
 import { IAuthTokenMaster } from '../../auth'
 
 export class ClientRepository {
-  static async findOne(id: ObjectID): Promise<Client> {
+  static async findOne(id: string): Promise<Client> {
     let db = await DB;
     let client: IClientDB | null = await db.collection("clients")
-      .findOne({ _id: id });
+      .findOne({ _id: new ObjectID(id) });
 
     if (client === null) {
       throw new AtNotFoundError("クライアントが存在しません");
@@ -16,10 +16,10 @@ export class ClientRepository {
     return Client.fromDB(client);
   }
 
-  static async findIn(ids: ObjectID[]): Promise<Client[]> {
+  static async findIn(ids: string[]): Promise<Client[]> {
     let db = await DB;
     let clients: IClientDB[] = await db.collection("clients")
-      .find({ _id: { $in: ids } })
+      .find({ _id: { $in: ids.map(id => new ObjectID(id)) } })
       .sort({ date: -1 })
       .toArray();
 
@@ -34,7 +34,7 @@ export class ClientRepository {
   static async findAll(authToken: IAuthTokenMaster): Promise<Client[]> {
     let db = await DB;
     let clients: IClientDB[] = await db.collection("clients")
-      .find({ user: authToken.user })
+      .find({ user: new ObjectID(authToken.user) })
       .sort({ date: -1 })
       .toArray();
     return clients.map(c => Client.fromDB(c));
@@ -51,7 +51,7 @@ export class ClientRepository {
 
   static async update(client: Client): Promise<null> {
     let db = await DB;
-    await db.collection("clients").update({ _id: client.id }, client.toDB());
+    await db.collection("clients").update({ _id: new ObjectID(client.id) }, client.toDB());
     return null;
   }
 }
