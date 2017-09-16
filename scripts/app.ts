@@ -33,7 +33,6 @@ import {
   ITokenReqAPI,
   IHistoryAPI,
 } from './models';
-import { ObjectID } from 'mongodb';
 import { Logger } from './logger';
 import { ObjectIDGenerator, RandomGenerator } from './generator';
 import { AtPrerequisiteError } from './at-error';
@@ -1481,7 +1480,7 @@ import { createDB } from "./create-db";
         }
       },
       call: async ({ params }) => {
-        return (await UserRepository.findSN(new ObjectID(params.id)));
+        return (await UserRepository.findSN(params.id));
       }
     });
     api.addAPI<{ pass: string, sn: string }, IUserAPI>({

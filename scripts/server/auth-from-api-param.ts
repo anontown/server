@@ -10,8 +10,6 @@ import {
   UserRepository
 } from '../models';
 
-import { ObjectID } from 'mongodb';
-
 import {
   AtAuthError,
   AtCaptchaError
@@ -28,7 +26,7 @@ export async function token(apiParamToken: { id: string, key: string } | null, i
     }
   }
 
-  let token = await TokenRepository.findOne(new ObjectID(apiParamToken.id));
+  let token = await TokenRepository.findOne(apiParamToken.id);
   let authToken = token.auth(apiParamToken.key);
 
   if (authToken.type !== 'master' && isAuthToken === 'master') {
@@ -47,7 +45,7 @@ export async function user(apiParamUser: { id: string, pass: string } | null, is
     }
   }
 
-  let user = await UserRepository.findOne(new ObjectID(apiParamUser.id));
+  let user = await UserRepository.findOne(apiParamUser.id);
   let authUser = user.auth(apiParamUser.pass);
 
   return authUser;

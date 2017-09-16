@@ -27,9 +27,9 @@ export class UserRepository {
 
     return user._id;
   }
-  static async findSN(id: ObjectID): Promise<string> {
+  static async findSN(id: string): Promise<string> {
     let db = await DB;
-    let user: IUserDB | null = await db.collection("users").findOne({ _id: id });
+    let user: IUserDB | null = await db.collection("users").findOne({ _id: new ObjectID(id) });
 
     if (user === null) {
       throw new AtNotFoundError("ユーザーが存在しません");
