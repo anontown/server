@@ -4,22 +4,25 @@ import {
   IMsgDB
 } from '../../../scripts';
 import * as assert from 'power-assert';
-import { ObjectID } from 'mongodb';
 
 describe("Msg", () => {
   {
     let msgs = [
       Msg.fromDB({
-        _id: new ObjectID(),
-        receiver: new ObjectID(),
-        body: "あいうえお",
-        date: new Date()
+        id: ObjectIDGenerator.get(),
+        body: {
+          receiver: ObjectIDGenerator.get(),
+          body: "あいうえお",
+          date: new Date().toISOString()
+        }
       }),
       Msg.fromDB({
-        _id: new ObjectID(),
-        receiver: null,
-        body: "あいうえお",
-        date: new Date()
+        id: ObjectIDGenerator.get(),
+        body: {
+          receiver: null,
+          body: "あいうえお",
+          date: new Date().toISOString()
+        }
       })
     ];
 
@@ -28,11 +31,11 @@ describe("Msg", () => {
         it(`receiverが${msg.receiver ? 'ObjectID' : 'null'}の時、正常に変換できるか`, () => {
           let db = msg.toDB();
 
-          assert(db._id.equals(msg.id));
-          assert((db.receiver === null && msg.receiver === null) ||
-            (db.receiver !== null && msg.receiver !== null && db.receiver.equals(msg.receiver)));
-          assert(db.body === msg.body);
-          assert(db.date.valueOf() === msg.date.valueOf());
+          assert(db.id === msg.id);
+          assert((db.body.receiver === null && msg.receiver === null) ||
+            (db.body.receiver !== null && msg.receiver !== null && db.body.receiver === msg.receiver));
+          assert(db.body.body === msg.body);
+          assert(new Date(db.body.date).valueOf() === msg.date.valueOf());
         });
       });
     });
@@ -40,7 +43,12 @@ describe("Msg", () => {
     describe("#toAPI", () => {
       msgs.forEach(msg => {
         it(`receiverが${msg.receiver ? 'ObjectID' : 'null'}の時、正常に変換できるか`, () => {
-          let api = msg.toAPI();
+          let api = msg.toAPI({
+            id: "usid",
+            key: "aaa",
+            user: msg.receiver || "user",
+            type: "master"
+          });
 
           assert(api.id === msg.id.toString());
           assert((api.receiver === null && msg.receiver === null) ||
@@ -55,28 +63,32 @@ describe("Msg", () => {
   describe("fromDB", () => {
     let dbs: IMsgDB[] = [
       {
-        _id: new ObjectID(),
-        receiver: new ObjectID(),
-        body: "a",
-        date: new Date()
+        id: ObjectIDGenerator.get(),
+        body: {
+          receiver: ObjectIDGenerator.get(),
+          body: "a",
+          date: new Date().toISOString()
+        }
       },
       {
-        _id: new ObjectID(),
-        receiver: null,
-        body: "a",
-        date: new Date()
+        id: ObjectIDGenerator.get(),
+        body: {
+          receiver: null,
+          body: "a",
+          date: new Date().toISOString()
+        }
       }
     ];
 
     dbs.forEach(db => {
-      it(`receiverが${db.receiver ? 'ObjectID' : 'null'}の時、正常に作成できるか`, () => {
+      it(`receiverが${db.body.receiver ? 'ObjectID' : 'null'}の時、正常に作成できるか`, () => {
         let msg = Msg.fromDB(db);
 
-        assert(msg.id.equals(db._id));
-        assert((db.receiver === null && msg.receiver === null) ||
-          (db.receiver !== null && msg.receiver !== null && db.receiver.equals(msg.receiver)));
-        assert(msg.body === db.body);
-        assert(msg.date.valueOf() === db.date.valueOf());
+        assert(msg.id === db.id);
+        assert((db.body.receiver === null && msg.receiver === null) ||
+          (db.body.receiver !== null && msg.receiver !== null && db.body.receiver === msg.receiver));
+        assert(msg.body === db.body.body);
+        assert(msg.date.valueOf() === new Date(db.body.date).valueOf());
       });
     });
   });

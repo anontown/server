@@ -2,7 +2,8 @@ import {
     History,
     ObjectIDGenerator,
     TopicNormal,
-    User
+    User,
+    IHistoryDB
 } from '../../../scripts';
 import * as assert from 'power-assert';
 import { ObjectID } from 'mongodb';
@@ -10,42 +11,46 @@ import { ObjectID } from 'mongodb';
 describe("History", () => {
     describe("fromDB", () => {
         it('正常に作れるか', () => {
-            let db = {
-                _id: new ObjectID(),
-                topic: new ObjectID(),
-                title: 'title',
-                tags: ['a', 'b'],
-                body: 'body',
-                date: new Date(),
-                hash: 'hogehogehogeaaa',
-                user: new ObjectID()
+            let db: IHistoryDB = {
+                id: ObjectIDGenerator.get(),
+                body: {
+                    topic: ObjectIDGenerator.get(),
+                    title: 'title',
+                    tags: ['a', 'b'],
+                    body: 'body',
+                    date: new Date().toISOString(),
+                    hash: 'hogehogehogeaaa',
+                    user: ObjectIDGenerator.get()
+                }
             };
 
             let h = History.fromDB(db);
 
-            assert(db._id.equals(h.id));
-            assert(db.topic.equals(h.topic));
-            assert(db.title === h.title);
-            assert.deepEqual(db.tags, h.tags);
-            assert(db.body === h.body);
-            assert(db.date.getTime() === h.date.getTime());
-            assert(db.hash === h.hash);
-            assert(db.user.equals(h.user));
+            assert(db.id === h.id);
+            assert(db.body.topic === h.topic);
+            assert(db.body.title === h.title);
+            assert.deepEqual(db.body.tags, h.tags);
+            assert(db.body.body === h.body);
+            assert(new Date(db.body.date).getTime() === h.date.getTime());
+            assert(db.body.hash === h.hash);
+            assert(db.body.user === h.user);
         });
     });
 
     describe("create", () => {
         it('正常に作れるか', () => {
             let t = TopicNormal.fromDB({
-                _id: new ObjectID(),
-                title: 'title',
-                tags: ['a'],
-                body: 'body',
-                update: new Date(),
-                date: new Date(),
+                id: ObjectIDGenerator.get(),
                 type: 'normal',
-                ageUpdate: new Date(),
-                active: true
+                body: {
+                    title: 'title',
+                    tags: ['a'],
+                    body: 'body',
+                    update: new Date().toISOString(),
+                    date: new Date().toISOString(),
+                    ageUpdate: new Date().toISOString(),
+                    active: true
+                }
             }, 10);
 
             let u = User.fromDB({
@@ -72,39 +77,41 @@ describe("History", () => {
             let hash = 'hash';
             let h = History.create(ObjectIDGenerator, t, date, hash, u);
 
-            assert(h.topic.equals(t.id));
+            assert(h.topic == t.id);
             assert(h.title === t.title);
             assert.deepEqual(h.tags, t.tags);
             assert(h.body === t.body);
             assert(h.date.getTime() === date.getTime());
             assert(h.hash === hash);
-            assert(h.user.equals(u.id));
+            assert(h.user === u.id);
         });
     });
 
     {
         let h = History.fromDB({
-            _id: new ObjectID(),
-            topic: new ObjectID(),
-            title: 'title',
-            tags: ['a', 'b'],
-            body: 'body',
-            date: new Date(),
-            hash: 'hogehogehogeaaa',
-            user: new ObjectID()
+            id: ObjectIDGenerator.get(),
+            body: {
+                topic: ObjectIDGenerator.get(),
+                title: 'title',
+                tags: ['a', 'b'],
+                body: 'body',
+                date: new Date().toISOString(),
+                hash: 'hogehogehogeaaa',
+                user: ObjectIDGenerator.get()
+            }
         });
         describe("#toDB", () => {
             it('正常に変換できるか', () => {
                 let db = h.toDB();
 
-                assert(db._id.equals(h.id));
-                assert(db.topic.equals(h.topic));
-                assert(db.title === h.title);
-                assert.deepEqual(db.tags, h.tags);
-                assert(db.body === h.body);
-                assert(db.date.getTime() === h.date.getTime());
-                assert(db.hash === h.hash);
-                assert(db.user.equals(h.user));
+                assert(db.id === h.id);
+                assert(db.body.topic === h.topic);
+                assert(db.body.title === h.title);
+                assert.deepEqual(db.body.tags, h.tags);
+                assert(db.body.body === h.body);
+                assert(new Date(db.body.date).getTime() === h.date.getTime());
+                assert(db.body.hash === h.hash);
+                assert(db.body.user === h.user);
             });
         });
 

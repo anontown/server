@@ -13,9 +13,9 @@ describe('Client', () => {
       Client.create(
         ObjectIDGenerator,
         {
-          id: new ObjectID(),
+          id: ObjectIDGenerator.get(),
           key: '',
-          user: new ObjectID(),
+          user: ObjectIDGenerator.get(),
           type: 'master'
         },
         'hoge',
@@ -28,9 +28,9 @@ describe('Client', () => {
       Client.create(
         ObjectIDGenerator,
         {
-          id: new ObjectID(),
+          id: ObjectIDGenerator.get(),
           key: '',
-          user: new ObjectID(),
+          user: ObjectIDGenerator.get(),
           type: 'master'
         },
         'hoge',
@@ -44,11 +44,11 @@ describe('Client', () => {
         Client.create(
           ObjectIDGenerator,
           {
-          id: new ObjectID(),
-          key: '',
-          user: new ObjectID(),
-          type: 'master'
-        },
+            id: ObjectIDGenerator.get(),
+            key: '',
+            user: ObjectIDGenerator.get(),
+            type: 'master'
+          },
           'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           'http://hoge',
           new Date()
@@ -61,11 +61,11 @@ describe('Client', () => {
         Client.create(
           ObjectIDGenerator,
           {
-          id: new ObjectID(),
-          key: '',
-          user: new ObjectID(),
-          type: 'master'
-        },
+            id: ObjectIDGenerator.get(),
+            key: '',
+            user: ObjectIDGenerator.get(),
+            type: 'master'
+          },
           '',
           'http://hoge',
           new Date()
@@ -78,11 +78,11 @@ describe('Client', () => {
         Client.create(
           ObjectIDGenerator,
           {
-          id: new ObjectID(),
-          key: '',
-          user: new ObjectID(),
-          type: 'master'
-        },
+            id: ObjectIDGenerator.get(),
+            key: '',
+            user: ObjectIDGenerator.get(),
+            type: 'master'
+          },
           'hoge',
           'hogehttp://hoge.com',
           new Date()
@@ -95,11 +95,11 @@ describe('Client', () => {
         Client.create(
           ObjectIDGenerator,
           {
-          id: new ObjectID(),
-          key: '',
-          user: new ObjectID(),
-          type: 'master'
-        },
+            id: ObjectIDGenerator.get(),
+            key: '',
+            user: ObjectIDGenerator.get(),
+            type: 'master'
+          },
           'http://',
           '',
           new Date()
@@ -112,11 +112,11 @@ describe('Client', () => {
         Client.create(
           ObjectIDGenerator,
           {
-          id: new ObjectID(),
-          key: '',
-          user: new ObjectID(),
-          type: 'master'
-        },
+            id: ObjectIDGenerator.get(),
+            key: '',
+            user: ObjectIDGenerator.get(),
+            type: 'master'
+          },
           'hoge',
           '',
           new Date()
@@ -138,10 +138,10 @@ describe('Client', () => {
 
       let client = Client.fromDB(db);
 
-      assert(db._id.equals(client.id));
+      assert(db._id.toHexString() === client.id);
       assert(db.name === client.name);
       assert(db.url === client.url);
-      assert(db.user.equals(client.user));
+      assert(db.user.toHexString() === client.user);
       assert(db.date.getTime() === client.date.getTime());
       assert(db.update.getTime() === client.update.getTime());
     });
@@ -149,12 +149,12 @@ describe('Client', () => {
 
   describe("#changeData", () => {
     it("正常に変更できるか", () => {
-      let auth:IAuthTokenMaster = {
-          id: new ObjectID(),
-          key: '',
-          user: new ObjectID(),
-          type: 'master'
-        };
+      let auth: IAuthTokenMaster = {
+        id: ObjectIDGenerator.get(),
+        key: '',
+        user: ObjectIDGenerator.get(),
+        type: 'master'
+      };
 
       let client = Client.create(ObjectIDGenerator,
         auth,
@@ -168,9 +168,9 @@ describe('Client', () => {
     it("違うユーザーが変更しようとしたらエラーになるか", () => {
       assert.throws(() => {
         let auth: IAuthTokenMaster = {
-          id: new ObjectID(),
+          id: ObjectIDGenerator.get(),
           key: '',
-          user: new ObjectID(),
+          user: ObjectIDGenerator.get(),
           type: 'master'
         };
 
@@ -181,9 +181,9 @@ describe('Client', () => {
           new Date());
 
         client.changeData({
-          id: new ObjectID(),
+          id: ObjectIDGenerator.get(),
           key: '',
-          user: new ObjectID(),
+          user: ObjectIDGenerator.get(),
           type: 'master'
         }, "foo", "http://foo", new Date());
       }, (e: any) => e instanceof AtError);
@@ -193,9 +193,9 @@ describe('Client', () => {
     it("長い名前でエラーになるか", () => {
       assert.throws(() => {
         let auth: IAuthTokenMaster = {
-          id: new ObjectID(),
+          id: ObjectIDGenerator.get(),
           key: '',
-          user: new ObjectID(),
+          user: ObjectIDGenerator.get(),
           type: 'master'
         };
 
@@ -212,9 +212,9 @@ describe('Client', () => {
     it("不正なURLでエラーになるか", () => {
       assert.throws(() => {
         let auth: IAuthTokenMaster = {
-          id: new ObjectID(),
+          id: ObjectIDGenerator.get(),
           key: '',
-          user: new ObjectID(),
+          user: ObjectIDGenerator.get(),
           type: 'master'
         };
 
@@ -242,25 +242,25 @@ describe('Client', () => {
     describe("#toAPI", () => {
       it("認証あり(同一ユーザー)", () => {
         let api = client.toAPI({
-          id: new ObjectID(),
+          id: ObjectIDGenerator.get(),
           key: '',
           user: client.user,
           type: 'master'
         });
 
-        assert(client.id.toString() === api.id);
+        assert(client.id === api.id);
         assert(client.name === api.name);
         assert(client.url === api.url);
-        assert(client.user.toString() === api.user);
+        assert(client.user === api.user);
         assert(client.date.toISOString() === api.date);
         assert(client.update.toISOString() === api.update);
       });
 
       it("認証あり(別ユーザー)", () => {
         let api = client.toAPI({
-          id: new ObjectID(),
+          id: ObjectIDGenerator.get(),
           key: '',
-          user: new ObjectID(),
+          user: ObjectIDGenerator.get(),
           type: 'master'
         });
 
@@ -278,10 +278,10 @@ describe('Client', () => {
       it("正常に出力できるか", () => {
         let db = client.toDB();
 
-        assert(client.id.equals(db._id));
+        assert(client.id === db._id.toHexString());
         assert(client.name === db.name);
         assert(client.url === db.url);
-        assert(client.user.equals(db.user));
+        assert(client.user === db.user.toHexString());
         assert(client.date.getTime() === db.date.getTime());
         assert(client.update.getTime() === db.update.getTime())
       });

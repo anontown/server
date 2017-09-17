@@ -1,5 +1,6 @@
 import {
-  Profile
+  Profile,
+  ObjectIDGenerator
 } from '../../../scripts';
 import * as assert from 'power-assert';
 import { ObjectID } from 'mongodb';
@@ -19,8 +20,8 @@ describe("Profile", () => {
       it('正常に変換できるか', () => {
         let db = profile.toDB();
 
-        assert(db._id.equals(profile.id));
-        assert(db.user.equals(profile.user));
+        assert(db._id.toHexString() === profile.id);
+        assert(db.user.toHexString() === profile.user);
         assert(db.name === profile.name);
         assert(db.body === profile.body);
         assert(db.date.valueOf() === profile.date.valueOf());
@@ -50,9 +51,9 @@ describe("Profile", () => {
         it(data.msg, () => {
           let api = profile.toAPI(data.user !== null ? {
             type: 'master',
-            user: data.user,
+            user: data.user.toHexString(),
             key: '',
-            id: new ObjectID()
+            id: ObjectIDGenerator.get()
           } : null);
 
           assert(api.id === profile.id.toString());
@@ -72,11 +73,11 @@ describe("Profile", () => {
       let user = new ObjectID().toString();
       let id = new ObjectID().toString();
       let date = Date.now();
-      let profile = Profile.create({ get: () => new ObjectID(id) }, {
+      let profile = Profile.create({ get: () => id }, {
         type: 'master',
-        user: new ObjectID(user),
+        user: user,
         key: '',
-        id: new ObjectID()
+        id: ObjectIDGenerator.get()
       }, '名前', '本文', 'test', new Date(date));
       assert(profile.id.toString() === id);
       assert(profile.user.toString() === user);
