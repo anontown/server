@@ -21,8 +21,6 @@ services:
       - "8080:8080"
     depends_on:
       - mongo
-#    args:
-#      TYPE: "test"
 #    volumes:
 #      - ./data/app/logs:/home/app/.anontown/logs
 #      - ./data/app/data:/home/app/.anontown/data

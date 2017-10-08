@@ -1,8 +1,5 @@
 FROM node:8.1.2
 
-
-ARG TYPE=start
-
 ENV HOME=/home/app
 ENV APP_HOME=$HOME/.anontown
 
@@ -14,4 +11,4 @@ WORKDIR $APP_HOME
 
 RUN npm i
 
-CMD npm $TYPE
+CMD npm start
