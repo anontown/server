@@ -58,8 +58,8 @@ export const Config = {
                 expireMinute: 5
             },
             storage: {
-                regex: /^[a-z0-9_]{1,20}$/,
-                msg: "ストレージ名は半角英数字、アンダーバー1～20文字にして下さい"
+                regex: /^.{1,100}$/,
+                msg: "ストレージ名は1～100文字にして下さい"
             }
         },
         client: {
