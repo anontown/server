@@ -33,6 +33,7 @@ services:
   es:
     build: es/.
     restart: always
+    env_file: es/.env
 #    volumes:
 #      - ./data/es:/usr/share/elasticsearch/data
 #  es-head:
