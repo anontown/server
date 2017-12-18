@@ -19,7 +19,7 @@ services:
     environment:
       PORT: "8080"
       DB_URL: "mongodb://mongo:27017/anontown"
-      
+      ES_HOST: "es:9200"
     env_file: .env
     ports:
       - "8080:8080"
