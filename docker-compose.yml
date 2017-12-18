@@ -16,6 +16,10 @@ services:
   app:
     build: .
     restart: always
+    environment:
+      PORT: "8080"
+      DB_URL: "mongodb://mongo:27017/anontown"
+      
     env_file: .env
     ports:
       - "8080:8080"
