@@ -414,6 +414,34 @@ updateFunc.push(async () => {
     },
   };
 
+  await ESClient.putTemplate({
+    id: "analyzer_template",
+    body: {
+      index_patterns: ["*"],
+      settings: {
+        analysis: {
+          analyzer: {
+            default: {
+              type: "custom",
+              tokenizer: "kuromoji_tokenizer",
+              char_filter: [
+                "icu_normalizer",
+                "kuromoji_iteration_mark"
+              ],
+              filter: [
+                "kuromoji_baseform",
+                "kuromoji_part_of_speech",
+                "ja_stop",
+                "kuromoji_number",
+                "kuromoji_stemmer",
+              ]
+            }
+          }
+        }
+      }
+    }
+  })
+
   await ESClient.indices.create({
     index: 'reses',
     body: {
