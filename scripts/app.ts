@@ -37,8 +37,20 @@ import { Logger } from './logger';
 import { ObjectIDGenerator, RandomGenerator } from './generator';
 import { AtPrerequisiteError } from './at-error';
 import { createDB } from "./create-db";
+import * as fs from 'fs-promise';
 
 (async () => {
+  //フォルダ作成
+  try {
+    await fs.mkdir("logs");
+  } catch{
+  }
+
+  try {
+    await fs.mkdir("data");
+  } catch{
+  }
+
   //ロガー
   function appLog(method: string, ip: string, idName: string, id: string) {
     Logger.app.info(method, ip, idName, id);
