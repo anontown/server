@@ -4,7 +4,7 @@ let dbPass = process.env['DB_PASS'] as string | undefined;
 
 export const Config = {
     server: {
-        port: Number(process.env['PORT'])
+        port: Number(process.env['SERVER_PORT'])
     },
     db: {
         url: process.env['DB_URL'] as string,
