@@ -229,6 +229,6 @@ export class AppServer {
       });
     });
     this.server.listen(this.port);
-    Logger.system.info("サーバー起動");
+    Logger.system.info(`listen port ${this.port}`);
   }
 }
