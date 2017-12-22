@@ -39,6 +39,9 @@ import { AtPrerequisiteError } from './at-error';
 import { createDB } from "./create-db";
 import * as fs from 'fs-promise';
 
+// 環境変数
+Logger.system.info(`env:${JSON.stringify(process.env)}`);
+
 (async () => {
   //フォルダ作成
   try {
