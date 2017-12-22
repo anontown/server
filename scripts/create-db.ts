@@ -4,6 +4,7 @@ import { ObjectID } from 'mongodb';
 import { StringUtil } from './util';
 import { Config } from './config';
 import { IProfileDB } from './models/profile';
+import { Logger } from "./logger";
 
 let updateFunc: (() => Promise<void>)[] = [];
 
@@ -631,14 +632,16 @@ export async function createDB() {
     //ファイルがなければ0
     ver = 0;
   }
-  console.log(`現在のバージョン:${ver}`);
+  Logger.system.info(`現在のDBバージョン:${ver}`);
 
   for (let i = ver; i < updateFunc.length; i++) {
-    console.log(`update:${i}`);
+    Logger.system.info(`update db:${i}`);
     await updateFunc[i]();
+    Logger.system.info(`updated db:${i}`);
   }
 
   fs.writeFileSync("./data/db-version.json", JSON.stringify(updateFunc.length), {
     encoding: "utf8"
   });
+  Logger.system.info(`DBアップデート完了:${updateFunc.length}`);
 };

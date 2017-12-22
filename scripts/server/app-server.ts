@@ -130,7 +130,7 @@ export class AppServer {
 
         res.status(200);
         res.json(result);
-        console.log("成功");
+        Logger.system.info("成功");
       } catch (e) {
         if (e instanceof AtError) {
           res.status(e.statusCode);

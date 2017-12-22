@@ -3,7 +3,7 @@ import { DB } from '../../db';
 import { AtNotFoundError, AtConflictError } from '../../at-error'
 import { User, IUserDB } from './user';
 import { CronJob } from 'cron';
-
+import { Logger } from "../../logger";
 
 export class UserRepository {
   static async findOne(id: string): Promise<User> {
@@ -66,7 +66,7 @@ export class UserRepository {
       new CronJob({
         cronTime,
         onTick: async () => {
-          console.log("UserCron", field);
+          Logger.system.info("UserCron", field);
           let db = await DB;
           await db.collection("users").update({}, { $set: { ["resWait." + field]: 0 } }, { multi: true });
         },
