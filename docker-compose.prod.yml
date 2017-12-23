@@ -8,7 +8,7 @@ services:
      - ./data/db:/data/db
   app:
     build:
-      context: .
+      context: ./app
       dockerfile: prod.Dockerfile
     restart: always
     environment:
