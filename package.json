@@ -44,8 +44,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "node ./dist/scripts/app.js",
-    "start:dev": "node --inspect=0.0.0.0:5858 ./dist/scripts/app.js",
+    "start": "tsc&&node ./dist/scripts/app.js",
     "pretest": "tsc",
     "test": "istanbul cover _mocha -- ./dist/tests/**/*.test.js --require intelli-espower-loader",
     "posttest": "cd coverage && remap-istanbul -i coverage.json -o html-report -t html"
