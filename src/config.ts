@@ -1,107 +1,106 @@
-let dbUser = process.env['DB_USER'] as string | undefined;
-let dbPass = process.env['DB_PASS'] as string | undefined;
-
+const dbUser = process.env.DB_USER as string | undefined;
+const dbPass = process.env.DB_PASS as string | undefined;
 
 export const Config = {
     server: {
-        port: Number(process.env['SERVER_PORT'])
+        port: Number(process.env.SERVER_PORT),
     },
     db: {
-        url: process.env['DB_URL'] as string,
+        url: process.env.DB_URL as string,
         auth: dbUser !== undefined && dbPass !== undefined ?
             {
                 user: dbUser,
-                pass: dbPass
+                pass: dbPass,
             } :
-            null
+            null,
     },
     api: {
-        limit: 1000
+        limit: 1000,
     },
     es: {
-        host: process.env['ES_HOST'] as string,
+        host: process.env.ES_HOST as string,
     },
     salt: {
-        pass: process.env['SALT_PASS'] as string,
-        hash: process.env['SALT_HASH'] as string,
-        token: process.env['SALT_TOKEN'] as string,
-        tokenReq: process.env['SALT_TOKEN_REQ'] as string
+        pass: process.env.SALT_PASS as string,
+        hash: process.env.SALT_HASH as string,
+        token: process.env.SALT_TOKEN as string,
+        tokenReq: process.env.SALT_TOKEN_REQ as string,
     },
     recaptcha: {
-        siteKey: process.env['RECAPTCHA_SITE_KET'] as string,
-        secretKey: process.env['RECAPTCHA_SECRET_KET'] as string
+        siteKey: process.env.RECAPTCHA_SITE_KET as string,
+        secretKey: process.env.RECAPTCHA_SECRET_KET as string,
     },
     user: {
         sn: {
             regex: /^[a-zA-Z0-9_]{3,20}$/,
-            msg: "スクリーンネームは半角英数字、アンダーバー3～20文字にして下さい"
+            msg: "スクリーンネームは半角英数字、アンダーバー3～20文字にして下さい",
         },
         pass: {
             regex: /^[a-zA-Z0-9_]{3,50}$/,
-            msg: "パスワードは半角英数字、アンダーバー3～50文字にして下さい"
+            msg: "パスワードは半角英数字、アンダーバー3～50文字にして下さい",
         },
         lvMax: 1000,
         profile: {
             name: {
                 regex: /^.{1,50}$/,
-                msg: "名前は1～50文字にして下さい"
+                msg: "名前は1～50文字にして下さい",
             },
             sn: {
                 regex: /^[a-zA-Z0-9_]{3,20}$/,
-                msg: "スクリーンネームは半角英数字、アンダーバー3～20文字にして下さい"
+                msg: "スクリーンネームは半角英数字、アンダーバー3～20文字にして下さい",
             },
             body: {
                 regex: /^[\s\S]{1,3000}$/,
-                msg: "自己紹介文は1～3000文字にして下さい"
-            }
+                msg: "自己紹介文は1～3000文字にして下さい",
+            },
         },
         token: {
             name: {
                 regex: /^.{1,50}$/,
-                msg: "名前は1～50文字にして下さい"
+                msg: "名前は1～50文字にして下さい",
             },
             req: {
-                expireMinute: 5
+                expireMinute: 5,
             },
             storage: {
                 regex: /^.{1,100}$/,
-                msg: "ストレージ名は1～100文字にして下さい"
-            }
+                msg: "ストレージ名は1～100文字にして下さい",
+            },
         },
         client: {
             name: {
                 regex: /^.{1,30}$/,
-                msg: "名前は1～30文字にして下さい"
+                msg: "名前は1～30文字にして下さい",
             },
             url: {
                 regex: /^https?:\/\/.{1,500}$/,
-                msg: "URLが不正です"
-            }
-        }
+                msg: "URLが不正です",
+            },
+        },
     },
     topic: {
         title: {
             regex: /^.{1,100}$/,
-            msg: "タイトルは1～100文字にして下さい"
+            msg: "タイトルは1～100文字にして下さい",
         },
         tags: {
             regex: /^[a-z0-9ぁ-んァ-ヶー一-龠々_]{1,20}$/,
             max: 15,
-            msg: "タグは半角小文字英数字ひらがな漢字、アンダーバー1～20文字15個以内にして下さい"
+            msg: "タグは半角小文字英数字ひらがな漢字、アンダーバー1～20文字15個以内にして下さい",
         },
         body: {
             regex: /^[\s\S]{1,10000}$/,
-            msg: "本文は1～1万文字以内にして下さい"
-        }
+            msg: "本文は1～1万文字以内にして下さい",
+        },
     },
     res: {
         name: {
             regex: /^.{1,50}$/,
-            msg: "名前は50文字以内にして下さい"
+            msg: "名前は50文字以内にして下さい",
         },
         body: {
             regex: /^[\s\S]{1,5000}$/,
-            msg: "本文は1～5000文字にして下さい"
+            msg: "本文は1～5000文字にして下さい",
         },
         wait: {
             maxLv: 3,
@@ -111,7 +110,7 @@ export const Config = {
             h1: 15,
             h6: 20,
             h12: 35,
-            d1: 50
-        }
-    }
+            d1: 50,
+        },
+    },
 };

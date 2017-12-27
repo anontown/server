@@ -1,24 +1,24 @@
-import { User } from '../user';
-import { Res, ResHistory, ResTopic, ResFork } from '../res';
-import { History } from '../history';
-import { IAuthToken } from '../../auth';
-import { AtPrerequisiteError, paramsErrorMaker, paramsErrorMakerData } from '../../at-error'
-import { Config } from '../../config';
-import { StringUtil } from '../../util';
-import { IGenerator } from '../../generator';
+import { AtPrerequisiteError, paramsErrorMaker, paramsErrorMakerData } from "../../at-error";
+import { IAuthToken } from "../../auth";
+import { Config } from "../../config";
+import { IGenerator } from "../../generator";
+import { StringUtil } from "../../util";
+import { History } from "../history";
+import { Res, ResFork, ResHistory, ResTopic } from "../res";
+import { User } from "../user";
 
 export type ITopicDB = ITopicNormalDB | ITopicOneDB | ITopicForkDB;
 
 export interface ITopicBaseDB<T extends TopicType, Body> {
-  id: string,
-  type: T,
+  id: string;
+  type: T;
   body: {
     title: string,
     update: string,
     date: string,
     ageUpdate: string,
     active: boolean,
-  } & Body
+  } & Body;
 }
 
 export type ITopicSearchBaseDB<T extends TopicSearchType> = ITopicBaseDB<T, {
@@ -26,49 +26,101 @@ export type ITopicSearchBaseDB<T extends TopicSearchType> = ITopicBaseDB<T, {
   body: string,
 }>;
 
-export type ITopicNormalDB = ITopicSearchBaseDB<'normal'>;
+export type ITopicNormalDB = ITopicSearchBaseDB<"normal">;
 
-export type ITopicOneDB = ITopicSearchBaseDB<'one'>;
+export type ITopicOneDB = ITopicSearchBaseDB<"one">;
 
-export type ITopicForkDB = ITopicBaseDB<'fork', {
+export type ITopicForkDB = ITopicBaseDB<"fork", {
   parent: string;
 }>;
 
 export type ITopicAPI = ITopicOneAPI | ITopicNormalAPI | ITopicForkAPI;
 
 export interface ITopicBaseAPI<T extends TopicType> {
-  id: string,
-  title: string,
-  update: string,
-  date: string,
-  resCount: number,
-  type: T,
-  active: boolean
+  id: string;
+  title: string;
+  update: string;
+  date: string;
+  resCount: number;
+  type: T;
+  active: boolean;
 }
 
 export interface ITopicSearchBaseAPI<T extends TopicSearchType> extends ITopicBaseAPI<T> {
-  tags: string[],
-  body: string,
+  tags: string[];
+  body: string;
 }
 
-export interface ITopicNormalAPI extends ITopicSearchBaseAPI<'normal'> {
+export interface ITopicNormalAPI extends ITopicSearchBaseAPI<"normal"> {
 }
 
-export interface ITopicOneAPI extends ITopicSearchBaseAPI<'one'> {
+export interface ITopicOneAPI extends ITopicSearchBaseAPI<"one"> {
 }
 
-export interface ITopicForkAPI extends ITopicBaseAPI<'fork'> {
-  parent: string
+export interface ITopicForkAPI extends ITopicBaseAPI<"fork"> {
+  parent: string;
 }
 
 export type TopicSearchType = "one" | "normal";
 export type TopicType = TopicSearchType | "fork";
 
-
 export type Topic = TopicNormal | TopicOne | TopicFork;
 
 export abstract class TopicBase<T extends TopicType> {
-  constructor(private _id: string,
+  static checkData({ title, tags, body }: { title?: string, tags?: string[], body?: string }) {
+    const data: paramsErrorMakerData[] = [];
+    if (title !== undefined) {
+      data.push({
+        field: "title",
+        val: title,
+        regex: Config.topic.title.regex,
+        message: Config.topic.title.msg,
+      });
+    }
+    if (tags !== undefined) {
+      data.push(() => {
+        if (tags.length !== new Set(tags).size) {
+          return {
+            field: "tags",
+            message: "タグの重複があります",
+          };
+        } else {
+          return null;
+        }
+      });
+
+      data.push(() => {
+        if (tags.length > Config.topic.tags.max) {
+          return {
+            field: "tags",
+            message: Config.topic.tags.msg,
+          };
+        } else {
+          return null;
+        }
+      });
+
+      data.push(...tags.map((x, i) => ({
+        field: `tags[${i}]`,
+        val: x,
+        regex: Config.topic.tags.regex,
+        message: Config.topic.tags.msg,
+      })));
+    }
+    if (body !== undefined) {
+      data.push({
+        field: "body",
+        val: body,
+        regex: Config.topic.body.regex,
+        message: Config.topic.body.msg,
+      });
+    }
+
+    paramsErrorMaker(data);
+  }
+
+  constructor(
+    private _id: string,
     protected _title: string,
     private _update: Date,
     private _date: Date,
@@ -119,8 +171,8 @@ export abstract class TopicBase<T extends TopicType> {
         update: this._update.toISOString(),
         date: this._date.toISOString(),
         ageUpdate: this._ageUpdate.toISOString(),
-        active: this._active
-      })
+        active: this._active,
+      }),
     };
   }
 
@@ -132,13 +184,13 @@ export abstract class TopicBase<T extends TopicType> {
       date: this._date.toISOString(),
       resCount: this._resCount,
       type: this._type,
-      active: this._active
+      active: this._active,
     };
   }
 
   resUpdate(res: Res) {
     if (!this.active) {
-      throw new AtPrerequisiteError("トピックが落ちているので書き込めません")
+      throw new AtPrerequisiteError("トピックが落ちているので書き込めません");
     }
 
     this._update = res.date;
@@ -147,76 +199,25 @@ export abstract class TopicBase<T extends TopicType> {
     }
   }
 
-  static checkData({ title, tags, body }: { title?: string, tags?: string[], body?: string }) {
-    let data: paramsErrorMakerData[] = [];
-    if (title !== undefined) {
-      data.push({
-        field: "title",
-        val: title,
-        regex: Config.topic.title.regex,
-        message: Config.topic.title.msg
-      });
-    }
-    if (tags !== undefined) {
-      data.push(() => {
-        if (tags.length !== new Set(tags).size) {
-          return {
-            field: "tags",
-            message: "タグの重複があります"
-          }
-        } else {
-          return null;
-        }
-      });
-
-      data.push(() => {
-        if (tags.length > Config.topic.tags.max) {
-          return {
-            field: "tags",
-            message: Config.topic.tags.msg
-          };
-        } else {
-          return null;
-        }
-      });
-
-      data.push(...tags.map((x, i) => ({
-        field: `tags[${i}]`,
-        val: x,
-        regex: Config.topic.tags.regex,
-        message: Config.topic.tags.msg
-      })));
-    }
-    if (body !== undefined) {
-      data.push({
-        field: "body",
-        val: body,
-        regex: Config.topic.body.regex,
-        message: Config.topic.body.msg
-      });
-    }
-
-    paramsErrorMaker(data);
-  }
-
   hash(date: Date, user: User): string {
     return StringUtil.hash(
-      //ユーザー依存
+      // ユーザー依存
       user.id + " " +
 
-      //書き込み年月日依存
+      // 書き込み年月日依存
       date.getFullYear() + " " + date.getMonth() + " " + date.getDate() + " " +
 
-      //トピ依存
+      // トピ依存
       this._id +
 
-      //ソルト依存
+      // ソルト依存
       Config.salt.hash);
   }
 }
 
 export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBase<T> {
-  constructor(id: string,
+  constructor(
+    id: string,
     title: string,
     protected _tags: string[],
     protected _body: string,
@@ -235,7 +236,6 @@ export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBa
       ageUpdate,
       active);
   }
-
 
   get tags() {
     return this._tags;
@@ -261,26 +261,29 @@ export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBa
   }
 }
 
-export class TopicNormal extends TopicSearchBase<'normal'> {
-  constructor(id: string,
+export class TopicNormal extends TopicSearchBase<"normal"> {
+  static create(
+    objidGenerator: IGenerator<string>,
     title: string,
     tags: string[],
     body: string,
-    update: Date,
-    date: Date,
-    resCount: number,
-    ageUpdate: Date,
-    active: boolean) {
-    super(id,
+    user: User,
+    authToken: IAuthToken,
+    now: Date): { topic: TopicNormal, res: Res, history: History } {
+    this.checkData({ title, tags, body });
+    const topic = new TopicNormal(objidGenerator.get(),
       title,
       tags,
       body,
-      update,
-      date,
-      resCount,
-      'normal',
-      ageUpdate,
-      active);
+      now,
+      now,
+      1,
+      now,
+      true);
+    const cd = topic.changeData(objidGenerator, user, authToken, title, tags, body, now);
+    user.changeLastTopic(now);
+
+    return { topic, history: cd.history, res: cd.res };
   }
 
   static fromDB(db: ITopicNormalDB, resCount: number): TopicNormal {
@@ -295,45 +298,8 @@ export class TopicNormal extends TopicSearchBase<'normal'> {
       db.body.active);
   }
 
-  changeData(objidGenerator: IGenerator<string>, user: User, authToken: IAuthToken, title: string, tags: string[], body: string, now: Date): { res: ResHistory, history: History } {
-    user.usePoint(10);
-    TopicBase.checkData({ title, tags, body });
-
-    this._title = title;
-    this._tags = tags;
-    this._body = body;
-
-    let history = History.create(objidGenerator, this, now, this.hash(now, user), user);
-    let res = ResHistory.create(objidGenerator,
-      this,
-      user,
-      authToken,
-      history,
-      now);
-
-    return { res, history };
-  }
-
-  static create(objidGenerator: IGenerator<string>, title: string, tags: string[], body: string, user: User, authToken: IAuthToken, now: Date): { topic: TopicNormal, res: Res, history: History } {
-    this.checkData({ title, tags, body });
-    let topic = new TopicNormal(objidGenerator.get(),
-      title,
-      tags,
-      body,
-      now,
-      now,
-      1,
-      now,
-      true);
-    let cd = topic.changeData(objidGenerator, user, authToken, title, tags, body, now);
-    user.changeLastTopic(now);
-
-    return { topic, history: cd.history, res: cd.res };
-  }
-}
-
-export class TopicOne extends TopicSearchBase<'one'> {
-  constructor(id: string,
+  constructor(
+    id: string,
     title: string,
     tags: string[],
     body: string,
@@ -349,11 +315,39 @@ export class TopicOne extends TopicSearchBase<'one'> {
       update,
       date,
       resCount,
-      'one',
+      "normal",
       ageUpdate,
       active);
   }
 
+  changeData(
+    objidGenerator: IGenerator<string>,
+    user: User,
+    authToken: IAuthToken,
+    title: string,
+    tags: string[],
+    body: string,
+    now: Date): { res: ResHistory, history: History } {
+    user.usePoint(10);
+    TopicBase.checkData({ title, tags, body });
+
+    this._title = title;
+    this._tags = tags;
+    this._body = body;
+
+    const history = History.create(objidGenerator, this, now, this.hash(now, user), user);
+    const res = ResHistory.create(objidGenerator,
+      this,
+      user,
+      authToken,
+      history,
+      now);
+
+    return { res, history };
+  }
+}
+
+export class TopicOne extends TopicSearchBase<"one"> {
   static fromDB(db: ITopicOneDB, resCount: number): TopicOne {
     return new TopicOne(db.id,
       db.body.title,
@@ -366,9 +360,16 @@ export class TopicOne extends TopicSearchBase<'one'> {
       db.body.active);
   }
 
-  static create(objidGenerator: IGenerator<string>, title: string, tags: string[], body: string, user: User, authToken: IAuthToken, now: Date): { topic: TopicOne, res: Res } {
+  static create(
+    objidGenerator: IGenerator<string>,
+    title: string,
+    tags: string[],
+    body: string,
+    user: User,
+    authToken: IAuthToken,
+    now: Date): { topic: TopicOne, res: Res } {
     this.checkData({ title, tags, body });
-    let topic = new TopicOne(objidGenerator.get(),
+    const topic = new TopicOne(objidGenerator.get(),
       title,
       tags,
       body,
@@ -378,7 +379,7 @@ export class TopicOne extends TopicSearchBase<'one'> {
       now,
       true);
 
-    let res = ResTopic.create(objidGenerator,
+    const res = ResTopic.create(objidGenerator,
       topic,
       user,
       authToken,
@@ -387,10 +388,78 @@ export class TopicOne extends TopicSearchBase<'one'> {
 
     return { topic, res };
   }
+
+  constructor(
+    id: string,
+    title: string,
+    tags: string[],
+    body: string,
+    update: Date,
+    date: Date,
+    resCount: number,
+    ageUpdate: Date,
+    active: boolean) {
+    super(id,
+      title,
+      tags,
+      body,
+      update,
+      date,
+      resCount,
+      "one",
+      ageUpdate,
+      active);
+  }
 }
 
-export class TopicFork extends TopicBase<'fork'> {
-  constructor(id: string,
+export class TopicFork extends TopicBase<"fork"> {
+  static fromDB(db: ITopicForkDB, resCount: number): TopicFork {
+    return new TopicFork(db.id,
+      db.body.title,
+      new Date(db.body.update),
+      new Date(db.body.date),
+      resCount,
+      new Date(db.body.ageUpdate),
+      db.body.active,
+      db.body.parent);
+  }
+
+  static create(
+    objidGenerator: IGenerator<string>,
+    title: string,
+    parent: TopicNormal,
+    user: User,
+    authToken: IAuthToken,
+    now: Date): { topic: TopicFork, res: Res, resParent: Res } {
+    this.checkData({ title });
+    const topic = new TopicFork(objidGenerator.get(),
+      title,
+      now,
+      now,
+      1,
+      now,
+      true,
+      parent.id);
+
+    const res = ResTopic.create(objidGenerator,
+      topic,
+      user,
+      authToken,
+      now);
+
+    const resParent = ResFork.create(objidGenerator,
+      parent,
+      user,
+      authToken,
+      topic,
+      now);
+    user.changeLastOneTopic(now);
+
+    return { topic, res, resParent };
+  }
+
+  constructor(
+    id: string,
     title: string,
     update: Date,
     date: Date,
@@ -403,7 +472,7 @@ export class TopicFork extends TopicBase<'fork'> {
       update,
       date,
       resCount,
-      'fork',
+      "fork",
       ageUpdate,
       active);
   }
@@ -419,46 +488,7 @@ export class TopicFork extends TopicBase<'fork'> {
   toAPI(): ITopicForkAPI {
     return {
       ...super.toAPI(),
-      parent: this._parent
+      parent: this._parent,
     };
-  }
-
-  static fromDB(db: ITopicForkDB, resCount: number): TopicFork {
-    return new TopicFork(db.id,
-      db.body.title,
-      new Date(db.body.update),
-      new Date(db.body.date),
-      resCount,
-      new Date(db.body.ageUpdate),
-      db.body.active,
-      db.body.parent);
-  }
-
-  static create(objidGenerator: IGenerator<string>, title: string, parent: TopicNormal, user: User, authToken: IAuthToken, now: Date): { topic: TopicFork, res: Res, resParent: Res } {
-    this.checkData({ title });
-    let topic = new TopicFork(objidGenerator.get(),
-      title,
-      now,
-      now,
-      1,
-      now,
-      true,
-      parent.id);
-
-    let res = ResTopic.create(objidGenerator,
-      topic,
-      user,
-      authToken,
-      now);
-
-    let resParent = ResFork.create(objidGenerator,
-      parent,
-      user,
-      authToken,
-      topic,
-      now);
-    user.changeLastOneTopic(now);
-
-    return { topic, res, resParent };
   }
 }

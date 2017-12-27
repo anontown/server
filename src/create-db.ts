@@ -1,15 +1,15 @@
-import { DB, ESClient } from './db';
-import * as fs from 'fs-promise';
-import { ObjectID } from 'mongodb';
-import { StringUtil } from './util';
-import { Config } from './config';
-import { IProfileDB } from './models/profile';
+import * as fs from "fs-promise";
+import { ObjectID } from "mongodb";
+import { Config } from "./config";
+import { DB, ESClient } from "./db";
 import { Logger } from "./logger";
+import { IProfileDB } from "./models/profile";
+import { StringUtil } from "./util";
 
-let updateFunc: (() => Promise<void>)[] = [];
+const updateFunc: Array<() => Promise<void>> = [];
 
 updateFunc.push((async () => {
-  let db = await DB;
+  const db = await DB;
 
   await db.createCollection("clients");
 
@@ -21,110 +21,110 @@ updateFunc.push((async () => {
 
   await db.createCollection("reses");
 
-  let tokens = await db.createCollection("tokens");
+  const tokens = await db.createCollection("tokens");
   await tokens.createIndex({ client: 1, user: 1 }, { unique: true });
 
   await db.createCollection("topics");
 
-  let user = await db.createCollection("users");
+  const user = await db.createCollection("users");
   await user.createIndex({ sn: 1 }, { unique: true });
 }));
 
 updateFunc.push((async () => {
-  let db = await DB;
+  const db = await DB;
 
   await db.collection("users").update({}, { $set: { point: 0 } }, { multi: true });
 }));
 
 updateFunc.push((async () => {
-  let db = await DB;
+  const db = await DB;
 
-  let board = await db.createCollection("boards");
+  const board = await db.createCollection("boards");
   await board.createIndex({ category: 1 }, { unique: true });
   await db.collection("topics").update({}, { $set: { type: "normal" } }, { multi: true });
 }));
 
 updateFunc.push((async () => {
-  let db = await DB;
+  const db = await DB;
 
-  //reply:ObjectID(ResID)|nullをreply:{res:ObjectID,User:ObjectID}|nullに変換
+  // reply:ObjectID(ResID)|nullをreply:{res:ObjectID,User:ObjectID}|nullに変換
 
-  //replyがnullでないレス取得
-  let targetReses: { _id: ObjectID, reply: ObjectID }[] =
+  // replyがnullでないレス取得
+  const targetReses: Array<{ _id: ObjectID, reply: ObjectID }> =
     await db.collection("reses")
       .find({ reply: { $ne: null } })
       .toArray();
 
-  //reply先のレス取得
-  let replyReses: { _id: ObjectID, user: ObjectID }[] =
+  // reply先のレス取得
+  const replyReses: Array<{ _id: ObjectID, user: ObjectID }> =
     await db.collection("reses")
       .find({ _id: { $in: targetReses.map(x => x.reply) } })
       .toArray();
 
-  //更新
-  let promises: Promise<any>[] = [];
+  // 更新
+  const promises: Array<Promise<any>> = [];
   targetReses.forEach(x => {
     promises.push(db.collection("reses")
       .update(
       {
-        _id: x._id
+        _id: x._id,
       },
       {
         $set: {
           reply: {
-            res: x.reply, user: replyReses.find(y => x.reply.equals(y._id))!.user
-          }
-        }
-      }
-      ))
+            res: x.reply, user: replyReses.find(y => x.reply.equals(y._id))!.user,
+          },
+        },
+      },
+    ));
   });
 
   await Promise.all(promises);
 }));
 
 updateFunc.push((async () => {
-  //HASHのイコール削除
-  let db = await DB;
-  let promises: Promise<any>[] = [];
+  // HASHのイコール削除
+  const db = await DB;
+  const promises: Array<Promise<any>> = [];
 
-  let reses: { _id: ObjectID, hash: string }[] = await db.collection("reses").find().toArray();
+  const reses: Array<{ _id: ObjectID, hash: string }> = await db.collection("reses").find().toArray();
   reses.forEach(r => {
-    promises.push(db.collection("reses").update({ _id: r._id }, { $set: { hash: r.hash.replace(/=/, "") } }))
+    promises.push(db.collection("reses").update({ _id: r._id }, { $set: { hash: r.hash.replace(/=/, "") } }));
   });
 
-  let histories: { _id: ObjectID, hash: string }[] = await db.collection("histories").find().toArray();
+  const histories: Array<{ _id: ObjectID, hash: string }> = await db.collection("histories").find().toArray();
   histories.forEach(h => {
-    promises.push(db.collection("histories").update({ _id: h._id }, { $set: { hash: h.hash.replace(/=/, "") } }))
+    promises.push(db.collection("histories").update({ _id: h._id }, { $set: { hash: h.hash.replace(/=/, "") } }));
   });
 
   await Promise.all(promises);
 }));
 updateFunc.push((async () => {
-  //ハッシュをmd5→sha256に
+  // ハッシュをmd5→sha256に
 
-  //ハッシュ関数
-  let hashFunc = (user: ObjectID, topic: ObjectID, date: Date) =>
+  // ハッシュ関数
+  const hashFunc = (user: ObjectID, topic: ObjectID, date: Date) =>
     StringUtil.hash(
-      //ユーザー依存
+      // ユーザー依存
       user + " " +
 
-      //書き込み年月日依存
+      // 書き込み年月日依存
       date.getFullYear() + " " + date.getMonth() + " " + date.getDate() + " " +
 
-      //トピ依存
+      // トピ依存
       topic +
 
-      //ソルト依存
+      // ソルト依存
       Config.salt.hash);
 
-  //レス、履歴取得
-  let db = await DB;
-  let rdb = db.collection("reses");
-  let hdb = db.collection("histories");
-  let reses = await rdb.find().toArray();
-  let histories = await hdb.find().toArray();
+  // レス、履歴取得
+  const db = await DB;
+  const rdb = db.collection("reses");
+  const hdb = db.collection("histories");
+  const reses = await rdb.find().toArray();
+  const histories = await hdb.find().toArray();
 
-  let promises: Promise<any>[] = [];
+  const promises: Array<Promise<any>> = [];
   reses.forEach(r => {
     promises.push(rdb.update({ _id: r._id }, { $set: { hash: hashFunc(r.user, r.topic, r.date) } }));
   });
@@ -136,26 +136,26 @@ updateFunc.push((async () => {
 }));
 
 updateFunc.push((async () => {
-  //topicにsage機能を実装するための修正
-  let db = await DB;
-  let promises: Promise<any>[] = [];
+  // topicにsage機能を実装するための修正
+  const db = await DB;
+  const promises: Array<Promise<any>> = [];
 
-  let topics = await db.collection("topics").find().toArray();
+  const topics = await db.collection("topics").find().toArray();
   topics.forEach(t => {
-    promises.push(db.collection("topics").update({ _id: t._id }, { $set: { ageUpdate: t.update } }))
+    promises.push(db.collection("topics").update({ _id: t._id }, { $set: { ageUpdate: t.update } }));
   });
-  promises.push(db.collection("reses").update({}, { $set: { age: true } }, { multi: true }))
+  promises.push(db.collection("reses").update({}, { $set: { age: true } }, { multi: true }));
 
   await Promise.all(promises);
 }));
 
 updateFunc.push((async () => {
-  let db = await DB;
-  let promises: Promise<any>[] = [];
+  const db = await DB;
+  const promises: Array<Promise<any>> = [];
 
-  let profiles: IProfileDB[] = await db.collection("profiles").find().toArray();
+  const profiles: IProfileDB[] = await db.collection("profiles").find().toArray();
   profiles.forEach(p => {
-    promises.push(db.collection("profiles").update({ _id: p._id }, { $set: { sn: p._id.toString() } }))
+    promises.push(db.collection("profiles").update({ _id: p._id }, { $set: { sn: p._id.toString() } }));
   });
   await db.collection("profiles").createIndex({ sn: 1 }, { unique: true });
 
@@ -163,20 +163,20 @@ updateFunc.push((async () => {
 }));
 
 updateFunc.push((async () => {
-  let db = await DB;
+  const db = await DB;
 
   await db.collection("reses").update({}, { $set: { vote: [] }, $unset: { voteUser: 1 } }, { multi: true });
 }));
 
 updateFunc.push((async () => {
-  let db = await DB;
+  const db = await DB;
 
   await db.collection("users").update({}, { $set: { lastOneTopic: new Date() } }, { multi: true });
   await db.collection("topics").update({}, { $set: { active: true } }, { multi: true });
 }));
 
 updateFunc.push((async () => {
-  let db = await DB;
+  const db = await DB;
 
   await db.dropCollection("boards");
   await db.collection("topics").update({ type: "board" }, { $set: { type: "normal", active: false } }, { multi: true });
@@ -185,13 +185,13 @@ updateFunc.push((async () => {
 }));
 
 updateFunc.push((async () => {
-  let db = await DB;
+  const db = await DB;
 
-  let ts: { _id: ObjectID, storage: string }[] = await db.collection("tokens").find().toArray();
-  let ps: Promise<void>[] = [];
-  await fs.mkdir('./storage');
+  const ts: Array<{ _id: ObjectID, storage: string }> = await db.collection("tokens").find().toArray();
+  const ps: Array<Promise<void>> = [];
+  await fs.mkdir("./storage");
   ts.forEach(t => {
-    let dir = "./storage/" + t._id.toString() + "/";
+    const dir = "./storage/" + t._id.toString() + "/";
     ps.push((async () => {
       await fs.mkdir(dir);
       await fs.writeFile(dir + "st-main", t.storage);
@@ -203,21 +203,21 @@ updateFunc.push((async () => {
 }));
 
 updateFunc.push((async () => {
-  let db = await DB;
+  const db = await DB;
 
-  await db.collection("tokens").update({}, { $set: { type: 'general' } }, { multi: true });
+  await db.collection("tokens").update({}, { $set: { type: "general" } }, { multi: true });
 }));
 
 updateFunc.push((async () => {
-  let db = await DB;
+  const db = await DB;
 
-  let storages = await db.createCollection("storages");
+  const storages = await db.createCollection("storages");
   await storages.createIndex({ client: 1, user: 1, key: 1 }, { unique: true });
 
-  //ユニークインデックス削除
+  // ユニークインデックス削除
   db.collection("tokens").dropIndexes();
 
-  let tokenIDs = (await fs.readdir("./storage"))
+  const tokenIDs = (await fs.readdir("./storage"))
     .map(x => {
       try {
         return new ObjectID(x);
@@ -225,71 +225,71 @@ updateFunc.push((async () => {
         return null;
       }
     }).filter(x => x !== null) as ObjectID[];
-  let tokens: { _id: ObjectID, client?: ObjectID, user: ObjectID }[] = await db.collection("tokens")
+  const tokens: Array<{ _id: ObjectID, client?: ObjectID, user: ObjectID }> = await db.collection("tokens")
     .find({ _id: { $in: tokenIDs } })
     .toArray();
 
-  for (let token of tokens) {
-    let fileNames = (await fs.readdir('./storage/' + token._id.toString()));
-    for (let fileName of fileNames) {
-      let value = await fs.readFile("./storage/" + token._id.toString() + "/" + fileName, { encoding: "utf8" });
-      let key = fileName.substr(3);
+  for (const token of tokens) {
+    const fileNames = (await fs.readdir("./storage/" + token._id.toString()));
+    for (const fileName of fileNames) {
+      const value = await fs.readFile("./storage/" + token._id.toString() + "/" + fileName, { encoding: "utf8" });
+      const key = fileName.substr(3);
 
       await storages.insert({
-        _id: new ObjectID,
+        _id: new ObjectID(),
         client: token.client ? token.client : null,
         user: token.user,
         key,
-        value
+        value,
       });
     }
   }
 
-  //トークン削除
+  // トークン削除
   await db.collection("tokens").remove({});
 }));
 
 updateFunc.push((async () => {
-  let db = await DB;
+  const db = await DB;
 
-  //mdtext削除
-  for (let col of ['topics', 'reses', 'profiles', 'msgs', 'histories']) {
+  // mdtext削除
+  for (const col of ["topics", "reses", "profiles", "msgs", "histories"]) {
     await db.collection(col).update({}, { $unset: { mdtext: 1 } }, { multi: true });
   }
 
-  let resesCol = db.collection('reses');
+  const resesCol = db.collection("reses");
 
-  //投票による削除→active
-  await resesCol.update({ deleteFlag: 'vote' }, { $set: { deleteFlag: "active" } }, { multi: true });
+  // 投票による削除→active
+  await resesCol.update({ deleteFlag: "vote" }, { $set: { deleteFlag: "active" } }, { multi: true });
 
-  //msgs削除
-  await db.collection('msgs').remove({});
+  // msgs削除
+  await db.collection("msgs").remove({});
 
-  //名無し→null
-  await resesCol.update({ name: 'anonymous' }, { $set: { name: null } }, { multi: true });
+  // 名無し→null
+  await resesCol.update({ name: "anonymous" }, { $set: { name: null } }, { multi: true });
 
-  //名前の●プロフィール削除
+  // 名前の●プロフィール削除
   {
-    //名前に●が付くレス
-    let reses: { name: string, _id: ObjectID }[] =
+    // 名前に●が付くレス
+    const reses: Array<{ name: string, _id: ObjectID }> =
       await resesCol.find({ name: /●/ }).toArray();
-    for (let res of reses) {
-      let [name] = res.name.split('●');
+    for (const res of reses) {
+      const [name] = res.name.split("●");
       await resesCol.update({ _id: res._id }, { $set: { name: name.length === 0 ? null : name } });
     }
   }
 
-  //名前に■が付くレス
-  //fork or oneの1
+  // 名前に■が付くレス
+  // fork or oneの1
   {
-    let reses = await resesCol
+    const reses = await resesCol
       .find({ name: "■トピ主" })
       .toArray();
-    let topics = await db.collection("topics")
+    const topics = await db.collection("topics")
       .find({ _id: { $in: reses.map(x => x.topic) } })
       .toArray();
-    for (let res of reses) {
-      let db = {
+    for (const res of reses) {
+      const db = {
         _id: res._id,
         topic: res.topic,
         date: topics.find(x => x._id.equals(res.topic)).date,
@@ -297,30 +297,30 @@ updateFunc.push((async () => {
         vote: res.vote,
         lv: res.lv,
         hash: res.hash,
-        type: "topic"
+        type: "topic",
       };
 
       await resesCol.update({ _id: res._id }, db);
     }
   }
 
-  //normalの編集履歴通知
+  // normalの編集履歴通知
   {
-    let reses = await resesCol
+    const reses = await resesCol
       .find({ name: "■トピックデータ" })
       .sort({ date: 1 })
       .toArray();
 
-    let histories = await db.collection("histories")
+    const histories = await db.collection("histories")
       .find({})
       .sort({ date: 1 })
       .toArray();
 
     for (let i = 0; i < reses.length; i++) {
-      let res = reses[i];
-      let history = histories[i];
+      const res = reses[i];
+      const history = histories[i];
 
-      let db = {
+      const db = {
         _id: res._id,
         topic: res.topic,
         date: history.date,
@@ -329,30 +329,30 @@ updateFunc.push((async () => {
         lv: res.lv,
         hash: res.hash,
         type: "history",
-        history: history._id
+        history: history._id,
       };
 
       await resesCol.update({ _id: res._id }, db);
     }
   }
 
-  //forkの建て通知
+  // forkの建て通知
   {
-    let reses = await resesCol
+    const reses = await resesCol
       .find({ name: "■派生トピック" })
       .sort({ date: 1 })
       .toArray();
 
-    let topics = await db.collection("topics")
+    const topics = await db.collection("topics")
       .find({ type: "fork" })
       .sort({ date: 1 })
       .toArray();
 
     for (let i = 0; i < reses.length; i++) {
-      let res = reses[i];
-      let topic = topics[i];
+      const res = reses[i];
+      const topic = topics[i];
 
-      let db = {
+      const db = {
         _id: res._id,
         topic: res.topic,
         date: topic.date,
@@ -361,21 +361,21 @@ updateFunc.push((async () => {
         lv: res.lv,
         hash: res.hash,
         type: "fork",
-        fork: topic._id
+        fork: topic._id,
       };
 
       await resesCol.update({ _id: res._id }, db);
     }
   }
 
-  //type normalをセット
+  // type normalをセット
   {
-    await resesCol.update({ type: { $exists: false } }, { $set: { type: 'normal' } }, { multi: true })
+    await resesCol.update({ type: { $exists: false } }, { $set: { type: "normal" } }, { multi: true });
   }
 }));
 
 updateFunc.push(async () => {
-  let db = await DB;
+  const db = await DB;
 
   await db.collection("histories").update({}, { $rename: { text: "body" } }, { multi: true });
   await db.collection("msgs").update({}, { $rename: { text: "body" } }, { multi: true });
@@ -383,12 +383,12 @@ updateFunc.push(async () => {
   await db.collection("reses").update({}, { $rename: { text: "body" } }, { multi: true });
   await db.collection("topics").update({}, { $rename: { text: "body" } }, { multi: true });
 
-  let resBaseProps = {
+  const resBaseProps = {
     topic: {
-      type: "keyword"
+      type: "keyword",
     },
     date: {
-      type: "date"
+      type: "date",
     },
     user: {
       type: "keyword",
@@ -400,15 +400,15 @@ updateFunc.push(async () => {
           type: "keyword",
         },
         value: {
-          type: "integer"
+          type: "integer",
         },
         lv: {
-          type: "integer"
-        }
-      }
+          type: "integer",
+        },
+      },
     },
     lv: {
-      type: "integer"
+      type: "integer",
     },
     hash: {
       type: "keyword",
@@ -427,7 +427,7 @@ updateFunc.push(async () => {
               tokenizer: "kuromoji_tokenizer",
               char_filter: [
                 "icu_normalizer",
-                "kuromoji_iteration_mark"
+                "kuromoji_iteration_mark",
               ],
               filter: [
                 "kuromoji_baseform",
@@ -435,16 +435,16 @@ updateFunc.push(async () => {
                 "ja_stop",
                 "kuromoji_number",
                 "kuromoji_stemmer",
-              ]
-            }
-          }
-        }
-      }
-    }
-  })
+              ],
+            },
+          },
+        },
+      },
+    },
+  });
 
   await ESClient.indices.create({
-    index: 'reses',
+    index: "reses",
     body: {
       mappings: {
         normal: {
@@ -452,21 +452,21 @@ updateFunc.push(async () => {
           properties: {
             ...resBaseProps,
             name: {
-              type: "text"
+              type: "text",
             },
             body: {
-              type: "text"
+              type: "text",
             },
             reply: {
               type: "nested",
               properties: {
                 res: {
-                  type: "text"
+                  type: "text",
                 },
                 user: {
-                  type: "text"
-                }
-              }
+                  type: "text",
+                },
+              },
             },
             deleteFlag: {
               type: "keyword",
@@ -476,8 +476,8 @@ updateFunc.push(async () => {
             },
             age: {
               type: "boolean",
-            }
-          }
+            },
+          },
         },
         history: {
           dynamic: "strict",
@@ -485,14 +485,14 @@ updateFunc.push(async () => {
             ...resBaseProps,
             history: {
               type: "keyword",
-            }
-          }
+            },
+          },
         },
         topic: {
           dynamic: "strict",
           properties: {
             ...resBaseProps,
-          }
+          },
         },
         fork: {
           dynamic: "strict",
@@ -500,125 +500,125 @@ updateFunc.push(async () => {
             ...resBaseProps,
             fork: {
               type: "keyword",
-            }
-          }
-        }
-      }
-    }
+            },
+          },
+        },
+      },
+    },
   });
 
   await ESClient.indices.create({
-    index: 'histories',
+    index: "histories",
     body: {
       mappings: {
         normal: {
           dynamic: "strict",
           properties: {
             topic: {
-              type: "keyword"
+              type: "keyword",
             },
             title: {
-              type: "text"
+              type: "text",
             },
             tags: {
-              type: "keyword"
+              type: "keyword",
             },
             body: {
-              type: "text"
+              type: "text",
             },
             date: {
-              type: "date"
+              type: "date",
             },
             hash: {
-              type: "keyword"
+              type: "keyword",
             },
             user: {
-              type: "keyword"
-            }
-          }
-        }
-      }
-    }
+              type: "keyword",
+            },
+          },
+        },
+      },
+    },
   });
 
   await ESClient.indices.create({
-    index: 'msgs',
+    index: "msgs",
     body: {
       mappings: {
         normal: {
           dynamic: "strict",
           properties: {
             receiver: {
-              type: "keyword"
+              type: "keyword",
             },
             body: {
-              type: "text"
+              type: "text",
             },
             date: {
-              type: "date"
-            }
-          }
-        }
-      }
-    }
+              type: "date",
+            },
+          },
+        },
+      },
+    },
   });
 
-  let topicBaseProps = {
+  const topicBaseProps = {
     title: {
-      type: "text"
+      type: "text",
     },
     update: {
-      type: "date"
+      type: "date",
     },
     date: {
-      type: "date"
+      type: "date",
     },
     ageUpdate: {
-      type: "date"
+      type: "date",
     },
     active: {
-      type: "boolean"
+      type: "boolean",
     },
   };
 
-  let topicSearchBaseProps = {
+  const topicSearchBaseProps = {
     ...topicBaseProps,
     tags: {
-      type: "keyword"
+      type: "keyword",
     },
     body: {
-      type: "text"
+      type: "text",
     },
   };
 
   await ESClient.indices.create({
-    index: 'topics',
+    index: "topics",
     body: {
       mappings: {
         normal: {
           dynamic: "strict",
           properties: {
-            ...topicSearchBaseProps
-          }
+            ...topicSearchBaseProps,
+          },
         },
         one: {
           dynamic: "strict",
           properties: {
-            ...topicSearchBaseProps
-          }
+            ...topicSearchBaseProps,
+          },
         },
         fork: {
           dynamic: "strict",
           properties: {
             ...topicBaseProps,
             parent: {
-              type: "keyword"
-            }
-          }
+              type: "keyword",
+            },
+          },
         },
-      }
-    }
-  })
+      },
+    },
+  });
 });
 
 /*
@@ -629,7 +629,7 @@ export async function createDB() {
   try {
     ver = JSON.parse(fs.readFileSync("./data/db-version.json", "utf8"));
   } catch (e) {
-    //ファイルがなければ0
+    // ファイルがなければ0
     ver = 0;
   }
   Logger.system.info(`現在のDBバージョン:${ver}`);
@@ -641,7 +641,7 @@ export async function createDB() {
   }
 
   fs.writeFileSync("./data/db-version.json", JSON.stringify(updateFunc.length), {
-    encoding: "utf8"
+    encoding: "utf8",
   });
   Logger.system.info(`DBアップデート完了:${updateFunc.length}`);
-};
+}

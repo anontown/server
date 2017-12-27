@@ -1,13 +1,13 @@
-import { DB } from '../../db';
-import { ObjectID } from 'mongodb';
-import { AtNotFoundError, AtNotFoundPartError } from '../../at-error'
-import { IClientDB, Client } from './client';
-import { IAuthTokenMaster } from '../../auth'
+import { ObjectID } from "mongodb";
+import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { IAuthTokenMaster } from "../../auth";
+import { DB } from "../../db";
+import { Client, IClientDB } from "./client";
 
 export class ClientRepository {
   static async findOne(id: string): Promise<Client> {
-    let db = await DB;
-    let client: IClientDB | null = await db.collection("clients")
+    const db = await DB;
+    const client: IClientDB | null = await db.collection("clients")
       .findOne({ _id: new ObjectID(id) });
 
     if (client === null) {
@@ -17,8 +17,8 @@ export class ClientRepository {
   }
 
   static async findIn(ids: string[]): Promise<Client[]> {
-    let db = await DB;
-    let clients: IClientDB[] = await db.collection("clients")
+    const db = await DB;
+    const clients: IClientDB[] = await db.collection("clients")
       .find({ _id: { $in: ids.map(id => new ObjectID(id)) } })
       .sort({ date: -1 })
       .toArray();
@@ -32,8 +32,8 @@ export class ClientRepository {
   }
 
   static async findAll(authToken: IAuthTokenMaster): Promise<Client[]> {
-    let db = await DB;
-    let clients: IClientDB[] = await db.collection("clients")
+    const db = await DB;
+    const clients: IClientDB[] = await db.collection("clients")
       .find({ user: new ObjectID(authToken.user) })
       .sort({ date: -1 })
       .toArray();
@@ -41,7 +41,7 @@ export class ClientRepository {
   }
 
   static async insert(client: Client): Promise<null> {
-    let db = await DB;
+    const db = await DB;
 
     await db.collection("clients")
       .insert(client.toDB());
@@ -50,7 +50,7 @@ export class ClientRepository {
   }
 
   static async update(client: Client): Promise<null> {
-    let db = await DB;
+    const db = await DB;
     await db.collection("clients").update({ _id: new ObjectID(client.id) }, client.toDB());
     return null;
   }

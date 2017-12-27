@@ -1,37 +1,37 @@
-import * as log4js from 'log4js';
+import * as log4js from "log4js";
 
-//log
+// log
 log4js.configure({
     appenders: [
         {
-            "type": "dateFile",
-            "category": "system",
-            "filename": "logs/system.log",
-            "pattern": "-yyyy-MM-dd"
+            type: "dateFile",
+            category: "system",
+            filename: "logs/system.log",
+            pattern: "-yyyy-MM-dd",
         },
         {
-            "type": "dateFile",
-            "category": "access",
-            "filename": "logs/access.log",
-            "pattern": "-yyyy-MM-dd"
+            type: "dateFile",
+            category: "access",
+            filename: "logs/access.log",
+            pattern: "-yyyy-MM-dd",
         },
         {
-            "type": "dateFile",
-            "category": "error",
-            "filename": "logs/error.log",
-            "pattern": "-yyyy-MM-dd"
+            type: "dateFile",
+            category: "error",
+            filename: "logs/error.log",
+            pattern: "-yyyy-MM-dd",
         },
         {
-            "type": "dateFile",
-            "category": "app",
-            "filename": "logs/app.log",
-            "pattern": "-yyyy-MM-dd"
+            type: "dateFile",
+            category: "app",
+            filename: "logs/app.log",
+            pattern: "-yyyy-MM-dd",
         },
         {
-            "type": "console"
-        }
+            type: "console",
+        },
 
-    ]
+    ],
 });
 
 export class Logger {

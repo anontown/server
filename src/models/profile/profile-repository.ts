@@ -1,13 +1,13 @@
-import { ObjectID, WriteError } from 'mongodb';
-import { DB } from '../../db';
-import { IAuthToken } from '../../auth';
-import { AtNotFoundError, AtNotFoundPartError, AtConflictError } from '../../at-error'
-import { Profile, IProfileDB } from './profile';
+import { ObjectID, WriteError } from "mongodb";
+import { AtConflictError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { IAuthToken } from "../../auth";
+import { DB } from "../../db";
+import { IProfileDB, Profile } from "./profile";
 
 export class ProfileRepository {
   static async findOne(id: string): Promise<Profile> {
-    let db = await DB;
-    let profile: IProfileDB | null = await db.collection("profiles")
+    const db = await DB;
+    const profile: IProfileDB | null = await db.collection("profiles")
       .findOne({ _id: new ObjectID(id) });
 
     if (profile === null) {
@@ -18,8 +18,8 @@ export class ProfileRepository {
   }
 
   static async findIn(ids: string[]): Promise<Profile[]> {
-    let db = await DB;
-    let profiles: IProfileDB[] = await db.collection("profiles")
+    const db = await DB;
+    const profiles: IProfileDB[] = await db.collection("profiles")
       .find({ _id: { $in: ids.map(id => new ObjectID(id)) } })
       .sort({ date: -1 })
       .toArray();
@@ -33,8 +33,8 @@ export class ProfileRepository {
   }
 
   static async findAll(authToken: IAuthToken): Promise<Profile[]> {
-    let db = await DB;
-    let profiles: IProfileDB[] = await db.collection("profiles")
+    const db = await DB;
+    const profiles: IProfileDB[] = await db.collection("profiles")
       .find({ user: new ObjectID(authToken.user) })
       .sort({ date: -1 })
       .toArray();
@@ -42,7 +42,7 @@ export class ProfileRepository {
   }
 
   static async insert(profile: Profile): Promise<null> {
-    let db = await DB;
+    const db = await DB;
     await db.collection("profiles").insert(profile.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
         throw new AtConflictError("スクリーンネームが使われています");
@@ -54,7 +54,7 @@ export class ProfileRepository {
   }
 
   static async update(profile: Profile): Promise<null> {
-    let db = await DB;
+    const db = await DB;
     await db.collection("profiles").update({ _id: new ObjectID(profile.id) }, profile.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
         throw new AtConflictError("スクリーンネームが使われています");

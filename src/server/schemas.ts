@@ -8,8 +8,8 @@ export const authUser: object = {
     },
     pass: {
       type: "string",
-    }
-  }
+    },
+  },
 };
 
 export const recaptcha: object = ["string", "null"];
@@ -24,6 +24,6 @@ export const authToken: object = {
     },
     key: {
       type: "string",
-    }
-  }
+    },
+  },
 };

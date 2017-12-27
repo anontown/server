@@ -1,26 +1,38 @@
-import { User } from '../user';
-import { IGenerator } from '../../generator';
-import { IAuthToken } from "../../auth";
 import { AtRightError } from "../../at-error";
+import { IAuthToken } from "../../auth";
+import { IGenerator } from "../../generator";
+import { User } from "../user";
 
 export interface IMsgDB {
-  id: string,
+  id: string;
   body: {
     receiver: string | null,
     body: string,
-    date: string
-  }
+    date: string,
+  };
 }
 
 export interface IMsgAPI {
-  id: string,
-  receiver: string | null,
-  body: string,
-  date: string
+  id: string;
+  receiver: string | null;
+  body: string;
+  date: string;
 }
 
 export class Msg {
-  private constructor(private _id: string,
+  static fromDB(m: IMsgDB): Msg {
+    return new Msg(m.id, m.body.receiver, m.body.body, new Date(m.body.date));
+  }
+
+  static create(objidGenerator: IGenerator<string>, receiver: User | null, body: string, now: Date): Msg {
+    return new Msg(objidGenerator.get(),
+      receiver !== null ? receiver.id : null,
+      body,
+      now);
+  }
+
+  private constructor(
+    private _id: string,
     private _receiver: string | null,
     private _body: string,
     private _date: Date) {
@@ -49,9 +61,9 @@ export class Msg {
       body: {
         receiver: this._receiver,
         body: this._body,
-        date: this._date.toISOString()
-      }
-    }
+        date: this._date.toISOString(),
+      },
+    };
   }
 
   toAPI(authToken: IAuthToken): IMsgAPI {
@@ -63,18 +75,7 @@ export class Msg {
       id: this._id,
       receiver: this._receiver,
       body: this._body,
-      date: this._date.toISOString()
-    }
-  }
-
-  static fromDB(m: IMsgDB): Msg {
-    return new Msg(m.id, m.body.receiver, m.body.body, new Date(m.body.date));
-  }
-
-  static create(objidGenerator: IGenerator<string>, receiver: User | null, body: string, now: Date): Msg {
-    return new Msg(objidGenerator.get(),
-      receiver !== null ? receiver.id : null,
-      body,
-      now);
+      date: this._date.toISOString(),
+    };
   }
 }

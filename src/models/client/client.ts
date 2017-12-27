@@ -1,29 +1,64 @@
-import { IAuthTokenMaster } from '../../auth'
-import { Config } from '../../config';
-import { paramsErrorMaker, AtRightError } from '../../at-error'
-import { ObjectID } from 'mongodb';
-import { IGenerator } from '../../generator';
+import { ObjectID } from "mongodb";
+import { AtRightError, paramsErrorMaker } from "../../at-error";
+import { IAuthTokenMaster } from "../../auth";
+import { Config } from "../../config";
+import { IGenerator } from "../../generator";
 
 export interface IClientDB {
-  _id: ObjectID,
-  name: string,
-  url: string,
-  user: ObjectID,
-  date: Date,
-  update: Date
+  _id: ObjectID;
+  name: string;
+  url: string;
+  user: ObjectID;
+  date: Date;
+  update: Date;
 }
 
 export interface IClientAPI {
-  id: string,
-  name: string,
-  url: string,
-  user: string | null
-  date: string,
-  update: string
+  id: string;
+  name: string;
+  url: string;
+  user: string | null;
+  date: string;
+  update: string;
 }
 
 export class Client {
-  private constructor(private _id: string,
+
+  static fromDB(c: IClientDB): Client {
+    return new Client(c._id.toString(), c.name, c.url, c.user.toString(), c.date, c.update);
+  }
+
+  static create(
+    objidGenerator: IGenerator<string>,
+    authToken: IAuthTokenMaster,
+    name: string,
+    url: string,
+    now: Date): Client {
+    paramsErrorMaker([
+      {
+        field: "name",
+        val: name,
+        regex: Config.user.client.name.regex,
+        message: Config.user.client.name.msg,
+      },
+      {
+        field: "url",
+        val: url,
+        regex: Config.user.client.url.regex,
+        message: Config.user.client.url.msg,
+      },
+    ]);
+
+    return new Client(objidGenerator.get(),
+      name,
+      url,
+      authToken.user,
+      now,
+      now);
+  }
+
+  private constructor(
+    private _id: string,
     private _name: string,
     private _url: string,
     private _user: string,
@@ -63,8 +98,8 @@ export class Client {
       url: this._url,
       user: new ObjectID(this._user),
       date: this._date,
-      update: this._update
-    }
+      update: this._update,
+    };
   }
 
   toAPI(authToken: IAuthTokenMaster | null): IClientAPI {
@@ -74,36 +109,8 @@ export class Client {
       url: this._url,
       user: authToken !== null && authToken.user === this._user ? this._user : null,
       date: this._date.toISOString(),
-      update: this._date.toISOString()
+      update: this._date.toISOString(),
     };
-  }
-
-  static fromDB(c: IClientDB): Client {
-    return new Client(c._id.toString(), c.name, c.url, c.user.toString(), c.date, c.update);
-  }
-
-  static create(objidGenerator: IGenerator<string>, authToken: IAuthTokenMaster, name: string, url: string, now: Date): Client {
-    paramsErrorMaker([
-      {
-        field: "name",
-        val: name,
-        regex: Config.user.client.name.regex,
-        message: Config.user.client.name.msg
-      },
-      {
-        field: "url",
-        val: url,
-        regex: Config.user.client.url.regex,
-        message: Config.user.client.url.msg
-      }
-    ]);
-
-    return new Client(objidGenerator.get(),
-      name,
-      url,
-      authToken.user,
-      now,
-      now);
   }
 
   changeData(authToken: IAuthTokenMaster, name: string, url: string, now: Date) {
@@ -115,14 +122,14 @@ export class Client {
         field: "name",
         val: name,
         regex: Config.user.client.name.regex,
-        message: Config.user.client.name.msg
+        message: Config.user.client.name.msg,
       },
       {
         field: "url",
         val: url,
         regex: Config.user.client.url.regex,
-        message: Config.user.client.url.msg
-      }
+        message: Config.user.client.url.msg,
+      },
     ]);
 
     this._name = name;

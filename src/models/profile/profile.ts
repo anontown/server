@@ -1,31 +1,73 @@
-import { ObjectID } from 'mongodb';
-import { IAuthToken } from '../../auth';
-import { AtRightError, paramsErrorMaker } from '../../at-error'
-import { Config } from '../../config';
-import { IGenerator } from '../../generator';
+import { ObjectID } from "mongodb";
+import { AtRightError, paramsErrorMaker } from "../../at-error";
+import { IAuthToken } from "../../auth";
+import { Config } from "../../config";
+import { IGenerator } from "../../generator";
 
 export interface IProfileDB {
-  _id: ObjectID,
-  user: ObjectID,
-  name: string,
-  body: string,
-  date: Date,
-  update: Date,
-  sn: string
+  _id: ObjectID;
+  user: ObjectID;
+  name: string;
+  body: string;
+  date: Date;
+  update: Date;
+  sn: string;
 }
 
 export interface IProfileAPI {
-  id: string,
-  user: string | null,
-  name: string,
-  body: string,
-  date: string,
-  update: string,
-  sn: string
+  id: string;
+  user: string | null;
+  name: string;
+  body: string;
+  date: string;
+  update: string;
+  sn: string;
 }
 
 export class Profile {
-  private constructor(private _id: string,
+  static fromDB(p: IProfileDB): Profile {
+    return new Profile(p._id.toString(), p.user.toString(), p.name, p.body, p.date, p.update, p.sn);
+  }
+
+  static create(
+    objidGenerator: IGenerator<string>,
+    authToken: IAuthToken,
+    name: string,
+    body: string,
+    sn: string,
+    now: Date): Profile {
+    paramsErrorMaker([
+      {
+        field: "name",
+        val: name,
+        regex: Config.user.profile.name.regex,
+        message: Config.user.profile.name.msg,
+      },
+      {
+        field: "body",
+        val: body,
+        regex: Config.user.profile.body.regex,
+        message: Config.user.profile.body.msg,
+      },
+      {
+        field: "sn",
+        val: sn,
+        regex: Config.user.profile.sn.regex,
+        message: Config.user.profile.sn.msg,
+      },
+    ]);
+
+    return new Profile(objidGenerator.get(),
+      authToken.user,
+      name,
+      body,
+      now,
+      now,
+      sn);
+  }
+
+  private constructor(
+    private _id: string,
     private _user: string,
     private _name: string,
     private _body: string,
@@ -71,7 +113,7 @@ export class Profile {
       body: this._body,
       date: this._date,
       update: this._update,
-      sn: this._sn
+      sn: this._sn,
     };
   }
 
@@ -83,43 +125,8 @@ export class Profile {
       body: this._body,
       date: this._date.toISOString(),
       update: this._update.toISOString(),
-      sn: this._sn
-    }
-  }
-
-  static fromDB(p: IProfileDB): Profile {
-    return new Profile(p._id.toString(), p.user.toString(), p.name, p.body, p.date, p.update, p.sn);
-  }
-
-  static create(objidGenerator: IGenerator<string>, authToken: IAuthToken, name: string, body: string, sn: string, now: Date): Profile {
-    paramsErrorMaker([
-      {
-        field: "name",
-        val: name,
-        regex: Config.user.profile.name.regex,
-        message: Config.user.profile.name.msg
-      },
-      {
-        field: "body",
-        val: body,
-        regex: Config.user.profile.body.regex,
-        message: Config.user.profile.body.msg
-      },
-      {
-        field: "sn",
-        val: sn,
-        regex: Config.user.profile.sn.regex,
-        message: Config.user.profile.sn.msg
-      },
-    ]);
-
-    return new Profile(objidGenerator.get(),
-      authToken.user,
-      name,
-      body,
-      now,
-      now,
-      sn);
+      sn: this._sn,
+    };
   }
 
   changeData(authToken: IAuthToken, name: string, body: string, sn: string, now: Date) {
@@ -131,19 +138,19 @@ export class Profile {
         field: "name",
         val: name,
         regex: Config.user.profile.name.regex,
-        message: Config.user.profile.name.msg
+        message: Config.user.profile.name.msg,
       },
       {
         field: "body",
         val: body,
         regex: Config.user.profile.body.regex,
-        message: Config.user.profile.body.msg
+        message: Config.user.profile.body.msg,
       },
       {
         field: "sn",
         val: sn,
         regex: Config.user.profile.sn.regex,
-        message: Config.user.profile.sn.msg
+        message: Config.user.profile.sn.msg,
       },
     ]);
 

@@ -1,141 +1,141 @@
+import { ObjectID } from "mongodb";
 import {
-  Client,
-  ObjectIDGenerator,
   AtError,
-  IAuthTokenMaster
-} from '../../';
-import { ObjectID } from 'mongodb';
+  Client,
+  IAuthTokenMaster,
+  ObjectIDGenerator,
+} from "../../";
 
-describe('Client', () => {
-  describe('create', () => {
-    it('http:// から始まるURLで正常に呼び出せるか', () => {
+describe("Client", () => {
+  describe("create", () => {
+    it("http:// から始まるURLで正常に呼び出せるか", () => {
       Client.create(
         ObjectIDGenerator,
         {
           id: ObjectIDGenerator.get(),
-          key: '',
+          key: "",
           user: ObjectIDGenerator.get(),
-          type: 'master'
+          type: "master",
         },
-        'hoge',
-        'http://hoge.com',
-        new Date()
+        "hoge",
+        "http://hoge.com",
+        new Date(),
       );
     });
 
-    it('https:// から始まるURLで正常に呼び出せるか', () => {
+    it("https:// から始まるURLで正常に呼び出せるか", () => {
       Client.create(
         ObjectIDGenerator,
         {
           id: ObjectIDGenerator.get(),
-          key: '',
+          key: "",
           user: ObjectIDGenerator.get(),
-          type: 'master'
+          type: "master",
         },
-        'hoge',
-        'https://hoge.com',
-        new Date()
+        "hoge",
+        "https://hoge.com",
+        new Date(),
       );
     });
 
-    it('長い名前でエラーになるか', () => {
+    it("長い名前でエラーになるか", () => {
       expect(() => {
         Client.create(
           ObjectIDGenerator,
           {
             id: ObjectIDGenerator.get(),
-            key: '',
+            key: "",
             user: ObjectIDGenerator.get(),
-            type: 'master'
+            type: "master",
           },
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          'http://hoge',
-          new Date()
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "http://hoge",
+          new Date(),
         );
       }).toThrow(AtError);
     });
 
-    it('名前が空文字でエラーになるか', () => {
+    it("名前が空文字でエラーになるか", () => {
       expect(() => {
         Client.create(
           ObjectIDGenerator,
           {
             id: ObjectIDGenerator.get(),
-            key: '',
+            key: "",
             user: ObjectIDGenerator.get(),
-            type: 'master'
+            type: "master",
           },
-          '',
-          'http://hoge',
-          new Date()
-        );
-      }).toThrow(AtError)
-    });
-
-    it('URLスキーマを不正にしたらエラーになるか', () => {
-      expect(() => {
-        Client.create(
-          ObjectIDGenerator,
-          {
-            id: ObjectIDGenerator.get(),
-            key: '',
-            user: ObjectIDGenerator.get(),
-            type: 'master'
-          },
-          'hoge',
-          'hogehttp://hoge.com',
-          new Date()
+          "",
+          "http://hoge",
+          new Date(),
         );
       }).toThrow(AtError);
     });
 
-    it('URLのホストなしでエラーになるか', () => {
+    it("URLスキーマを不正にしたらエラーになるか", () => {
       expect(() => {
         Client.create(
           ObjectIDGenerator,
           {
             id: ObjectIDGenerator.get(),
-            key: '',
+            key: "",
             user: ObjectIDGenerator.get(),
-            type: 'master'
+            type: "master",
           },
-          'http://',
-          '',
-          new Date()
+          "hoge",
+          "hogehttp://hoge.com",
+          new Date(),
         );
       }).toThrow(AtError);
     });
 
-    it('URLが空でエラーになるか', () => {
+    it("URLのホストなしでエラーになるか", () => {
       expect(() => {
         Client.create(
           ObjectIDGenerator,
           {
             id: ObjectIDGenerator.get(),
-            key: '',
+            key: "",
             user: ObjectIDGenerator.get(),
-            type: 'master'
+            type: "master",
           },
-          'hoge',
-          '',
-          new Date()
+          "http://",
+          "",
+          new Date(),
+        );
+      }).toThrow(AtError);
+    });
+
+    it("URLが空でエラーになるか", () => {
+      expect(() => {
+        Client.create(
+          ObjectIDGenerator,
+          {
+            id: ObjectIDGenerator.get(),
+            key: "",
+            user: ObjectIDGenerator.get(),
+            type: "master",
+          },
+          "hoge",
+          "",
+          new Date(),
         );
       }).toThrow(AtError);
     });
   });
 
-  describe('fromDB', () => {
-    it('正常にインスタンス化出来るか', () => {
-      let db = {
+  describe("fromDB", () => {
+    it("正常にインスタンス化出来るか", () => {
+      const db = {
         _id: new ObjectID(),
-        name: 'name',
-        url: 'https://hoge.com',
+        name: "name",
+        url: "https://hoge.com",
         user: new ObjectID(),
         date: new Date(),
-        update: new Date()
+        update: new Date(),
       };
 
-      let client = Client.fromDB(db);
+      const client = Client.fromDB(db);
 
       expect(db._id.toHexString()).toBe(client.id);
       expect(db.name).toBe(client.name);
@@ -148,14 +148,14 @@ describe('Client', () => {
 
   describe("#changeData", () => {
     it("正常に変更できるか", () => {
-      let auth: IAuthTokenMaster = {
+      const auth: IAuthTokenMaster = {
         id: ObjectIDGenerator.get(),
-        key: '',
+        key: "",
         user: ObjectIDGenerator.get(),
-        type: 'master'
+        type: "master",
       };
 
-      let client = Client.create(ObjectIDGenerator,
+      const client = Client.create(ObjectIDGenerator,
         auth,
         "a",
         "https://a",
@@ -166,14 +166,14 @@ describe('Client', () => {
 
     it("違うユーザーが変更しようとしたらエラーになるか", () => {
       expect(() => {
-        let auth: IAuthTokenMaster = {
+        const auth: IAuthTokenMaster = {
           id: ObjectIDGenerator.get(),
-          key: '',
+          key: "",
           user: ObjectIDGenerator.get(),
-          type: 'master'
+          type: "master",
         };
 
-        let client = Client.create(ObjectIDGenerator,
+        const client = Client.create(ObjectIDGenerator,
           auth,
           "hoge",
           "http://hoge",
@@ -181,43 +181,42 @@ describe('Client', () => {
 
         client.changeData({
           id: ObjectIDGenerator.get(),
-          key: '',
+          key: "",
           user: ObjectIDGenerator.get(),
-          type: 'master'
+          type: "master",
         }, "foo", "http://foo", new Date());
       }).toThrow(AtError);
     });
 
-
     it("長い名前でエラーになるか", () => {
       expect(() => {
-        let auth: IAuthTokenMaster = {
+        const auth: IAuthTokenMaster = {
           id: ObjectIDGenerator.get(),
-          key: '',
+          key: "",
           user: ObjectIDGenerator.get(),
-          type: 'master'
+          type: "master",
         };
 
-        let client = Client.create(ObjectIDGenerator,
+        const client = Client.create(ObjectIDGenerator,
           auth,
           "hoge",
           "http://hoge",
           new Date());
 
         client.changeData(auth, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "http://foo", new Date());
-      }).toThrow(AtError)
+      }).toThrow(AtError);
     });
 
     it("不正なURLでエラーになるか", () => {
       expect(() => {
-        let auth: IAuthTokenMaster = {
+        const auth: IAuthTokenMaster = {
           id: ObjectIDGenerator.get(),
-          key: '',
+          key: "",
           user: ObjectIDGenerator.get(),
-          type: 'master'
+          type: "master",
         };
 
-        let client = Client.create(ObjectIDGenerator,
+        const client = Client.create(ObjectIDGenerator,
           auth,
           "hoge",
           "hogehttp://hoge",
@@ -229,22 +228,22 @@ describe('Client', () => {
   });
 
   {
-    let client = Client.fromDB({
+    const client = Client.fromDB({
       _id: new ObjectID(),
-      name: 'name',
-      url: 'https://hoge.com',
+      name: "name",
+      url: "https://hoge.com",
       user: new ObjectID(),
       date: new Date(),
-      update: new Date()
+      update: new Date(),
     });
 
     describe("#toAPI", () => {
       it("認証あり(同一ユーザー)", () => {
-        let api = client.toAPI({
+        const api = client.toAPI({
           id: ObjectIDGenerator.get(),
-          key: '',
+          key: "",
           user: client.user,
-          type: 'master'
+          type: "master",
         });
 
         expect(client.id).toBe(api.id);
@@ -256,18 +255,18 @@ describe('Client', () => {
       });
 
       it("認証あり(別ユーザー)", () => {
-        let api = client.toAPI({
+        const api = client.toAPI({
           id: ObjectIDGenerator.get(),
-          key: '',
+          key: "",
           user: ObjectIDGenerator.get(),
-          type: 'master'
+          type: "master",
         });
 
         expect(api.user).toBeNull();
       });
 
       it("認証無し", () => {
-        let api = client.toAPI(null);
+        const api = client.toAPI(null);
 
         expect(api.user).toBeNull();
       });
@@ -275,7 +274,7 @@ describe('Client', () => {
 
     describe("#toDB", () => {
       it("正常に出力できるか", () => {
-        let db = client.toDB();
+        const db = client.toDB();
 
         expect(client.id).toBe(db._id.toHexString());
         expect(client.name).toBe(db.name);

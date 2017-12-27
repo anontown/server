@@ -1,9 +1,9 @@
-import { User } from '../user';
-import { TopicNormal } from '../topic';
-import { IGenerator } from '../../generator';
+import { IGenerator } from "../../generator";
+import { TopicNormal } from "../topic";
+import { User } from "../user";
 
 export interface IHistoryDB {
-  id: string,
+  id: string;
   body: {
     topic: string,
     title: string,
@@ -11,23 +11,30 @@ export interface IHistoryDB {
     body: string,
     date: string,
     hash: string,
-    user: string
-  }
+    user: string,
+  };
 }
 
 export interface IHistoryAPI {
-  id: string,
-  topic: string,
-  title: string,
-  tags: string[],
-  body: string,
-  date: string,
-  hash: string
+  id: string;
+  topic: string;
+  title: string;
+  tags: string[];
+  body: string;
+  date: string;
+  hash: string;
 }
 
 export class History {
   static fromDB(h: IHistoryDB): History {
-    return new History(h.id, h.body.topic, h.body.title, h.body.tags, h.body.body, new Date(h.body.date), h.body.hash, h.body.user);
+    return new History(h.id,
+      h.body.topic,
+      h.body.title,
+      h.body.tags,
+      h.body.body,
+      new Date(h.body.date),
+      h.body.hash,
+      h.body.user);
   }
 
   static create(objidGenerator: IGenerator<string>, topic: TopicNormal, date: Date, hash: string, user: User): History {
@@ -35,13 +42,13 @@ export class History {
   }
 
   private constructor(private _id: string,
-    private _topic: string,
-    private _title: string,
-    private _tags: string[],
-    private _body: string,
-    private _date: Date,
-    private _hash: string,
-    private _user: string) {
+                      private _topic: string,
+                      private _title: string,
+                      private _tags: string[],
+                      private _body: string,
+                      private _date: Date,
+                      private _hash: string,
+                      private _user: string) {
 
   }
 
@@ -87,9 +94,9 @@ export class History {
         body: this._body,
         date: this._date.toISOString(),
         hash: this._hash,
-        user: this._user
-      }
-    }
+        user: this._user,
+      },
+    };
   }
 
   toAPI(): IHistoryAPI {
@@ -100,7 +107,7 @@ export class History {
       tags: this._tags,
       body: this._body,
       date: this._date.toISOString(),
-      hash: this._hash
+      hash: this._hash,
     };
   }
 }

@@ -1,4 +1,4 @@
-import { IJSONSchemaValidationError } from 'jsonschema';
+import { IJSONSchemaValidationError } from "jsonschema";
 
 export interface AtErrorItem {
     message: string;
@@ -18,7 +18,7 @@ export class AtError extends Error {
         return {
             statusCode: this.statusCode,
             type: this.type,
-            errors: this.errors
+            errors: this.errors,
         };
     }
 }
@@ -26,7 +26,7 @@ export class AtError extends Error {
 export class AtServerError extends AtError {
     constructor() {
         super(StatusCode.InternalServerError, "server", [
-            { message: "サーバー内部エラー", data: null }
+            { message: "サーバー内部エラー", data: null },
         ]);
     }
 }
@@ -34,7 +34,7 @@ export class AtServerError extends AtError {
 export class AtParamTypeError extends AtError {
     constructor(data: IJSONSchemaValidationError[]) {
         super(StatusCode.MisdirectedRequest, "param_type", [
-            { message: "パラメーターの型が不正です", data: data }
+            { message: "パラメーターの型が不正です", data },
         ]);
     }
 }
@@ -42,7 +42,7 @@ export class AtParamTypeError extends AtError {
 export class AtCaptchaError extends AtError {
     constructor() {
         super(StatusCode.Forbidden, "captcha", [
-            { message: "キャプチャ認証に失敗", data: null }
+            { message: "キャプチャ認証に失敗", data: null },
         ]);
     }
 }
@@ -60,13 +60,15 @@ export class AtParamsError extends AtError {
     }
 }
 
-export type paramsErrorMakerData = (() => IParamErrorData | null) | { field: string, val: string, regex: RegExp, message: string };
+export type paramsErrorMakerData =
+    (() => IParamErrorData | null)
+    | { field: string, val: string, regex: RegExp, message: string };
 
 export function paramsErrorMaker(fs: paramsErrorMakerData[]) {
-    let errors: IParamErrorData[] = [];
+    const errors: IParamErrorData[] = [];
     fs.forEach(f => {
         if (typeof f === "function") {
-            let error = f();
+            const error = f();
             if (error !== null) {
                 errors.push(error);
             }
@@ -74,7 +76,7 @@ export function paramsErrorMaker(fs: paramsErrorMakerData[]) {
             if (!f.regex.test(f.val)) {
                 errors.push({
                     field: f.field,
-                    message: f.message
+                    message: f.message,
                 });
             }
         }

@@ -1,8 +1,8 @@
-import { IAuthToken, IAuthUser, IAuthTokenMaster } from '../auth';
+import { IAuthToken, IAuthTokenMaster, IAuthUser } from "../auth";
 
 export class AuthContainer {
   constructor(private _token: IAuthToken | null,
-    private _user: IAuthUser | null) {
+              private _user: IAuthUser | null) {
   }
 
   get token(): IAuthToken {
@@ -14,8 +14,8 @@ export class AuthContainer {
   }
 
   get tokenMaster(): IAuthTokenMaster {
-    let t = this.token;
-    if (t.type === 'general') {
+    const t = this.token;
+    if (t.type === "general") {
       throw new Error();
     }
     return t;

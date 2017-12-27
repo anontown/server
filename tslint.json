@@ -8,10 +8,7 @@
       true,
       "no-public"
     ],
-    "interface-name": [
-      true,
-      "never-prefix"
-    ],
+    "interface-name": false,
     "object-literal-sort-keys": false,
     "variable-name": [
       true,
@@ -31,7 +28,8 @@
       true,
       "spaces",
       2
-    ]
+    ],
+    "no-shadowed-variable": false
   },
   "rulesDirectory": []
 }

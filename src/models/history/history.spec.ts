@@ -1,29 +1,29 @@
+import { ObjectID } from "mongodb";
 import {
     History,
+    IHistoryDB,
     ObjectIDGenerator,
     TopicNormal,
     User,
-    IHistoryDB
-} from '../../';
-import { ObjectID } from 'mongodb';
+} from "../../";
 
 describe("History", () => {
     describe("fromDB", () => {
-        it('正常に作れるか', () => {
-            let db: IHistoryDB = {
+        it("正常に作れるか", () => {
+            const db: IHistoryDB = {
                 id: ObjectIDGenerator.get(),
                 body: {
                     topic: ObjectIDGenerator.get(),
-                    title: 'title',
-                    tags: ['a', 'b'],
-                    body: 'body',
+                    title: "title",
+                    tags: ["a", "b"],
+                    body: "body",
                     date: new Date().toISOString(),
-                    hash: 'hogehogehogeaaa',
-                    user: ObjectIDGenerator.get()
-                }
+                    hash: "hogehogehogeaaa",
+                    user: ObjectIDGenerator.get(),
+                },
             };
 
-            let h = History.fromDB(db);
+            const h = History.fromDB(db);
 
             expect(db.id).toBe(h.id);
             expect(db.body.topic).toBe(h.topic);
@@ -37,25 +37,25 @@ describe("History", () => {
     });
 
     describe("create", () => {
-        it('正常に作れるか', () => {
-            let t = TopicNormal.fromDB({
+        it("正常に作れるか", () => {
+            const t = TopicNormal.fromDB({
                 id: ObjectIDGenerator.get(),
-                type: 'normal',
+                type: "normal",
                 body: {
-                    title: 'title',
-                    tags: ['a'],
-                    body: 'body',
+                    title: "title",
+                    tags: ["a"],
+                    body: "body",
                     update: new Date().toISOString(),
                     date: new Date().toISOString(),
                     ageUpdate: new Date().toISOString(),
-                    active: true
-                }
+                    active: true,
+                },
             }, 10);
 
-            let u = User.fromDB({
+            const u = User.fromDB({
                 _id: new ObjectID(),
-                sn: 'sn',
-                pass: 'pass',
+                sn: "sn",
+                pass: "pass",
                 lv: 1,
                 resWait: {
                     last: new Date(),
@@ -64,17 +64,17 @@ describe("History", () => {
                     h1: 0,
                     h6: 0,
                     h12: 0,
-                    d1: 0
+                    d1: 0,
                 },
                 lastTopic: new Date(),
                 date: new Date(),
                 point: 0,
-                lastOneTopic: new Date()
+                lastOneTopic: new Date(),
             });
 
-            let date = new Date();
-            let hash = 'hash';
-            let h = History.create(ObjectIDGenerator, t, date, hash, u);
+            const date = new Date();
+            const hash = "hash";
+            const h = History.create(ObjectIDGenerator, t, date, hash, u);
 
             expect(h.topic).toBe(t.id);
             expect(h.title).toBe(t.title);
@@ -87,21 +87,21 @@ describe("History", () => {
     });
 
     {
-        let h = History.fromDB({
+        const h = History.fromDB({
             id: ObjectIDGenerator.get(),
             body: {
                 topic: ObjectIDGenerator.get(),
-                title: 'title',
-                tags: ['a', 'b'],
-                body: 'body',
+                title: "title",
+                tags: ["a", "b"],
+                body: "body",
                 date: new Date().toISOString(),
-                hash: 'hogehogehogeaaa',
-                user: ObjectIDGenerator.get()
-            }
+                hash: "hogehogehogeaaa",
+                user: ObjectIDGenerator.get(),
+            },
         });
         describe("#toDB", () => {
-            it('正常に変換できるか', () => {
-                let db = h.toDB();
+            it("正常に変換できるか", () => {
+                const db = h.toDB();
 
                 expect(db.id).toBe(h.id);
                 expect(db.body.topic).toBe(h.topic);
@@ -114,9 +114,9 @@ describe("History", () => {
             });
         });
 
-        describe('#toAPI', () => {
-            it('正常に変換できるか', () => {
-                let api = h.toAPI();
+        describe("#toAPI", () => {
+            it("正常に変換できるか", () => {
+                const api = h.toAPI();
                 expect(api.id).toBe(h.id.toString());
                 expect(api.topic).toBe(h.topic.toString());
                 expect(api.title).toBe(h.title);

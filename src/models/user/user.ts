@@ -1,46 +1,78 @@
-import { ObjectID } from 'mongodb';
-import { IAuthUser } from '../../auth';
-import { paramsErrorMaker, AtUserAuthError, AtPrerequisiteError } from '../../at-error'
-import { Config } from '../../config';
-import { StringUtil } from '../../util';
-import { IGenerator } from '../../generator';
+import { ObjectID } from "mongodb";
+import { AtPrerequisiteError, AtUserAuthError, paramsErrorMaker } from "../../at-error";
+import { IAuthUser } from "../../auth";
+import { Config } from "../../config";
+import { IGenerator } from "../../generator";
+import { StringUtil } from "../../util";
 
 export interface IUserDB {
-  _id: ObjectID,
-  sn: string,
-  pass: string,
-  lv: number,
-  resWait: IResWait,
-  lastTopic: Date,
-  date: Date,
-  point: number
-  lastOneTopic: Date
+  _id: ObjectID;
+  sn: string;
+  pass: string;
+  lv: number;
+  resWait: IResWait;
+  lastTopic: Date;
+  date: Date;
+  point: number;
+  lastOneTopic: Date;
 }
 
 export interface IUserAPI {
-  id: string,
-  sn: string
+  id: string;
+  sn: string;
 }
 
 export interface IResWait {
-  last: Date,
-  m10: number,
-  m30: number,
-  h1: number,
-  h6: number,
-  h12: number,
-  d1: number
+  last: Date;
+  m10: number;
+  m30: number;
+  h1: number;
+  h6: number;
+  h12: number;
+  d1: number;
 }
 
 export class User {
-  private constructor(private _id: string,
+  static fromDB(u: IUserDB): User {
+    return new User(u._id.toString(), u.sn, u.pass, u.lv, u.resWait, u.lastTopic, u.date, u.point, u.lastOneTopic);
+  }
+
+  static create(objidGenerator: IGenerator<string>, sn: string, pass: string, now: Date): User {
+    paramsErrorMaker([
+      {
+        field: "pass",
+        val: pass,
+        regex: Config.user.pass.regex,
+        message: Config.user.pass.msg,
+      },
+      {
+        field: "sn",
+        val: sn,
+        regex: Config.user.sn.regex,
+        message: Config.user.sn.msg,
+      },
+    ]);
+
+    return new User(objidGenerator.get(),
+      sn,
+      StringUtil.hash(pass + Config.salt.pass),
+      1,
+      { last: now, m10: 0, m30: 0, h1: 0, h6: 0, h12: 0, d1: 0 },
+      now,
+      now,
+      0,
+      now);
+  }
+
+  private constructor(
+    private _id: string,
     private _sn: string,
     private _pass: string,
     private _lv: number,
     private _resWait: IResWait,
     private _lastTopic: Date,
     private _date: Date,
-    //毎日リセットされ、特殊動作をすると増えるポイント
+    // 毎日リセットされ、特殊動作をすると増えるポイント
     private _point: number,
     private _lastOneTopic: Date) {
   }
@@ -91,46 +123,15 @@ export class User {
       lastTopic: this._lastTopic,
       date: this._date,
       point: this._point,
-      lastOneTopic: this._lastOneTopic
-    }
+      lastOneTopic: this._lastOneTopic,
+    };
   }
 
   toAPI(): IUserAPI {
     return {
       id: this._id,
-      sn: this._sn
-    }
-  }
-
-  static fromDB(u: IUserDB): User {
-    return new User(u._id.toString(), u.sn, u.pass, u.lv, u.resWait, u.lastTopic, u.date, u.point, u.lastOneTopic);
-  }
-
-  static create(objidGenerator: IGenerator<string>, sn: string, pass: string, now: Date): User {
-    paramsErrorMaker([
-      {
-        field: "pass",
-        val: pass,
-        regex: Config.user.pass.regex,
-        message: Config.user.pass.msg
-      },
-      {
-        field: "sn",
-        val: sn,
-        regex: Config.user.sn.regex,
-        message: Config.user.sn.msg
-      }
-    ]);
-
-    return new User(objidGenerator.get(),
-      sn,
-      StringUtil.hash(pass + Config.salt.pass),
-      1,
-      { last: now, m10: 0, m30: 0, h1: 0, h6: 0, h12: 0, d1: 0 },
-      now,
-      now,
-      0,
-      now);
+      sn: this._sn,
+    };
   }
 
   change(_authUser: IAuthUser, pass: string, sn: string) {
@@ -139,21 +140,21 @@ export class User {
         field: "pass",
         val: pass,
         regex: Config.user.pass.regex,
-        message: Config.user.pass.msg
+        message: Config.user.pass.msg,
       },
       {
         field: "sn",
         val: sn,
         regex: Config.user.sn.regex,
-        message: Config.user.sn.msg
-      }
+        message: Config.user.sn.msg,
+      },
     ]);
 
     this._pass = StringUtil.hash(pass + Config.salt.pass);
     this._sn = sn;
   }
 
-  auth(pass: String): IAuthUser {
+  auth(pass: string): IAuthUser {
     if (this._pass === StringUtil.hash(pass + Config.salt.pass)) {
       return { id: this._id, pass: this._pass };
     } else {
@@ -174,13 +175,13 @@ export class User {
     } else if (lv > Config.user.lvMax) {
       this._lv = Config.user.lvMax;
     } else {
-      this._lv = lv;;
+      this._lv = lv;
     }
   }
 
   changeLastRes(lastRes: Date) {
-    //条件
-    //係数
+    // 条件
+    // 係数
     const coe = (this._lv / Config.user.lvMax) * (Config.res.wait.maxLv - 1) + 1;
     if (
       this._resWait.d1 < Config.res.wait.d1 * coe &&

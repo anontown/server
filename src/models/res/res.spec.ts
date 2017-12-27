@@ -1,12 +1,12 @@
 import {
-  ResBase,
   IAuthToken,
-  IVote
-} from '../../';
+  IVote,
+  ResBase,
+} from "../../";
 
 describe("Res", () => {
   describe("ResBase", () => {
-    class ResBaseTest extends ResBase<"normal">{
+    class ResBaseTest extends ResBase<"normal"> {
       toDB() {
         return super.toBaseDB({});
       }

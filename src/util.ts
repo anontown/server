@@ -1,4 +1,4 @@
-import * as CryptoJS from 'crypto-js';
+import * as CryptoJS from "crypto-js";
 
 export class StringUtil {
     static hash(str: string): string {

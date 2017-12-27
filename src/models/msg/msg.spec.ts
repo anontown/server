@@ -1,9 +1,9 @@
 import {
-  ObjectIDGenerator,
-  Msg,
+  AtError,
   IMsgDB,
-  AtError
-} from '../../';
+  Msg,
+  ObjectIDGenerator,
+} from "../../";
 
 describe("Msg", () => {
   {
@@ -12,8 +12,8 @@ describe("Msg", () => {
       body: {
         receiver: "user",
         body: "あいうえお",
-        date: new Date().toISOString()
-      }
+        date: new Date().toISOString(),
+      },
     });
 
     const receiverNullMsg = Msg.fromDB({
@@ -21,13 +21,13 @@ describe("Msg", () => {
       body: {
         receiver: null,
         body: "あいうえお",
-        date: new Date().toISOString()
-      }
+        date: new Date().toISOString(),
+      },
     });
 
     describe("#toDB", () => {
       it("正常に変換出来るか", () => {
-        let db = msg.toDB();
+        const db = msg.toDB();
 
         expect(db.id).toBe(msg.id);
         expect(db.body.receiver).toBe(msg.receiver);
@@ -38,11 +38,11 @@ describe("Msg", () => {
 
     describe("#toAPI", () => {
       it("正常に変換出来るか", () => {
-        let api = msg.toAPI({
+        const api = msg.toAPI({
           id: "usid",
           key: "aaa",
           user: "user",
-          type: "master"
+          type: "master",
         });
 
         expect(api.id).toBe(msg.id);
@@ -52,11 +52,11 @@ describe("Msg", () => {
       });
 
       it("receiverがnull", () => {
-        let api = receiverNullMsg.toAPI({
+        const api = receiverNullMsg.toAPI({
           id: "usid",
           key: "aaa",
           user: "user",
-          type: "master"
+          type: "master",
         });
 
         expect(api.receiver).toBeNull();
@@ -68,8 +68,8 @@ describe("Msg", () => {
             id: "usid",
             key: "aaa",
             user: "other",
-            type: "master"
-          })
+            type: "master",
+          });
         }).toThrow(AtError);
       });
     });
@@ -82,8 +82,8 @@ describe("Msg", () => {
         body: {
           receiver: ObjectIDGenerator.get(),
           body: "a",
-          date: new Date().toISOString()
-        }
+          date: new Date().toISOString(),
+        },
       };
 
       const msg = Msg.fromDB(db);
@@ -96,8 +96,8 @@ describe("Msg", () => {
   });
 
   describe("create", () => {
-    it('正常に生成できるか', () => {
-      Msg.create(ObjectIDGenerator, null, 'hoge', new Date());
+    it("正常に生成できるか", () => {
+      Msg.create(ObjectIDGenerator, null, "hoge", new Date());
     });
   });
 });

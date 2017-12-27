@@ -1,43 +1,43 @@
-import { History, IHistoryDB } from './history';
-import { AtNotFoundError, AtNotFoundPartError } from '../../at-error';
-import { Topic } from '../topic';
-import { ESClient } from "../../db";
+import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { Config } from "../../config";
+import { ESClient } from "../../db";
+import { Topic } from "../topic";
+import { History, IHistoryDB } from "./history";
 
 export class HistoryRepository {
   static async insert(history: History): Promise<null> {
-    let hDB = history.toDB();
+    const hDB = history.toDB();
     await ESClient.create({
       index: "histories",
       type: "normal",
       id: hDB.id,
-      body: hDB.body
+      body: hDB.body,
     });
     return null;
   }
 
   static async update(history: History): Promise<null> {
-    let hDB = history.toDB();
+    const hDB = history.toDB();
     await ESClient.update({
       index: "histories",
       type: "normal",
       id: hDB.id,
-      body: hDB.body
+      body: hDB.body,
     });
     return null;
   }
 
   static async findOne(id: string): Promise<History> {
-    let histories = await ESClient.search<IHistoryDB["body"]>({
-      index: 'histories',
+    const histories = await ESClient.search<IHistoryDB["body"]>({
+      index: "histories",
       size: 1,
       body: {
         query: {
           term: {
-            _id: id
-          }
-        }
-      }
+            _id: id,
+          },
+        },
+      },
     });
 
     if (histories.hits.total === 0) {
@@ -48,16 +48,16 @@ export class HistoryRepository {
   }
 
   static async findIn(ids: string[]): Promise<History[]> {
-    let histories = await ESClient.search<IHistoryDB["body"]>({
-      index: 'histories',
+    const histories = await ESClient.search<IHistoryDB["body"]>({
+      index: "histories",
       size: ids.length,
       body: {
         query: {
           terms: {
-            _id: ids
-          }
+            _id: ids,
+          },
         },
-        sort: { ageUpdate: { order: "desc" } }
+        sort: { ageUpdate: { order: "desc" } },
       },
     });
 
@@ -70,16 +70,16 @@ export class HistoryRepository {
   }
 
   static async findAll(topic: Topic): Promise<History[]> {
-    let histories = await ESClient.search<IHistoryDB["body"]>({
-      index: 'histories',
+    const histories = await ESClient.search<IHistoryDB["body"]>({
+      index: "histories",
       size: Config.api.limit,
       body: {
         query: {
           terms: {
-            topic: topic.id
-          }
+            topic: topic.id,
+          },
         },
-        sort: { ageUpdate: { order: "desc" } }
+        sort: { ageUpdate: { order: "desc" } },
       },
     });
 
