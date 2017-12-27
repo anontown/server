@@ -35,13 +35,18 @@
     "@types/ws": "0.0.41",
     "intelli-espower-loader": "^1.0.1",
     "jest": "^22.0.4",
+    "sloc": "^0.2.0",
     "ts-jest": "^22.0.0",
+    "tslint": "^5.8.0",
     "typescript": "^2.5.2"
   },
   "scripts": {
     "build": "tsc",
     "start": "tsc&&node ./dist/scripts/app.js",
-    "test": "jest"
+    "test": "jest",
+    "lint": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts{,x}'",
+    "lint:fix": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts{,x}' --fix",
+    "loc": "sloc --format cli-table ./src"
   },
   "jest": {
     "transform": {
