@@ -4,7 +4,6 @@ import {
   AtError,
   IAuthTokenMaster
 } from '../../../scripts';
-import * as assert from 'power-assert';
 import { ObjectID } from 'mongodb';
 
 describe('Client', () => {
@@ -40,7 +39,7 @@ describe('Client', () => {
     });
 
     it('長い名前でエラーになるか', () => {
-      assert.throws(() => {
+      expect(() => {
         Client.create(
           ObjectIDGenerator,
           {
@@ -53,11 +52,11 @@ describe('Client', () => {
           'http://hoge',
           new Date()
         );
-      }, (e: any) => e instanceof AtError);
+      }).toThrow(AtError);
     });
 
     it('名前が空文字でエラーになるか', () => {
-      assert.throws(() => {
+      expect(() => {
         Client.create(
           ObjectIDGenerator,
           {
@@ -70,11 +69,11 @@ describe('Client', () => {
           'http://hoge',
           new Date()
         );
-      }, (e: any) => e instanceof AtError);
+      }).toThrow(AtError)
     });
 
     it('URLスキーマを不正にしたらエラーになるか', () => {
-      assert.throws(() => {
+      expect(() => {
         Client.create(
           ObjectIDGenerator,
           {
@@ -87,11 +86,11 @@ describe('Client', () => {
           'hogehttp://hoge.com',
           new Date()
         );
-      }, (e: any) => e instanceof AtError);
+      }).toThrow(AtError);
     });
 
     it('URLのホストなしでエラーになるか', () => {
-      assert.throws(() => {
+      expect(() => {
         Client.create(
           ObjectIDGenerator,
           {
@@ -104,11 +103,11 @@ describe('Client', () => {
           '',
           new Date()
         );
-      }, (e: any) => e instanceof AtError);
+      }).toThrow(AtError);
     });
 
     it('URLが空でエラーになるか', () => {
-      assert.throws(() => {
+      expect(() => {
         Client.create(
           ObjectIDGenerator,
           {
@@ -121,7 +120,7 @@ describe('Client', () => {
           '',
           new Date()
         );
-      }, (e: any) => e instanceof AtError);
+      }).toThrow(AtError);
     });
   });
 
@@ -138,12 +137,12 @@ describe('Client', () => {
 
       let client = Client.fromDB(db);
 
-      assert(db._id.toHexString() === client.id);
-      assert(db.name === client.name);
-      assert(db.url === client.url);
-      assert(db.user.toHexString() === client.user);
-      assert(db.date.getTime() === client.date.getTime());
-      assert(db.update.getTime() === client.update.getTime());
+      expect(db._id.toHexString()).toBe(client.id);
+      expect(db.name).toBe(client.name);
+      expect(db.url).toBe(client.url);
+      expect(db.user.toHexString()).toBe(client.user);
+      expect(db.date.getTime()).toBe(client.date.getTime());
+      expect(db.update.getTime()).toBe(client.update.getTime());
     });
   });
 
@@ -166,7 +165,7 @@ describe('Client', () => {
     });
 
     it("違うユーザーが変更しようとしたらエラーになるか", () => {
-      assert.throws(() => {
+      expect(() => {
         let auth: IAuthTokenMaster = {
           id: ObjectIDGenerator.get(),
           key: '',
@@ -186,12 +185,12 @@ describe('Client', () => {
           user: ObjectIDGenerator.get(),
           type: 'master'
         }, "foo", "http://foo", new Date());
-      }, (e: any) => e instanceof AtError);
+      }).toThrow(AtError);
     });
 
 
     it("長い名前でエラーになるか", () => {
-      assert.throws(() => {
+      expect(() => {
         let auth: IAuthTokenMaster = {
           id: ObjectIDGenerator.get(),
           key: '',
@@ -206,11 +205,11 @@ describe('Client', () => {
           new Date());
 
         client.changeData(auth, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "http://foo", new Date());
-      }, (e: any) => e instanceof AtError);
+      }).toThrow(AtError)
     });
 
     it("不正なURLでエラーになるか", () => {
-      assert.throws(() => {
+      expect(() => {
         let auth: IAuthTokenMaster = {
           id: ObjectIDGenerator.get(),
           key: '',
@@ -225,7 +224,7 @@ describe('Client', () => {
           new Date());
 
         client.changeData(auth, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "http://foo", new Date());
-      }, (e: any) => e instanceof AtError);
+      }).toThrow(AtError);
     });
   });
 
@@ -248,12 +247,12 @@ describe('Client', () => {
           type: 'master'
         });
 
-        assert(client.id === api.id);
-        assert(client.name === api.name);
-        assert(client.url === api.url);
-        assert(client.user === api.user);
-        assert(client.date.toISOString() === api.date);
-        assert(client.update.toISOString() === api.update);
+        expect(client.id).toBe(api.id);
+        expect(client.name).toBe(api.name);
+        expect(client.url).toBe(api.url);
+        expect(client.user).toBe(api.user);
+        expect(client.date.toISOString()).toBe(api.date);
+        expect(client.update.toISOString()).toBe(api.update);
       });
 
       it("認証あり(別ユーザー)", () => {
@@ -264,13 +263,13 @@ describe('Client', () => {
           type: 'master'
         });
 
-        assert(api.user === null);
+        expect(api.user).toBeNull();
       });
 
       it("認証無し", () => {
         let api = client.toAPI(null);
 
-        assert(api.user === null);
+        expect(api.user).toBeNull();
       });
     });
 
@@ -278,12 +277,12 @@ describe('Client', () => {
       it("正常に出力できるか", () => {
         let db = client.toDB();
 
-        assert(client.id === db._id.toHexString());
-        assert(client.name === db.name);
-        assert(client.url === db.url);
-        assert(client.user === db.user.toHexString());
-        assert(client.date.getTime() === db.date.getTime());
-        assert(client.update.getTime() === db.update.getTime())
+        expect(client.id).toBe(db._id.toHexString());
+        expect(client.name).toBe(db.name);
+        expect(client.url).toBe(db.url);
+        expect(client.user).toBe(db.user.toHexString());
+        expect(client.date.getTime()).toBe(db.date.getTime());
+        expect(client.update.getTime()).toBe(db.update.getTime());
       });
     });
   }

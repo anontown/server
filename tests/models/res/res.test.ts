@@ -3,7 +3,6 @@ import {
   IAuthToken,
   IVote
 } from '../../../scripts';
-import * as assert from 'power-assert';
 
 describe("Res", () => {
   describe("ResBase", () => {
@@ -31,15 +30,15 @@ describe("Res", () => {
           "normal",
           10);
 
-        assert(res.id === "id");
-        assert(res.topic === "topic");
-        assert(res.date === date);
-        assert(res.user === "user");
-        assert(res.vote === vote);
-        assert(res.lv === 1);
-        assert(res.hash === "hash");
-        assert(res.type === "normal");
-        assert(res.replyCount === 10);
+        expect(res.id).toBe("id");
+        expect(res.topic).toBe("topic");
+        expect(res.date).toBe(date);
+        expect(res.user).toBe("user");
+        expect(res.vote).toBe(vote);
+        expect(res.lv).toBe(1);
+        expect(res.hash).toBe("hash");
+        expect(res.type).toBe("normal");
+        expect(res.replyCount).toBe(10);
       });
     });
   });

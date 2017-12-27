@@ -2,7 +2,6 @@ import {
   Profile,
   ObjectIDGenerator
 } from '../../../scripts';
-import * as assert from 'power-assert';
 import { ObjectID } from 'mongodb';
 
 describe("Profile", () => {
@@ -20,13 +19,13 @@ describe("Profile", () => {
       it('正常に変換できるか', () => {
         let db = profile.toDB();
 
-        assert(db._id.toHexString() === profile.id);
-        assert(db.user.toHexString() === profile.user);
-        assert(db.name === profile.name);
-        assert(db.body === profile.body);
-        assert(db.date.valueOf() === profile.date.valueOf());
-        assert(db.update.valueOf() === profile.update.valueOf());
-        assert(db.sn === profile.sn);
+        expect(db._id.toHexString()).toBe(profile.id);
+        expect(db.user.toHexString()).toBe(profile.user);
+        expect(db.name).toBe(profile.name);
+        expect(db.body).toBe(profile.body);
+        expect(db.date.valueOf()).toBe(profile.date.valueOf());
+        expect(db.update.valueOf()).toBe(profile.update.valueOf());
+        expect(db.sn === profile.sn);
       });
     });
 
@@ -56,13 +55,13 @@ describe("Profile", () => {
             id: ObjectIDGenerator.get()
           } : null);
 
-          assert(api.id === profile.id.toString());
-          assert(api.user === data.apiUser);
-          assert(api.name === profile.name);
-          assert(api.body === profile.body);
-          assert(api.date === profile.date.toISOString());
-          assert(api.update === profile.update.toISOString());
-          assert(api.sn === profile.sn);
+          expect(api.id).toBe(profile.id.toString());
+          expect(api.user).toBe(data.apiUser);
+          expect(api.name).toBe(profile.name);
+          expect(api.body).toBe(profile.body);
+          expect(api.date).toBe(profile.date.toISOString());
+          expect(api.update).toBe(profile.update.toISOString());
+          expect(api.sn).toBe(profile.sn);
         });
       }
     });
@@ -79,13 +78,13 @@ describe("Profile", () => {
         key: '',
         id: ObjectIDGenerator.get()
       }, '名前', '本文', 'test', new Date(date));
-      assert(profile.id.toString() === id);
-      assert(profile.user.toString() === user);
-      assert(profile.name === '名前');
-      assert(profile.body === '本文');
-      assert(profile.date.valueOf() === date);
-      assert(profile.update.valueOf() === date);
-      assert(profile.sn === 'test');
+      expect(profile.id.toString()).toBe(id);
+      expect(profile.user.toString()).toBe(user);
+      expect(profile.name).toBe('名前');
+      expect(profile.body).toBe('本文');
+      expect(profile.date.valueOf()).toBe(date);
+      expect(profile.update.valueOf()).toBe(date);
+      expect(profile.sn).toBe('test');
     });
   });
 });
