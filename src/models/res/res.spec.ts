@@ -2,7 +2,7 @@ import {
   ResBase,
   IAuthToken,
   IVote
-} from '../../../scripts';
+} from '../../';
 
 describe("Res", () => {
   describe("ResBase", () => {

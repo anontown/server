@@ -7,8 +7,7 @@ WORKDIR $APP_HOME
 
 COPY package.json package-lock.json $APP_HOME/
 RUN npm i --no-progress
-COPY scripts/ $APP_HOME/scripts/
-COPY tests/ $APP_HOME/tests/
+COPY src/ $APP_HOME/src/
 COPY tsconfig.json $APP_HOME/
 
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh $APP_HOME/wait-for-it.sh

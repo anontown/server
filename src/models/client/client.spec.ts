@@ -3,7 +3,7 @@ import {
   ObjectIDGenerator,
   AtError,
   IAuthTokenMaster
-} from '../../../scripts';
+} from '../../';
 import { ObjectID } from 'mongodb';
 
 describe('Client', () => {

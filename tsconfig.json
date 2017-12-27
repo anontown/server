@@ -8,8 +8,7 @@
     ],
     "outDir": "./dist",
     "rootDirs": [
-      "./scripts",
-      "./tests"
+      "./src"
     ],
     "skipLibCheck": true,
     "experimentalDecorators": true,

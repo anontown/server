@@ -4,7 +4,7 @@ import {
     TopicNormal,
     User,
     IHistoryDB
-} from '../../../scripts';
+} from '../../';
 import { ObjectID } from 'mongodb';
 
 describe("History", () => {

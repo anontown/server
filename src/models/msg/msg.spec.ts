@@ -3,7 +3,7 @@ import {
   Msg,
   IMsgDB,
   AtError
-} from '../../../scripts';
+} from '../../';
 
 describe("Msg", () => {
   {

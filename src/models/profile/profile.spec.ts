@@ -1,7 +1,7 @@
 import {
   Profile,
   ObjectIDGenerator
-} from '../../../scripts';
+} from '../../';
 import { ObjectID } from 'mongodb';
 
 describe("Profile", () => {
