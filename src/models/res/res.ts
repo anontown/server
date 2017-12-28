@@ -14,7 +14,6 @@ import { User } from "../user";
 export interface IVote {
   user: string;
   value: number;
-  lv: number;
 }
 
 export type ResType = "normal" | "history" | "topic" | "fork";
@@ -174,9 +173,9 @@ export abstract class ResBase<T extends ResType> {
     if (this._vote.find(x => x.user === user.id) !== undefined) {
       throw new AtPrerequisiteError("既に投票しています");
     }
-    const lv = Math.floor(user.lv / 100) + 1;
-    this._vote.push({ user: user.id, value: user.lv, lv });
-    resUser.changeLv(resUser.lv + lv);
+    const value = Math.floor(user.lv / 100) + 1;
+    this._vote.push({ user: user.id, value });
+    resUser.changeLv(resUser.lv + value);
   }
 
   dv(resUser: User, user: User, _authToken: IAuthToken) {
@@ -187,9 +186,9 @@ export abstract class ResBase<T extends ResType> {
       throw new AtPrerequisiteError("既に投票しています");
     }
 
-    const lv = -Math.floor(user.lv / 100) - 1;
-    this._vote.push({ user: user.id, value: -Math.min(user.lv, Math.ceil(this._lv / 3)), lv });
-    resUser.changeLv(resUser.lv + lv);
+    const value = -(Math.floor(user.lv / 100) + 1);
+    this._vote.push({ user: user.id, value });
+    resUser.changeLv(resUser.lv + value);
   }
 
   cv(resUser: User, user: User, _authToken: IAuthToken) {
