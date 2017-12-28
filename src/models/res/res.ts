@@ -168,13 +168,9 @@ export abstract class ResBase<T extends ResType> {
   }
 
   get voteValue() {
-    if (this._vote.length === 0) {
-      return 0;
-    } else {
-      return this._vote
-        .map(x => x.value)
-        .reduce((x, y) => x + y);
-    }
+    return this._vote
+      .map(x => x.value)
+      .reduce((x, y) => x + y, 0);
   }
 
   uv(resUser: User, user: User, _authToken: IAuthToken) {
