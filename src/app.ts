@@ -38,9 +38,6 @@ import {
 } from "./models";
 import { AppServer } from "./server/app-server";
 
-// 環境変数
-Logger.system.info(`env:${JSON.stringify(process.env)}`);
-
 (async () => {
   // フォルダ作成
   try {
