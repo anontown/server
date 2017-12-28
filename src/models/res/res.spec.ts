@@ -2,7 +2,9 @@ import {
   IAuthToken,
   IVote,
   ResBase,
-  User
+  User,
+  ObjectIDGenerator,
+  IResWait
 } from "../../";
 import { ObjectID } from "mongodb";
 
@@ -24,7 +26,6 @@ describe("Res", () => {
         const vote: IVote[] = [{
           user: "user",
           value: 5,
-          lv: 10,
         }];
         const res = new ResBaseTest("id",
           "topic",
@@ -45,38 +46,39 @@ describe("Res", () => {
         expect(res.hash).toBe("hash");
         expect(res.type).toBe("normal");
         expect(res.replyCount).toBe(10);
-        expect(res.voteValue).toBe(5);
       });
     });
+
     describe("#uv", () => {
       it("正常に投票出来るか", () => {
-        const resUserID = new ObjectID();
-        const voteUserID = new ObjectID();
+        const resWait: IResWait = {
+          last: new Date(),
+          m10: 0,
+          m30: 0,
+          h1: 0,
+          h6: 0,
+          h12: 0,
+          d1: 0,
+        };
+        const resUserID = ObjectIDGenerator.get();
+        const voteUserID = ObjectIDGenerator.get();
         const date = new Date();
         const vote: IVote[] = [];
         const res = new ResBaseTest("id",
           "topic",
           date,
-          resUserID.toHexString(),
+          resUserID,
           vote,
           1,
           "hash",
           "normal",
           10);
         const resUser = User.fromDB({
-          _id: resUserID,
+          _id: new ObjectID(resUserID),
           sn: "sn1",
           pass: "pass",
           lv: 2,
-          resWait: {
-            last: new Date(),
-            m10: 0,
-            m30: 0,
-            h1: 0,
-            h6: 0,
-            h12: 0,
-            d1: 0,
-          },
+          resWait,
           lastTopic: new Date(),
           date: new Date(),
           point: 1,
@@ -84,32 +86,25 @@ describe("Res", () => {
         });
         res.uv(resUser,
           User.fromDB({
-            _id: voteUserID,
+            _id: new ObjectID(voteUserID),
             sn: "sn1",
             pass: "pass",
-            lv: 2,
-            resWait: {
-              last: new Date(),
-              m10: 0,
-              m30: 0,
-              h1: 0,
-              h6: 0,
-              h12: 0,
-              d1: 0,
-            },
+            lv: 101,
+            resWait,
             lastTopic: new Date(),
             date: new Date(),
             point: 1,
             lastOneTopic: new Date()
           }),
           {
-            id: voteUserID.toHexString(),
+            id: voteUserID,
             key: "aaaaa",
             user: "user2",
             type: "master"
           });
-        expect(res.vote).toEqual([{ user: voteUserID.toHexString(), value: 2, lv: 2 }]);
-        expect(resUser.lv)
+
+        expect(res.vote).toEqual([{ user: voteUserID, value: 2 }]);
+        expect(resUser.lv).toBe(4);
       });
     });
   });
