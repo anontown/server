@@ -167,12 +167,6 @@ export abstract class ResBase<T extends ResType> {
     return this._replyCount;
   }
 
-  get voteValue() {
-    return this._vote
-      .map(x => x.value)
-      .reduce((x, y) => x + y, 0);
-  }
-
   uv(resUser: User, user: User, _authToken: IAuthToken) {
     if (user.id === this._user) {
       throw new AtRightError("自分に投票は出来ません");
