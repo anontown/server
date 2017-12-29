@@ -4,7 +4,8 @@ import {
   ResBase,
   User,
   ObjectIDGenerator,
-  IResWait
+  IResWait,
+  AtError
 } from "../../";
 import { ObjectID } from "mongodb";
 
@@ -105,6 +106,51 @@ describe("Res", () => {
 
         expect(res.vote).toEqual([{ user: voteUserID, value: 2 }]);
         expect(resUser.lv).toBe(4);
+      });
+
+      it("自分に投票するとエラーになるか", () => {
+        const resWait: IResWait = {
+          last: new Date(),
+          m10: 0,
+          m30: 0,
+          h1: 0,
+          h6: 0,
+          h12: 0,
+          d1: 0,
+        };
+        const resUserID = ObjectIDGenerator.get();
+        const date = new Date();
+        const vote: IVote[] = [];
+        const res = new ResBaseTest("id",
+          "topic",
+          date,
+          resUserID,
+          vote,
+          1,
+          "hash",
+          "normal",
+          10);
+        const resUser = User.fromDB({
+          _id: new ObjectID(resUserID),
+          sn: "sn1",
+          pass: "pass",
+          lv: 2,
+          resWait,
+          lastTopic: new Date(),
+          date: new Date(),
+          point: 1,
+          lastOneTopic: new Date()
+        });
+        expect(() => {
+          res.uv(resUser,
+            resUser,
+            {
+              id: resUserID,
+              key: "aaaaa",
+              user: "user2",
+              type: "master"
+            });
+        }).toThrow(AtError);
       });
     });
   });
