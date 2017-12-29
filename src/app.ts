@@ -392,7 +392,7 @@ import { AppServer } from "./server/app-server";
         // レスを書き込んだユーザー
         const resUser = await UserRepository.findOne(res.user);
 
-        res.uv(resUser, user, auth.token);
+        res.v(resUser, user, "uv", auth.token);
 
         await Promise.all([
           ResRepository.update(res),
@@ -433,7 +433,7 @@ import { AppServer } from "./server/app-server";
         // レスを書き込んだユーザー
         const resUser = await UserRepository.findOne(res.user);
 
-        res.dv(resUser, user, auth.token);
+        res.v(resUser, user,"dv", auth.token);
 
         const promise = [
           ResRepository.update(res),
