@@ -50,7 +50,7 @@ describe("Res", () => {
       });
     });
 
-    describe("#uv", () => {
+    describe("#v", () => {
       it("正常に投票出来るか", () => {
         const resWait: IResWait = {
           last: new Date(),
@@ -85,7 +85,7 @@ describe("Res", () => {
           point: 1,
           lastOneTopic: new Date()
         });
-        res.uv(resUser,
+        res.v(resUser,
           User.fromDB({
             _id: new ObjectID(voteUserID),
             sn: "sn1",
@@ -97,6 +97,7 @@ describe("Res", () => {
             point: 1,
             lastOneTopic: new Date()
           }),
+          "uv",
           {
             id: voteUserID,
             key: "aaaaa",
@@ -142,8 +143,9 @@ describe("Res", () => {
           lastOneTopic: new Date()
         });
         expect(() => {
-          res.uv(resUser,
+          res.v(resUser,
             resUser,
+            "uv",
             {
               id: resUserID,
               key: "aaaaa",
@@ -152,6 +154,66 @@ describe("Res", () => {
             });
         }).toThrow(AtError);
       });
+
+      it("重複投票でエラーになるか", () => {
+        const resWait: IResWait = {
+          last: new Date(),
+          m10: 0,
+          m30: 0,
+          h1: 0,
+          h6: 0,
+          h12: 0,
+          d1: 0,
+        };
+        const resUserID = ObjectIDGenerator.get();
+        const voteUserID = ObjectIDGenerator.get();
+        const date = new Date();
+        const vote: IVote[] = [];
+        const res = new ResBaseTest("id",
+          "topic",
+          date,
+          resUserID,
+          vote,
+          1,
+          "hash",
+          "normal",
+          10);
+        const resUser = User.fromDB({
+          _id: new ObjectID(resUserID),
+          sn: "sn1",
+          pass: "pass",
+          lv: 2,
+          resWait,
+          lastTopic: new Date(),
+          date: new Date(),
+          point: 1,
+          lastOneTopic: new Date()
+        });
+        expect(() => {
+          for (let i = 0; i < 2; i++) {
+            res.v(resUser,
+              User.fromDB({
+                _id: new ObjectID(voteUserID),
+                sn: "sn1",
+                pass: "pass",
+                lv: 101,
+                resWait,
+                lastTopic: new Date(),
+                date: new Date(),
+                point: 1,
+                lastOneTopic: new Date()
+              }),
+              "uv",
+              {
+                id: voteUserID,
+                key: "aaaaa",
+                user: "user2",
+                type: "master"
+              });
+          }
+        }).toThrow(AtError);
+      });
     });
+
   });
 });

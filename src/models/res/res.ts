@@ -166,7 +166,7 @@ export abstract class ResBase<T extends ResType> {
     return this._replyCount;
   }
 
-  uv(resUser: User, user: User, _authToken: IAuthToken) {
+  v(resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) {
     if (user.id === this._user) {
       throw new AtRightError("自分に投票は出来ません");
     }
@@ -175,20 +175,7 @@ export abstract class ResBase<T extends ResType> {
     }
     const value = Math.floor(user.lv / 100) + 1;
     this._vote.push({ user: user.id, value });
-    resUser.changeLv(resUser.lv + value);
-  }
-
-  dv(resUser: User, user: User, _authToken: IAuthToken) {
-    if (user.id === this._user) {
-      throw new AtRightError("自分に投票は出来ません");
-    }
-    if (this._vote.find(x => x.user === user.id) !== undefined) {
-      throw new AtPrerequisiteError("既に投票しています");
-    }
-
-    const value = -(Math.floor(user.lv / 100) + 1);
-    this._vote.push({ user: user.id, value });
-    resUser.changeLv(resUser.lv + value);
+    resUser.changeLv(resUser.lv + (type === "uv" ? value : -value));
   }
 
   cv(resUser: User, user: User, _authToken: IAuthToken) {
