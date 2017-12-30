@@ -5,23 +5,23 @@ import { Config } from "../../config";
 import { IGenerator } from "../../generator";
 
 export interface IProfileDB {
-  _id: ObjectID;
-  user: ObjectID;
-  name: string;
-  body: string;
-  date: Date;
-  update: Date;
-  sn: string;
+  readonly _id: ObjectID;
+  readonly user: ObjectID;
+  readonly name: string;
+  readonly body: string;
+  readonly date: Date;
+  readonly update: Date;
+  readonly sn: string;
 }
 
 export interface IProfileAPI {
-  id: string;
-  user: string | null;
-  name: string;
-  body: string;
-  date: string;
-  update: string;
-  sn: string;
+  readonly id: string;
+  readonly user: string | null;
+  readonly name: string;
+  readonly body: string;
+  readonly date: string;
+  readonly update: string;
+  readonly sn: string;
 }
 
 export class Profile {

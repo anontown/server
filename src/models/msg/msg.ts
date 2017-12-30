@@ -4,19 +4,19 @@ import { IGenerator } from "../../generator";
 import { User } from "../user";
 
 export interface IMsgDB {
-  id: string;
-  body: {
-    receiver: string | null,
-    body: string,
-    date: string,
+  readonly id: string;
+  readonly body: {
+    readonly receiver: string | null,
+    readonly body: string,
+    readonly date: string,
   };
 }
 
 export interface IMsgAPI {
-  id: string;
-  receiver: string | null;
-  body: string;
-  date: string;
+  readonly id: string;
+  readonly receiver: string | null;
+  readonly body: string;
+  readonly date: string;
 }
 
 export class Msg {

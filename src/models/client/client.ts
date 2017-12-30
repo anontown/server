@@ -5,21 +5,21 @@ import { Config } from "../../config";
 import { IGenerator } from "../../generator";
 
 export interface IClientDB {
-  _id: ObjectID;
-  name: string;
-  url: string;
-  user: ObjectID;
-  date: Date;
-  update: Date;
+  readonly _id: ObjectID;
+  readonly name: string;
+  readonly url: string;
+  readonly user: ObjectID;
+  readonly date: Date;
+  readonly update: Date;
 }
 
 export interface IClientAPI {
-  id: string;
-  name: string;
-  url: string;
-  user: string | null;
-  date: string;
-  update: string;
+  readonly id: string;
+  readonly name: string;
+  readonly url: string;
+  readonly user: string | null;
+  readonly date: string;
+  readonly update: string;
 }
 
 export class Client {

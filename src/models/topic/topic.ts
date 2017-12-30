@@ -10,20 +10,20 @@ import { User } from "../user";
 export type ITopicDB = ITopicNormalDB | ITopicOneDB | ITopicForkDB;
 
 export interface ITopicBaseDB<T extends TopicType, Body> {
-  id: string;
-  type: T;
-  body: {
-    title: string,
-    update: string,
-    date: string,
-    ageUpdate: string,
-    active: boolean,
+  readonly id: string;
+  readonly type: T;
+  readonly body: {
+    readonly title: string,
+    readonly update: string,
+    readonly date: string,
+    readonly ageUpdate: string,
+    readonly active: boolean,
   } & Body;
 }
 
 export type ITopicSearchBaseDB<T extends TopicSearchType> = ITopicBaseDB<T, {
-  tags: string[],
-  body: string,
+  readonly tags: string[],
+  readonly body: string,
 }>;
 
 export type ITopicNormalDB = ITopicSearchBaseDB<"normal">;
@@ -31,24 +31,24 @@ export type ITopicNormalDB = ITopicSearchBaseDB<"normal">;
 export type ITopicOneDB = ITopicSearchBaseDB<"one">;
 
 export type ITopicForkDB = ITopicBaseDB<"fork", {
-  parent: string;
+  readonly parent: string;
 }>;
 
 export type ITopicAPI = ITopicOneAPI | ITopicNormalAPI | ITopicForkAPI;
 
 export interface ITopicBaseAPI<T extends TopicType> {
-  id: string;
-  title: string;
-  update: string;
-  date: string;
-  resCount: number;
-  type: T;
-  active: boolean;
+  readonly id: string;
+  readonly title: string;
+  readonly update: string;
+  readonly date: string;
+  readonly resCount: number;
+  readonly type: T;
+  readonly active: boolean;
 }
 
 export interface ITopicSearchBaseAPI<T extends TopicSearchType> extends ITopicBaseAPI<T> {
-  tags: string[];
-  body: string;
+  readonly tags: string[];
+  readonly body: string;
 }
 
 export interface ITopicNormalAPI extends ITopicSearchBaseAPI<"normal"> {
@@ -58,7 +58,7 @@ export interface ITopicOneAPI extends ITopicSearchBaseAPI<"one"> {
 }
 
 export interface ITopicForkAPI extends ITopicBaseAPI<"fork"> {
-  parent: string;
+  readonly parent: string;
 }
 
 export type TopicSearchType = "one" | "normal";

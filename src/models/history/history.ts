@@ -3,26 +3,26 @@ import { TopicNormal } from "../topic";
 import { User } from "../user";
 
 export interface IHistoryDB {
-  id: string;
-  body: {
-    topic: string,
-    title: string,
-    tags: string[],
-    body: string,
-    date: string,
-    hash: string,
-    user: string,
+  readonly id: string;
+  readonly body: {
+    readonly topic: string,
+    readonly title: string,
+    readonly tags: string[],
+    readonly body: string,
+    readonly date: string,
+    readonly hash: string,
+    readonly user: string,
   };
 }
 
 export interface IHistoryAPI {
-  id: string;
-  topic: string;
-  title: string;
-  tags: string[];
-  body: string;
-  date: string;
-  hash: string;
+  readonly id: string;
+  readonly topic: string;
+  readonly title: string;
+  readonly tags: string[];
+  readonly body: string;
+  readonly date: string;
+  readonly hash: string;
 }
 
 export class History {
@@ -42,13 +42,13 @@ export class History {
   }
 
   private constructor(private _id: string,
-                      private _topic: string,
-                      private _title: string,
-                      private _tags: string[],
-                      private _body: string,
-                      private _date: Date,
-                      private _hash: string,
-                      private _user: string) {
+    private _topic: string,
+    private _title: string,
+    private _tags: string[],
+    private _body: string,
+    private _date: Date,
+    private _hash: string,
+    private _user: string) {
 
   }
 

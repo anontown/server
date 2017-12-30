@@ -7,14 +7,14 @@ import { StringUtil } from "../../util";
 import { Client } from "..//client";
 
 export interface ITokenReq {
-  key: string;
-  expireDate: Date;
-  active: boolean;
+  readonly key: string;
+  readonly expireDate: Date;
+  readonly active: boolean;
 }
 
 export interface ITokenReqAPI {
-  token: string;
-  key: string;
+  readonly token: string;
+  readonly key: string;
 }
 
 export type TokenType = "master" | "general";
@@ -22,36 +22,36 @@ export type TokenType = "master" | "general";
 export type ITokenDB = ITokenGeneralDB | ITokenMasterDB;
 
 export interface ITokenBaseDB<T extends TokenType> {
-  _id: ObjectID;
-  key: string;
-  type: T;
-  user: ObjectID;
-  date: Date;
+  readonly _id: ObjectID;
+  readonly key: string;
+  readonly type: T;
+  readonly user: ObjectID;
+  readonly date: Date;
 }
 
 export interface ITokenMasterDB extends ITokenBaseDB<"master"> {
 }
 
 export interface ITokenGeneralDB extends ITokenBaseDB<"general"> {
-  client: ObjectID;
-  req: ITokenReq[];
+  readonly client: ObjectID;
+  readonly req: ITokenReq[];
 }
 
 export type ITokenAPI = ITokenGeneralAPI | ITokenMasterAPI;
 
 export interface ITokenBaseAPI<T extends TokenType> {
-  id: string;
-  key: string;
-  user: string;
-  date: string;
-  type: T;
+  readonly id: string;
+  readonly key: string;
+  readonly user: string;
+  readonly date: string;
+  readonly type: T;
 }
 
 export interface ITokenMasterAPI extends ITokenBaseAPI<"master"> {
 }
 
 export interface ITokenGeneralAPI extends ITokenBaseAPI<"general"> {
-  client: string;
+  readonly client: string;
 }
 
 export type Token = TokenMaster | TokenGeneral;

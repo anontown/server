@@ -12,8 +12,8 @@ import { Topic, TopicFork, TopicNormal, TopicOne } from "../topic";
 import { User } from "../user";
 
 export interface IVote {
-  user: string;
-  value: number;
+  readonly user: string;
+  readonly value: number;
 }
 
 export type ResType = "normal" | "history" | "topic" | "fork";
@@ -39,25 +39,25 @@ export function fromDBToRes(db: IResDB, replyCount: number): Res {
 }
 
 export interface IResBaseDB<T extends ResType, Body> {
-  id: string;
-  type: T;
-  body: {
-    topic: string,
-    date: string,
-    user: string,
-    vote: IVote[],
-    lv: number,
-    hash: string,
+  readonly id: string;
+  readonly type: T;
+  readonly body: {
+    readonly topic: string,
+    readonly date: string,
+    readonly user: string,
+    readonly vote: IVote[],
+    readonly lv: number,
+    readonly hash: string,
   } & Body;
 }
 
 export type IResNormalDB = IResBaseDB<"normal", {
-  name: string | null,
-  body: string,
-  reply: IReply | null,
-  deleteFlag: ResDeleteFlag,
-  profile: string | null,
-  age: boolean,
+  readonly name: string | null,
+  readonly body: string,
+  readonly reply: IReply | null,
+  readonly deleteFlag: ResDeleteFlag,
+  readonly profile: string | null,
+  readonly age: boolean,
 }>;
 
 export type IResHistoryDB = IResBaseDB<"history", {
@@ -75,46 +75,46 @@ export type ResAPIType = ResType | "delete";
 export type IResAPI = IResNormalAPI | IResHistoryAPI | IResTopicAPI | IResForkAPI | IResDeleteAPI;
 
 export interface IResBaseAPI<T extends ResAPIType> {
-  id: string;
-  topic: string;
-  date: Date;
-  user: string | null;
-  uv: number;
-  dv: number;
-  hash: string;
-  replyCount: number;
-  voteFlag: VoteFlag | null;
-  type: T;
+  readonly id: string;
+  readonly topic: string;
+  readonly date: Date;
+  readonly user: string | null;
+  readonly uv: number;
+  readonly dv: number;
+  readonly hash: string;
+  readonly replyCount: number;
+  readonly voteFlag: VoteFlag | null;
+  readonly type: T;
 }
 
 export interface IResNormalAPI extends IResBaseAPI<"normal"> {
-  name: string | null;
-  body: string;
-  reply: string | null;
-  profile: string | null;
-  isReply: boolean | null;
+  readonly name: string | null;
+  readonly body: string;
+  readonly reply: string | null;
+  readonly profile: string | null;
+  readonly isReply: boolean | null;
 }
 
 export interface IResHistoryAPI extends IResBaseAPI<"history"> {
-  history: string;
+  readonly history: string;
 }
 
 export interface IResTopicAPI extends IResBaseAPI<"topic"> {
 }
 
 export interface IResForkAPI extends IResBaseAPI<"fork"> {
-  fork: string;
+  readonly fork: string;
 }
 
 export interface IResDeleteAPI extends IResBaseAPI<"delete"> {
-  flag: "self" | "freeze";
+  readonly flag: "self" | "freeze";
 }
 
 export type VoteFlag = "uv" | "dv" | "not";
 export type ResDeleteFlag = "active" | "self" | "freeze";
 export interface IReply {
-  res: string;
-  user: string;
+  readonly res: string;
+  readonly user: string;
 }
 
 export abstract class ResBase<T extends ResType> {

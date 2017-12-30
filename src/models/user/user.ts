@@ -6,30 +6,30 @@ import { IGenerator } from "../../generator";
 import { StringUtil } from "../../util";
 
 export interface IUserDB {
-  _id: ObjectID;
-  sn: string;
-  pass: string;
-  lv: number;
-  resWait: IResWait;
-  lastTopic: Date;
-  date: Date;
-  point: number;
-  lastOneTopic: Date;
+  readonly _id: ObjectID;
+  readonly sn: string;
+  readonly pass: string;
+  readonly lv: number;
+  readonly resWait: IResWait;
+  readonly lastTopic: Date;
+  readonly date: Date;
+  readonly point: number;
+  readonly lastOneTopic: Date;
 }
 
 export interface IUserAPI {
-  id: string;
-  sn: string;
+  readonly id: string;
+  readonly sn: string;
 }
 
 export interface IResWait {
-  last: Date;
-  m10: number;
-  m30: number;
-  h1: number;
-  h6: number;
-  h12: number;
-  d1: number;
+  readonly last: Date;
+  readonly m10: number;
+  readonly m30: number;
+  readonly h1: number;
+  readonly h6: number;
+  readonly h12: number;
+  readonly d1: number;
 }
 
 export class User {
@@ -192,13 +192,15 @@ export class User {
       this._resWait.m10 < Config.res.wait.m10 * coe &&
       this._resWait.last.getTime() + 1000 * Config.res.wait.minSecond < lastRes.getTime()
     ) {
-      this._resWait.d1++;
-      this._resWait.h12++;
-      this._resWait.h6++;
-      this._resWait.h1++;
-      this._resWait.m30++;
-      this._resWait.m10++;
-      this._resWait.last = lastRes;
+      this._resWait = {
+        d1: this._resWait.d1 + 1,
+        h12: this._resWait.h12 + 1,
+        h6: this._resWait.h6 + 1,
+        h1: this._resWait.h1 + 1,
+        m30: this._resWait.m30 + 1,
+        m10: this._resWait.m10 + 1,
+        last: lastRes,
+      };
     } else {
       throw new AtPrerequisiteError("連続書き込みはできません");
     }
