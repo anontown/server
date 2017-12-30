@@ -3,6 +3,7 @@ import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
+import Copyable from "ts-copyable";
 
 export interface IClientDB {
   readonly _id: ObjectID;
@@ -22,7 +23,7 @@ export interface IClientAPI {
   readonly update: string;
 }
 
-export class Client {
+export class Client extends Copyable<Client>{
 
   static fromDB(c: IClientDB): Client {
     return new Client(c._id.toString(), c.name, c.url, c.user.toString(), c.date, c.update);
@@ -57,64 +58,40 @@ export class Client {
       now);
   }
 
-  private constructor(
-    private _id: string,
-    private _name: string,
-    private _url: string,
-    private _user: string,
-    private _date: Date,
-    private _update: Date) {
-
-  }
-
-  get id() {
-    return this._id;
-  }
-
-  get name() {
-    return this._name;
-  }
-
-  get url() {
-    return this._url;
-  }
-
-  get user() {
-    return this._user;
-  }
-
-  get date() {
-    return this._date;
-  }
-
-  get update() {
-    return this._update;
+  constructor(
+    public readonly id: string,
+    public readonly name: string,
+    public readonly url: string,
+    public readonly user: string,
+    public readonly date: Date,
+    public readonly update: Date) {
+    super(Client);
   }
 
   toDB(): IClientDB {
     return {
-      _id: new ObjectID(this._id),
-      name: this._name,
-      url: this._url,
-      user: new ObjectID(this._user),
-      date: this._date,
-      update: this._update,
+      _id: new ObjectID(this.id),
+      name: this.name,
+      url: this.url,
+      user: new ObjectID(this.user),
+      date: this.date,
+      update: this.update,
     };
   }
 
   toAPI(authToken: IAuthTokenMaster | null): IClientAPI {
     return {
-      id: this._id,
-      name: this._name,
-      url: this._url,
-      user: authToken !== null && authToken.user === this._user ? this._user : null,
-      date: this._date.toISOString(),
-      update: this._date.toISOString(),
+      id: this.id,
+      name: this.name,
+      url: this.url,
+      user: authToken !== null && authToken.user === this.user ? this.user : null,
+      date: this.date.toISOString(),
+      update: this.date.toISOString(),
     };
   }
 
-  changeData(authToken: IAuthTokenMaster, name: string, url: string, now: Date) {
-    if (authToken.user !== this._user) {
+  changeData(authToken: IAuthTokenMaster, name: string, url: string, now: Date): Client {
+    if (authToken.user !== this.user) {
       throw new AtRightError("人のクライアント変更は出来ません");
     }
     paramsErrorMaker([
@@ -132,8 +109,6 @@ export class Client {
       },
     ]);
 
-    this._name = name;
-    this._url = url;
-    this._update = now;
+    return this.copy({ name, url, update: now });
   }
 }

@@ -433,7 +433,7 @@ import { AppServer } from "./server/app-server";
         // レスを書き込んだユーザー
         const resUser = await UserRepository.findOne(res.user);
 
-        res.v(resUser, user,"dv", auth.token);
+        res.v(resUser, user, "dv", auth.token);
 
         const promise = [
           ResRepository.update(res),
@@ -1580,10 +1580,10 @@ import { AppServer } from "./server/app-server";
       },
       call: async ({ params, auth, ip, now }) => {
         const client = await ClientRepository.findOne(params.id);
-        client.changeData(auth.tokenMaster, params.name, params.url, now);
-        await ClientRepository.update(client);
-        appLog("client/update", ip, "clients", client.id);
-        return client.toAPI(auth.tokenMaster);
+        const newClient = client.changeData(auth.tokenMaster, params.name, params.url, now);
+        await ClientRepository.update(newClient);
+        appLog("client/update", ip, "clients", newClient.id);
+        return newClient.toAPI(auth.tokenMaster);
       },
     });
 
