@@ -61,7 +61,8 @@ describe("ResBase", () => {
         d1: 0,
       };
       const resUserID = ObjectIDGenerator.get();
-      const voteUserID = ObjectIDGenerator.get();
+      const voteUserID1 = ObjectIDGenerator.get();
+      const voteUserID2 = ObjectIDGenerator.get();
       const date = new Date();
       const vote: IVote[] = [];
       const res = new ResBaseTest("id",
@@ -86,7 +87,7 @@ describe("ResBase", () => {
       });
       res.v(resUser,
         User.fromDB({
-          _id: new ObjectID(voteUserID),
+          _id: new ObjectID(voteUserID1),
           sn: "sn1",
           pass: "pass",
           lv: 101,
@@ -98,14 +99,37 @@ describe("ResBase", () => {
         }),
         "uv",
         {
-          id: voteUserID,
+          id: voteUserID1,
           key: "aaaaa",
           user: "user2",
           type: "master"
         });
 
-      expect(res.vote).toEqual([{ user: voteUserID, value: 2 }]);
+      expect(res.vote).toEqual([{ user: voteUserID1, value: 2 }]);
       expect(resUser.lv).toBe(4);
+
+      res.v(resUser,
+        User.fromDB({
+          _id: new ObjectID(voteUserID2),
+          sn: "sn1",
+          pass: "pass",
+          lv: 50,
+          resWait,
+          lastTopic: new Date(),
+          date: new Date(),
+          point: 1,
+          lastOneTopic: new Date()
+        }),
+        "dv",
+        {
+          id: voteUserID2,
+          key: "aaaaa",
+          user: "user2",
+          type: "master"
+        });
+
+      expect(res.vote).toEqual([{ user: voteUserID1, value: 2 }, { user: voteUserID2, value: -1 }]);
+      expect(resUser.lv).toBe(3);
     });
 
     it("自分に投票するとエラーになるか", () => {

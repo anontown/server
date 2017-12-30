@@ -173,9 +173,10 @@ export abstract class ResBase<T extends ResType> {
     if (this._vote.find(x => x.user === user.id) !== undefined) {
       throw new AtPrerequisiteError("既に投票しています");
     }
-    const value = Math.floor(user.lv / 100) + 1;
+    const valueAbs = Math.floor(user.lv / 100) + 1;
+    const value = type === "uv" ? valueAbs : -valueAbs;
     this._vote.push({ user: user.id, value });
-    resUser.changeLv(resUser.lv + (type === "uv" ? value : -value));
+    resUser.changeLv(resUser.lv + value);
   }
 
   cv(resUser: User, user: User, _authToken: IAuthToken) {
