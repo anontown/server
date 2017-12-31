@@ -4,7 +4,7 @@ import { Config } from "./config";
 import { DB, ESClient } from "./db";
 import { Logger } from "./logger";
 import { IProfileDB } from "./models/profile";
-import { StringUtil } from "./utils";
+import { hash } from "./utils";
 
 const updateFunc: Array<() => Promise<void>> = [];
 
@@ -104,7 +104,7 @@ updateFunc.push((async () => {
 
   // ハッシュ関数
   const hashFunc = (user: ObjectID, topic: ObjectID, date: Date) =>
-    StringUtil.hash(
+    hash(
       // ユーザー依存
       user + " " +
 

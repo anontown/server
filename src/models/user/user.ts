@@ -3,7 +3,7 @@ import { AtPrerequisiteError, AtUserAuthError, paramsErrorMaker } from "../../at
 import { IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { StringUtil } from "../../utils";
+import { hash } from "../../utils";
 
 export interface IUserDB {
   readonly _id: ObjectID;
@@ -55,7 +55,7 @@ export class User {
 
     return new User(objidGenerator.get(),
       sn,
-      StringUtil.hash(pass + Config.salt.pass),
+      hash(pass + Config.salt.pass),
       1,
       { last: now, m10: 0, m30: 0, h1: 0, h6: 0, h12: 0, d1: 0 },
       now,
@@ -150,12 +150,12 @@ export class User {
       },
     ]);
 
-    this._pass = StringUtil.hash(pass + Config.salt.pass);
+    this._pass = hash(pass + Config.salt.pass);
     this._sn = sn;
   }
 
   auth(pass: string): IAuthUser {
-    if (this._pass === StringUtil.hash(pass + Config.salt.pass)) {
+    if (this._pass === hash(pass + Config.salt.pass)) {
       return { id: this._id, pass: this._pass };
     } else {
       throw new AtUserAuthError();

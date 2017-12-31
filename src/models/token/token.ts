@@ -3,7 +3,7 @@ import { AtNotFoundError, AtTokenAuthError } from "../../at-error";
 import { IAuthTokenGeneral, IAuthTokenMaster, IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { StringUtil } from "../../utils";
+import { hash } from "../../utils";
 import { Client } from "..//client";
 
 export interface ITokenReq {
@@ -58,7 +58,7 @@ export type Token = TokenMaster | TokenGeneral;
 
 export abstract class TokenBase<T extends TokenType> {
   static createTokenKey(randomGenerator: IGenerator<string>): string {
-    return StringUtil.hash(randomGenerator.get() + Config.salt.token);
+    return hash(randomGenerator.get() + Config.salt.token);
   }
 
   protected constructor(

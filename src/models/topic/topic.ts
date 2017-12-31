@@ -2,7 +2,7 @@ import { AtPrerequisiteError, paramsErrorMaker, paramsErrorMakerData } from "../
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { StringUtil } from "../../utils";
+import { hash } from "../../utils";
 import { History } from "../history";
 import { Res, ResFork, ResHistory, ResTopic } from "../res";
 import { User } from "../user";
@@ -200,7 +200,7 @@ export abstract class TopicBase<T extends TopicType> {
   }
 
   hash(date: Date, user: User): string {
-    return StringUtil.hash(
+    return hash(
       // ユーザー依存
       user.id + " " +
 
