@@ -2,7 +2,7 @@ import { AtPrerequisiteError, paramsErrorMaker, paramsErrorMakerData } from "../
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { StringUtil } from "../../util";
+import { StringUtil } from "../../utils";
 import { History } from "../history";
 import { Res, ResFork, ResHistory, ResTopic } from "../res";
 import { User } from "../user";

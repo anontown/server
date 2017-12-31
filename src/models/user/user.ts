@@ -3,7 +3,7 @@ import { AtPrerequisiteError, AtUserAuthError, paramsErrorMaker } from "../../at
 import { IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { StringUtil } from "../../util";
+import { StringUtil } from "../../utils";
 
 export interface IUserDB {
   readonly _id: ObjectID;

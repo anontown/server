@@ -4,7 +4,7 @@ import { Config } from "./config";
 import { DB, ESClient } from "./db";
 import { Logger } from "./logger";
 import { IProfileDB } from "./models/profile";
-import { StringUtil } from "./util";
+import { StringUtil } from "./utils";
 
 const updateFunc: Array<() => Promise<void>> = [];
 

@@ -5,4 +5,4 @@ export * from "./config";
 export * from "./db";
 export * from "./generator";
 export * from "./logger";
-export * from "./util";
+export * from "./utils";

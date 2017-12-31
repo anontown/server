@@ -3,7 +3,7 @@ import { AtNotFoundError, AtTokenAuthError } from "../../at-error";
 import { IAuthTokenGeneral, IAuthTokenMaster, IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { StringUtil } from "../../util";
+import { StringUtil } from "../../utils";
 import { Client } from "..//client";
 
 export interface ITokenReq {
