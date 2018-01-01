@@ -392,15 +392,15 @@ import { AppServer } from "./server/app-server";
         // レスを書き込んだユーザー
         const resUser = await UserRepository.findOne(res.user);
 
-        res.v(resUser, user, "uv", auth.token);
+        const { res: newRes } = res.v(resUser, user, "uv", auth.token);
 
         await Promise.all([
-          ResRepository.update(res),
+          ResRepository.update(newRes),
           UserRepository.update(resUser),
           UserRepository.update(user),
         ]);
 
-        return res.toAPI(auth.token);
+        return newRes.toAPI(auth.token);
       },
     });
 
@@ -433,17 +433,17 @@ import { AppServer } from "./server/app-server";
         // レスを書き込んだユーザー
         const resUser = await UserRepository.findOne(res.user);
 
-        res.v(resUser, user, "dv", auth.token);
+        const { res: newRes } = res.v(resUser, user, "dv", auth.token);
 
         const promise = [
-          ResRepository.update(res),
+          ResRepository.update(newRes),
           UserRepository.update(resUser),
           UserRepository.update(user),
         ];
 
         await Promise.all(promise);
 
-        return res.toAPI(auth.token);
+        return newRes.toAPI(auth.token);
       },
     });
 
@@ -477,15 +477,15 @@ import { AppServer } from "./server/app-server";
         // レスを書き込んだユーザー
         const resUser = await UserRepository.findOne(res.user);
 
-        res.cv(resUser, user, auth.token);
+        const { res: newRes } = res.cv(resUser, user, auth.token);
 
         await Promise.all([
-          ResRepository.update(res),
+          ResRepository.update(newRes),
           UserRepository.update(resUser),
           UserRepository.update(user),
         ]);
 
-        return res.toAPI(auth.token);
+        return newRes.toAPI(auth.token);
       },
     });
 
@@ -515,14 +515,14 @@ import { AppServer } from "./server/app-server";
         // レスを書き込んだユーザー
         const resUser = await UserRepository.findOne(res.user);
 
-        res.del(resUser, auth.token);
+        const { res: newRes } = res.del(resUser, auth.token);
 
         await Promise.all([
-          ResRepository.update(res),
+          ResRepository.update(newRes),
           UserRepository.update(resUser),
         ]);
 
-        return res.toAPI(auth.token);
+        return newRes.toAPI(auth.token);
       },
     });
   }

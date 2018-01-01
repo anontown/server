@@ -5,28 +5,46 @@ import {
   User,
   ObjectIDGenerator,
   IResWait,
-  AtError
+  AtError,
+  IResBaseAPI,
+  IResBaseDB
 } from "../../";
 import { ObjectID } from "mongodb";
+import Copyable from "ts-copyable";
+import * as Im from "immutable";
+import { applyMixins } from "../../utils";
 
 describe("ResBase", () => {
-  class ResBaseTest extends ResBase<"normal"> {
-    toDB() {
-      return super.toBaseDB({});
-    }
+  class ResBaseTest extends Copyable<ResBaseTest> implements ResBase<"normal", ResBaseTest> {
+    toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"normal">;
+    toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"normal", Body>;
+    cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResBaseTest };
+    v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResBaseTest };
 
-    toAPI(authToken: IAuthToken | null) {
-      return super.toBaseAPI(authToken);
+    readonly type: "normal" = "normal";
+
+    constructor(
+      public readonly id: string,
+      public readonly topic: string,
+      public readonly date: Date,
+      public readonly user: string,
+      public readonly vote: Im.List<IVote>,
+      public readonly lv: number,
+      public readonly hash: string,
+      public readonly replyCount: number) {
+      super(ResBaseTest);
     }
   }
+  applyMixins(ResBaseTest, [ResBase]);
 
   describe("constructor", () => {
     it("正常に作れるか", () => {
       const date = new Date();
-      const vote: IVote[] = [{
+      const vote: Im.List<IVote> = Im.List([{
         user: "user",
         value: 5,
-      }];
+      }]);
+
       const res = new ResBaseTest("id",
         "topic",
         date,
@@ -34,7 +52,6 @@ describe("ResBase", () => {
         vote,
         1,
         "hash",
-        "normal",
         10);
 
       expect(res.id).toBe("id");
@@ -64,7 +81,7 @@ describe("ResBase", () => {
       const voteUserID1 = ObjectIDGenerator.get();
       const voteUserID2 = ObjectIDGenerator.get();
       const date = new Date();
-      const vote: IVote[] = [];
+      const vote: Im.List<IVote> = Im.List();
       const res = new ResBaseTest("id",
         "topic",
         date,
@@ -72,7 +89,6 @@ describe("ResBase", () => {
         vote,
         1,
         "hash",
-        "normal",
         10);
       const resUser = User.fromDB({
         _id: new ObjectID(resUserID),
@@ -85,7 +101,7 @@ describe("ResBase", () => {
         point: 1,
         lastOneTopic: new Date()
       });
-      res.v(resUser,
+      const { res: newRes } = res.v(resUser,
         User.fromDB({
           _id: new ObjectID(voteUserID1),
           sn: "sn1",
@@ -105,10 +121,10 @@ describe("ResBase", () => {
           type: "master"
         });
 
-      expect(res.vote).toEqual([{ user: voteUserID1, value: 2 }]);
+      expect(newRes.vote).toEqual(Im.List([{ user: voteUserID1, value: 2 }]));
       expect(resUser.lv).toBe(4);
 
-      res.v(resUser,
+      const { res: newNewRes } = newRes.v(resUser,
         User.fromDB({
           _id: new ObjectID(voteUserID2),
           sn: "sn1",
@@ -128,7 +144,7 @@ describe("ResBase", () => {
           type: "master"
         });
 
-      expect(res.vote).toEqual([{ user: voteUserID1, value: 2 }, { user: voteUserID2, value: -1 }]);
+      expect(newNewRes.vote).toEqual(Im.List([{ user: voteUserID1, value: 2 }, { user: voteUserID2, value: -1 }]));
       expect(resUser.lv).toBe(3);
     });
 
@@ -144,7 +160,7 @@ describe("ResBase", () => {
       };
       const resUserID = ObjectIDGenerator.get();
       const date = new Date();
-      const vote: IVote[] = [];
+      const vote: Im.List<IVote> = Im.List();
       const res = new ResBaseTest("id",
         "topic",
         date,
@@ -152,7 +168,6 @@ describe("ResBase", () => {
         vote,
         1,
         "hash",
-        "normal",
         10);
       const resUser = User.fromDB({
         _id: new ObjectID(resUserID),
@@ -191,7 +206,7 @@ describe("ResBase", () => {
       const resUserID = ObjectIDGenerator.get();
       const voteUserID = ObjectIDGenerator.get();
       const date = new Date();
-      const vote: IVote[] = [];
+      const vote: Im.List<IVote> = Im.List();
       const res = new ResBaseTest("id",
         "topic",
         date,
@@ -199,7 +214,6 @@ describe("ResBase", () => {
         vote,
         1,
         "hash",
-        "normal",
         10);
       const resUser = User.fromDB({
         _id: new ObjectID(resUserID),
@@ -213,8 +227,9 @@ describe("ResBase", () => {
         lastOneTopic: new Date()
       });
       expect(() => {
+        let nowRes = res;
         for (let i = 0; i < 2; i++) {
-          res.v(resUser,
+          nowRes = nowRes.v(resUser,
             User.fromDB({
               _id: new ObjectID(voteUserID),
               sn: "sn1",
@@ -232,7 +247,7 @@ describe("ResBase", () => {
               key: "aaaaa",
               user: "user2",
               type: "master"
-            });
+            }).res;
         }
       }).toThrow(AtError);
     });

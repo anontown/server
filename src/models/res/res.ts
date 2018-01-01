@@ -10,6 +10,9 @@ import { History } from "../history";
 import { Profile } from "../profile";
 import { Topic, TopicFork, TopicNormal, TopicOne } from "../topic";
 import { User } from "../user";
+import Copyable from "ts-copyable";
+import * as Im from "immutable";
+import { applyMixins } from "../../utils";
 
 export interface IVote {
   readonly user: string;
@@ -117,98 +120,70 @@ export interface IReply {
   readonly user: string;
 }
 
-export abstract class ResBase<T extends ResType> {
-  constructor(
-    private _id: string,
-    private _topic: string,
-    private _date: Date,
-    private _user: string,
-    private _vote: IVote[],
-    private _lv: number,
-    private _hash: string,
-    private _type: T,
-    private _replyCount: number) {
-  }
+export abstract class ResBase<T extends ResType, C extends ResBase<T, C>>{
+  abstract readonly id: string;
+  abstract readonly topic: string;
+  abstract readonly date: Date;
+  abstract readonly user: string;
+  abstract readonly vote: Im.List<IVote>;
+  abstract readonly lv: number;
+  abstract readonly hash: string;
+  abstract readonly type: T;
+  abstract readonly replyCount: number;
 
-  get id() {
-    return this._id;
-  }
+  abstract copy(partial: Partial<ResBase<T, C>>): C;
 
-  get topic() {
-    return this._topic;
-  }
-
-  get date() {
-    return this._date;
-  }
-
-  get user() {
-    return this._user;
-  }
-
-  get vote() {
-    return this._vote;
-  }
-
-  get lv() {
-    return this._lv;
-  }
-
-  get hash() {
-    return this._hash;
-  }
-
-  get type() {
-    return this._type;
-  }
-
-  get replyCount() {
-    return this._replyCount;
-  }
-
-  v(resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) {
-    if (user.id === this._user) {
+  v(resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken): { res: C } {
+    if (user.id === this.user) {
       throw new AtRightError("自分に投票は出来ません");
     }
-    if (this._vote.find(x => x.user === user.id) !== undefined) {
+    if (this.vote.find(x => x.user === user.id) !== undefined) {
       throw new AtPrerequisiteError("既に投票しています");
     }
     const valueAbs = Math.floor(user.lv / 100) + 1;
     const value = type === "uv" ? valueAbs : -valueAbs;
-    this._vote.push({ user: user.id, value });
     resUser.changeLv(resUser.lv + value);
+    return {
+      res: this.copy({
+        vote: this.vote.push({ user: user.id, value })
+      })
+    };
   }
 
-  cv(resUser: User, user: User, _authToken: IAuthToken) {
-    const vote = this._vote.find(x => x.user === user.id);
+  cv(resUser: User, user: User, _authToken: IAuthToken): { res: C } {
+    const vote = this.vote.find(x => x.user === user.id);
     if (vote === undefined) {
       throw new AtPrerequisiteError("投票していません");
     }
-    this._vote.splice(this._vote.indexOf(vote), 1);
     resUser.changeLv(resUser.lv - vote.value);
+    return {
+      res: this.copy({
+        vote: this.vote.remove(this.vote.indexOf(vote))
+      })
+    };
   }
 
-  protected toBaseDB<Body extends object>(body: Body): IResBaseDB<T, Body> {
+  toBaseDB<Body extends object>(body: Body): IResBaseDB<T, Body> {
     return {
-      id: this._id,
-      type: this._type,
+      id: this.id,
+      type: this.type,
       body: Object.assign({}, body, {
-        topic: this._topic,
-        date: this._date.toISOString(),
-        user: this._user,
-        vote: this._vote,
-        lv: this._lv,
-        hash: this._hash,
+        topic: this.topic,
+        date: this.date.toISOString(),
+        user: this.user,
+        vote: this.vote.toArray(),
+        lv: this.lv,
+        hash: this.hash,
       }),
     };
   }
 
-  protected toBaseAPI(authToken: IAuthToken | null): IResBaseAPI<T> {
+  toBaseAPI(authToken: IAuthToken | null): IResBaseAPI<T> {
     let voteFlag: VoteFlag | null;
     if (authToken === null) {
       voteFlag = null;
     } else {
-      const vote = this._vote.find(v => authToken.user === v.user);
+      const vote = this.vote.find(v => authToken.user === v.user);
       if (vote === undefined) {
         voteFlag = "not";
       } else {
@@ -217,23 +192,23 @@ export abstract class ResBase<T extends ResType> {
     }
 
     return {
-      id: this._id,
-      topic: this._topic,
-      date: this._date,
-      user: (authToken !== null && authToken.user === this._user ? this._user : null),
-      uv: this._vote.filter(x => x.value > 0).length,
-      dv: this._vote.filter(x => x.value < 0).length,
-      hash: this._hash,
-      replyCount: this._replyCount,
+      id: this.id,
+      topic: this.topic,
+      date: this.date,
+      user: (authToken !== null && authToken.user === this.user ? this.user : null),
+      uv: this.vote.filter(x => x.value > 0).size,
+      dv: this.vote.filter(x => x.value < 0).size,
+      hash: this.hash,
+      replyCount: this.replyCount,
       voteFlag,
-      type: this._type,
+      type: this.type,
     };
   }
 }
 
 export type Res = ResNormal | ResHistory | ResTopic | ResFork;
 
-export class ResNormal extends ResBase<"normal"> {
+export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", ResNormal> {
   static fromDB(r: IResNormalDB, replyCount: number): ResNormal {
     return new ResNormal(r.body.name,
       r.body.body,
@@ -245,7 +220,7 @@ export class ResNormal extends ResBase<"normal"> {
       r.body.topic,
       new Date(r.body.date),
       r.body.user,
-      r.body.vote,
+      Im.List(r.body.vote),
       r.body.lv,
       r.body.hash,
       replyCount);
@@ -307,7 +282,7 @@ export class ResNormal extends ResBase<"normal"> {
       topic.id,
       now,
       user.id,
-      [],
+      Im.List(),
       user.lv * 5,
       topic.hash(now, user),
       0);
@@ -316,80 +291,55 @@ export class ResNormal extends ResBase<"normal"> {
     return result;
   }
 
-  private constructor(
-    private _name: string | null,
-    private _body: string,
-    private _reply: IReply | null,
-    private _deleteFlag: ResDeleteFlag,
-    private _profile: string | null,
-    private _age: boolean,
-    id: string,
-    topic: string,
-    date: Date,
-    user: string,
-    vote: IVote[],
-    lv: number,
-    hash: string,
-    replyCount: number) {
-    super(id,
-      topic,
-      date,
-      user,
-      vote,
-      lv,
-      hash,
-      "normal",
-      replyCount);
+  readonly type: "normal" = "normal";
+
+  constructor(
+    public readonly name: string | null,
+    public readonly body: string,
+    public readonly reply: IReply | null,
+    public readonly deleteFlag: ResDeleteFlag,
+    public readonly profile: string | null,
+    public readonly age: boolean,
+    public readonly id: string,
+    public readonly topic: string,
+    public readonly date: Date,
+    public readonly user: string,
+    public readonly vote: Im.List<IVote>,
+    public readonly lv: number,
+    public readonly hash: string,
+    public readonly replyCount: number) {
+    super(ResNormal);
   }
 
-  get name() {
-    return this._name;
-  }
-
-  get body() {
-    return this._body;
-  }
-
-  get reply() {
-    return this._reply;
-  }
-
-  get deleteFlag() {
-    return this._deleteFlag;
-  }
-
-  get profile() {
-    return this._profile;
-  }
-
-  get age() {
-    return this._age;
-  }
+  toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"normal">;
+  toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"normal", Body>;
+  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResNormal };
+  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResNormal };
 
   toDB(): IResNormalDB {
-    return super.toBaseDB({
-      name: this._name,
-      body: this._body,
-      reply: this._reply,
-      deleteFlag: this._deleteFlag,
-      profile: this._profile,
-      age: this._age,
+    return this.toBaseDB({
+      name: this.name,
+      body: this.body,
+      reply: this.reply,
+      deleteFlag: this.deleteFlag,
+      profile: this.profile,
+      age: this.age,
     });
   }
 
   toAPI(authToken: IAuthToken | null): IResNormalAPI | IResDeleteAPI {
     if (this.deleteFlag === "active") {
       return {
-        ...super.toBaseAPI(authToken),
-        name: this._name,
-        body: this._body,
-        reply: this._reply !== null ? this._reply.res : null,
-        profile: this._profile !== null ? this._profile : null,
-        isReply: authToken === null || this._reply === null ? null : authToken.user === this._reply.user,
+        ...this.toBaseAPI(authToken),
+        name: this.name,
+        body: this.body,
+        reply: this.reply !== null ? this.reply.res : null,
+        profile: this.profile !== null ? this.profile : null,
+        isReply: authToken === null || this.reply === null ? null : authToken.user === this.reply.user,
       };
     } else {
       return {
-        ...super.toBaseAPI(authToken),
+        ...this.toBaseAPI(authToken),
         type: "delete",
         flag: this.deleteFlag,
       };
@@ -401,23 +351,28 @@ export class ResNormal extends ResBase<"normal"> {
       throw new AtRightError("人の書き込み削除は出来ません");
     }
 
-    if (this._deleteFlag !== "active") {
+    if (this.deleteFlag !== "active") {
       throw new AtPrerequisiteError("既に削除済みです");
     }
 
-    this._deleteFlag = "self";
     resUser.changeLv(resUser.lv - 1);
+    return {
+      res: this.copy({
+        deleteFlag: "self"
+      })
+    }
   }
 }
+applyMixins(ResNormal, [ResBase]);
 
-export class ResHistory extends ResBase<"history"> {
+export class ResHistory extends Copyable<ResHistory> implements ResBase<"history", ResHistory> {
   static fromDB(r: IResHistoryDB, replyCount: number): ResHistory {
     return new ResHistory(r.body.history,
       r.id,
       r.body.topic,
       new Date(r.body.date),
       r.body.user,
-      r.body.vote,
+      Im.List(r.body.vote),
       r.body.lv,
       r.body.hash,
       replyCount);
@@ -435,7 +390,7 @@ export class ResHistory extends ResBase<"history"> {
       topic.id,
       now,
       user.id,
-      [],
+      Im.List(),
       user.lv * 5,
       topic.hash(now, user),
       0);
@@ -444,50 +399,46 @@ export class ResHistory extends ResBase<"history"> {
     return result;
   }
 
-  private constructor(
-    private _history: string,
-    id: string,
-    topic: string,
-    date: Date,
-    user: string,
-    vote: IVote[],
-    lv: number,
-    hash: string,
-    replyCount: number) {
-    super(id,
-      topic,
-      date,
-      user,
-      vote,
-      lv,
-      hash,
-      "history",
-      replyCount);
-  }
+  toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"history">;
+  toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"history", Body>;
+  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResHistory };
+  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResHistory };
 
-  get history() {
-    return this._history;
+  readonly type: "history" = "history";
+
+  constructor(
+    public readonly history: string,
+    public readonly id: string,
+    public readonly topic: string,
+    public readonly date: Date,
+    public readonly user: string,
+    public readonly vote: Im.List<IVote>,
+    public readonly lv: number,
+    public readonly hash: string,
+    public readonly replyCount: number) {
+    super(ResHistory);
   }
 
   toDB(): IResHistoryDB {
-    return super.toBaseDB({ history: this._history });
+    return this.toBaseDB({ history: this.history });
   }
 
   toAPI(authToken: IAuthToken | null): IResHistoryAPI {
     return {
-      ...super.toBaseAPI(authToken),
-      history: this._history,
+      ...this.toBaseAPI(authToken),
+      history: this.history,
     };
   }
 }
+applyMixins(ResHistory, [ResBase]);
 
-export class ResTopic extends ResBase<"topic"> {
+export class ResTopic extends Copyable<ResTopic> implements ResBase<"topic", ResTopic> {
   static fromDB(r: IResTopicDB, replyCount: number): ResTopic {
     return new ResTopic(r.id,
       r.body.topic,
       new Date(r.body.date),
       r.body.user,
-      r.body.vote,
+      Im.List(r.body.vote),
       r.body.lv,
       r.body.hash,
       replyCount);
@@ -503,7 +454,7 @@ export class ResTopic extends ResBase<"topic"> {
       topic.id,
       now,
       user.id,
-      [],
+      Im.List(),
       user.lv * 5,
       topic.hash(now, user),
       0);
@@ -512,43 +463,43 @@ export class ResTopic extends ResBase<"topic"> {
     return result;
   }
 
-  private constructor(
-    id: string,
-    topic: string,
-    date: Date,
-    user: string,
-    vote: IVote[],
-    lv: number,
-    hash: string,
-    replyCount: number) {
-    super(id,
-      topic,
-      date,
-      user,
-      vote,
-      lv,
-      hash,
-      "topic",
-      replyCount);
+  toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"topic">;
+  toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"topic", Body>;
+  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResTopic };
+  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResTopic };
+
+  readonly type: "topic" = "topic";
+
+  constructor(
+    public readonly id: string,
+    public readonly topic: string,
+    public readonly date: Date,
+    public readonly user: string,
+    public readonly vote: Im.List<IVote>,
+    public readonly lv: number,
+    public readonly hash: string,
+    public readonly replyCount: number) {
+    super(ResTopic);
   }
 
   toDB(): IResTopicDB {
-    return super.toBaseDB({});
+    return this.toBaseDB({});
   }
 
   toAPI(authToken: IAuthToken | null): IResTopicAPI {
-    return super.toBaseAPI(authToken);
+    return this.toBaseAPI(authToken);
   }
 }
+applyMixins(ResTopic, [ResBase]);
 
-export class ResFork extends ResBase<"fork"> {
+export class ResFork extends Copyable<ResFork> implements ResBase<"fork", ResFork> {
   static fromDB(r: IResForkDB, replyCount: number): ResFork {
     return new ResFork(r.body.fork,
       r.id,
       r.body.topic,
       new Date(r.body.date),
       r.body.user,
-      r.body.vote,
+      Im.List(r.body.vote),
       r.body.lv,
       r.body.hash,
       replyCount);
@@ -566,7 +517,7 @@ export class ResFork extends ResBase<"fork"> {
       topic.id,
       now,
       user.id,
-      [],
+      Im.List(),
       user.lv * 5,
       topic.hash(now, user),
       0);
@@ -575,39 +526,36 @@ export class ResFork extends ResBase<"fork"> {
     return result;
   }
 
-  private constructor(
-    private _fork: string,
-    id: string,
-    topic: string,
-    date: Date,
-    user: string,
-    vote: IVote[],
-    lv: number,
-    hash: string,
-    replyCount: number) {
-    super(id,
-      topic,
-      date,
-      user,
-      vote,
-      lv,
-      hash,
-      "fork",
-      replyCount);
-  }
+  toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"fork">;
+  toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"fork", Body>;
+  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResFork };
+  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResFork };
 
-  get fork() {
-    return this._fork;
+  readonly type: "fork" = "fork";
+
+  constructor(
+    public readonly fork: string,
+    public readonly id: string,
+    public readonly topic: string,
+    public readonly date: Date,
+    public readonly user: string,
+    public readonly vote: Im.List<IVote>,
+    public readonly lv: number,
+    public readonly hash: string,
+    public readonly replyCount: number) {
+    super(ResFork);
   }
 
   toDB(): IResForkDB {
-    return super.toBaseDB({ fork: this._fork });
+    return this.toBaseDB({ fork: this.fork });
   }
 
   toAPI(authToken: IAuthToken | null): IResForkAPI {
     return {
-      ...super.toBaseAPI(authToken),
-      fork: this._fork,
+      ...this.toBaseAPI(authToken),
+      fork: this.fork,
     };
   }
 }
+applyMixins(ResFork, [ResBase]);
+
