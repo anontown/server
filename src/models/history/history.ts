@@ -1,6 +1,8 @@
 import { IGenerator } from "../../generator";
 import { TopicNormal } from "../topic";
 import { User } from "../user";
+import Copyable from "ts-copyable";
+import * as Im from "immutable";
 
 export interface IHistoryDB {
   readonly id: string;
@@ -25,12 +27,12 @@ export interface IHistoryAPI {
   readonly hash: string;
 }
 
-export class History {
+export class History extends Copyable<History>{
   static fromDB(h: IHistoryDB): History {
     return new History(h.id,
       h.body.topic,
       h.body.title,
-      h.body.tags,
+      Im.List(h.body.tags),
       h.body.body,
       new Date(h.body.date),
       h.body.hash,
@@ -38,76 +40,44 @@ export class History {
   }
 
   static create(objidGenerator: IGenerator<string>, topic: TopicNormal, date: Date, hash: string, user: User): History {
-    return new History(objidGenerator.get(), topic.id, topic.title, topic.tags, topic.body, date, hash, user.id);
+    return new History(objidGenerator.get(), topic.id, topic.title, Im.List(topic.tags), topic.body, date, hash, user.id);
   }
 
-  private constructor(private _id: string,
-    private _topic: string,
-    private _title: string,
-    private _tags: string[],
-    private _body: string,
-    private _date: Date,
-    private _hash: string,
-    private _user: string) {
-
-  }
-
-  get id() {
-    return this._id;
-  }
-
-  get topic() {
-    return this._topic;
-  }
-
-  get title() {
-    return this._title;
-  }
-
-  get tags() {
-    return this._tags;
-  }
-
-  get body() {
-    return this._body;
-  }
-
-  get date() {
-    return this._date;
-  }
-
-  get hash() {
-    return this._hash;
-  }
-
-  get user() {
-    return this._user;
+  constructor(public readonly id: string,
+    public readonly topic: string,
+    public readonly title: string,
+    public readonly tags: Im.List<string>,
+    public readonly body: string,
+    public readonly date: Date,
+    public readonly hash: string,
+    public readonly user: string) {
+    super(History);
   }
 
   toDB(): IHistoryDB {
     return {
-      id: this._id,
+      id: this.id,
       body: {
-        topic: this._topic,
-        title: this._title,
-        tags: this._tags,
-        body: this._body,
-        date: this._date.toISOString(),
-        hash: this._hash,
-        user: this._user,
+        topic: this.topic,
+        title: this.title,
+        tags: this.tags.toArray(),
+        body: this.body,
+        date: this.date.toISOString(),
+        hash: this.hash,
+        user: this.user,
       },
     };
   }
 
   toAPI(): IHistoryAPI {
     return {
-      id: this._id,
-      topic: this._topic,
-      title: this._title,
-      tags: this._tags,
-      body: this._body,
-      date: this._date.toISOString(),
-      hash: this._hash,
+      id: this.id,
+      topic: this.topic,
+      title: this.title,
+      tags: this.tags.toArray(),
+      body: this.body,
+      date: this.date.toISOString(),
+      hash: this.hash,
     };
   }
 }
