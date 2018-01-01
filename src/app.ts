@@ -1190,10 +1190,10 @@ import { AppServer } from "./server/app-server";
       },
       call: async ({ params, auth, ip, now }) => {
         const profile = await ProfileRepository.findOne(params.id);
-        profile.changeData(auth.token, params.name, params.body, params.sn, now);
-        await ProfileRepository.update(profile);
-        appLog("profile/update", ip, "profiles", profile.id);
-        return profile.toAPI(auth.token);
+        const newProfile = profile.changeData(auth.token, params.name, params.body, params.sn, now);
+        await ProfileRepository.update(newProfile);
+        appLog("profile/update", ip, "profiles", newProfile.id);
+        return newProfile.toAPI(auth.token);
       },
     });
   }

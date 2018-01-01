@@ -3,6 +3,7 @@ import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
+import Copyable from "ts-copyable";
 
 export interface IProfileDB {
   readonly _id: ObjectID;
@@ -24,7 +25,7 @@ export interface IProfileAPI {
   readonly sn: string;
 }
 
-export class Profile {
+export class Profile extends Copyable<Profile>{
   static fromDB(p: IProfileDB): Profile {
     return new Profile(p._id.toString(), p.user.toString(), p.name, p.body, p.date, p.update, p.sn);
   }
@@ -66,71 +67,43 @@ export class Profile {
       sn);
   }
 
-  private constructor(
-    private _id: string,
-    private _user: string,
-    private _name: string,
-    private _body: string,
-    private _date: Date,
-    private _update: Date,
-    private _sn: string) {
-
-  }
-
-  get id() {
-    return this._id;
-  }
-
-  get user() {
-    return this._user;
-  }
-
-  get name() {
-    return this._name;
-  }
-
-  get body() {
-    return this._body;
-  }
-
-  get date() {
-    return this._date;
-  }
-
-  get update() {
-    return this._update;
-  }
-
-  get sn() {
-    return this._sn;
+  constructor(
+    public readonly id: string,
+    public readonly user: string,
+    public readonly name: string,
+    public readonly body: string,
+    public readonly date: Date,
+    public readonly update: Date,
+    public readonly sn: string) {
+    super(Profile);
   }
 
   toDB(): IProfileDB {
     return {
-      _id: new ObjectID(this._id),
-      user: new ObjectID(this._user),
-      name: this._name,
-      body: this._body,
-      date: this._date,
-      update: this._update,
-      sn: this._sn,
+      _id: new ObjectID(this.id),
+      user: new ObjectID(this.user),
+      name: this.name,
+      body: this.body,
+      date: this.date,
+      update: this.update,
+      sn: this.sn,
     };
   }
 
   toAPI(authToken: IAuthToken | null): IProfileAPI {
     return {
-      id: this._id,
-      user: authToken !== null && authToken.user === this._user ? this._user : null,
-      name: this._name,
-      body: this._body,
-      date: this._date.toISOString(),
-      update: this._update.toISOString(),
-      sn: this._sn,
+      id: this.id,
+      user: authToken !== null && authToken.user === this.user ? this.user : null,
+      name: this.name,
+      body: this.body,
+      date: this.date.toISOString(),
+      update: this.update.toISOString(),
+      sn: this.sn,
     };
   }
 
   changeData(authToken: IAuthToken, name: string, body: string, sn: string, now: Date) {
-    if (authToken.user !== this._user) {
+    if (authToken.user !== this.user) {
       throw new AtRightError("人のプロフィール変更は出来ません");
     }
     paramsErrorMaker([
@@ -154,9 +127,11 @@ export class Profile {
       },
     ]);
 
-    this._name = name;
-    this._body = body;
-    this._sn = sn;
-    this._update = now;
+    return this.copy({
+      name,
+      body,
+      sn,
+      update: now
+    })
   }
 }
