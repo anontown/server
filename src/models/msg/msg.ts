@@ -2,6 +2,7 @@ import { AtRightError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { IGenerator } from "../../generator";
 import { User } from "../user";
+import Copyable from "ts-copyable";
 
 export interface IMsgDB {
   readonly id: string;
@@ -19,7 +20,7 @@ export interface IMsgAPI {
   readonly date: string;
 }
 
-export class Msg {
+export class Msg extends Copyable<Msg>{
   static fromDB(m: IMsgDB): Msg {
     return new Msg(m.id, m.body.receiver, m.body.body, new Date(m.body.date));
   }
@@ -31,51 +32,35 @@ export class Msg {
       now);
   }
 
-  private constructor(
-    private _id: string,
-    private _receiver: string | null,
-    private _body: string,
-    private _date: Date) {
-
-  }
-
-  get id() {
-    return this._id;
-  }
-
-  get receiver() {
-    return this._receiver;
-  }
-
-  get body() {
-    return this._body;
-  }
-
-  get date() {
-    return this._date;
+  constructor(
+    public readonly id: string,
+    public readonly receiver: string | null,
+    public readonly body: string,
+    public readonly date: Date) {
+    super(Msg);
   }
 
   toDB(): IMsgDB {
     return {
-      id: this._id,
+      id: this.id,
       body: {
-        receiver: this._receiver,
-        body: this._body,
-        date: this._date.toISOString(),
+        receiver: this.receiver,
+        body: this.body,
+        date: this.date.toISOString(),
       },
     };
   }
 
   toAPI(authToken: IAuthToken): IMsgAPI {
-    if (this._receiver !== null && this._receiver !== authToken.user) {
+    if (this.receiver !== null && this.receiver !== authToken.user) {
       throw new AtRightError("アクセス権がありません。");
     }
 
     return {
-      id: this._id,
-      receiver: this._receiver,
-      body: this._body,
-      date: this._date.toISOString(),
+      id: this.id,
+      receiver: this.receiver,
+      body: this.body,
+      date: this.date.toISOString(),
     };
   }
 }
