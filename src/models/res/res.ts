@@ -148,7 +148,7 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
       res: this.copy({
         vote: this.vote.push({ user: user.id, value }),
       }),
-      resUser: newResUser
+      resUser: newResUser,
     };
   }
 
@@ -162,7 +162,7 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
       res: this.copy({
         vote: this.vote.remove(this.vote.indexOf(vote)),
       }),
-      resUser: newResUser
+      resUser: newResUser,
     };
   }
 
@@ -363,7 +363,7 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
       res: this.copy({
         deleteFlag: "self",
       }),
-      resUser: newResUser
+      resUser: newResUser,
     };
   }
 }

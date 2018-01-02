@@ -570,7 +570,7 @@ import { AppServer } from "./server/app-server";
         await Promise.all([
           UserRepository.update(create.user),
           ResRepository.insert(create.res),
-          HistoryRepository.insert(create.history)
+          HistoryRepository.insert(create.history),
         ]);
         appLog("topic/create", ip, "topics", create.topic.id);
         appLog("topic/create", ip, "reses", create.res.id);
