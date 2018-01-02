@@ -1,8 +1,8 @@
+import Copyable from "ts-copyable";
 import { AtRightError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { IGenerator } from "../../generator";
 import { User } from "../user";
-import Copyable from "ts-copyable";
 
 export interface IMsgDB {
   readonly id: string;
@@ -20,7 +20,7 @@ export interface IMsgAPI {
   readonly date: string;
 }
 
-export class Msg extends Copyable<Msg>{
+export class Msg extends Copyable<Msg> {
   static fromDB(m: IMsgDB): Msg {
     return new Msg(m.id, m.body.receiver, m.body.body, new Date(m.body.date));
   }
@@ -33,10 +33,10 @@ export class Msg extends Copyable<Msg>{
   }
 
   constructor(
-    public readonly id: string,
-    public readonly receiver: string | null,
-    public readonly body: string,
-    public readonly date: Date) {
+    readonly id: string,
+    readonly receiver: string | null,
+    readonly body: string,
+    readonly date: Date) {
     super(Msg);
   }
 

@@ -1,9 +1,9 @@
 import { ObjectID } from "mongodb";
+import Copyable from "ts-copyable";
 import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import Copyable from "ts-copyable";
 
 export interface IClientDB {
   readonly _id: ObjectID;
@@ -23,7 +23,7 @@ export interface IClientAPI {
   readonly update: string;
 }
 
-export class Client extends Copyable<Client>{
+export class Client extends Copyable<Client> {
 
   static fromDB(c: IClientDB): Client {
     return new Client(c._id.toString(), c.name, c.url, c.user.toString(), c.date, c.update);
@@ -59,12 +59,12 @@ export class Client extends Copyable<Client>{
   }
 
   constructor(
-    public readonly id: string,
-    public readonly name: string,
-    public readonly url: string,
-    public readonly user: string,
-    public readonly date: Date,
-    public readonly update: Date) {
+    readonly id: string,
+    readonly name: string,
+    readonly url: string,
+    readonly user: string,
+    readonly date: Date,
+    readonly update: Date) {
     super(Client);
   }
 

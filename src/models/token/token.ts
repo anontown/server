@@ -1,13 +1,13 @@
+import * as Im from "immutable";
 import { ObjectID } from "mongodb";
+import Copyable, { PartialMap } from "ts-copyable";
 import { AtNotFoundError, AtTokenAuthError } from "../../at-error";
 import { IAuthTokenGeneral, IAuthTokenMaster, IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
 import { hash } from "../../utils";
-import { Client } from "..//client";
-import Copyable, { PartialMap } from "ts-copyable";
-import * as Im from "immutable";
 import { applyMixins } from "../../utils";
+import { Client } from "..//client";
 
 export interface ITokenReq {
   readonly key: string;
@@ -116,10 +116,10 @@ export class TokenMaster extends Copyable<TokenMaster> implements TokenBase<"mas
   toBaseDB: () => ITokenBaseDB<"master">;
 
   constructor(
-    public readonly id: string,
-    public readonly key: string,
-    public readonly user: string,
-    public readonly date: Date) {
+    readonly id: string,
+    readonly key: string,
+    readonly user: string,
+    readonly date: Date) {
     super(TokenMaster);
   }
 
@@ -166,12 +166,12 @@ export class TokenGeneral extends Copyable<TokenGeneral> implements TokenBase<"g
   toBaseDB: () => ITokenBaseDB<"general">;
 
   constructor(
-    public readonly id: string,
-    public readonly key: string,
-    public readonly client: string,
-    public readonly user: string,
-    public readonly req: Im.List<ITokenReq>,
-    public readonly date: Date) {
+    readonly id: string,
+    readonly key: string,
+    readonly client: string,
+    readonly user: string,
+    readonly req: Im.List<ITokenReq>,
+    readonly date: Date) {
     super(TokenGeneral);
   }
 
@@ -208,12 +208,12 @@ export class TokenGeneral extends Copyable<TokenGeneral> implements TokenBase<"g
 
     return {
       token: this.copy({
-        req: reqFilter.push(req)
+        req: reqFilter.push(req),
       }),
       req: {
         token: this.id,
         key: req.key,
-      }
+      },
     };
   }
 

@@ -1,10 +1,10 @@
 import { ObjectID } from "mongodb";
+import Copyable from "ts-copyable";
 import { AtPrerequisiteError, AtUserAuthError, paramsErrorMaker } from "../../at-error";
 import { IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
 import { hash } from "../../utils";
-import Copyable from "ts-copyable";
 
 export interface IUserDB {
   readonly _id: ObjectID;
@@ -66,16 +66,16 @@ export class User extends Copyable<User> {
   }
 
   constructor(
-    public readonly id: string,
-    public readonly sn: string,
-    public readonly pass: string,
-    public readonly lv: number,
-    public readonly resWait: IResWait,
-    public readonly lastTopic: Date,
-    public readonly date: Date,
+    readonly id: string,
+    readonly sn: string,
+    readonly pass: string,
+    readonly lv: number,
+    readonly resWait: IResWait,
+    readonly lastTopic: Date,
+    readonly date: Date,
     // 毎日リセットされ、特殊動作をすると増えるポイント
-    public readonly point: number,
-    public readonly lastOneTopic: Date) {
+    readonly point: number,
+    readonly lastOneTopic: Date) {
     super(User);
   }
 
@@ -138,7 +138,7 @@ export class User extends Copyable<User> {
     return this.copy({
       lv: lv < 1 ? 1
         : lv > Config.user.lvMax ? Config.user.lvMax
-          : lv
+          : lv,
     });
   }
 
@@ -164,7 +164,7 @@ export class User extends Copyable<User> {
           m30: this.resWait.m30 + 1,
           m10: this.resWait.m10 + 1,
           last: lastRes,
-        }
+        },
       });
     } else {
       throw new AtPrerequisiteError("連続書き込みはできません");

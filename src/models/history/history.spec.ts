@@ -1,3 +1,4 @@
+import * as Im from "immutable";
 import { ObjectID } from "mongodb";
 import {
     History,
@@ -6,7 +7,6 @@ import {
     TopicNormal,
     User,
 } from "../../";
-import * as Im from "immutable";
 
 describe("History", () => {
     describe("fromDB", () => {

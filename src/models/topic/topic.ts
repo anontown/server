@@ -1,14 +1,14 @@
+import * as Im from "immutable";
+import Copyable, { PartialMap } from "ts-copyable";
 import { AtPrerequisiteError, paramsErrorMaker, paramsErrorMakerData } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
 import { hash } from "../../utils";
+import { applyMixins } from "../../utils";
 import { History } from "../history";
 import { Res, ResFork, ResHistory, ResTopic } from "../res";
 import { User } from "../user";
-import Copyable, { PartialMap } from "ts-copyable";
-import * as Im from "immutable";
-import { applyMixins } from "../../utils";
 
 export type ITopicDB = ITopicNormalDB | ITopicOneDB | ITopicForkDB;
 
@@ -167,7 +167,7 @@ export abstract class TopicBase<T extends TopicType, C extends TopicBase<T, C>> 
 
     return this.copy({
       update: res.date,
-      ageUpdate: res.type === "normal" && res.age ? res.date : this.ageUpdate
+      ageUpdate: res.type === "normal" && res.age ? res.date : this.ageUpdate,
     });
   }
 
@@ -187,7 +187,8 @@ export abstract class TopicBase<T extends TopicType, C extends TopicBase<T, C>> 
   }
 }
 
-export abstract class TopicSearchBase<T extends TopicSearchType, C extends TopicSearchBase<T, C>> extends TopicBase<T, C> {
+export abstract class TopicSearchBase<T extends TopicSearchType, C extends TopicSearchBase<T, C>>
+  extends TopicBase<T, C> {
   abstract readonly tags: Im.List<string>;
   abstract readonly body: string;
 
@@ -254,15 +255,15 @@ export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBas
   toBaseDB: <Body extends object>(body: Body) => ITopicBaseDB<"normal", Body>;
 
   constructor(
-    public readonly id: string,
-    public readonly title: string,
-    public readonly tags: Im.List<string>,
-    public readonly body: string,
-    public readonly update: Date,
-    public readonly date: Date,
-    public readonly resCount: number,
-    public readonly ageUpdate: Date,
-    public readonly active: boolean) {
+    readonly id: string,
+    readonly title: string,
+    readonly tags: Im.List<string>,
+    readonly body: string,
+    readonly update: Date,
+    readonly date: Date,
+    readonly resCount: number,
+    readonly ageUpdate: Date,
+    readonly active: boolean) {
     super(TopicNormal);
   }
 
@@ -343,20 +344,19 @@ export class TopicOne extends Copyable<TopicOne> implements TopicSearchBase<"one
   toBaseDB: <Body extends object>(body: Body) => ITopicBaseDB<"one", Body>;
 
   constructor(
-    public readonly id: string,
-    public readonly title: string,
-    public readonly tags: Im.List<string>,
-    public readonly body: string,
-    public readonly update: Date,
-    public readonly date: Date,
-    public readonly resCount: number,
-    public readonly ageUpdate: Date,
-    public readonly active: boolean) {
+    readonly id: string,
+    readonly title: string,
+    readonly tags: Im.List<string>,
+    readonly body: string,
+    readonly update: Date,
+    readonly date: Date,
+    readonly resCount: number,
+    readonly ageUpdate: Date,
+    readonly active: boolean) {
     super(TopicOne);
   }
 }
 applyMixins(TopicOne, [TopicSearchBase]);
-
 
 export class TopicFork extends Copyable<TopicFork> implements TopicBase<"fork", TopicFork> {
   static fromDB(db: ITopicForkDB, resCount: number): TopicFork {
@@ -411,14 +411,14 @@ export class TopicFork extends Copyable<TopicFork> implements TopicBase<"fork", 
   toBaseDB: <Body extends object>(body: Body) => ITopicBaseDB<"fork", Body>;
 
   constructor(
-    public readonly id: string,
-    public readonly title: string,
-    public readonly update: Date,
-    public readonly date: Date,
-    public readonly resCount: number,
-    public readonly ageUpdate: Date,
-    public readonly active: boolean,
-    public readonly parent: string) {
+    readonly id: string,
+    readonly title: string,
+    readonly update: Date,
+    readonly date: Date,
+    readonly resCount: number,
+    readonly ageUpdate: Date,
+    readonly active: boolean,
+    readonly parent: string) {
     super(TopicFork);
   }
 

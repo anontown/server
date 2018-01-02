@@ -1,9 +1,9 @@
 import { ObjectID } from "mongodb";
+import Copyable from "ts-copyable";
 import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import Copyable from "ts-copyable";
 
 export interface IProfileDB {
   readonly _id: ObjectID;
@@ -25,7 +25,7 @@ export interface IProfileAPI {
   readonly sn: string;
 }
 
-export class Profile extends Copyable<Profile>{
+export class Profile extends Copyable<Profile> {
   static fromDB(p: IProfileDB): Profile {
     return new Profile(p._id.toString(), p.user.toString(), p.name, p.body, p.date, p.update, p.sn);
   }
@@ -68,13 +68,13 @@ export class Profile extends Copyable<Profile>{
   }
 
   constructor(
-    public readonly id: string,
-    public readonly user: string,
-    public readonly name: string,
-    public readonly body: string,
-    public readonly date: Date,
-    public readonly update: Date,
-    public readonly sn: string) {
+    readonly id: string,
+    readonly user: string,
+    readonly name: string,
+    readonly body: string,
+    readonly date: Date,
+    readonly update: Date,
+    readonly sn: string) {
     super(Profile);
   }
 
@@ -131,7 +131,7 @@ export class Profile extends Copyable<Profile>{
       name,
       body,
       sn,
-      update: now
-    })
+      update: now,
+    });
   }
 }

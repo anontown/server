@@ -1,3 +1,5 @@
+import * as Im from "immutable";
+import Copyable, { PartialMap } from "ts-copyable";
 import {
   AtPrerequisiteError,
   AtRightError,
@@ -6,13 +8,11 @@ import {
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
+import { applyMixins } from "../../utils";
 import { History } from "../history";
 import { Profile } from "../profile";
 import { Topic, TopicFork, TopicNormal, TopicOne } from "../topic";
 import { User } from "../user";
-import Copyable, { PartialMap } from "ts-copyable";
-import * as Im from "immutable";
-import { applyMixins } from "../../utils";
 
 export interface IVote {
   readonly user: string;
@@ -120,7 +120,7 @@ export interface IReply {
   readonly user: string;
 }
 
-export abstract class ResBase<T extends ResType, C extends ResBase<T, C>>{
+export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
   abstract readonly id: string;
   abstract readonly topic: string;
   abstract readonly date: Date;
@@ -146,8 +146,8 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>>{
     resUser.changeLv(resUser.lv + value);
     return {
       res: this.copy({
-        vote: this.vote.push({ user: user.id, value })
-      })
+        vote: this.vote.push({ user: user.id, value }),
+      }),
     };
   }
 
@@ -159,8 +159,8 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>>{
     resUser.changeLv(resUser.lv - vote.value);
     return {
       res: this.copy({
-        vote: this.vote.remove(this.vote.indexOf(vote))
-      })
+        vote: this.vote.remove(this.vote.indexOf(vote)),
+      }),
     };
   }
 
@@ -294,28 +294,28 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
 
   readonly type: "normal" = "normal";
 
-  constructor(
-    public readonly name: string | null,
-    public readonly body: string,
-    public readonly reply: IReply | null,
-    public readonly deleteFlag: ResDeleteFlag,
-    public readonly profile: string | null,
-    public readonly age: boolean,
-    public readonly id: string,
-    public readonly topic: string,
-    public readonly date: Date,
-    public readonly user: string,
-    public readonly vote: Im.List<IVote>,
-    public readonly lv: number,
-    public readonly hash: string,
-    public readonly replyCount: number) {
-    super(ResNormal);
-  }
-
   toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"normal">;
   toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"normal", Body>;
   cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResNormal };
   v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResNormal };
+
+  constructor(
+    readonly name: string | null,
+    readonly body: string,
+    readonly reply: IReply | null,
+    readonly deleteFlag: ResDeleteFlag,
+    readonly profile: string | null,
+    readonly age: boolean,
+    readonly id: string,
+    readonly topic: string,
+    readonly date: Date,
+    readonly user: string,
+    readonly vote: Im.List<IVote>,
+    readonly lv: number,
+    readonly hash: string,
+    readonly replyCount: number) {
+    super(ResNormal);
+  }
 
   toDB(): IResNormalDB {
     return this.toBaseDB({
@@ -359,9 +359,9 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
     resUser.changeLv(resUser.lv - 1);
     return {
       res: this.copy({
-        deleteFlag: "self"
-      })
-    }
+        deleteFlag: "self",
+      }),
+    };
   }
 }
 applyMixins(ResNormal, [ResBase]);
@@ -408,15 +408,15 @@ export class ResHistory extends Copyable<ResHistory> implements ResBase<"history
   readonly type: "history" = "history";
 
   constructor(
-    public readonly history: string,
-    public readonly id: string,
-    public readonly topic: string,
-    public readonly date: Date,
-    public readonly user: string,
-    public readonly vote: Im.List<IVote>,
-    public readonly lv: number,
-    public readonly hash: string,
-    public readonly replyCount: number) {
+    readonly history: string,
+    readonly id: string,
+    readonly topic: string,
+    readonly date: Date,
+    readonly user: string,
+    readonly vote: Im.List<IVote>,
+    readonly lv: number,
+    readonly hash: string,
+    readonly replyCount: number) {
     super(ResHistory);
   }
 
@@ -472,14 +472,14 @@ export class ResTopic extends Copyable<ResTopic> implements ResBase<"topic", Res
   readonly type: "topic" = "topic";
 
   constructor(
-    public readonly id: string,
-    public readonly topic: string,
-    public readonly date: Date,
-    public readonly user: string,
-    public readonly vote: Im.List<IVote>,
-    public readonly lv: number,
-    public readonly hash: string,
-    public readonly replyCount: number) {
+    readonly id: string,
+    readonly topic: string,
+    readonly date: Date,
+    readonly user: string,
+    readonly vote: Im.List<IVote>,
+    readonly lv: number,
+    readonly hash: string,
+    readonly replyCount: number) {
     super(ResTopic);
   }
 
@@ -535,15 +535,15 @@ export class ResFork extends Copyable<ResFork> implements ResBase<"fork", ResFor
   readonly type: "fork" = "fork";
 
   constructor(
-    public readonly fork: string,
-    public readonly id: string,
-    public readonly topic: string,
-    public readonly date: Date,
-    public readonly user: string,
-    public readonly vote: Im.List<IVote>,
-    public readonly lv: number,
-    public readonly hash: string,
-    public readonly replyCount: number) {
+    readonly fork: string,
+    readonly id: string,
+    readonly topic: string,
+    readonly date: Date,
+    readonly user: string,
+    readonly vote: Im.List<IVote>,
+    readonly lv: number,
+    readonly hash: string,
+    readonly replyCount: number) {
     super(ResFork);
   }
 
@@ -559,4 +559,3 @@ export class ResFork extends Copyable<ResFork> implements ResBase<"fork", ResFor
   }
 }
 applyMixins(ResFork, [ResBase]);
-

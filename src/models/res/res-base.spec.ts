@@ -1,17 +1,17 @@
-import {
-  IAuthToken,
-  IVote,
-  ResBase,
-  User,
-  ObjectIDGenerator,
-  IResWait,
-  AtError,
-  IResBaseAPI,
-  IResBaseDB
-} from "../../";
+import * as Im from "immutable";
 import { ObjectID } from "mongodb";
 import Copyable from "ts-copyable";
-import * as Im from "immutable";
+import {
+  AtError,
+  IAuthToken,
+  IResBaseAPI,
+  IResBaseDB,
+  IResWait,
+  IVote,
+  ObjectIDGenerator,
+  ResBase,
+  User,
+} from "../../";
 import { applyMixins } from "../../utils";
 
 describe("ResBase", () => {
@@ -24,14 +24,14 @@ describe("ResBase", () => {
     readonly type: "normal" = "normal";
 
     constructor(
-      public readonly id: string,
-      public readonly topic: string,
-      public readonly date: Date,
-      public readonly user: string,
-      public readonly vote: Im.List<IVote>,
-      public readonly lv: number,
-      public readonly hash: string,
-      public readonly replyCount: number) {
+      readonly id: string,
+      readonly topic: string,
+      readonly date: Date,
+      readonly user: string,
+      readonly vote: Im.List<IVote>,
+      readonly lv: number,
+      readonly hash: string,
+      readonly replyCount: number) {
       super(ResBaseTest);
     }
   }
@@ -99,7 +99,7 @@ describe("ResBase", () => {
         lastTopic: new Date(),
         date: new Date(),
         point: 1,
-        lastOneTopic: new Date()
+        lastOneTopic: new Date(),
       });
       const { res: newRes } = res.v(resUser,
         User.fromDB({
@@ -111,14 +111,14 @@ describe("ResBase", () => {
           lastTopic: new Date(),
           date: new Date(),
           point: 1,
-          lastOneTopic: new Date()
+          lastOneTopic: new Date(),
         }),
         "uv",
         {
           id: voteUserID1,
           key: "aaaaa",
           user: "user2",
-          type: "master"
+          type: "master",
         });
 
       expect(newRes.vote).toEqual(Im.List([{ user: voteUserID1, value: 2 }]));
@@ -134,14 +134,14 @@ describe("ResBase", () => {
           lastTopic: new Date(),
           date: new Date(),
           point: 1,
-          lastOneTopic: new Date()
+          lastOneTopic: new Date(),
         }),
         "dv",
         {
           id: voteUserID2,
           key: "aaaaa",
           user: "user2",
-          type: "master"
+          type: "master",
         });
 
       expect(newNewRes.vote).toEqual(Im.List([{ user: voteUserID1, value: 2 }, { user: voteUserID2, value: -1 }]));
@@ -178,7 +178,7 @@ describe("ResBase", () => {
         lastTopic: new Date(),
         date: new Date(),
         point: 1,
-        lastOneTopic: new Date()
+        lastOneTopic: new Date(),
       });
       expect(() => {
         res.v(resUser,
@@ -188,7 +188,7 @@ describe("ResBase", () => {
             id: resUserID,
             key: "aaaaa",
             user: "user2",
-            type: "master"
+            type: "master",
           });
       }).toThrow(AtError);
     });
@@ -224,7 +224,7 @@ describe("ResBase", () => {
         lastTopic: new Date(),
         date: new Date(),
         point: 1,
-        lastOneTopic: new Date()
+        lastOneTopic: new Date(),
       });
       expect(() => {
         let nowRes = res;
@@ -239,14 +239,14 @@ describe("ResBase", () => {
               lastTopic: new Date(),
               date: new Date(),
               point: 1,
-              lastOneTopic: new Date()
+              lastOneTopic: new Date(),
             }),
             "uv",
             {
               id: voteUserID,
               key: "aaaaa",
               user: "user2",
-              type: "master"
+              type: "master",
             }).res;
         }
       }).toThrow(AtError);

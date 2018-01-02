@@ -1,8 +1,8 @@
+import * as Im from "immutable";
+import Copyable from "ts-copyable";
 import { IGenerator } from "../../generator";
 import { TopicNormal } from "../topic";
 import { User } from "../user";
-import Copyable from "ts-copyable";
-import * as Im from "immutable";
 
 export interface IHistoryDB {
   readonly id: string;
@@ -27,7 +27,7 @@ export interface IHistoryAPI {
   readonly hash: string;
 }
 
-export class History extends Copyable<History>{
+export class History extends Copyable<History> {
   static fromDB(h: IHistoryDB): History {
     return new History(h.id,
       h.body.topic,
@@ -39,18 +39,30 @@ export class History extends Copyable<History>{
       h.body.user);
   }
 
-  static create(objidGenerator: IGenerator<string>, topic: TopicNormal, date: Date, hash: string, user: User): History {
-    return new History(objidGenerator.get(), topic.id, topic.title, Im.List(topic.tags), topic.body, date, hash, user.id);
+  static create(
+    objidGenerator: IGenerator<string>,
+    topic: TopicNormal,
+    date: Date,
+    hash: string,
+    user: User): History {
+    return new History(
+      objidGenerator.get(),
+      topic.id,
+      topic.title,
+      Im.List(topic.tags),
+      topic.body,
+      date, hash,
+      user.id);
   }
 
-  constructor(public readonly id: string,
-    public readonly topic: string,
-    public readonly title: string,
-    public readonly tags: Im.List<string>,
-    public readonly body: string,
-    public readonly date: Date,
-    public readonly hash: string,
-    public readonly user: string) {
+  constructor(readonly id: string,
+              readonly topic: string,
+              readonly title: string,
+              readonly tags: Im.List<string>,
+              readonly body: string,
+              readonly date: Date,
+              readonly hash: string,
+              readonly user: string) {
     super(History);
   }
 
