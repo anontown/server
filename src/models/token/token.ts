@@ -5,6 +5,9 @@ import { Config } from "../../config";
 import { IGenerator } from "../../generator";
 import { hash } from "../../utils";
 import { Client } from "..//client";
+import Copyable, { PartialMap } from "ts-copyable";
+import * as Im from "immutable";
+import { applyMixins } from "../../utils";
 
 export interface ITokenReq {
   readonly key: string;
@@ -56,62 +59,42 @@ export interface ITokenGeneralAPI extends ITokenBaseAPI<"general"> {
 
 export type Token = TokenMaster | TokenGeneral;
 
-export abstract class TokenBase<T extends TokenType> {
+export abstract class TokenBase<T extends TokenType, C extends TokenBase<T, C>> {
   static createTokenKey(randomGenerator: IGenerator<string>): string {
     return hash(randomGenerator.get() + Config.salt.token);
   }
 
-  protected constructor(
-    private _id: string,
-    private _key: string,
-    private _user: string,
-    private _date: Date,
-    private _type: T) {
+  abstract readonly id: string;
+  abstract readonly key: string;
+  abstract readonly user: string;
+  abstract readonly date: Date;
+  abstract readonly type: T;
 
-  }
+  abstract copy(partial: Partial<TokenBase<T, C>>): C;
+  abstract mapCopy(partial: PartialMap<TokenBase<T, C>>): C;
 
-  get id() {
-    return this._id;
-  }
-
-  get key() {
-    return this._key;
-  }
-
-  get user() {
-    return this._user;
-  }
-
-  get type() {
-    return this._type;
-  }
-
-  get date() {
-    return this._date;
-  }
-
-  toDB(): ITokenBaseDB<T> {
+  toBaseDB(): ITokenBaseDB<T> {
     return {
-      _id: new ObjectID(this._id),
-      key: this._key,
-      user: new ObjectID(this._user),
-      date: this._date,
-      type: this._type,
+      _id: new ObjectID(this.id),
+      key: this.key,
+      user: new ObjectID(this.user),
+      date: this.date,
+      type: this.type,
     };
   }
 
-  toAPI(): ITokenBaseAPI<T> {
+  toBaseAPI(): ITokenBaseAPI<T> {
     return {
-      id: this._id,
-      key: this._key,
-      user: this._user,
-      date: this._date.toISOString(),
-      type: this._type,
+      id: this.id,
+      key: this.key,
+      user: this.user,
+      date: this.date.toISOString(),
+      type: this.type,
     };
   }
 }
 
-export class TokenMaster extends TokenBase<"master"> {
+export class TokenMaster extends Copyable<TokenMaster> implements TokenBase<"master", TokenMaster> {
   static fromDB(t: ITokenMasterDB): TokenMaster {
     return new TokenMaster(t._id.toString(), t.key, t.user.toString(), t.date);
   }
@@ -127,20 +110,25 @@ export class TokenMaster extends TokenBase<"master"> {
       now);
   }
 
-  private constructor(
-    id: string,
-    key: string,
-    user: string,
-    date: Date) {
-    super(id, key, user, date, "master");
+  readonly type: "master" = "master";
+
+  toBaseAPI: () => ITokenBaseAPI<"master">;
+  toBaseDB: () => ITokenBaseDB<"master">;
+
+  constructor(
+    public readonly id: string,
+    public readonly key: string,
+    public readonly user: string,
+    public readonly date: Date) {
+    super(TokenMaster);
   }
 
   toDB(): ITokenMasterDB {
-    return super.toDB();
+    return this.toBaseDB();
   }
 
   toAPI(): ITokenMasterAPI {
-    return super.toAPI();
+    return this.toBaseAPI();
   }
 
   auth(key: string): IAuthTokenMaster {
@@ -151,10 +139,11 @@ export class TokenMaster extends TokenBase<"master"> {
     return { id: this.id, key: this.key, user: this.user, type: this.type };
   }
 }
+applyMixins(TokenMaster, [TokenBase]);
 
-export class TokenGeneral extends TokenBase<"general"> {
+export class TokenGeneral extends Copyable<TokenGeneral> implements TokenBase<"general", TokenGeneral> {
   static fromDB(t: ITokenGeneralDB): TokenGeneral {
-    return new TokenGeneral(t._id.toString(), t.key, t.client.toString(), t.user.toString(), t.req, t.date);
+    return new TokenGeneral(t._id.toString(), t.key, t.client.toString(), t.user.toString(), Im.List(t.req), t.date);
   }
 
   static create(
@@ -167,48 +156,45 @@ export class TokenGeneral extends TokenBase<"general"> {
       TokenBase.createTokenKey(randomGenerator),
       client.id,
       authToken.user,
-      [],
+      Im.List(),
       now);
   }
 
-  private constructor(
-    id: string,
-    key: string,
-    private _client: string,
-    user: string,
-    private _req: ITokenReq[],
-    date: Date) {
-    super(id, key, user, date, "general");
-  }
+  readonly type: "general" = "general";
 
-  get client() {
-    return this._client;
-  }
+  toBaseAPI: () => ITokenBaseAPI<"general">;
+  toBaseDB: () => ITokenBaseDB<"general">;
 
-  get req() {
-    return this._req;
+  constructor(
+    public readonly id: string,
+    public readonly key: string,
+    public readonly client: string,
+    public readonly user: string,
+    public readonly req: Im.List<ITokenReq>,
+    public readonly date: Date) {
+    super(TokenGeneral);
   }
 
   toDB(): ITokenGeneralDB {
     return {
-      ...super.toDB(),
-      client: new ObjectID(this._client),
-      req: this._req,
+      ...this.toBaseDB(),
+      client: new ObjectID(this.client),
+      req: this.req.toArray(),
     };
   }
 
   toAPI(): ITokenGeneralAPI {
     return {
-      ...super.toAPI(),
-      client: this._client,
+      ...this.toBaseAPI(),
+      client: this.client,
     };
   }
 
-  createReq(now: Date, randomGenerator: IGenerator<string>): ITokenReqAPI {
+  createReq(now: Date, randomGenerator: IGenerator<string>): { token: TokenGeneral, req: ITokenReqAPI } {
     const nowNum = now.getTime();
 
     // ゴミを削除
-    this._req = this._req.filter(r => r.active && nowNum < r.expireDate.getTime());
+    const reqFilter = this.req.filter(r => r.active && nowNum < r.expireDate.getTime());
 
     // キーの被り防止
     let req: ITokenReq;
@@ -218,23 +204,26 @@ export class TokenGeneral extends TokenBase<"general"> {
         expireDate: new Date(nowNum + 1000 * 60 * Config.user.token.req.expireMinute),
         active: true,
       };
-    } while (this._req.find(x => x.key === req.key) !== undefined);
-
-    this._req.push(req);
+    } while (reqFilter.find(x => x.key === req.key) !== undefined);
 
     return {
-      token: this.id,
-      key: req.key,
+      token: this.copy({
+        req: reqFilter.push(req)
+      }),
+      req: {
+        token: this.id,
+        key: req.key,
+      }
     };
   }
 
   authReq(key: string, now: Date): IAuthTokenGeneral {
-    const req = this._req.find(x => x.key === key);
+    const req = this.req.find(x => x.key === key);
     if (req === undefined || !req.active || req.expireDate.getTime() < now.getTime()) {
       throw new AtNotFoundError("トークンリクエストが見つかりません");
     }
 
-    return { id: this.id, key: this.key, user: this.user, type: "general", client: this._client };
+    return { id: this.id, key: this.key, user: this.user, type: "general", client: this.client };
   }
 
   auth(key: string): IAuthTokenGeneral {
@@ -242,6 +231,7 @@ export class TokenGeneral extends TokenBase<"general"> {
       throw new AtTokenAuthError();
     }
 
-    return { id: this.id, key: this.key, user: this.user, type: this.type, client: this._client };
+    return { id: this.id, key: this.key, user: this.user, type: this.type, client: this.client };
   }
 }
+applyMixins(TokenGeneral, [TokenBase]);

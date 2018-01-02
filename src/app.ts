@@ -1394,9 +1394,9 @@ import { AppServer } from "./server/app-server";
         if (token.type !== "general") {
           throw new AtPrerequisiteError("通常トークン以外では出来ません");
         }
-        const req = token.createReq(now, RandomGenerator);
+        const { req, token: newToken } = token.createReq(now, RandomGenerator);
 
-        await TokenRepository.update(token);
+        await TokenRepository.update(newToken);
 
         return req;
       },
