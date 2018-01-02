@@ -216,7 +216,7 @@ export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBas
     body: string,
     user: User,
     authToken: IAuthToken,
-    now: Date): { topic: TopicNormal, res: Res, history: History } {
+    now: Date) {
     TopicBase.checkData({ title, tags, body });
     const topic = new TopicNormal(objidGenerator.get(),
       title,
@@ -228,9 +228,9 @@ export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBas
       now,
       true);
     const cd = topic.changeData(objidGenerator, user, authToken, title, tags, body, now);
-    user.changeLastTopic(now);
+    const newUser = cd.user.changeLastTopic(now);
 
-    return { topic, history: cd.history, res: cd.res };
+    return { topic: cd.topic, history: cd.history, res: cd.res, user: newUser };
   }
 
   static fromDB(db: ITopicNormalDB, resCount: number): TopicNormal {
@@ -274,21 +274,21 @@ export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBas
     title: string,
     tags: string[],
     body: string,
-    now: Date): { res: ResHistory, history: History, topic: TopicNormal } {
-    user.usePoint(10);
+    now: Date) {
+    const newUser = user.usePoint(10);
     TopicBase.checkData({ title, tags, body });
 
     const newTopic = this.copy({ title, tags: Im.List(tags), body });
 
-    const history = History.create(objidGenerator, newTopic, now, newTopic.hash(now, user), user);
-    const res = ResHistory.create(objidGenerator,
+    const history = History.create(objidGenerator, newTopic, now, newTopic.hash(now, newUser), newUser);
+    const { res, topic: newNewTopic } = ResHistory.create(objidGenerator,
       newTopic,
-      user,
+      newUser,
       authToken,
       history,
       now);
 
-    return { topic: newTopic, res, history };
+    return { topic: newNewTopic, res, history, user: newUser };
   }
 }
 applyMixins(TopicNormal, [TopicSearchBase]);
@@ -313,7 +313,7 @@ export class TopicOne extends Copyable<TopicOne> implements TopicSearchBase<"one
     body: string,
     user: User,
     authToken: IAuthToken,
-    now: Date): { topic: TopicOne, res: Res } {
+    now: Date) {
     TopicBase.checkData({ title, tags, body });
     const topic = new TopicOne(objidGenerator.get(),
       title,
@@ -325,14 +325,14 @@ export class TopicOne extends Copyable<TopicOne> implements TopicSearchBase<"one
       now,
       true);
 
-    const res = ResTopic.create(objidGenerator,
+    const { res, topic: newTopic } = ResTopic.create(objidGenerator,
       topic,
       user,
       authToken,
       now);
-    user.changeLastOneTopic(now);
+    const newUser = user.changeLastOneTopic(now);
 
-    return { topic, res };
+    return { topic: newTopic, res, user: newUser };
   }
 
   readonly type: "one" = "one";
@@ -376,7 +376,7 @@ export class TopicFork extends Copyable<TopicFork> implements TopicBase<"fork", 
     parent: TopicNormal,
     user: User,
     authToken: IAuthToken,
-    now: Date): { topic: TopicFork, res: Res, resParent: Res } {
+    now: Date) {
     TopicBase.checkData({ title });
     const topic = new TopicFork(objidGenerator.get(),
       title,
@@ -387,21 +387,21 @@ export class TopicFork extends Copyable<TopicFork> implements TopicBase<"fork", 
       true,
       parent.id);
 
-    const res = ResTopic.create(objidGenerator,
+    const { res, topic: newTopic } = ResTopic.create(objidGenerator,
       topic,
       user,
       authToken,
       now);
 
-    const resParent = ResFork.create(objidGenerator,
+    const { topic: newParent, res: resParent } = ResFork.create(objidGenerator,
       parent,
       user,
       authToken,
-      topic,
+      newTopic,
       now);
-    user.changeLastOneTopic(now);
+    const newUser = user.changeLastOneTopic(now);
 
-    return { topic, res, resParent };
+    return { topic: newTopic, res, resParent, user: newUser, parent: newParent };
   }
 
   readonly type: "fork" = "fork";

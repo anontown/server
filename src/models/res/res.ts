@@ -134,7 +134,7 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
   abstract copy(partial: Partial<ResBase<T, C>>): C;
   abstract mapCopy(partial: PartialMap<ResBase<T, C>>): C;
 
-  v(resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken): { res: C } {
+  v(resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken): { res: C, resUser: User } {
     if (user.id === this.user) {
       throw new AtRightError("自分に投票は出来ません");
     }
@@ -143,24 +143,26 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
     }
     const valueAbs = Math.floor(user.lv / 100) + 1;
     const value = type === "uv" ? valueAbs : -valueAbs;
-    resUser.changeLv(resUser.lv + value);
+    const newResUser = resUser.changeLv(resUser.lv + value);
     return {
       res: this.copy({
         vote: this.vote.push({ user: user.id, value }),
       }),
+      resUser: newResUser
     };
   }
 
-  cv(resUser: User, user: User, _authToken: IAuthToken): { res: C } {
+  cv(resUser: User, user: User, _authToken: IAuthToken): { res: C, resUser: User } {
     const vote = this.vote.find(x => x.user === user.id);
     if (vote === undefined) {
       throw new AtPrerequisiteError("投票していません");
     }
-    resUser.changeLv(resUser.lv - vote.value);
+    const newResUser = resUser.changeLv(resUser.lv - vote.value);
     return {
       res: this.copy({
         vote: this.vote.remove(this.vote.indexOf(vote)),
       }),
+      resUser: newResUser
     };
   }
 
@@ -237,7 +239,7 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
     reply: Res | null,
     profile: Profile | null,
     age: boolean,
-    now: Date): ResNormal {
+    now: Date) {
     const bodyCheck = {
       field: "body",
       val: body,
@@ -271,7 +273,7 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
       throw new AtPrerequisiteError("他のトピックのレスへのリプは出来ません");
     }
 
-    user.changeLastRes(now);
+    const newUser = user.changeLastRes(now);
 
     const result = new ResNormal(name,
       body,
@@ -282,22 +284,22 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
       objidGenerator.get(),
       topic.id,
       now,
-      user.id,
+      newUser.id,
       Im.List(),
-      user.lv * 5,
-      topic.hash(now, user),
+      newUser.lv * 5,
+      topic.hash(now, newUser),
       0);
 
-    topic.resUpdate(result);
-    return result;
+    const newTopic = topic.resUpdate(result);
+    return { res: result, user: newUser, topic: newTopic };
   }
 
   readonly type: "normal" = "normal";
 
   toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"normal">;
   toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"normal", Body>;
-  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResNormal };
-  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResNormal };
+  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResNormal, resUser: User };
+  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResNormal, resUser: User };
 
   constructor(
     readonly name: string | null,
@@ -356,11 +358,12 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
       throw new AtPrerequisiteError("既に削除済みです");
     }
 
-    resUser.changeLv(resUser.lv - 1);
+    const newResUser = resUser.changeLv(resUser.lv - 1);
     return {
       res: this.copy({
         deleteFlag: "self",
       }),
+      resUser: newResUser
     };
   }
 }
@@ -385,7 +388,7 @@ export class ResHistory extends Copyable<ResHistory> implements ResBase<"history
     user: User,
     _authToken: IAuthToken,
     history: History,
-    now: Date): ResHistory {
+    now: Date) {
     const result = new ResHistory(history.id,
       objidGenerator.get(),
       topic.id,
@@ -396,14 +399,14 @@ export class ResHistory extends Copyable<ResHistory> implements ResBase<"history
       topic.hash(now, user),
       0);
 
-    topic.resUpdate(result);
-    return result;
+    const newTopic = topic.resUpdate(result);
+    return { res: result, topic: newTopic };
   }
 
   toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"history">;
   toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"history", Body>;
-  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResHistory };
-  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResHistory };
+  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResHistory, resUser: User };
+  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResHistory, resUser: User };
 
   readonly type: "history" = "history";
 
@@ -445,12 +448,12 @@ export class ResTopic extends Copyable<ResTopic> implements ResBase<"topic", Res
       replyCount);
   }
 
-  static create(
+  static create<TC extends TopicOne | TopicFork>(
     objidGenerator: IGenerator<string>,
-    topic: TopicOne | TopicFork,
+    topic: TC,
     user: User,
     _authToken: IAuthToken,
-    now: Date): ResTopic {
+    now: Date) {
     const result = new ResTopic(objidGenerator.get(),
       topic.id,
       now,
@@ -460,14 +463,15 @@ export class ResTopic extends Copyable<ResTopic> implements ResBase<"topic", Res
       topic.hash(now, user),
       0);
 
-    topic.resUpdate(result);
-    return result;
+    // TODO:キャストなしで書きたい
+    const newTopic = topic.resUpdate(result) as TC;
+    return { res: result, topic: newTopic };
   }
 
   toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"topic">;
   toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"topic", Body>;
-  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResTopic };
-  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResTopic };
+  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResTopic, resUser: User };
+  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResTopic, resUser: User };
 
   readonly type: "topic" = "topic";
 
@@ -512,7 +516,7 @@ export class ResFork extends Copyable<ResFork> implements ResBase<"fork", ResFor
     user: User,
     _authToken: IAuthToken,
     fork: TopicFork,
-    now: Date): ResFork {
+    now: Date) {
     const result = new ResFork(fork.id,
       objidGenerator.get(),
       topic.id,
@@ -523,14 +527,14 @@ export class ResFork extends Copyable<ResFork> implements ResBase<"fork", ResFor
       topic.hash(now, user),
       0);
 
-    topic.resUpdate(result);
-    return result;
+    const newTopic = topic.resUpdate(result);
+    return { res: result, topic: newTopic };
   }
 
   toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"fork">;
   toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"fork", Body>;
-  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResFork };
-  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResFork };
+  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResFork, resUser: User };
+  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResFork, resUser: User };
 
   readonly type: "fork" = "fork";
 

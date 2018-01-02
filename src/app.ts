@@ -112,7 +112,7 @@ import { AppServer } from "./server/app-server";
         const user = val[1];
         const reply = val[2];
         const profile = val[3];
-        const res = ResNormal.create(ObjectIDGenerator,
+        const { res, user: newUser, topic: newTopic } = ResNormal.create(ObjectIDGenerator,
           topic,
           user,
           auth.token,
@@ -125,8 +125,8 @@ import { AppServer } from "./server/app-server";
 
         await Promise.all([
           ResRepository.insert(res),
-          TopicRepository.update(topic),
-          UserRepository.update(user),
+          TopicRepository.update(newTopic),
+          UserRepository.update(newUser),
         ]);
 
         appLog("create/res", ip, "reses", res.id);
@@ -392,11 +392,11 @@ import { AppServer } from "./server/app-server";
         // レスを書き込んだユーザー
         const resUser = await UserRepository.findOne(res.user);
 
-        const { res: newRes } = res.v(resUser, user, "uv", auth.token);
+        const { res: newRes, resUser: newResUser } = res.v(resUser, user, "uv", auth.token);
 
         await Promise.all([
           ResRepository.update(newRes),
-          UserRepository.update(resUser),
+          UserRepository.update(newResUser),
           UserRepository.update(user),
         ]);
 
@@ -433,11 +433,11 @@ import { AppServer } from "./server/app-server";
         // レスを書き込んだユーザー
         const resUser = await UserRepository.findOne(res.user);
 
-        const { res: newRes } = res.v(resUser, user, "dv", auth.token);
+        const { res: newRes, resUser: newResUser } = res.v(resUser, user, "dv", auth.token);
 
         const promise = [
           ResRepository.update(newRes),
-          UserRepository.update(resUser),
+          UserRepository.update(newResUser),
           UserRepository.update(user),
         ];
 
@@ -477,11 +477,11 @@ import { AppServer } from "./server/app-server";
         // レスを書き込んだユーザー
         const resUser = await UserRepository.findOne(res.user);
 
-        const { res: newRes } = res.cv(resUser, user, auth.token);
+        const { res: newRes, resUser: newResUser } = res.cv(resUser, user, auth.token);
 
         await Promise.all([
           ResRepository.update(newRes),
-          UserRepository.update(resUser),
+          UserRepository.update(newResUser),
           UserRepository.update(user),
         ]);
 
@@ -515,11 +515,11 @@ import { AppServer } from "./server/app-server";
         // レスを書き込んだユーザー
         const resUser = await UserRepository.findOne(res.user);
 
-        const { res: newRes } = res.del(resUser, auth.token);
+        const { res: newRes, resUser: newResUser } = res.del(resUser, auth.token);
 
         await Promise.all([
           ResRepository.update(newRes),
-          UserRepository.update(resUser),
+          UserRepository.update(newResUser),
         ]);
 
         return newRes.toAPI(auth.token);
@@ -568,15 +568,13 @@ import { AppServer } from "./server/app-server";
 
         await TopicRepository.insert(create.topic);
         await Promise.all([
-          UserRepository.update(user),
+          UserRepository.update(create.user),
           ResRepository.insert(create.res),
-          create.history ? HistoryRepository.insert(create.history) : Promise.resolve(),
+          HistoryRepository.insert(create.history)
         ]);
         appLog("topic/create", ip, "topics", create.topic.id);
         appLog("topic/create", ip, "reses", create.res.id);
-        if (create.history) {
-          appLog("topic/create", ip, "histories", create.history.id);
-        }
+        appLog("topic/create", ip, "histories", create.history.id);
         return create.topic.toAPI();
       },
     });
@@ -621,7 +619,7 @@ import { AppServer } from "./server/app-server";
 
         await TopicRepository.insert(create.topic);
         await Promise.all([
-          UserRepository.update(user),
+          UserRepository.update(create.user),
           ResRepository.insert(create.res),
         ]);
 
@@ -669,8 +667,9 @@ import { AppServer } from "./server/app-server";
           now);
 
         await TopicRepository.insert(create.topic);
+        await TopicRepository.update(create.parent);
         await Promise.all([
-          UserRepository.update(user),
+          UserRepository.update(create.user),
           ResRepository.insert(create.res),
           ResRepository.insert(create.resParent),
         ]);
@@ -881,8 +880,8 @@ import { AppServer } from "./server/app-server";
         await Promise.all([
           ResRepository.insert(val.res),
           HistoryRepository.insert(val.history),
-          TopicRepository.update(topic),
-          UserRepository.update(user),
+          TopicRepository.update(val.topic),
+          UserRepository.update(val.user),
         ]);
 
         appLog("topic/update", ip, "reses", val.res.id);
@@ -1518,10 +1517,10 @@ import { AppServer } from "./server/app-server";
       },
       call: async ({ params, auth }) => {
         const user = await UserRepository.findOne(auth.user.id);
-        user.change(auth.user, params.pass, params.sn);
-        await UserRepository.update(user);
+        const newUser = user.change(auth.user, params.pass, params.sn);
+        await UserRepository.update(newUser);
         await TokenRepository.delMasterToken(auth.user);
-        return user.toAPI();
+        return newUser.toAPI();
       },
     });
   }
