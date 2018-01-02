@@ -6,6 +6,9 @@ import { hash } from "../../utils";
 import { History } from "../history";
 import { Res, ResFork, ResHistory, ResTopic } from "../res";
 import { User } from "../user";
+import Copyable, { PartialMap } from "ts-copyable";
+import * as Im from "immutable";
+import { applyMixins } from "../../utils";
 
 export type ITopicDB = ITopicNormalDB | ITopicOneDB | ITopicForkDB;
 
@@ -66,7 +69,7 @@ export type TopicType = TopicSearchType | "fork";
 
 export type Topic = TopicNormal | TopicOne | TopicFork;
 
-export abstract class TopicBase<T extends TopicType> {
+export abstract class TopicBase<T extends TopicType, C extends TopicBase<T, C>> {
   static checkData({ title, tags, body }: { title?: string, tags?: string[], body?: string }) {
     const data: paramsErrorMakerData[] = [];
     if (title !== undefined) {
@@ -119,84 +122,53 @@ export abstract class TopicBase<T extends TopicType> {
     paramsErrorMaker(data);
   }
 
-  constructor(
-    private _id: string,
-    protected _title: string,
-    private _update: Date,
-    private _date: Date,
-    private _resCount: number,
-    private _type: T,
-    private _ageUpdate: Date,
-    private _active: boolean) {
-  }
+  abstract readonly id: string;
+  abstract readonly title: string;
+  abstract readonly update: Date;
+  abstract readonly date: Date;
+  abstract readonly resCount: number;
+  abstract readonly type: T;
+  abstract readonly ageUpdate: Date;
+  abstract readonly active: boolean;
 
-  get id() {
-    return this._id;
-  }
-
-  get title() {
-    return this._title;
-  }
-
-  get update() {
-    return this._update;
-  }
-
-  get date() {
-    return this._date;
-  }
-
-  get resCount() {
-    return this._resCount;
-  }
-
-  get type() {
-    return this._type;
-  }
-
-  get ageUpdate() {
-    return this._ageUpdate;
-  }
-
-  get active() {
-    return this._active;
-  }
+  abstract copy(partial: Partial<TopicBase<T, C>>): C;
+  abstract mapCopy(partial: PartialMap<TopicBase<T, C>>): C;
 
   toBaseDB<Body extends object>(body: Body): ITopicBaseDB<T, Body> {
     return {
-      id: this._id,
-      type: this._type,
+      id: this.id,
+      type: this.type,
       body: Object.assign({}, body, {
-        title: this._title,
-        update: this._update.toISOString(),
-        date: this._date.toISOString(),
-        ageUpdate: this._ageUpdate.toISOString(),
-        active: this._active,
+        title: this.title,
+        update: this.update.toISOString(),
+        date: this.date.toISOString(),
+        ageUpdate: this.ageUpdate.toISOString(),
+        active: this.active,
       }),
     };
   }
 
-  toAPI(): ITopicBaseAPI<T> {
+  toBaseAPI(): ITopicBaseAPI<T> {
     return {
-      id: this._id,
-      title: this._title,
-      update: this._update.toISOString(),
-      date: this._date.toISOString(),
-      resCount: this._resCount,
-      type: this._type,
-      active: this._active,
+      id: this.id,
+      title: this.title,
+      update: this.update.toISOString(),
+      date: this.date.toISOString(),
+      resCount: this.resCount,
+      type: this.type,
+      active: this.active,
     };
   }
 
-  resUpdate(res: Res) {
+  resUpdate(res: Res): C {
     if (!this.active) {
       throw new AtPrerequisiteError("トピックが落ちているので書き込めません");
     }
 
-    this._update = res.date;
-    if (res.type === "normal" && res.age) {
-      this._ageUpdate = res.date;
-    }
+    return this.copy({
+      update: res.date,
+      ageUpdate: res.type === "normal" && res.age ? res.date : this.ageUpdate
+    });
   }
 
   hash(date: Date, user: User): string {
@@ -208,60 +180,34 @@ export abstract class TopicBase<T extends TopicType> {
       date.getFullYear() + " " + date.getMonth() + " " + date.getDate() + " " +
 
       // トピ依存
-      this._id +
+      this.id +
 
       // ソルト依存
       Config.salt.hash);
   }
 }
 
-export abstract class TopicSearchBase<T extends TopicSearchType> extends TopicBase<T> {
-  constructor(
-    id: string,
-    title: string,
-    protected _tags: string[],
-    protected _body: string,
-    update: Date,
-    date: Date,
-    resCount: number,
-    type: T,
-    ageUpdate: Date,
-    active: boolean) {
-    super(id,
-      title,
-      update,
-      date,
-      resCount,
-      type,
-      ageUpdate,
-      active);
-  }
-
-  get tags() {
-    return this._tags;
-  }
-
-  get body() {
-    return this._body;
-  }
+export abstract class TopicSearchBase<T extends TopicSearchType, C extends TopicSearchBase<T, C>> extends TopicBase<T, C> {
+  abstract readonly tags: Im.List<string>;
+  abstract readonly body: string;
 
   toDB(): ITopicSearchBaseDB<T> {
-    return super.toBaseDB({
-      tags: this._tags,
-      body: this._body,
+    return this.toBaseDB({
+      tags: this.tags.toArray(),
+      body: this.body,
     });
   }
 
   toAPI(): ITopicSearchBaseAPI<T> {
     return {
-      ...super.toAPI(),
-      tags: this._tags,
-      body: this._body,
+      ...this.toBaseAPI(),
+      tags: this.tags.toArray(),
+      body: this.body,
     };
   }
 }
 
-export class TopicNormal extends TopicSearchBase<"normal"> {
+export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBase<"normal", TopicNormal> {
   static create(
     objidGenerator: IGenerator<string>,
     title: string,
@@ -270,10 +216,10 @@ export class TopicNormal extends TopicSearchBase<"normal"> {
     user: User,
     authToken: IAuthToken,
     now: Date): { topic: TopicNormal, res: Res, history: History } {
-    this.checkData({ title, tags, body });
+    TopicBase.checkData({ title, tags, body });
     const topic = new TopicNormal(objidGenerator.get(),
       title,
-      tags,
+      Im.List(tags),
       body,
       now,
       now,
@@ -289,7 +235,7 @@ export class TopicNormal extends TopicSearchBase<"normal"> {
   static fromDB(db: ITopicNormalDB, resCount: number): TopicNormal {
     return new TopicNormal(db.id,
       db.body.title,
-      db.body.tags,
+      Im.List(db.body.tags),
       db.body.body,
       new Date(db.body.update),
       new Date(db.body.date),
@@ -298,26 +244,26 @@ export class TopicNormal extends TopicSearchBase<"normal"> {
       db.body.active);
   }
 
+  readonly type: "normal" = "normal";
+
+  toBaseAPI: () => ITopicBaseAPI<"normal">;
+  hash: (date: Date, user: User) => string;
+  toAPI: () => ITopicSearchBaseAPI<"normal">;
+  resUpdate: (res: Res) => TopicNormal;
+  toDB: () => ITopicSearchBaseDB<"normal">;
+  toBaseDB: <Body extends object>(body: Body) => ITopicBaseDB<"normal", Body>;
+
   constructor(
-    id: string,
-    title: string,
-    tags: string[],
-    body: string,
-    update: Date,
-    date: Date,
-    resCount: number,
-    ageUpdate: Date,
-    active: boolean) {
-    super(id,
-      title,
-      tags,
-      body,
-      update,
-      date,
-      resCount,
-      "normal",
-      ageUpdate,
-      active);
+    public readonly id: string,
+    public readonly title: string,
+    public readonly tags: Im.List<string>,
+    public readonly body: string,
+    public readonly update: Date,
+    public readonly date: Date,
+    public readonly resCount: number,
+    public readonly ageUpdate: Date,
+    public readonly active: boolean) {
+    super(TopicNormal);
   }
 
   changeData(
@@ -327,31 +273,30 @@ export class TopicNormal extends TopicSearchBase<"normal"> {
     title: string,
     tags: string[],
     body: string,
-    now: Date): { res: ResHistory, history: History } {
+    now: Date): { res: ResHistory, history: History, topic: TopicNormal } {
     user.usePoint(10);
     TopicBase.checkData({ title, tags, body });
 
-    this._title = title;
-    this._tags = tags;
-    this._body = body;
+    const newTopic = this.copy({ title, tags: Im.List(tags), body });
 
-    const history = History.create(objidGenerator, this, now, this.hash(now, user), user);
+    const history = History.create(objidGenerator, newTopic, now, newTopic.hash(now, user), user);
     const res = ResHistory.create(objidGenerator,
-      this,
+      newTopic,
       user,
       authToken,
       history,
       now);
 
-    return { res, history };
+    return { topic: newTopic, res, history };
   }
 }
+applyMixins(TopicNormal, [TopicSearchBase]);
 
-export class TopicOne extends TopicSearchBase<"one"> {
+export class TopicOne extends Copyable<TopicOne> implements TopicSearchBase<"one", TopicOne> {
   static fromDB(db: ITopicOneDB, resCount: number): TopicOne {
     return new TopicOne(db.id,
       db.body.title,
-      db.body.tags,
+      Im.List(db.body.tags),
       db.body.body,
       new Date(db.body.update),
       new Date(db.body.date),
@@ -368,10 +313,10 @@ export class TopicOne extends TopicSearchBase<"one"> {
     user: User,
     authToken: IAuthToken,
     now: Date): { topic: TopicOne, res: Res } {
-    this.checkData({ title, tags, body });
+    TopicBase.checkData({ title, tags, body });
     const topic = new TopicOne(objidGenerator.get(),
       title,
-      tags,
+      Im.List(tags),
       body,
       now,
       now,
@@ -389,30 +334,31 @@ export class TopicOne extends TopicSearchBase<"one"> {
     return { topic, res };
   }
 
+  readonly type: "one" = "one";
+  toBaseAPI: () => ITopicBaseAPI<"one">;
+  hash: (date: Date, user: User) => string;
+  toAPI: () => ITopicSearchBaseAPI<"one">;
+  resUpdate: (res: Res) => TopicOne;
+  toDB: () => ITopicSearchBaseDB<"one">;
+  toBaseDB: <Body extends object>(body: Body) => ITopicBaseDB<"one", Body>;
+
   constructor(
-    id: string,
-    title: string,
-    tags: string[],
-    body: string,
-    update: Date,
-    date: Date,
-    resCount: number,
-    ageUpdate: Date,
-    active: boolean) {
-    super(id,
-      title,
-      tags,
-      body,
-      update,
-      date,
-      resCount,
-      "one",
-      ageUpdate,
-      active);
+    public readonly id: string,
+    public readonly title: string,
+    public readonly tags: Im.List<string>,
+    public readonly body: string,
+    public readonly update: Date,
+    public readonly date: Date,
+    public readonly resCount: number,
+    public readonly ageUpdate: Date,
+    public readonly active: boolean) {
+    super(TopicOne);
   }
 }
+applyMixins(TopicOne, [TopicSearchBase]);
 
-export class TopicFork extends TopicBase<"fork"> {
+
+export class TopicFork extends Copyable<TopicFork> implements TopicBase<"fork", TopicFork> {
   static fromDB(db: ITopicForkDB, resCount: number): TopicFork {
     return new TopicFork(db.id,
       db.body.title,
@@ -431,7 +377,7 @@ export class TopicFork extends TopicBase<"fork"> {
     user: User,
     authToken: IAuthToken,
     now: Date): { topic: TopicFork, res: Res, resParent: Res } {
-    this.checkData({ title });
+    TopicBase.checkData({ title });
     const topic = new TopicFork(objidGenerator.get(),
       title,
       now,
@@ -458,37 +404,33 @@ export class TopicFork extends TopicBase<"fork"> {
     return { topic, res, resParent };
   }
 
-  constructor(
-    id: string,
-    title: string,
-    update: Date,
-    date: Date,
-    resCount: number,
-    ageUpdate: Date,
-    active: boolean,
-    private _parent: string) {
-    super(id,
-      title,
-      update,
-      date,
-      resCount,
-      "fork",
-      ageUpdate,
-      active);
-  }
+  readonly type: "fork" = "fork";
+  toBaseAPI: () => ITopicBaseAPI<"fork">;
+  hash: (date: Date, user: User) => string;
+  resUpdate: (res: Res) => TopicFork;
+  toBaseDB: <Body extends object>(body: Body) => ITopicBaseDB<"fork", Body>;
 
-  get parent() {
-    return this._parent;
+  constructor(
+    public readonly id: string,
+    public readonly title: string,
+    public readonly update: Date,
+    public readonly date: Date,
+    public readonly resCount: number,
+    public readonly ageUpdate: Date,
+    public readonly active: boolean,
+    public readonly parent: string) {
+    super(TopicFork);
   }
 
   toDB(): ITopicForkDB {
-    return super.toBaseDB({ parent: this._parent });
+    return this.toBaseDB({ parent: this.parent });
   }
 
   toAPI(): ITopicForkAPI {
     return {
-      ...super.toAPI(),
-      parent: this._parent,
+      ...this.toBaseAPI(),
+      parent: this.parent,
     };
   }
 }
+applyMixins(TopicFork, [TopicSearchBase]);
