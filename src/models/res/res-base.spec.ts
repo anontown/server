@@ -101,7 +101,7 @@ describe("ResBase", () => {
         point: 1,
         lastOneTopic: new Date(),
       });
-      const { res: newRes } = res.v(resUser,
+      const { res: newRes, resUser: newResUser } = res.v(resUser,
         User.fromDB({
           _id: new ObjectID(voteUserID1),
           sn: "sn1",
@@ -122,9 +122,9 @@ describe("ResBase", () => {
         });
 
       expect(newRes.vote).toEqual(Im.List([{ user: voteUserID1, value: 2 }]));
-      expect(resUser.lv).toBe(4);
+      expect(newResUser.lv).toBe(4);
 
-      const { res: newNewRes } = newRes.v(resUser,
+      const { res: newNewRes, resUser: newNewResUser } = newRes.v(newResUser,
         User.fromDB({
           _id: new ObjectID(voteUserID2),
           sn: "sn1",
@@ -145,7 +145,7 @@ describe("ResBase", () => {
         });
 
       expect(newNewRes.vote).toEqual(Im.List([{ user: voteUserID1, value: 2 }, { user: voteUserID2, value: -1 }]));
-      expect(resUser.lv).toBe(3);
+      expect(newNewResUser.lv).toBe(3);
     });
 
     it("自分に投票するとエラーになるか", () => {
