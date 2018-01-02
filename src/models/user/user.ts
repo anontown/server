@@ -4,6 +4,7 @@ import { IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
 import { hash } from "../../utils";
+import Copyable from "ts-copyable";
 
 export interface IUserDB {
   readonly _id: ObjectID;
@@ -32,7 +33,7 @@ export interface IResWait {
   readonly d1: number;
 }
 
-export class User {
+export class User extends Copyable<User> {
   static fromDB(u: IUserDB): User {
     return new User(u._id.toString(), u.sn, u.pass, u.lv, u.resWait, u.lastTopic, u.date, u.point, u.lastOneTopic);
   }
@@ -64,77 +65,42 @@ export class User {
       now);
   }
 
-  private constructor(
-    private _id: string,
-    private _sn: string,
-    private _pass: string,
-    private _lv: number,
-    private _resWait: IResWait,
-    private _lastTopic: Date,
-    private _date: Date,
+  constructor(
+    public readonly id: string,
+    public readonly sn: string,
+    public readonly pass: string,
+    public readonly lv: number,
+    public readonly resWait: IResWait,
+    public readonly lastTopic: Date,
+    public readonly date: Date,
     // 毎日リセットされ、特殊動作をすると増えるポイント
-    private _point: number,
-    private _lastOneTopic: Date) {
-  }
-
-  get id() {
-    return this._id;
-  }
-
-  get sn() {
-    return this._sn;
-  }
-
-  get pass() {
-    return this._pass;
-  }
-
-  get lv() {
-    return this._lv;
-  }
-
-  get resWait() {
-    return this._resWait;
-  }
-
-  get lastTopic() {
-    return this._lastTopic;
-  }
-
-  get date() {
-    return this._date;
-  }
-
-  get point() {
-    return this._point;
-  }
-
-  get lastOneTopic() {
-    return this._lastOneTopic;
+    public readonly point: number,
+    public readonly lastOneTopic: Date) {
+    super(User);
   }
 
   toDB(): IUserDB {
     return {
-      _id: new ObjectID(this._id),
-      sn: this._sn,
-      pass: this._pass,
-      lv: this._lv,
-      resWait: this._resWait,
-      lastTopic: this._lastTopic,
-      date: this._date,
-      point: this._point,
-      lastOneTopic: this._lastOneTopic,
+      _id: new ObjectID(this.id),
+      sn: this.sn,
+      pass: this.pass,
+      lv: this.lv,
+      resWait: this.resWait,
+      lastTopic: this.lastTopic,
+      date: this.date,
+      point: this.point,
+      lastOneTopic: this.lastOneTopic,
     };
   }
 
   toAPI(): IUserAPI {
     return {
-      id: this._id,
-      sn: this._sn,
+      id: this.id,
+      sn: this.sn,
     };
   }
 
-  change(_authUser: IAuthUser, pass: string, sn: string) {
+  change(_authUser: IAuthUser, pass: string, sn: string): User {
     paramsErrorMaker([
       {
         field: "pass",
@@ -150,72 +116,71 @@ export class User {
       },
     ]);
 
-    this._pass = hash(pass + Config.salt.pass);
-    this._sn = sn;
+    return this.copy({ pass: hash(pass + Config.salt.pass), sn });
   }
 
   auth(pass: string): IAuthUser {
-    if (this._pass === hash(pass + Config.salt.pass)) {
-      return { id: this._id, pass: this._pass };
+    if (this.pass === hash(pass + Config.salt.pass)) {
+      return { id: this.id, pass: this.pass };
     } else {
       throw new AtUserAuthError();
     }
   }
 
-  usePoint(val: number) {
-    if (this._lv < this._point + val) {
+  usePoint(val: number): User {
+    if (this.lv < this.point + val) {
       throw new AtPrerequisiteError("LVが足りません");
     }
-    this._point += val;
+    return this.copy({ point: this.point + val });
   }
 
-  changeLv(lv: number) {
-    if (lv < 1) {
-      this._lv = 1;
-    } else if (lv > Config.user.lvMax) {
-      this._lv = Config.user.lvMax;
-    } else {
-      this._lv = lv;
-    }
+  changeLv(lv: number): User {
+    return this.copy({
+      lv: lv < 1 ? 1
+        : lv > Config.user.lvMax ? Config.user.lvMax
+          : lv
+    });
   }
 
-  changeLastRes(lastRes: Date) {
+  changeLastRes(lastRes: Date): User {
     // 条件
     // 係数
-    const coe = (this._lv / Config.user.lvMax) * (Config.res.wait.maxLv - 1) + 1;
+    const coe = (this.lv / Config.user.lvMax) * (Config.res.wait.maxLv - 1) + 1;
     if (
-      this._resWait.d1 < Config.res.wait.d1 * coe &&
-      this._resWait.h12 < Config.res.wait.h12 * coe &&
-      this._resWait.h6 < Config.res.wait.h6 * coe &&
-      this._resWait.h1 < Config.res.wait.h1 * coe &&
-      this._resWait.m30 < Config.res.wait.m30 * coe &&
-      this._resWait.m10 < Config.res.wait.m10 * coe &&
-      this._resWait.last.getTime() + 1000 * Config.res.wait.minSecond < lastRes.getTime()
+      this.resWait.d1 < Config.res.wait.d1 * coe &&
+      this.resWait.h12 < Config.res.wait.h12 * coe &&
+      this.resWait.h6 < Config.res.wait.h6 * coe &&
+      this.resWait.h1 < Config.res.wait.h1 * coe &&
+      this.resWait.m30 < Config.res.wait.m30 * coe &&
+      this.resWait.m10 < Config.res.wait.m10 * coe &&
+      this.resWait.last.getTime() + 1000 * Config.res.wait.minSecond < lastRes.getTime()
     ) {
-      this._resWait = {
-        d1: this._resWait.d1 + 1,
-        h12: this._resWait.h12 + 1,
-        h6: this._resWait.h6 + 1,
-        h1: this._resWait.h1 + 1,
-        m30: this._resWait.m30 + 1,
-        m10: this._resWait.m10 + 1,
-        last: lastRes,
-      };
+      return this.copy({
+        resWait: {
+          d1: this.resWait.d1 + 1,
+          h12: this.resWait.h12 + 1,
+          h6: this.resWait.h6 + 1,
+          h1: this.resWait.h1 + 1,
+          m30: this.resWait.m30 + 1,
+          m10: this.resWait.m10 + 1,
+          last: lastRes,
+        }
+      });
     } else {
       throw new AtPrerequisiteError("連続書き込みはできません");
     }
   }
-  changeLastTopic(lastTopic: Date) {
-    if (this._lastTopic.getTime() + 1000 * 60 * 30 < lastTopic.getTime()) {
-      this._lastTopic = lastTopic;
+  changeLastTopic(lastTopic: Date): User {
+    if (this.lastTopic.getTime() + 1000 * 60 * 30 < lastTopic.getTime()) {
+      return this.copy({ lastTopic });
     } else {
       throw new AtPrerequisiteError("連続書き込みはできません");
     }
   }
 
-  changeLastOneTopic(lastTopic: Date) {
-    if (this._lastOneTopic.getTime() + 1000 * 60 * 10 < lastTopic.getTime()) {
-      this._lastOneTopic = lastTopic;
+  changeLastOneTopic(lastTopic: Date): User {
+    if (this.lastOneTopic.getTime() + 1000 * 60 * 10 < lastTopic.getTime()) {
+      return this.copy({ lastOneTopic: lastTopic });
     } else {
       throw new AtPrerequisiteError("連続書き込みはできません");
     }
