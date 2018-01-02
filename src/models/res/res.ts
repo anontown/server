@@ -10,7 +10,7 @@ import { History } from "../history";
 import { Profile } from "../profile";
 import { Topic, TopicFork, TopicNormal, TopicOne } from "../topic";
 import { User } from "../user";
-import Copyable from "ts-copyable";
+import Copyable, { PartialMap } from "ts-copyable";
 import * as Im from "immutable";
 import { applyMixins } from "../../utils";
 
@@ -132,6 +132,7 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>>{
   abstract readonly replyCount: number;
 
   abstract copy(partial: Partial<ResBase<T, C>>): C;
+  abstract mapCopy(partial: PartialMap<ResBase<T, C>>): C;
 
   v(resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken): { res: C } {
     if (user.id === this.user) {
