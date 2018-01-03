@@ -5,26 +5,35 @@ import {
   IAuthTokenMaster,
   ObjectIDGenerator,
 } from "../../";
+import { update } from "immutable";
 
 describe("Client", () => {
   describe("create", () => {
     it("http:// から始まるURLで正常に呼び出せるか", () => {
-      Client.create(
-        ObjectIDGenerator,
+      const now = new Date();
+      const client = Client.create(
+        () => "client",
         {
-          id: ObjectIDGenerator(),
+          id: "token",
           key: "",
-          user: ObjectIDGenerator(),
+          user: "user",
           type: "master",
         },
         "hoge",
         "http://hoge.com",
-        new Date(),
+        now,
       );
+
+      expect(client.id).toBe("client");
+      expect(client.name).toBe("hoge");
+      expect(client.url).toBe("http://hoge.com");
+      expect(client.user).toBe("user");
+      expect(client.date).toEqual(now);
+      expect(client.update).toEqual(now);
     });
 
     it("https:// から始まるURLで正常に呼び出せるか", () => {
-      Client.create(
+      const client = Client.create(
         ObjectIDGenerator,
         {
           id: ObjectIDGenerator(),
@@ -36,6 +45,8 @@ describe("Client", () => {
         "https://hoge.com",
         new Date(),
       );
+
+      expect(client.url).toBe("https://hoge.com");
     });
 
     it("長い名前でエラーになるか", () => {
@@ -137,31 +148,41 @@ describe("Client", () => {
 
       const client = Client.fromDB(db);
 
-      expect(db._id.toHexString()).toBe(client.id);
-      expect(db.name).toBe(client.name);
-      expect(db.url).toBe(client.url);
-      expect(db.user.toHexString()).toBe(client.user);
-      expect(db.date.getTime()).toBe(client.date.getTime());
-      expect(db.update.getTime()).toBe(client.update.getTime());
+      expect(client.id).toBe(db._id.toHexString());
+      expect(client.name).toBe(db.name);
+      expect(client.url).toBe(db.url);
+      expect(client.user).toBe(db.user.toHexString());
+      expect(client.date).toEqual(db.date);
+      expect(client.update).toEqual(db.update);
     });
   });
 
   describe("#changeData", () => {
     it("正常に変更できるか", () => {
       const auth: IAuthTokenMaster = {
-        id: ObjectIDGenerator(),
+        id: "token",
         key: "",
-        user: ObjectIDGenerator(),
+        user: "user",
         type: "master",
       };
 
-      const client = Client.create(ObjectIDGenerator,
+      const date = new Date();
+      const update = new Date(date.valueOf() + 1000);
+
+      const client = Client.create(() => "client",
         auth,
         "a",
         "https://a",
-        new Date());
+        date);
 
-      client.changeData(auth, "name", "http://hoge", new Date());
+      const newClient = client.changeData(auth, "name", "http://hoge", update);
+
+      expect(newClient.id).toBe("client");
+      expect(newClient.name).toBe("name");
+      expect(newClient.url).toBe("http://hoge");
+      expect(newClient.user).toBe("user");
+      expect(newClient.date).toEqual(date);
+      expect(newClient.update).toEqual(update);
     });
 
     it("違うユーザーが変更しようとしたらエラーになるか", () => {
@@ -246,12 +267,12 @@ describe("Client", () => {
           type: "master",
         });
 
-        expect(client.id).toBe(api.id);
-        expect(client.name).toBe(api.name);
-        expect(client.url).toBe(api.url);
-        expect(client.user).toBe(api.user);
-        expect(client.date.toISOString()).toBe(api.date);
-        expect(client.update.toISOString()).toBe(api.update);
+        expect(api.id).toBe(client.id);
+        expect(api.name).toBe(client.name);
+        expect(api.url).toBe(client.url);
+        expect(api.user).toBe(client.user);
+        expect(api.date).toEqual(client.date.toISOString());
+        expect(api.update).toEqual(client.update.toISOString());
       });
 
       it("認証あり(別ユーザー)", () => {
@@ -276,12 +297,12 @@ describe("Client", () => {
       it("正常に出力できるか", () => {
         const db = client.toDB();
 
-        expect(client.id).toBe(db._id.toHexString());
-        expect(client.name).toBe(db.name);
-        expect(client.url).toBe(db.url);
-        expect(client.user).toBe(db.user.toHexString());
-        expect(client.date.getTime()).toBe(db.date.getTime());
-        expect(client.update.getTime()).toBe(db.update.getTime());
+        expect(db._id).toEqual(new ObjectID(client.id));
+        expect(db.name).toBe(client.name);
+        expect(db.url).toBe(client.url);
+        expect(db.user).toEqual(new ObjectID(client.user));
+        expect(db.date).toEqual(client.date);
+        expect(db.update).toEqual(client.update);
       });
     });
   }
