@@ -3,6 +3,7 @@ import {
   IMsgDB,
   Msg,
   ObjectIDGenerator,
+  User
 } from "../../";
 
 describe("Msg", () => {
@@ -32,7 +33,7 @@ describe("Msg", () => {
         expect(db.id).toBe(msg.id);
         expect(db.body.receiver).toBe(msg.receiver);
         expect(db.body.body).toBe(msg.body);
-        expect(new Date(db.body.date).valueOf()).toBe(msg.date.valueOf());
+        expect(db.body.date).toBe(msg.date.toISOString());
       });
     });
 
@@ -48,7 +49,7 @@ describe("Msg", () => {
         expect(api.id).toBe(msg.id);
         expect(api.receiver).toBe(msg.receiver);
         expect(api.body).toBe(msg.body);
-        expect(api.date.valueOf()).toBe(msg.date.toISOString());
+        expect(api.date).toBe(msg.date.toISOString());
       });
 
       it("receiverがnull", () => {
@@ -91,13 +92,42 @@ describe("Msg", () => {
       expect(msg.id).toBe(db.id);
       expect(msg.receiver).toBe(db.body.receiver);
       expect(msg.body).toBe(db.body.body);
-      expect(msg.date.valueOf()).toBe(new Date(db.body.date).valueOf());
+      expect(msg.date).toEqual(new Date(db.body.date));
     });
   });
 
   describe("create", () => {
-    it("正常に生成できるか", () => {
-      Msg.create(ObjectIDGenerator, null, "hoge", new Date());
+    it("receiverがnullの時正常に生成できるか", () => {
+      const date = new Date();
+      const msg = Msg.create(() => "msg", null, "hoge", date);
+
+      expect(msg.id).toBe("msg");
+      expect(msg.receiver).toBeNull();
+      expect(msg.body).toBe("hoge");
+      expect(msg.date).toEqual(date);
+    });
+
+    it("receiverがnullでない時正常に生成出来るか", () => {
+      const date = new Date();
+      const user = new User(
+        "user",
+        "sn",
+        "pass",
+        1, {
+          last: new Date(),
+          m10: 0,
+          m30: 0,
+          h1: 0,
+          h6: 0,
+          h12: 0,
+          d1: 0,
+        },
+        new Date(),
+        new Date(),
+        0,
+        new Date());
+      const msg = Msg.create(() => "msg", user, "hoge", date);
+      expect(msg.receiver).toBe("user");
     });
   });
 });
