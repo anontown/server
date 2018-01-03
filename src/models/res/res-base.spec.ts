@@ -51,7 +51,14 @@ describe("ResBase", () => {
     new Date(),
     new Date(),
     0,
-    new Date())
+    new Date());
+
+  const token: IAuthToken = {
+    id: "token",
+    key: "key",
+    user: "user",
+    type: "master",
+  };
 
   const res = new ResBaseTest("id",
     "topic",
@@ -68,12 +75,7 @@ describe("ResBase", () => {
       const { res: newRes, resUser: newResUser } = res.v(user,
         voteUser,
         "uv",
-        {
-          id: voteUser.id,
-          key: "aaaaa",
-          user: "user2",
-          type: "master",
-        });
+        { ...token, user: "voteuser" });
 
       expect(newRes.vote).toEqual(Im.List([{ user: voteUser.id, value: 2 }]));
       expect(newResUser.lv).toBe(3);
@@ -82,12 +84,7 @@ describe("ResBase", () => {
       const { res: newNewRes, resUser: newNewResUser } = newRes.v(newResUser,
         voteUser2,
         "dv",
-        {
-          id: voteUser2.id,
-          key: "aaaaa",
-          user: "user2",
-          type: "master",
-        });
+        { ...token, user: "voteuser2" });
 
       expect(newNewRes.vote).toEqual(Im.List([{ user: voteUser.id, value: 2 }, { user: voteUser2.id, value: -1 }]));
       expect(newNewResUser.lv).toBe(2);
@@ -98,12 +95,7 @@ describe("ResBase", () => {
         res.v(user,
           user,
           "uv",
-          {
-            id: user.id,
-            key: "aaaaa",
-            user: "user2",
-            type: "master",
-          });
+          token);
       }).toThrow(AtError);
     });
 
@@ -112,15 +104,38 @@ describe("ResBase", () => {
       const voteUser = user.copy({ id: "voteuser" });
 
       expect(() => {
-        votedRes.v(user, voteUser, "uv", {
-          id: user.id,
-          key: "aaaaa",
-          user: "user2",
-          type: "master",
-        });
+        votedRes.v(user, voteUser, "uv", { ...token, user: "voteuser" });
       }).toThrow(AtError);
     });
   });
 
+  describe("#cv", () => {
+    it("正常にcv出来るか", () => {
+      const votedRes = res.copy({ vote: Im.List([{ user: "voteuser", value: 2 }]) });
+      const resUser = user.copy({ lv: 5 });
+      const voteUser = user.copy({ id: "voteuser" });
+      const { res: newRes, resUser: newResUser }
+        = votedRes.cv(resUser, voteUser, { ...token, user: "voteuser" });
 
+      expect(newRes.vote).toEqual(Im.List());
+      expect(newResUser.lv).toBe(3);
+    });
+
+    it("投票していない時エラーになるか", () => {
+      const votedRes = res.copy({ vote: Im.List([{ user: "voteuser", value: 2 }]) });
+      const resUser = user.copy({ lv: 5 });
+      const voteUser = user.copy({ id: "voteuser2" });
+      expect(() => {
+        votedRes.cv(resUser, voteUser, { ...token, user: "voteuser2" })
+      }).toThrow(AtError);
+    });
+  });
+
+  describe("#toBaseDB", () => {
+
+  });
+
+  describe("#toBaseAPI", () => {
+
+  });
 });
