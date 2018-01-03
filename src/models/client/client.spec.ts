@@ -5,7 +5,6 @@ import {
   IAuthTokenMaster,
   ObjectIDGenerator,
 } from "../../";
-import { update } from "immutable";
 
 describe("Client", () => {
   describe("create", () => {

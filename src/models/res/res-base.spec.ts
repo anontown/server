@@ -1,14 +1,11 @@
 import * as Im from "immutable";
-import { ObjectID } from "mongodb";
 import Copyable from "ts-copyable";
 import {
   AtError,
   IAuthToken,
   IResBaseAPI,
   IResBaseDB,
-  IResWait,
   IVote,
-  ObjectIDGenerator,
   ResBase,
   User,
 } from "../../";
@@ -124,5 +121,6 @@ describe("ResBase", () => {
       }).toThrow(AtError);
     });
   });
+
 
 });
