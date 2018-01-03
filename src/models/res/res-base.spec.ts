@@ -150,6 +150,94 @@ describe("ResBase", () => {
   });
 
   describe("#toBaseAPI", () => {
+    it("tokenがnullの時", () => {
+      const api = res.toBaseAPI(null);
+      expect(api).toEqual({
+        id: res.id,
+        topic: res.topic,
+        date: res.date,
+        user: null,
+        uv: 0,
+        dv: 0,
+        hash: res.hash,
+        replyCount: res.replyCount,
+        voteFlag: null,
+        type: res.type
+      });
+    });
 
+    it("tokenが投稿ユーザーの時", () => {
+      const api = res.toBaseAPI(token);
+      expect(api).toEqual({
+        id: res.id,
+        topic: res.topic,
+        date: res.date,
+        user: res.user,
+        uv: 0,
+        dv: 0,
+        hash: res.hash,
+        replyCount: res.replyCount,
+        voteFlag: "not",
+        type: res.type
+      });
+    });
+
+    it("tokenが投稿ユーザーでない時", () => {
+      const api = res.copy({
+        vote: Im.List([{ user: "user2", value: -2 }])
+      }).toBaseAPI({ ...token, user: "user1" });
+      expect(api).toEqual({
+        id: res.id,
+        topic: res.topic,
+        date: res.date,
+        user: null,
+        uv: 0,
+        dv: 1,
+        hash: res.hash,
+        replyCount: res.replyCount,
+        voteFlag: "not",
+        type: res.type
+      });
+    });
+
+    it("uvした時", () => {
+      const api = res.copy({
+        vote: Im.List([{ user: "user2", value: -2 }, { user: "user1", value: 5 }])
+      })
+        .toBaseAPI({ ...token, user: "user1" });
+
+      expect(api).toEqual({
+        id: res.id,
+        topic: res.topic,
+        date: res.date,
+        user: null,
+        uv: 1,
+        dv: 1,
+        hash: res.hash,
+        replyCount: res.replyCount,
+        voteFlag: "uv",
+        type: res.type
+      });
+    });
+
+    it("dvした時", () => {
+      const api = res.copy({
+        vote: Im.List([{ user: "user1", value: -1 }, { user: "user2", value: 1 }])
+      })
+        .toBaseAPI({ ...token, user: "user1" });
+
+      expect(api).toEqual({
+        id: res.id,
+        topic: res.topic,
+        date: res.date,
+        user: null,
+        uv: 1,
+        dv: 1,
+        hash: res.hash,
+        replyCount: res.replyCount,
+        voteFlag: "dv",
+        type: res.type
+      });
+    });
   });
 });
