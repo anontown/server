@@ -37,155 +37,72 @@ describe("ResBase", () => {
   }
   applyMixins(ResBaseTest, [ResBase]);
 
-  describe("constructor", () => {
-    it("正常に作れるか", () => {
-      const date = new Date();
-      const vote: Im.List<IVote> = Im.List([{
-        user: "user",
-        value: 5,
-      }]);
+  const user = new User(
+    "user",
+    "sn",
+    "pass",
+    1,
+    {
+      last: new Date(),
+      m10: 0,
+      m30: 0,
+      h1: 0,
+      h6: 0,
+      h12: 0,
+      d1: 0,
+    },
+    new Date(),
+    new Date(),
+    0,
+    new Date())
 
-      const res = new ResBaseTest("id",
-        "topic",
-        date,
-        "user",
-        vote,
-        1,
-        "hash",
-        10);
-
-      expect(res.id).toBe("id");
-      expect(res.topic).toBe("topic");
-      expect(res.date).toBe(date);
-      expect(res.user).toBe("user");
-      expect(res.vote).toBe(vote);
-      expect(res.lv).toBe(1);
-      expect(res.hash).toBe("hash");
-      expect(res.type).toBe("normal");
-      expect(res.replyCount).toBe(10);
-    });
-  });
+  const res = new ResBaseTest("id",
+    "topic",
+    new Date(),
+    "user",
+    Im.List(),
+    1,
+    "hash",
+    10);
 
   describe("#v", () => {
     it("正常に投票出来るか", () => {
-      const resWait: IResWait = {
-        last: new Date(),
-        m10: 0,
-        m30: 0,
-        h1: 0,
-        h6: 0,
-        h12: 0,
-        d1: 0,
-      };
-      const resUserID = ObjectIDGenerator();
-      const voteUserID1 = ObjectIDGenerator();
-      const voteUserID2 = ObjectIDGenerator();
-      const date = new Date();
-      const vote: Im.List<IVote> = Im.List();
-      const res = new ResBaseTest("id",
-        "topic",
-        date,
-        resUserID,
-        vote,
-        1,
-        "hash",
-        10);
-      const resUser = User.fromDB({
-        _id: new ObjectID(resUserID),
-        sn: "sn1",
-        pass: "pass",
-        lv: 2,
-        resWait,
-        lastTopic: new Date(),
-        date: new Date(),
-        point: 1,
-        lastOneTopic: new Date(),
-      });
-      const { res: newRes, resUser: newResUser } = res.v(resUser,
-        User.fromDB({
-          _id: new ObjectID(voteUserID1),
-          sn: "sn1",
-          pass: "pass",
-          lv: 101,
-          resWait,
-          lastTopic: new Date(),
-          date: new Date(),
-          point: 1,
-          lastOneTopic: new Date(),
-        }),
+      const voteUser = user.copy({ id: "voteuser", lv: 100 });
+      const { res: newRes, resUser: newResUser } = res.v(user,
+        voteUser,
         "uv",
         {
-          id: voteUserID1,
+          id: voteUser.id,
           key: "aaaaa",
           user: "user2",
           type: "master",
         });
 
-      expect(newRes.vote).toEqual(Im.List([{ user: voteUserID1, value: 2 }]));
-      expect(newResUser.lv).toBe(4);
+      expect(newRes.vote).toEqual(Im.List([{ user: voteUser.id, value: 2 }]));
+      expect(newResUser.lv).toBe(3);
 
+      const voteUser2 = voteUser.copy({ id: "voteuser2", lv: 50 });
       const { res: newNewRes, resUser: newNewResUser } = newRes.v(newResUser,
-        User.fromDB({
-          _id: new ObjectID(voteUserID2),
-          sn: "sn1",
-          pass: "pass",
-          lv: 50,
-          resWait,
-          lastTopic: new Date(),
-          date: new Date(),
-          point: 1,
-          lastOneTopic: new Date(),
-        }),
+        voteUser2,
         "dv",
         {
-          id: voteUserID2,
+          id: voteUser2.id,
           key: "aaaaa",
           user: "user2",
           type: "master",
         });
 
-      expect(newNewRes.vote).toEqual(Im.List([{ user: voteUserID1, value: 2 }, { user: voteUserID2, value: -1 }]));
-      expect(newNewResUser.lv).toBe(3);
+      expect(newNewRes.vote).toEqual(Im.List([{ user: voteUser.id, value: 2 }, { user: voteUser2.id, value: -1 }]));
+      expect(newNewResUser.lv).toBe(2);
     });
 
     it("自分に投票するとエラーになるか", () => {
-      const resWait: IResWait = {
-        last: new Date(),
-        m10: 0,
-        m30: 0,
-        h1: 0,
-        h6: 0,
-        h12: 0,
-        d1: 0,
-      };
-      const resUserID = ObjectIDGenerator();
-      const date = new Date();
-      const vote: Im.List<IVote> = Im.List();
-      const res = new ResBaseTest("id",
-        "topic",
-        date,
-        resUserID,
-        vote,
-        1,
-        "hash",
-        10);
-      const resUser = User.fromDB({
-        _id: new ObjectID(resUserID),
-        sn: "sn1",
-        pass: "pass",
-        lv: 2,
-        resWait,
-        lastTopic: new Date(),
-        date: new Date(),
-        point: 1,
-        lastOneTopic: new Date(),
-      });
       expect(() => {
-        res.v(resUser,
-          resUser,
+        res.v(user,
+          user,
           "uv",
           {
-            id: resUserID,
+            id: user.id,
             key: "aaaaa",
             user: "user2",
             type: "master",
@@ -194,61 +111,16 @@ describe("ResBase", () => {
     });
 
     it("重複投票でエラーになるか", () => {
-      const resWait: IResWait = {
-        last: new Date(),
-        m10: 0,
-        m30: 0,
-        h1: 0,
-        h6: 0,
-        h12: 0,
-        d1: 0,
-      };
-      const resUserID = ObjectIDGenerator();
-      const voteUserID = ObjectIDGenerator();
-      const date = new Date();
-      const vote: Im.List<IVote> = Im.List();
-      const res = new ResBaseTest("id",
-        "topic",
-        date,
-        resUserID,
-        vote,
-        1,
-        "hash",
-        10);
-      const resUser = User.fromDB({
-        _id: new ObjectID(resUserID),
-        sn: "sn1",
-        pass: "pass",
-        lv: 2,
-        resWait,
-        lastTopic: new Date(),
-        date: new Date(),
-        point: 1,
-        lastOneTopic: new Date(),
-      });
+      const votedRes = res.copy({ vote: Im.List([{ user: "voteuser", value: 2 }]) });
+      const voteUser = user.copy({ id: "voteuser" });
+
       expect(() => {
-        let nowRes = res;
-        for (let i = 0; i < 2; i++) {
-          nowRes = nowRes.v(resUser,
-            User.fromDB({
-              _id: new ObjectID(voteUserID),
-              sn: "sn1",
-              pass: "pass",
-              lv: 101,
-              resWait,
-              lastTopic: new Date(),
-              date: new Date(),
-              point: 1,
-              lastOneTopic: new Date(),
-            }),
-            "uv",
-            {
-              id: voteUserID,
-              key: "aaaaa",
-              user: "user2",
-              type: "master",
-            }).res;
-        }
+        votedRes.v(user, voteUser, "uv", {
+          id: user.id,
+          key: "aaaaa",
+          user: "user2",
+          type: "master",
+        });
       }).toThrow(AtError);
     });
   });
