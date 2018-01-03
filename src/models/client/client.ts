@@ -50,7 +50,7 @@ export class Client extends Copyable<Client> {
       },
     ]);
 
-    return new Client(objidGenerator.get(),
+    return new Client(objidGenerator(),
       name,
       url,
       authToken.user,

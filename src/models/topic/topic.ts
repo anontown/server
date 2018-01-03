@@ -218,7 +218,7 @@ export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBas
     authToken: IAuthToken,
     now: Date) {
     TopicBase.checkData({ title, tags, body });
-    const topic = new TopicNormal(objidGenerator.get(),
+    const topic = new TopicNormal(objidGenerator(),
       title,
       Im.List(tags),
       body,
@@ -315,7 +315,7 @@ export class TopicOne extends Copyable<TopicOne> implements TopicSearchBase<"one
     authToken: IAuthToken,
     now: Date) {
     TopicBase.checkData({ title, tags, body });
-    const topic = new TopicOne(objidGenerator.get(),
+    const topic = new TopicOne(objidGenerator(),
       title,
       Im.List(tags),
       body,
@@ -378,7 +378,7 @@ export class TopicFork extends Copyable<TopicFork> implements TopicBase<"fork", 
     authToken: IAuthToken,
     now: Date) {
     TopicBase.checkData({ title });
-    const topic = new TopicFork(objidGenerator.get(),
+    const topic = new TopicFork(objidGenerator(),
       title,
       now,
       now,

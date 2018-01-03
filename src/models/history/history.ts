@@ -46,7 +46,7 @@ export class History extends Copyable<History> {
     hash: string,
     user: User): History {
     return new History(
-      objidGenerator.get(),
+      objidGenerator(),
       topic.id,
       topic.title,
       Im.List(topic.tags),
@@ -56,13 +56,13 @@ export class History extends Copyable<History> {
   }
 
   constructor(readonly id: string,
-              readonly topic: string,
-              readonly title: string,
-              readonly tags: Im.List<string>,
-              readonly body: string,
-              readonly date: Date,
-              readonly hash: string,
-              readonly user: string) {
+    readonly topic: string,
+    readonly title: string,
+    readonly tags: Im.List<string>,
+    readonly body: string,
+    readonly date: Date,
+    readonly hash: string,
+    readonly user: string) {
     super(History);
   }
 

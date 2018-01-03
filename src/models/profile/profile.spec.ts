@@ -52,7 +52,7 @@ describe("Profile", () => {
             type: "master",
             user: data.user.toHexString(),
             key: "",
-            id: ObjectIDGenerator.get(),
+            id: ObjectIDGenerator(),
           } : null);
 
           expect(api.id).toBe(profile.id.toString());
@@ -72,11 +72,11 @@ describe("Profile", () => {
       const user = new ObjectID().toString();
       const id = new ObjectID().toString();
       const date = Date.now();
-      const profile = Profile.create({ get: () => id }, {
+      const profile = Profile.create(() => id, {
         type: "master",
         user,
         key: "",
-        id: ObjectIDGenerator.get(),
+        id: ObjectIDGenerator(),
       }, "名前", "本文", "test", new Date(date));
       expect(profile.id.toString()).toBe(id);
       expect(profile.user.toString()).toBe(user);

@@ -12,9 +12,9 @@ describe("Client", () => {
       Client.create(
         ObjectIDGenerator,
         {
-          id: ObjectIDGenerator.get(),
+          id: ObjectIDGenerator(),
           key: "",
-          user: ObjectIDGenerator.get(),
+          user: ObjectIDGenerator(),
           type: "master",
         },
         "hoge",
@@ -27,9 +27,9 @@ describe("Client", () => {
       Client.create(
         ObjectIDGenerator,
         {
-          id: ObjectIDGenerator.get(),
+          id: ObjectIDGenerator(),
           key: "",
-          user: ObjectIDGenerator.get(),
+          user: ObjectIDGenerator(),
           type: "master",
         },
         "hoge",
@@ -43,9 +43,9 @@ describe("Client", () => {
         Client.create(
           ObjectIDGenerator,
           {
-            id: ObjectIDGenerator.get(),
+            id: ObjectIDGenerator(),
             key: "",
-            user: ObjectIDGenerator.get(),
+            user: ObjectIDGenerator(),
             type: "master",
           },
           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -60,9 +60,9 @@ describe("Client", () => {
         Client.create(
           ObjectIDGenerator,
           {
-            id: ObjectIDGenerator.get(),
+            id: ObjectIDGenerator(),
             key: "",
-            user: ObjectIDGenerator.get(),
+            user: ObjectIDGenerator(),
             type: "master",
           },
           "",
@@ -77,9 +77,9 @@ describe("Client", () => {
         Client.create(
           ObjectIDGenerator,
           {
-            id: ObjectIDGenerator.get(),
+            id: ObjectIDGenerator(),
             key: "",
-            user: ObjectIDGenerator.get(),
+            user: ObjectIDGenerator(),
             type: "master",
           },
           "hoge",
@@ -94,9 +94,9 @@ describe("Client", () => {
         Client.create(
           ObjectIDGenerator,
           {
-            id: ObjectIDGenerator.get(),
+            id: ObjectIDGenerator(),
             key: "",
-            user: ObjectIDGenerator.get(),
+            user: ObjectIDGenerator(),
             type: "master",
           },
           "http://",
@@ -111,9 +111,9 @@ describe("Client", () => {
         Client.create(
           ObjectIDGenerator,
           {
-            id: ObjectIDGenerator.get(),
+            id: ObjectIDGenerator(),
             key: "",
-            user: ObjectIDGenerator.get(),
+            user: ObjectIDGenerator(),
             type: "master",
           },
           "hoge",
@@ -149,9 +149,9 @@ describe("Client", () => {
   describe("#changeData", () => {
     it("正常に変更できるか", () => {
       const auth: IAuthTokenMaster = {
-        id: ObjectIDGenerator.get(),
+        id: ObjectIDGenerator(),
         key: "",
-        user: ObjectIDGenerator.get(),
+        user: ObjectIDGenerator(),
         type: "master",
       };
 
@@ -167,9 +167,9 @@ describe("Client", () => {
     it("違うユーザーが変更しようとしたらエラーになるか", () => {
       expect(() => {
         const auth: IAuthTokenMaster = {
-          id: ObjectIDGenerator.get(),
+          id: ObjectIDGenerator(),
           key: "",
-          user: ObjectIDGenerator.get(),
+          user: ObjectIDGenerator(),
           type: "master",
         };
 
@@ -180,9 +180,9 @@ describe("Client", () => {
           new Date());
 
         client.changeData({
-          id: ObjectIDGenerator.get(),
+          id: ObjectIDGenerator(),
           key: "",
-          user: ObjectIDGenerator.get(),
+          user: ObjectIDGenerator(),
           type: "master",
         }, "foo", "http://foo", new Date());
       }).toThrow(AtError);
@@ -191,9 +191,9 @@ describe("Client", () => {
     it("長い名前でエラーになるか", () => {
       expect(() => {
         const auth: IAuthTokenMaster = {
-          id: ObjectIDGenerator.get(),
+          id: ObjectIDGenerator(),
           key: "",
-          user: ObjectIDGenerator.get(),
+          user: ObjectIDGenerator(),
           type: "master",
         };
 
@@ -210,9 +210,9 @@ describe("Client", () => {
     it("不正なURLでエラーになるか", () => {
       expect(() => {
         const auth: IAuthTokenMaster = {
-          id: ObjectIDGenerator.get(),
+          id: ObjectIDGenerator(),
           key: "",
-          user: ObjectIDGenerator.get(),
+          user: ObjectIDGenerator(),
           type: "master",
         };
 
@@ -240,7 +240,7 @@ describe("Client", () => {
     describe("#toAPI", () => {
       it("認証あり(同一ユーザー)", () => {
         const api = client.toAPI({
-          id: ObjectIDGenerator.get(),
+          id: ObjectIDGenerator(),
           key: "",
           user: client.user,
           type: "master",
@@ -256,9 +256,9 @@ describe("Client", () => {
 
       it("認証あり(別ユーザー)", () => {
         const api = client.toAPI({
-          id: ObjectIDGenerator.get(),
+          id: ObjectIDGenerator(),
           key: "",
-          user: ObjectIDGenerator.get(),
+          user: ObjectIDGenerator(),
           type: "master",
         });
 

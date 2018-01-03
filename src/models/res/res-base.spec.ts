@@ -77,9 +77,9 @@ describe("ResBase", () => {
         h12: 0,
         d1: 0,
       };
-      const resUserID = ObjectIDGenerator.get();
-      const voteUserID1 = ObjectIDGenerator.get();
-      const voteUserID2 = ObjectIDGenerator.get();
+      const resUserID = ObjectIDGenerator();
+      const voteUserID1 = ObjectIDGenerator();
+      const voteUserID2 = ObjectIDGenerator();
       const date = new Date();
       const vote: Im.List<IVote> = Im.List();
       const res = new ResBaseTest("id",
@@ -158,7 +158,7 @@ describe("ResBase", () => {
         h12: 0,
         d1: 0,
       };
-      const resUserID = ObjectIDGenerator.get();
+      const resUserID = ObjectIDGenerator();
       const date = new Date();
       const vote: Im.List<IVote> = Im.List();
       const res = new ResBaseTest("id",
@@ -203,8 +203,8 @@ describe("ResBase", () => {
         h12: 0,
         d1: 0,
       };
-      const resUserID = ObjectIDGenerator.get();
-      const voteUserID = ObjectIDGenerator.get();
+      const resUserID = ObjectIDGenerator();
+      const voteUserID = ObjectIDGenerator();
       const date = new Date();
       const vote: Im.List<IVote> = Im.List();
       const res = new ResBaseTest("id",

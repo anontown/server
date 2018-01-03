@@ -12,15 +12,15 @@ describe("History", () => {
     describe("fromDB", () => {
         it("正常に作れるか", () => {
             const db: IHistoryDB = {
-                id: ObjectIDGenerator.get(),
+                id: ObjectIDGenerator(),
                 body: {
-                    topic: ObjectIDGenerator.get(),
+                    topic: ObjectIDGenerator(),
                     title: "title",
                     tags: ["a", "b"],
                     body: "body",
                     date: new Date().toISOString(),
                     hash: "hogehogehogeaaa",
-                    user: ObjectIDGenerator.get(),
+                    user: ObjectIDGenerator(),
                 },
             };
 
@@ -40,7 +40,7 @@ describe("History", () => {
     describe("create", () => {
         it("正常に作れるか", () => {
             const t = TopicNormal.fromDB({
-                id: ObjectIDGenerator.get(),
+                id: ObjectIDGenerator(),
                 type: "normal",
                 body: {
                     title: "title",
@@ -89,15 +89,15 @@ describe("History", () => {
 
     {
         const h = History.fromDB({
-            id: ObjectIDGenerator.get(),
+            id: ObjectIDGenerator(),
             body: {
-                topic: ObjectIDGenerator.get(),
+                topic: ObjectIDGenerator(),
                 title: "title",
                 tags: ["a", "b"],
                 body: "body",
                 date: new Date().toISOString(),
                 hash: "hogehogehogeaaa",
-                user: ObjectIDGenerator.get(),
+                user: ObjectIDGenerator(),
             },
         });
         describe("#toDB", () => {

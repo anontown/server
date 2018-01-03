@@ -58,7 +58,7 @@ export class Profile extends Copyable<Profile> {
       },
     ]);
 
-    return new Profile(objidGenerator.get(),
+    return new Profile(objidGenerator(),
       authToken.user,
       name,
       body,

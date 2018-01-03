@@ -54,7 +54,7 @@ export class User extends Copyable<User> {
       },
     ]);
 
-    return new User(objidGenerator.get(),
+    return new User(objidGenerator(),
       sn,
       hash(pass + Config.salt.pass),
       1,

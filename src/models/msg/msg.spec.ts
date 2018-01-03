@@ -8,7 +8,7 @@ import {
 describe("Msg", () => {
   {
     const msg = Msg.fromDB({
-      id: ObjectIDGenerator.get(),
+      id: ObjectIDGenerator(),
       body: {
         receiver: "user",
         body: "あいうえお",
@@ -17,7 +17,7 @@ describe("Msg", () => {
     });
 
     const receiverNullMsg = Msg.fromDB({
-      id: ObjectIDGenerator.get(),
+      id: ObjectIDGenerator(),
       body: {
         receiver: null,
         body: "あいうえお",
@@ -78,9 +78,9 @@ describe("Msg", () => {
   describe("fromDB", () => {
     it(`正常に作成できるか`, () => {
       const db: IMsgDB = {
-        id: ObjectIDGenerator.get(),
+        id: ObjectIDGenerator(),
         body: {
-          receiver: ObjectIDGenerator.get(),
+          receiver: ObjectIDGenerator(),
           body: "a",
           date: new Date().toISOString(),
         },

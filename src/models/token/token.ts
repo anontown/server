@@ -61,7 +61,7 @@ export type Token = TokenMaster | TokenGeneral;
 
 export abstract class TokenBase<T extends TokenType, C extends TokenBase<T, C>> {
   static createTokenKey(randomGenerator: IGenerator<string>): string {
-    return hash(randomGenerator.get() + Config.salt.token);
+    return hash(randomGenerator() + Config.salt.token);
   }
 
   abstract readonly id: string;
@@ -104,7 +104,7 @@ export class TokenMaster extends Copyable<TokenMaster> implements TokenBase<"mas
     authUser: IAuthUser,
     now: Date,
     randomGenerator: IGenerator<string>): TokenMaster {
-    return new TokenMaster(objidGenerator.get(),
+    return new TokenMaster(objidGenerator(),
       TokenBase.createTokenKey(randomGenerator),
       authUser.id,
       now);
@@ -152,7 +152,7 @@ export class TokenGeneral extends Copyable<TokenGeneral> implements TokenBase<"g
     client: Client,
     now: Date,
     randomGenerator: IGenerator<string>): TokenGeneral {
-    return new TokenGeneral(objidGenerator.get(),
+    return new TokenGeneral(objidGenerator(),
       TokenBase.createTokenKey(randomGenerator),
       client.id,
       authToken.user,

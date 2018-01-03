@@ -26,7 +26,7 @@ export class Msg extends Copyable<Msg> {
   }
 
   static create(objidGenerator: IGenerator<string>, receiver: User | null, body: string, now: Date): Msg {
-    return new Msg(objidGenerator.get(),
+    return new Msg(objidGenerator(),
       receiver !== null ? receiver.id : null,
       body,
       now);
