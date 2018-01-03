@@ -132,7 +132,21 @@ describe("ResBase", () => {
   });
 
   describe("#toBaseDB", () => {
-
+    it("正常に変換出来るか", () => {
+      const db = res.toBaseDB({});
+      expect(db).toEqual({
+        id: res.id,
+        type: res.type,
+        body: {
+          topic: res.topic,
+          date: res.date.toISOString(),
+          user: res.user,
+          vote: res.vote.toArray(),
+          lv: res.lv,
+          hash: res.hash,
+        }
+      });
+    });
   });
 
   describe("#toBaseAPI", () => {
