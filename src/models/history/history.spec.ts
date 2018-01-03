@@ -26,14 +26,14 @@ describe("History", () => {
 
             const h = History.fromDB(db);
 
-            expect(db.id).toBe(h.id);
-            expect(db.body.topic).toBe(h.topic);
-            expect(db.body.title).toBe(h.title);
-            expect(db.body.tags).toEqual(h.tags.toArray());
-            expect(db.body.body).toBe(h.body);
-            expect(new Date(db.body.date).getTime()).toBe(h.date.getTime());
-            expect(db.body.hash).toBe(h.hash);
-            expect(db.body.user).toBe(h.user);
+            expect(h.id).toBe(db.id);
+            expect(h.topic).toBe(db.body.topic);
+            expect(h.title).toBe(db.body.title);
+            expect(h.tags).toEqual(Im.List(db.body.tags));
+            expect(h.body).toBe(db.body.body);
+            expect(h.date).toEqual(new Date(db.body.date));
+            expect(h.hash).toBe(db.body.hash);
+            expect(h.user).toBe(db.body.user);
         });
     });
 
@@ -81,7 +81,7 @@ describe("History", () => {
             expect(h.title).toBe(t.title);
             expect(h.tags).toEqual(Im.List(t.tags));
             expect(h.body).toBe(t.body);
-            expect(h.date.getTime()).toBe(date.getTime());
+            expect(h.date).toEqual(date);
             expect(h.hash).toBe(hash);
             expect(h.user).toBe(u.id);
         });
@@ -109,7 +109,7 @@ describe("History", () => {
                 expect(db.body.title).toBe(h.title);
                 expect(db.body.tags).toEqual(h.tags.toArray());
                 expect(db.body.body).toBe(h.body);
-                expect(new Date(db.body.date).getTime()).toBe(h.date.getTime());
+                expect(db.body.date).toBe(h.date.toISOString());
                 expect(db.body.hash).toBe(h.hash);
                 expect(db.body.user).toBe(h.user);
             });
