@@ -207,6 +207,7 @@ export abstract class TopicSearchBase<T extends TopicSearchType, C extends Topic
     };
   }
 }
+applyMixins(TopicSearchBase, [TopicBase]);
 
 export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBase<"normal", TopicNormal> {
   static create(
