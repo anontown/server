@@ -131,7 +131,7 @@ describe("ResNormal", () => {
         topicNormal,
         user,
         token,
-        null,
+        "name",
         "body",
         null,
         null,
@@ -231,6 +231,44 @@ describe("ResNormal", () => {
           true,
           new Date());
       }).toThrow(AtError);
+
+      it("nameが不正な時エラーになるか", () => {
+        for (let name of ["", "x".repeat(51)]) {
+          expect(() => {
+            ResNormal.create(
+              () => "res",
+              topicNormal,
+              user,
+              token,
+              name,
+              "body",
+              null,
+              null,
+              true,
+              new Date());
+          }).toThrow(AtError);
+        }
+      });
+
+      for (let name of [null, "name"]) {
+        it("bodyが不正な時エラーになるか。ただしname=" + name, () => {
+          for (let body of ["", "x".repeat(5001)]) {
+            expect(() => {
+              ResNormal.create(
+                () => "res",
+                topicNormal,
+                user,
+                token,
+                name,
+                body,
+                null,
+                null,
+                true,
+                new Date());
+            }).toThrow(AtError);
+          }
+        });
+      }
     });
   });
 });
