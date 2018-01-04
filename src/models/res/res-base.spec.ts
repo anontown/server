@@ -126,7 +126,7 @@ describe("ResBase", () => {
       const resUser = user.copy({ lv: 5 });
       const voteUser = user.copy({ id: "voteuser2" });
       expect(() => {
-        votedRes.cv(resUser, voteUser, { ...token, user: "voteuser2" })
+        votedRes.cv(resUser, voteUser, { ...token, user: "voteuser2" });
       }).toThrow(AtError);
     });
   });
@@ -144,7 +144,7 @@ describe("ResBase", () => {
           vote: res.vote.toArray(),
           lv: res.lv,
           hash: res.hash,
-        }
+        },
       });
     });
   });
@@ -162,7 +162,7 @@ describe("ResBase", () => {
         hash: res.hash,
         replyCount: res.replyCount,
         voteFlag: null,
-        type: res.type
+        type: res.type,
       });
     });
 
@@ -178,13 +178,13 @@ describe("ResBase", () => {
         hash: res.hash,
         replyCount: res.replyCount,
         voteFlag: "not",
-        type: res.type
+        type: res.type,
       });
     });
 
     it("tokenが投稿ユーザーでない時", () => {
       const api = res.copy({
-        vote: Im.List([{ user: "user2", value: -2 }])
+        vote: Im.List([{ user: "user2", value: -2 }]),
       }).toBaseAPI({ ...token, user: "user1" });
       expect(api).toEqual({
         id: res.id,
@@ -196,13 +196,13 @@ describe("ResBase", () => {
         hash: res.hash,
         replyCount: res.replyCount,
         voteFlag: "not",
-        type: res.type
+        type: res.type,
       });
     });
 
     it("uvした時", () => {
       const api = res.copy({
-        vote: Im.List([{ user: "user2", value: -2 }, { user: "user1", value: 5 }])
+        vote: Im.List([{ user: "user2", value: -2 }, { user: "user1", value: 5 }]),
       })
         .toBaseAPI({ ...token, user: "user1" });
 
@@ -216,13 +216,13 @@ describe("ResBase", () => {
         hash: res.hash,
         replyCount: res.replyCount,
         voteFlag: "uv",
-        type: res.type
+        type: res.type,
       });
     });
 
     it("dvした時", () => {
       const api = res.copy({
-        vote: Im.List([{ user: "user1", value: -1 }, { user: "user2", value: 1 }])
+        vote: Im.List([{ user: "user1", value: -1 }, { user: "user2", value: 1 }]),
       })
         .toBaseAPI({ ...token, user: "user1" });
 
@@ -236,7 +236,7 @@ describe("ResBase", () => {
         hash: res.hash,
         replyCount: res.replyCount,
         voteFlag: "dv",
-        type: res.type
+        type: res.type,
       });
     });
   });

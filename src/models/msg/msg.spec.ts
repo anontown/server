@@ -3,7 +3,7 @@ import {
   IMsgDB,
   Msg,
   ObjectIDGenerator,
-  User
+  User,
 } from "../../";
 
 describe("Msg", () => {

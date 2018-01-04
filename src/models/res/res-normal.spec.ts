@@ -2,11 +2,11 @@ import * as Im from "immutable";
 import {
   AtError,
   IAuthToken,
-  ResNormal,
   IResNormalDB,
-  User,
+  Profile,
+  ResNormal,
   TopicNormal,
-  Profile
+  User,
 } from "../../";
 
 describe("ResNormal", () => {
@@ -15,7 +15,7 @@ describe("ResNormal", () => {
     "body",
     {
       res: "replyres",
-      user: "replyuser"
+      user: "replyuser",
     },
     "active",
     "profile",
@@ -38,7 +38,7 @@ describe("ResNormal", () => {
     new Date(),
     10,
     new Date(),
-    true
+    true,
   );
 
   const user = new User(
@@ -92,12 +92,12 @@ describe("ResNormal", () => {
           body: "body",
           reply: {
             res: "replyres",
-            user: "replyuser"
+            user: "replyuser",
           },
           deleteFlag: "active",
           profile: "profile",
           age: true,
-        }
+        },
       };
 
       const replyCount = 2;
@@ -231,7 +231,7 @@ describe("ResNormal", () => {
     });
 
     it("nameが不正な時エラーになるか", () => {
-      for (let name of ["", "x".repeat(51)]) {
+      for (const name of ["", "x".repeat(51)]) {
         expect(() => {
           ResNormal.create(
             () => "res",
@@ -248,9 +248,9 @@ describe("ResNormal", () => {
       }
     });
 
-    for (let name of [null, "name"]) {
+    for (const name of [null, "name"]) {
       it("bodyが不正な時エラーになるか。ただしname=" + name, () => {
-        for (let body of ["", "x".repeat(5001)]) {
+        for (const body of ["", "x".repeat(5001)]) {
           expect(() => {
             ResNormal.create(
               () => "res",

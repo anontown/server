@@ -1,8 +1,6 @@
 import { ObjectID } from "mongodb";
 
-export interface IGenerator<T> {
-    (): T;
-}
+export type IGenerator<T> = () => T;
 
 export const ObjectIDGenerator: IGenerator<string> = () => new ObjectID().toString();
 
