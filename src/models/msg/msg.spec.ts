@@ -77,7 +77,7 @@ describe("Msg", () => {
   }
 
   describe("fromDB", () => {
-    it(`正常に作成できるか`, () => {
+    it("正常に作成できるか", () => {
       const db: IMsgDB = {
         id: ObjectIDGenerator(),
         body: {
