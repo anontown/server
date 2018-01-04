@@ -4,10 +4,7 @@ import {
   IAuthToken,
   ResNormal,
   IResNormalDB,
-  IVote,
-  ResBase,
   User,
-  IResNormalAPI,
   TopicNormal,
   Profile
 } from "../../";
