@@ -261,11 +261,8 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
         bodyCheck,
       ]);
 
-    if (profile !== null) {
-      // 自分のプロフィールか？
-      if (profile.user !== user.id) {
-        throw new AtRightError("自分のプロフィールを指定して下さい。");
-      }
+    if (profile !== null && profile.user !== user.id) {
+      throw new AtRightError("自分のプロフィールを指定して下さい。");
     }
 
     // もしリプ先があるかつ、トピックがリプ先と違えばエラー
