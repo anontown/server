@@ -50,7 +50,7 @@ describe("ResNormal", () => {
     "pass",
     1,
     {
-      last: new Date(),
+      last: new Date(0),
       m10: 0,
       m30: 0,
       h1: 0,
@@ -116,7 +116,7 @@ describe("ResNormal", () => {
       expect(res.topic).toBe(db.body.topic);
       expect(res.date).toEqual(new Date(db.body.date));
       expect(res.user).toBe(db.body.user);
-      expect(res.vote).toEqual(db.body.vote);
+      expect(res.vote).toEqual(Im.List(db.body.vote));
       expect(res.lv).toBe(db.body.lv);
       expect(res.hash).toBe(db.body.hash);
       expect(res.replyCount).toBe(replyCount);
@@ -138,7 +138,7 @@ describe("ResNormal", () => {
         true,
         date);
 
-      expect(res.name).toBeNull();
+      expect(res.name).toBe("name");
       expect(res.body).toBe("body");
       expect(res.reply).toBeNull();
       expect(res.deleteFlag).toBe("active");
@@ -149,8 +149,8 @@ describe("ResNormal", () => {
       expect(res.date).toEqual(date);
       expect(res.user).toBe("user");
       expect(res.vote).toEqual(Im.List());
-      expect(res.lv).toBe(user.lv);
-      expect(res.hash).toBe("hash");
+      expect(res.lv).toBe(user.lv * 5);
+      expect(res.hash).toBe(topicNormal.hash(date, user));
       expect(res.replyCount).toBe(0);
 
       expect(newUser.resWait).toEqual({
@@ -181,7 +181,7 @@ describe("ResNormal", () => {
         true,
         date);
 
-      expect(res.reply).toEqual({ id: "res2", user: "res2" });
+      expect(res.reply).toEqual({ res: "res2", user: "res2" });
     });
 
     it("profileがnullでない時正常に作れるか", () => {
@@ -231,9 +231,29 @@ describe("ResNormal", () => {
           true,
           new Date());
       }).toThrow(AtError);
+    });
 
-      it("nameが不正な時エラーになるか", () => {
-        for (let name of ["", "x".repeat(51)]) {
+    it("nameが不正な時エラーになるか", () => {
+      for (let name of ["", "x".repeat(51)]) {
+        expect(() => {
+          ResNormal.create(
+            () => "res",
+            topicNormal,
+            user,
+            token,
+            name,
+            "body",
+            null,
+            null,
+            true,
+            new Date());
+        }).toThrow(AtError);
+      }
+    });
+
+    for (let name of [null, "name"]) {
+      it("bodyが不正な時エラーになるか。ただしname=" + name, () => {
+        for (let body of ["", "x".repeat(5001)]) {
           expect(() => {
             ResNormal.create(
               () => "res",
@@ -241,7 +261,7 @@ describe("ResNormal", () => {
               user,
               token,
               name,
-              "body",
+              body,
               null,
               null,
               true,
@@ -249,26 +269,6 @@ describe("ResNormal", () => {
           }).toThrow(AtError);
         }
       });
-
-      for (let name of [null, "name"]) {
-        it("bodyが不正な時エラーになるか。ただしname=" + name, () => {
-          for (let body of ["", "x".repeat(5001)]) {
-            expect(() => {
-              ResNormal.create(
-                () => "res",
-                topicNormal,
-                user,
-                token,
-                name,
-                body,
-                null,
-                null,
-                true,
-                new Date());
-            }).toThrow(AtError);
-          }
-        });
-      }
-    });
+    }
   });
 });
