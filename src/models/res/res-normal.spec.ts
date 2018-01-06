@@ -268,4 +268,28 @@ describe("ResNormal", () => {
       });
     }
   });
+
+  describe("toDB", () => {
+    it("正常に変換出来るか", () => {
+      const db = resNormal.toDB();
+      expect(db).toEqual({
+        id: resNormal.id,
+        type: resNormal.type,
+        body: {
+          topic: resNormal.topic,
+          date: resNormal.date.toISOString(),
+          user: resNormal.user,
+          vote: resNormal.vote.toArray(),
+          lv: resNormal.lv,
+          hash: resNormal.hash,
+          name: resNormal.name,
+          body: resNormal.body,
+          reply: resNormal.reply,
+          deleteFlag: resNormal.deleteFlag,
+          profile: resNormal.profile,
+          age: resNormal.age,
+        },
+      });
+    });
+  });
 });
