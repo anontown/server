@@ -269,7 +269,7 @@ describe("ResNormal", () => {
     }
   });
 
-  describe("toDB", () => {
+  describe("#toDB", () => {
     it("正常に変換出来るか", () => {
       const db = resNormal.toDB();
       expect(db).toEqual({
@@ -289,6 +289,55 @@ describe("ResNormal", () => {
           profile: resNormal.profile,
           age: resNormal.age,
         },
+      });
+    });
+    describe("#toAPI", () => {
+      it("正常に変換出来るか", () => {
+        const api = resNormal.toAPI(null);
+        expect(api).toEqual({
+          ...resNormal.toBaseAPI(null),
+          name: resNormal.name,
+          body: resNormal.body,
+          reply: "replyres",
+          profile: resNormal.profile,
+          isReply: null,
+        });
+      });
+
+      it("自分に対するリプライ", () => {
+        const api = resNormal.toAPI({ ...token, user: "replyuser" });
+        if (api.type === "normal") {
+          expect(api.isReply).toBe(true);
+        } else {
+          throw new Error();
+        }
+      });
+
+      it("他人に対するリプライ", () => {
+        const api = resNormal.toAPI({ ...token, user: "user2" });
+        if (api.type === "normal") {
+          expect(api.isReply).toBe(false);
+        } else {
+          throw new Error();
+        }
+      });
+
+      it("自主削除されたレス", () => {
+        const api = resNormal.copy({ deleteFlag: "self" }).toAPI(null);
+        expect(api).toEqual({
+          ...resNormal.toBaseAPI(null),
+          type: "delete",
+          flag: "self",
+        });
+      });
+
+      it("強制削除されたレス", () => {
+        const api = resNormal.copy({ deleteFlag: "freeze" }).toAPI(null);
+        expect(api).toEqual({
+          ...resNormal.toBaseAPI(null),
+          type: "delete",
+          flag: "freeze",
+        });
       });
     });
   });
