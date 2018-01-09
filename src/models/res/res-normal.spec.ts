@@ -340,5 +340,25 @@ describe("ResNormal", () => {
         });
       });
     });
+
+    describe("#del", () => {
+      it("正常に削除出来るか", () => {
+        const { res: newRes, resUser: newUser } = resNormal.del(user.copy({ lv: 3 }), token);
+        expect(newUser.lv).toBe(2);
+        expect(newRes.deleteFlag).toBe("self");
+      });
+
+      it("人のレスを削除しようとするとエラーになるか", () => {
+        expect(() => {
+          resNormal.del(user.copy({ id: "user2" }), { ...token, user: "user2" });
+        }).toThrow(AtError);
+      });
+
+      it("削除済みのレスを削除しようとするとエラーになるか", () => {
+        expect(() => {
+          resNormal.copy({ deleteFlag: "self" }).del(user, token);
+        }).toThrow(AtError);
+      });
+    });
   });
 });
