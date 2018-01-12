@@ -90,27 +90,37 @@ describe("ResHistory", () => {
   });
 
   describe("create", () => {
-    const date = new Date();
-    const { res, topic: newTopic } = ResHistory.create(
-      () => "res",
-      topicNormal,
-      user,
-      token,
-      history,
-      date);
+    it("正常に作れるか", () => {
+      const date = new Date();
+      const { res, topic: newTopic } = ResHistory.create(
+        () => "res",
+        topicNormal,
+        user,
+        token,
+        history,
+        date);
 
-    expect(res.type).toBe("history");
-    expect(res.history).toBe("history");
-    expect(res.id).toBe("res");
-    expect(res.topic).toBe("topic");
-    expect(res.date).toEqual(date);
-    expect(res.user).toBe("user");
-    expect(res.vote).toEqual(Im.List());
-    expect(res.lv).toBe(user.lv * 5);
-    expect(res.hash).toBe(topicNormal.hash(date, user));
-    expect(res.replyCount).toBe(0);
+      expect(res.type).toBe("history");
+      expect(res.history).toBe("history");
+      expect(res.id).toBe("res");
+      expect(res.topic).toBe("topic");
+      expect(res.date).toEqual(date);
+      expect(res.user).toBe("user");
+      expect(res.vote).toEqual(Im.List());
+      expect(res.lv).toBe(user.lv * 5);
+      expect(res.hash).toBe(topicNormal.hash(date, user));
+      expect(res.replyCount).toBe(0);
 
-    expect(newTopic.update).toEqual(date);
-    expect(newTopic.ageUpdate).toEqual(topicNormal.ageUpdate);
+      expect(newTopic.update).toEqual(date);
+      expect(newTopic.ageUpdate).toEqual(topicNormal.ageUpdate);
+    });
+  });
+
+  describe("#toDB", () => {
+
+  });
+
+  describe("#toAPI", () => {
+
   });
 });
