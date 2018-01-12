@@ -129,6 +129,13 @@ describe("ResHistory", () => {
   });
 
   describe("#toAPI", () => {
+    it("正常に変換できるか", () => {
+      const api = resHistory.toAPI(null);
 
+      expect(api).toEqual({
+        ...resHistory.toBaseAPI(null),
+        history: resHistory.history
+      });
+    });
   });
 });
