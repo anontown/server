@@ -57,6 +57,8 @@ describe("ResHistory", () => {
     "hash",
     "user");
 
+  const resHistory = new ResHistory("history", "res", "topic", new Date(), "user", Im.List(), 5, "hash", 1);
+
   describe("fromDB", () => {
     it("正常に作れるか", () => {
       const db: IResHistoryDB = {
@@ -117,7 +119,13 @@ describe("ResHistory", () => {
   });
 
   describe("#toDB", () => {
+    it("正常に変換できるか", () => {
+      const db = resHistory.toDB();
 
+      expect(db).toEqual(resHistory.toBaseDB({
+        history: resHistory.history
+      }));
+    });
   });
 
   describe("#toAPI", () => {
