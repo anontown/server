@@ -77,19 +77,21 @@ describe("ResTopic", () => {
   });
 
   describe("create", () => {
-    const date = new Date();
-    const { res, topic } = ResTopic.create(() => "res", topicOne, user, token, date);
+    it("正常に作れるか", () => {
+      const date = new Date();
+      const { res, topic } = ResTopic.create(() => "res", topicOne, user, token, date);
 
-    expect(res.type).toBe("topic");
-    expect(res.id).toBe("res");
-    expect(res.topic).toBe("topic");
-    expect(res.date).toEqual(date);
-    expect(res.user).toBe("user");
-    expect(res.vote).toEqual(Im.List());
-    expect(res.lv).toBe(5);
-    expect(res.hash).toBe(topicOne.hash(date, user));
-    expect(res.replyCount).toBe(0);
+      expect(res.type).toBe("topic");
+      expect(res.id).toBe("res");
+      expect(res.topic).toBe("topic");
+      expect(res.date).toEqual(date);
+      expect(res.user).toBe("user");
+      expect(res.vote).toEqual(Im.List());
+      expect(res.lv).toBe(5);
+      expect(res.hash).toBe(topicOne.hash(date, user));
+      expect(res.replyCount).toBe(0);
 
-    expect(topic.update).toEqual(date);
+      expect(topic.update).toEqual(date);
+    });
   });
 });
