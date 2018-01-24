@@ -109,4 +109,10 @@ describe("ResTopic", () => {
       expect(resTopic.toDB()).toEqual(resTopic.toBaseDB({}));
     });
   });
+
+  describe("toAPI", () => {
+    it("正常に変換出来るか", () => {
+      expect(resTopic.toAPI(token)).toEqual(resTopic.toAPI(token));
+    });
+  });
 });
