@@ -112,7 +112,7 @@ describe("ResTopic", () => {
 
   describe("toAPI", () => {
     it("正常に変換出来るか", () => {
-      expect(resTopic.toAPI(token)).toEqual(resTopic.toAPI(token));
+      expect(resTopic.toAPI(token)).toEqual(resTopic.toBaseAPI(token));
     });
   });
 });
