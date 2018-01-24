@@ -46,6 +46,15 @@ describe("ResTopic", () => {
     type: "master",
   };
 
+  const resTopic = new ResTopic("res",
+    "topic",
+    new Date(),
+    "user",
+    Im.List(),
+    5,
+    "hash",
+    10);
+
   describe("fromDB", () => {
     it("正常に作れるか", () => {
       const db: IResTopicDB = {
@@ -92,6 +101,12 @@ describe("ResTopic", () => {
       expect(res.replyCount).toBe(0);
 
       expect(topic.update).toEqual(date);
+    });
+  });
+
+  describe("toDB", () => {
+    it("正常に変換出来るか", () => {
+      expect(resTopic.toDB()).toEqual(resTopic.toBaseDB({}));
     });
   });
 });
