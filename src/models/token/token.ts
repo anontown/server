@@ -7,7 +7,7 @@ import { Config } from "../../config";
 import { IGenerator } from "../../generator";
 import { hash } from "../../utils";
 import { applyMixins } from "../../utils";
-import { Client } from "..//client";
+import { Client } from "../client";
 
 export interface ITokenReq {
   readonly key: string;
