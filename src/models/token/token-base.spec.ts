@@ -9,6 +9,7 @@ import {
   ITokenBaseAPI
 } from "../../";
 import { applyMixins } from "../../utils";
+import { ObjectID } from "mongodb";
 
 describe("TokenBase", () => {
   class TokenBaseTest extends Copyable<TokenBaseTest> implements TokenBase<"general", TokenBaseTest> {
@@ -26,4 +27,17 @@ describe("TokenBase", () => {
     }
   }
   applyMixins(TokenBaseTest, [TokenBase]);
+
+  describe("toBaseDB", () => {
+    it("正常に変換できるか", () => {
+      const token = new TokenBaseTest("token", "key", "user", new Date());
+      expect(token.toBaseDB()).toEqual({
+        _id: new ObjectID(token.id),
+        key: token.key,
+        user: new ObjectID(token.user),
+        date: token.date,
+        type: token.type,
+      });
+    });
+  });
 });
