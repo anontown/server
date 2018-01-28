@@ -48,7 +48,7 @@ describe("TokenBase", () => {
       id: token.id,
       key: token.key,
       user: token.user,
-      date: token.date,
+      date: token.date.toISOString(),
       type: token.type,
     });
   });
