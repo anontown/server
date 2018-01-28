@@ -6,7 +6,8 @@ import {
   TokenBase,
   User,
   ITokenBaseDB,
-  ITokenBaseAPI
+  ITokenBaseAPI,
+  ObjectIDGenerator
 } from "../../";
 import { applyMixins } from "../../utils";
 import { ObjectID } from "mongodb";
@@ -30,7 +31,7 @@ describe("TokenBase", () => {
 
   describe("toBaseDB", () => {
     it("正常に変換できるか", () => {
-      const token = new TokenBaseTest("token", "key", "user", new Date());
+      const token = new TokenBaseTest(ObjectIDGenerator(), "key", ObjectIDGenerator(), new Date());
       expect(token.toBaseDB()).toEqual({
         _id: new ObjectID(token.id),
         key: token.key,
