@@ -40,4 +40,15 @@ describe("TokenBase", () => {
       });
     });
   });
+
+  describe("toBaseAPI", () => {
+    const token = new TokenBaseTest("token", "key", "user", new Date());
+    expect(token.toBaseAPI()).toEqual({
+      id: token.id,
+      key: token.key,
+      user: token.user,
+      date: token.date,
+      type: token.type,
+    });
+  });
 });
