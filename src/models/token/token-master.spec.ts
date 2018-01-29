@@ -4,7 +4,6 @@ import {
   ObjectIDGenerator
 } from "../../";
 import { ObjectID } from "mongodb";
-import { take } from "rxjs/operator/take";
 
 describe("TokenMaster", () => {
   describe("fromDB", () => {
