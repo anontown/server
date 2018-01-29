@@ -1,14 +1,10 @@
-import * as Im from "immutable";
 import { ObjectID } from "mongodb";
 import Copyable from "ts-copyable";
 import {
-  AtError,
-  IAuthToken,
   ITokenBaseAPI,
   ITokenBaseDB,
   ObjectIDGenerator,
   TokenBase,
-  User,
 } from "../../";
 import { applyMixins } from "../../utils";
 
