@@ -1,16 +1,16 @@
 import * as Im from "immutable";
+import { ObjectID } from "mongodb";
 import Copyable from "ts-copyable";
 import {
   AtError,
   IAuthToken,
+  ITokenBaseAPI,
+  ITokenBaseDB,
+  ObjectIDGenerator,
   TokenBase,
   User,
-  ITokenBaseDB,
-  ITokenBaseAPI,
-  ObjectIDGenerator
 } from "../../";
 import { applyMixins } from "../../utils";
-import { ObjectID } from "mongodb";
 
 describe("TokenBase", () => {
   class TokenBaseTest extends Copyable<TokenBaseTest> implements TokenBase<"general", TokenBaseTest> {

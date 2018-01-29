@@ -1,11 +1,11 @@
 import * as Im from "immutable";
 import {
-  ResFork,
+  IAuthToken,
   IResForkDB,
+  ResFork,
+  TopicFork,
   TopicNormal,
   User,
-  IAuthToken,
-  TopicFork
 } from "../../";
 
 describe("ResFork", () => {
@@ -78,8 +78,8 @@ describe("ResFork", () => {
           vote: [],
           lv: 5,
           hash: "hash",
-          fork: "topicfork"
-        }
+          fork: "topicfork",
+        },
       };
       const replyCount = 3;
 

@@ -1,11 +1,11 @@
 import * as Im from "immutable";
 import {
-  ResHistory,
+  History,
+  IAuthToken,
   IResHistoryDB,
+  ResHistory,
   TopicNormal,
   User,
-  IAuthToken,
-  History
 } from "../../";
 
 describe("ResHistory", () => {
@@ -71,8 +71,8 @@ describe("ResHistory", () => {
           vote: [],
           lv: 5,
           hash: "hash",
-          history: "history"
-        }
+          history: "history",
+        },
       };
       const replyCount = 3;
 
@@ -123,7 +123,7 @@ describe("ResHistory", () => {
       const db = resHistory.toDB();
 
       expect(db).toEqual(resHistory.toBaseDB({
-        history: resHistory.history
+        history: resHistory.history,
       }));
     });
   });
@@ -134,7 +134,7 @@ describe("ResHistory", () => {
 
       expect(api).toEqual({
         ...resHistory.toBaseAPI(null),
-        history: resHistory.history
+        history: resHistory.history,
       });
     });
   });

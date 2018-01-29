@@ -1,10 +1,10 @@
 import * as Im from "immutable";
 import {
-  ResTopic,
+  IAuthToken,
   IResTopicDB,
+  ResTopic,
   TopicOne,
   User,
-  IAuthToken
 } from "../../";
 
 describe("ResTopic", () => {
@@ -67,7 +67,7 @@ describe("ResTopic", () => {
           vote: [],
           lv: 5,
           hash: "hash",
-        }
+        },
       };
       const replyCount = 3;
 
