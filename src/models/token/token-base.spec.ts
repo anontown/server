@@ -25,6 +25,12 @@ describe("TokenBase", () => {
   }
   applyMixins(TokenBaseTest, [TokenBase]);
 
+  describe("createTokenKey", () => {
+    it("正常に生成出来るか", () => {
+      expect(TokenBase.createTokenKey(() => "key")).toBe("YwWX/R2CwHpqzfN5l6CU6ePSfmJxLQi8yL0vtOP+mCc");
+    });
+  });
+
   describe("toBaseDB", () => {
     it("正常に変換できるか", () => {
       const token = new TokenBaseTest(ObjectIDGenerator(), "key", ObjectIDGenerator(), new Date());
