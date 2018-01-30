@@ -21,7 +21,7 @@ describe("TokenMaster", () => {
       expect(token.key).toBe(db.key);
       expect(token.type).toBe(db.type);
       expect(token.user).toBe(db.user.toHexString());
-      expect(token.date).toEqual(token.date);
+      expect(token.date).toEqual(db.date);
     });
   });
 });
