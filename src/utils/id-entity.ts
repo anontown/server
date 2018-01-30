@@ -2,11 +2,11 @@ import { ObjectOmit } from "typelevel-ts";
 
 export type ID = { id: string };
 
-export type IDEntity<T extends object, E extends keyof T> = Pick<T, E> & ObjectOmit<ToID<T>, E>;
-type ToID<T extends object> = {
+type EntityObject = { [key: string]: ID };
+export type IDEntity<T extends EntityObject, E extends keyof T> = Pick<T, E> & ObjectOmit<ToID<T>, E>;
+type ToID<T extends EntityObject> = {
   [P in keyof T]: ID;
 }
-
 
 /*
 //example
