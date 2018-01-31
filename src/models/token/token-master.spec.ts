@@ -8,7 +8,7 @@ import {
 import { ObjectID } from "mongodb";
 
 describe("TokenMaster", () => {
-  const tokenMaster = new TokenMaster("token", "key", "user", new Date());
+  const tokenMaster = new TokenMaster(ObjectIDGenerator(), "key", "user", new Date());
 
   describe("fromDB", () => {
     it("正常に変換出来るか", () => {
@@ -65,7 +65,7 @@ describe("TokenMaster", () => {
   describe("auth", () => {
     it("正常に認証出来るか", () => {
       const auth = tokenMaster.auth("key");
-      expect(auth).toEqual({ id: "token", key: "key", user: "user", type: "master" });
+      expect(auth).toEqual({ id: tokenMaster.id, key: "key", user: "user", type: "master" });
     });
 
     it("keyが違う時エラーになるか", () => {
