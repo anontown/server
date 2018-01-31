@@ -2,7 +2,8 @@ import {
   TokenMaster,
   ITokenMasterDB,
   ObjectIDGenerator,
-  TokenBase
+  TokenBase,
+  AtError
 } from "../../";
 import { ObjectID } from "mongodb";
 
@@ -58,6 +59,19 @@ describe("TokenMaster", () => {
     it("正常に変換出来るか", () => {
       const api = tokenMaster.toAPI();
       expect(api).toEqual(tokenMaster.toBaseAPI());
+    });
+  });
+
+  describe("auth", () => {
+    it("正常に認証出来るか", () => {
+      const auth = tokenMaster.auth("key");
+      expect(auth).toEqual({ id: "token", key: "key", user: "user", type: "master" });
+    });
+
+    it("keyが違う時エラーになるか", () => {
+      expect(() => {
+        tokenMaster.auth("key2");
+      }).toThrow(AtError);
     });
   });
 });
