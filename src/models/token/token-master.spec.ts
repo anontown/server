@@ -53,4 +53,11 @@ describe("TokenMaster", () => {
       expect(db).toEqual(tokenMaster.toBaseDB());
     });
   });
+
+  describe("toAPI", () => {
+    it("正常に変換出来るか", () => {
+      const api = tokenMaster.toAPI();
+      expect(api).toEqual(tokenMaster.toBaseAPI());
+    });
+  });
 });
