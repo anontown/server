@@ -7,6 +7,8 @@ import {
 import { ObjectID } from "mongodb";
 
 describe("TokenMaster", () => {
+  const tokenMaster = new TokenMaster("token", "key", "user", new Date());
+
   describe("fromDB", () => {
     it("正常に変換出来るか", () => {
       const db: ITokenMasterDB = {
@@ -42,6 +44,13 @@ describe("TokenMaster", () => {
       expect(token.type).toBe("master");
       expect(token.user).toBe("user");
       expect(token.date).toEqual(date);
+    });
+  });
+
+  describe("toDB", () => {
+    it("正常に変換出来るか", () => {
+      const db = tokenMaster.toDB();
+      expect(db).toEqual(tokenMaster.toBaseDB());
     });
   });
 });
