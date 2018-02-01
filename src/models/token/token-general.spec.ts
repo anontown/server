@@ -6,6 +6,7 @@ import {
   AtError
 } from "../../";
 import { ObjectID } from "mongodb";
+import * as Im from "immutable";
 
 describe("TokenMaster", () => {
   describe("fromDB", () => {
@@ -27,7 +28,7 @@ describe("TokenMaster", () => {
       expect(token.user).toBe(db.user.toHexString());
       expect(token.date).toEqual(db.date);
       expect(token.client).toBe(db.client.toHexString());
-      expect(token.req).toEqual(db.req);
+      expect(token.req).toEqual(Im.List(db.req));
     });
   });
 });
