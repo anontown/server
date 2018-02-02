@@ -293,10 +293,10 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
 
   readonly type: "normal" = "normal";
 
-  toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"normal">;
-  toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"normal", Body>;
-  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResNormal, resUser: User };
-  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResNormal, resUser: User };
+  toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"normal">;
+  toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"normal", Body>;
+  cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResNormal, resUser: User };
+  v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResNormal, resUser: User };
 
   constructor(
     readonly name: string | null,
@@ -400,10 +400,10 @@ export class ResHistory extends Copyable<ResHistory> implements ResBase<"history
     return { res: result, topic: newTopic };
   }
 
-  toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"history">;
-  toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"history", Body>;
-  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResHistory, resUser: User };
-  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResHistory, resUser: User };
+  toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"history">;
+  toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"history", Body>;
+  cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResHistory, resUser: User };
+  v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResHistory, resUser: User };
 
   readonly type: "history" = "history";
 
@@ -465,10 +465,10 @@ export class ResTopic extends Copyable<ResTopic> implements ResBase<"topic", Res
     return { res: result, topic: newTopic };
   }
 
-  toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"topic">;
-  toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"topic", Body>;
-  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResTopic, resUser: User };
-  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResTopic, resUser: User };
+  toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"topic">;
+  toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"topic", Body>;
+  cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResTopic, resUser: User };
+  v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResTopic, resUser: User };
 
   readonly type: "topic" = "topic";
 
@@ -528,10 +528,10 @@ export class ResFork extends Copyable<ResFork> implements ResBase<"fork", ResFor
     return { res: result, topic: newTopic };
   }
 
-  toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"fork">;
-  toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"fork", Body>;
-  cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResFork, resUser: User };
-  v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResFork, resUser: User };
+  toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"fork">;
+  toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"fork", Body>;
+  cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResFork, resUser: User };
+  v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResFork, resUser: User };
 
   readonly type: "fork" = "fork";
 

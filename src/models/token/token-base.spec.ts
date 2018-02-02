@@ -12,8 +12,8 @@ describe("TokenBase", () => {
   class TokenBaseTest extends Copyable<TokenBaseTest> implements TokenBase<"general", TokenBaseTest> {
     readonly type: "general" = "general";
 
-    toBaseAPI: () => ITokenBaseAPI<"general">;
-    toBaseDB: () => ITokenBaseDB<"general">;
+    toBaseAPI!: () => ITokenBaseAPI<"general">;
+    toBaseDB!: () => ITokenBaseDB<"general">;
 
     constructor(
       readonly id: string,

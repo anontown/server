@@ -248,12 +248,12 @@ export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBas
 
   readonly type: "normal" = "normal";
 
-  toBaseAPI: () => ITopicBaseAPI<"normal">;
-  hash: (date: Date, user: User) => string;
-  toAPI: () => ITopicSearchBaseAPI<"normal">;
-  resUpdate: (res: Res) => TopicNormal;
-  toDB: () => ITopicSearchBaseDB<"normal">;
-  toBaseDB: <Body extends object>(body: Body) => ITopicBaseDB<"normal", Body>;
+  toBaseAPI!: () => ITopicBaseAPI<"normal">;
+  hash!: (date: Date, user: User) => string;
+  toAPI!: () => ITopicSearchBaseAPI<"normal">;
+  resUpdate!: (res: Res) => TopicNormal;
+  toDB!: () => ITopicSearchBaseDB<"normal">;
+  toBaseDB!: <Body extends object>(body: Body) => ITopicBaseDB<"normal", Body>;
 
   constructor(
     readonly id: string,
@@ -337,12 +337,12 @@ export class TopicOne extends Copyable<TopicOne> implements TopicSearchBase<"one
   }
 
   readonly type: "one" = "one";
-  toBaseAPI: () => ITopicBaseAPI<"one">;
-  hash: (date: Date, user: User) => string;
-  toAPI: () => ITopicSearchBaseAPI<"one">;
-  resUpdate: (res: Res) => TopicOne;
-  toDB: () => ITopicSearchBaseDB<"one">;
-  toBaseDB: <Body extends object>(body: Body) => ITopicBaseDB<"one", Body>;
+  toBaseAPI!: () => ITopicBaseAPI<"one">;
+  hash!: (date: Date, user: User) => string;
+  toAPI!: () => ITopicSearchBaseAPI<"one">;
+  resUpdate!: (res: Res) => TopicOne;
+  toDB!: () => ITopicSearchBaseDB<"one">;
+  toBaseDB!: <Body extends object>(body: Body) => ITopicBaseDB<"one", Body>;
 
   constructor(
     readonly id: string,
@@ -406,10 +406,10 @@ export class TopicFork extends Copyable<TopicFork> implements TopicBase<"fork", 
   }
 
   readonly type: "fork" = "fork";
-  toBaseAPI: () => ITopicBaseAPI<"fork">;
-  hash: (date: Date, user: User) => string;
-  resUpdate: (res: Res) => TopicFork;
-  toBaseDB: <Body extends object>(body: Body) => ITopicBaseDB<"fork", Body>;
+  toBaseAPI!: () => ITopicBaseAPI<"fork">;
+  hash!: (date: Date, user: User) => string;
+  resUpdate!: (res: Res) => TopicFork;
+  toBaseDB!: <Body extends object>(body: Body) => ITopicBaseDB<"fork", Body>;
 
   constructor(
     readonly id: string,

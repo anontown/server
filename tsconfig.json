@@ -13,7 +13,7 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "strictNullChecks": true,
+    "strict": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,

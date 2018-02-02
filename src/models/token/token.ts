@@ -112,8 +112,8 @@ export class TokenMaster extends Copyable<TokenMaster> implements TokenBase<"mas
 
   readonly type: "master" = "master";
 
-  toBaseAPI: () => ITokenBaseAPI<"master">;
-  toBaseDB: () => ITokenBaseDB<"master">;
+  toBaseAPI!: () => ITokenBaseAPI<"master">;
+  toBaseDB!: () => ITokenBaseDB<"master">;
 
   constructor(
     readonly id: string,
@@ -162,8 +162,8 @@ export class TokenGeneral extends Copyable<TokenGeneral> implements TokenBase<"g
 
   readonly type: "general" = "general";
 
-  toBaseAPI: () => ITokenBaseAPI<"general">;
-  toBaseDB: () => ITokenBaseDB<"general">;
+  toBaseAPI!: () => ITokenBaseAPI<"general">;
+  toBaseDB!: () => ITokenBaseDB<"general">;
 
   constructor(
     readonly id: string,

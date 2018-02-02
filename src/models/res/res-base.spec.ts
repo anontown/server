@@ -13,10 +13,10 @@ import { applyMixins } from "../../utils";
 
 describe("ResBase", () => {
   class ResBaseTest extends Copyable<ResBaseTest> implements ResBase<"normal", ResBaseTest> {
-    toBaseAPI: (authToken: IAuthToken | null) => IResBaseAPI<"normal">;
-    toBaseDB: <Body extends object>(body: Body) => IResBaseDB<"normal", Body>;
-    cv: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResBaseTest, resUser: User };
-    v: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResBaseTest, resUser: User };
+    toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"normal">;
+    toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"normal", Body>;
+    cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResBaseTest, resUser: User };
+    v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResBaseTest, resUser: User };
 
     readonly type: "normal" = "normal";
 

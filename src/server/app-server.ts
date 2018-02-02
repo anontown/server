@@ -90,7 +90,7 @@ export class AppServer {
 
   constructor(private port: number) {
     this.app = express();
-    this.server = http.createServer(this.app);
+    this.server = http.createServer(this.app as any);
     this.wsServer = new ws.Server({ server: this.server });
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(bodyParser.json());
