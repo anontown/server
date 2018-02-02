@@ -1,9 +1,7 @@
 import {
   TokenGeneral,
   ITokenGeneralDB,
-  ObjectIDGenerator,
-  TokenBase,
-  AtError
+  ObjectIDGenerator
 } from "../../";
 import { ObjectID } from "mongodb";
 import * as Im from "immutable";
