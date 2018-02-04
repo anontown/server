@@ -1,12 +1,29 @@
 import {
   TokenGeneral,
   ITokenGeneralDB,
-  ObjectIDGenerator
+  ObjectIDGenerator,
+  Client,
+  IAuthTokenMaster,
+  TokenBase
 } from "../../";
 import { ObjectID } from "mongodb";
 import * as Im from "immutable";
 
 describe("TokenMaster", () => {
+  const client = new Client(ObjectIDGenerator(),
+    "name",
+    "https://hoge.com",
+    ObjectIDGenerator(),
+    new Date(),
+    new Date());
+
+  const auth: IAuthTokenMaster = {
+    id: ObjectIDGenerator(),
+    key: "key",
+    user: ObjectIDGenerator(),
+    type: "master",
+  };
+
   describe("fromDB", () => {
     it("正常に変換出来るか", () => {
       const db: ITokenGeneralDB = {
@@ -28,5 +45,19 @@ describe("TokenMaster", () => {
       expect(token.client).toBe(db.client.toHexString());
       expect(token.req).toEqual(Im.List(db.req));
     });
+  });
+
+  describe("create", () => {
+    const id = ObjectIDGenerator();
+    const now = new Date();
+    const token = TokenGeneral.create(() => id, auth, client, now, () => "random");
+
+    expect(token.id).toBe(id);
+    expect(token.key).toBe(TokenBase.createTokenKey(() => "random"));
+    expect(token.type).toBe("general");
+    expect(token.user).toBe(auth.user);
+    expect(token.date).toEqual(now);
+    expect(token.client).toBe(client.id);
+    expect(token.req).toEqual(Im.List());
   });
 });
