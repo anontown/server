@@ -24,6 +24,13 @@ describe("TokenMaster", () => {
     type: "master",
   };
 
+  const token = new TokenGeneral(ObjectIDGenerator(),
+    "key",
+    ObjectIDGenerator(),
+    ObjectIDGenerator(),
+    Im.List(),
+    new Date());
+
   describe("fromDB", () => {
     it("正常に変換出来るか", () => {
       const db: ITokenGeneralDB = {
@@ -62,4 +69,16 @@ describe("TokenMaster", () => {
       expect(token.req).toEqual(Im.List());
     });
   });
+
+  describe("toDB", () => {
+    it("正常に変換出来るか", () => {
+      expect(token.toDB()).toEqual({
+        ...token.toBaseDB(),
+        client: new ObjectID(token.client),
+        req: []
+      });
+    });
+  });
+
+
 });
