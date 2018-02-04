@@ -48,16 +48,18 @@ describe("TokenMaster", () => {
   });
 
   describe("create", () => {
-    const id = ObjectIDGenerator();
-    const now = new Date();
-    const token = TokenGeneral.create(() => id, auth, client, now, () => "random");
+    it("正常に作成出来るか", () => {
+      const id = ObjectIDGenerator();
+      const now = new Date();
+      const token = TokenGeneral.create(() => id, auth, client, now, () => "random");
 
-    expect(token.id).toBe(id);
-    expect(token.key).toBe(TokenBase.createTokenKey(() => "random"));
-    expect(token.type).toBe("general");
-    expect(token.user).toBe(auth.user);
-    expect(token.date).toEqual(now);
-    expect(token.client).toBe(client.id);
-    expect(token.req).toEqual(Im.List());
+      expect(token.id).toBe(id);
+      expect(token.key).toBe(TokenBase.createTokenKey(() => "random"));
+      expect(token.type).toBe("general");
+      expect(token.user).toBe(auth.user);
+      expect(token.date).toEqual(now);
+      expect(token.client).toBe(client.id);
+      expect(token.req).toEqual(Im.List());
+    });
   });
 });
