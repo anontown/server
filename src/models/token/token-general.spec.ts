@@ -85,7 +85,7 @@ describe("TokenMaster", () => {
       expect(token.toAPI()).toEqual({
         ...token.toBaseAPI(),
         client: token.client
-      })
+      });
     });
   });
 });
