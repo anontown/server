@@ -80,5 +80,12 @@ describe("TokenMaster", () => {
     });
   });
 
-
+  describe("toAPI", () => {
+    it("正常に変換出来るか", () => {
+      expect(token.toAPI()).toEqual({
+        ...token.toBaseAPI(),
+        client: token.client
+      })
+    });
+  });
 });
