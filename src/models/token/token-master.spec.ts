@@ -1,11 +1,11 @@
+import { ObjectID } from "mongodb";
 import {
-  TokenMaster,
+  AtError,
   ITokenMasterDB,
   ObjectIDGenerator,
   TokenBase,
-  AtError
+  TokenMaster,
 } from "../../";
-import { ObjectID } from "mongodb";
 
 describe("TokenMaster", () => {
   const tokenMaster = new TokenMaster(ObjectIDGenerator(), "key", ObjectIDGenerator(), new Date());
@@ -29,13 +29,12 @@ describe("TokenMaster", () => {
     });
   });
 
-
   describe("create", () => {
     it("正常に生成出来るか", () => {
       const date = new Date();
       const token = TokenMaster.create(() => "token", {
         id: "user",
-        pass: "pass"
+        pass: "pass",
       },
         date,
         () => "key");

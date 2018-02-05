@@ -1,13 +1,13 @@
+import * as Im from "immutable";
+import { ObjectID } from "mongodb";
 import {
-  TokenGeneral,
-  ITokenGeneralDB,
-  ObjectIDGenerator,
   Client,
   IAuthTokenMaster,
-  TokenBase
+  ITokenGeneralDB,
+  ObjectIDGenerator,
+  TokenBase,
+  TokenGeneral,
 } from "../../";
-import { ObjectID } from "mongodb";
-import * as Im from "immutable";
 
 describe("TokenMaster", () => {
   const client = new Client(ObjectIDGenerator(),
@@ -40,7 +40,7 @@ describe("TokenMaster", () => {
         client: new ObjectID(ObjectIDGenerator()),
         user: new ObjectID(ObjectIDGenerator()),
         date: new Date(),
-        req: []
+        req: [],
       };
       const token = TokenGeneral.fromDB(db);
 
@@ -75,7 +75,7 @@ describe("TokenMaster", () => {
       expect(token.toDB()).toEqual({
         ...token.toBaseDB(),
         client: new ObjectID(token.client),
-        req: []
+        req: [],
       });
     });
   });
@@ -84,7 +84,7 @@ describe("TokenMaster", () => {
     it("正常に変換出来るか", () => {
       expect(token.toAPI()).toEqual({
         ...token.toBaseAPI(),
-        client: token.client
+        client: token.client,
       });
     });
   });
