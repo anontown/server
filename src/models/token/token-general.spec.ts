@@ -156,7 +156,7 @@ describe("TokenMaster", () => {
         ])
       }).authReq("a", date);
 
-      expect(authToken).toBe({
+      expect(authToken).toEqual({
         id: token.id,
         key: token.key,
         user: token.user,
