@@ -207,4 +207,23 @@ describe("TokenMaster", () => {
       }).toThrow(AtError);
     });
   });
+
+  describe("auth", () => {
+    it("正常に認証出来るか", () => {
+      const auth = token.auth("key");
+      expect(auth).toEqual({
+        id: token.id,
+        key: token.key,
+        user: token.user,
+        type: "general",
+        client: token.client
+      });
+    });
+
+    it("キーが違う時、認証に失敗するか", () => {
+      expect(() => {
+        token.auth("key2");
+      }).toThrow(AtError);
+    });
+  });
 });
