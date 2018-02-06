@@ -97,9 +97,10 @@ describe("TokenMaster", () => {
       const r = {
         key: TokenBase.createTokenKey(() => "random"),
         expireDate: new Date(300000),
+        active: true
       };
-      expect(req).toEqual(r);
-      expect(newToken).toEqual(token.copy({ req: Im.List([{ ...r, active: true }]) }));
+      expect(req).toEqual({ token: token.id, key: r.key });
+      expect(newToken).toEqual(token.copy({ req: Im.List([r]) }));
     });
 
     it("期限切れのトークンと死んでいるトークンが削除されてるか", () => {
@@ -126,8 +127,9 @@ describe("TokenMaster", () => {
       const r = {
         key: TokenBase.createTokenKey(() => "random"),
         expireDate: new Date(300100),
+        active: true
       };
-      expect(req).toEqual(r);
+      expect(req).toEqual({ token: token.id, key: r.key });
       expect(newToken).toEqual(token.copy({
         req: Im.List([
           {
