@@ -7,6 +7,7 @@ import {
   ObjectIDGenerator,
   TokenBase,
   TokenGeneral,
+  AtError,
 } from "../../";
 
 describe("TokenMaster", () => {
@@ -137,6 +138,70 @@ describe("TokenMaster", () => {
           { ...r, active: true }
         ])
       }));
+    });
+  });
+
+  describe("authReq", () => {
+    it("正常に認証出来るか", () => {
+      const date = new Date(0);
+      const authToken = token.copy({
+        req: Im.List([
+          {
+            key: "a",
+            expireDate: new Date(50),
+            active: true
+          }
+        ])
+      }).authReq("a", date);
+
+      expect(authToken).toBe({
+        id: token.id,
+        key: token.key,
+        user: token.user,
+        type: "general",
+      });
+    });
+
+    it("有効期限切れでエラーになるか", () => {
+      expect(() => {
+        token.copy({
+          req: Im.List([
+            {
+              key: "a",
+              expireDate: new Date(50),
+              active: true
+            }
+          ])
+        }).authReq("a", new Date(100));
+      }).toThrow(AtError);
+    });
+
+    it("死んでいるとエラーになるか", () => {
+      expect(() => {
+        token.copy({
+          req: Im.List([
+            {
+              key: "a",
+              expireDate: new Date(50),
+              active: false
+            }
+          ])
+        }).authReq("a", new Date(0));
+      }).toThrow(AtError);
+    });
+
+    it("トークンが存在しないとエラーに鳴るか", () => {
+      expect(() => {
+        token.copy({
+          req: Im.List([
+            {
+              key: "a",
+              expireDate: new Date(50),
+              active: true
+            }
+          ])
+        }).authReq("b", new Date(0));
+      }).toThrow(AtError);
     });
   });
 });
