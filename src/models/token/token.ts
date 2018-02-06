@@ -218,6 +218,7 @@ export class TokenGeneral extends Copyable<TokenGeneral> implements TokenBase<"g
   }
 
   authReq(key: string, now: Date): IAuthTokenGeneral {
+    //TODO: 自動削除
     const req = this.req.find(x => x.key === key);
     if (req === undefined || !req.active || req.expireDate.getTime() < now.getTime()) {
       throw new AtNotFoundError("トークンリクエストが見つかりません");
