@@ -88,4 +88,55 @@ describe("TokenMaster", () => {
       });
     });
   });
+
+  describe("createReq", () => {
+    it("正常に追加出来るか", () => {
+      const date = new Date(0);
+      const { token: newToken, req } = token.createReq(date, () => "random");
+      const r = {
+        key: TokenBase.createTokenKey(() => "random"),
+        expireDate: new Date(300000),
+      };
+      expect(req).toEqual(r);
+      expect(newToken).toEqual(token.copy({ req: Im.List([{ ...r, active: true }]) }));
+    });
+
+    it("期限切れのトークンと死んでいるトークンが削除されてるか", () => {
+      const date = new Date(100);
+      const { token: newToken, req } = token.copy({
+        req: Im.List([
+          {
+            key: "a",
+            expireDate: new Date(50),
+            active: true
+          },
+          {
+            key: "b",
+            expireDate: new Date(150),
+            active: false
+          },
+          {
+            key: "c",
+            expireDate: new Date(150),
+            active: true
+          },
+        ])
+      }).createReq(date, () => "random");
+      const r = {
+        key: TokenBase.createTokenKey(() => "random"),
+        expireDate: new Date(300100),
+      };
+      expect(req).toEqual(r);
+      expect(newToken).toEqual(token.copy({
+        req: Im.List([
+          {
+            key: "c",
+            expireDate: new Date(150),
+            active: true
+          },
+          { ...r, active: true }
+        ])
+      }));
+    });
+  });
 });
