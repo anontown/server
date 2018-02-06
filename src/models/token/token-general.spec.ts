@@ -161,6 +161,7 @@ describe("TokenMaster", () => {
         key: token.key,
         user: token.user,
         type: "general",
+        client: token.client
       });
     });
 
