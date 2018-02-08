@@ -1,13 +1,13 @@
 import * as Im from "immutable";
 import { ObjectID } from "mongodb";
 import {
+  AtError,
   Client,
   IAuthTokenMaster,
   ITokenGeneralDB,
   ObjectIDGenerator,
   TokenBase,
   TokenGeneral,
-  AtError,
 } from "../../";
 
 describe("TokenMaster", () => {
@@ -97,7 +97,7 @@ describe("TokenMaster", () => {
       const r = {
         key: TokenBase.createTokenKey(() => "random"),
         expireDate: new Date(300000),
-        active: true
+        active: true,
       };
       expect(req).toEqual({ token: token.id, key: r.key });
       expect(newToken).toEqual(token.copy({ req: Im.List([r]) }));
@@ -110,24 +110,24 @@ describe("TokenMaster", () => {
           {
             key: "a",
             expireDate: new Date(50),
-            active: true
+            active: true,
           },
           {
             key: "b",
             expireDate: new Date(150),
-            active: false
+            active: false,
           },
           {
             key: "c",
             expireDate: new Date(150),
-            active: true
+            active: true,
           },
-        ])
+        ]),
       }).createReq(date, () => "random");
       const r = {
         key: TokenBase.createTokenKey(() => "random"),
         expireDate: new Date(300100),
-        active: true
+        active: true,
       };
       expect(req).toEqual({ token: token.id, key: r.key });
       expect(newToken).toEqual(token.copy({
@@ -135,10 +135,10 @@ describe("TokenMaster", () => {
           {
             key: "c",
             expireDate: new Date(150),
-            active: true
+            active: true,
           },
-          { ...r, active: true }
-        ])
+          { ...r, active: true },
+        ]),
       }));
     });
   });
@@ -151,9 +151,9 @@ describe("TokenMaster", () => {
           {
             key: "a",
             expireDate: new Date(50),
-            active: true
-          }
-        ])
+            active: true,
+          },
+        ]),
       }).authReq("a", date);
 
       expect(authToken).toEqual({
@@ -161,7 +161,7 @@ describe("TokenMaster", () => {
         key: token.key,
         user: token.user,
         type: "general",
-        client: token.client
+        client: token.client,
       });
     });
 
@@ -172,9 +172,9 @@ describe("TokenMaster", () => {
             {
               key: "a",
               expireDate: new Date(50),
-              active: true
-            }
-          ])
+              active: true,
+            },
+          ]),
         }).authReq("a", new Date(100));
       }).toThrow(AtError);
     });
@@ -186,9 +186,9 @@ describe("TokenMaster", () => {
             {
               key: "a",
               expireDate: new Date(50),
-              active: false
-            }
-          ])
+              active: false,
+            },
+          ]),
         }).authReq("a", new Date(0));
       }).toThrow(AtError);
     });
@@ -200,9 +200,9 @@ describe("TokenMaster", () => {
             {
               key: "a",
               expireDate: new Date(50),
-              active: true
-            }
-          ])
+              active: true,
+            },
+          ]),
         }).authReq("b", new Date(0));
       }).toThrow(AtError);
     });
@@ -216,7 +216,7 @@ describe("TokenMaster", () => {
         key: token.key,
         user: token.user,
         type: "general",
-        client: token.client
+        client: token.client,
       });
     });
 
