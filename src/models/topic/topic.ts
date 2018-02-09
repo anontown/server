@@ -434,4 +434,4 @@ export class TopicFork extends Copyable<TopicFork> implements TopicBase<"fork", 
     };
   }
 }
-applyMixins(TopicFork, [TopicSearchBase]);
+applyMixins(TopicFork, [TopicBase]);
