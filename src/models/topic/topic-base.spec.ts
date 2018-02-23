@@ -117,4 +117,18 @@ describe("TopicBase", () => {
       });
     });
   });
+
+  describe("toBaseAPI", () => {
+    it("正常に変換出来るか", () => {
+      expect(topicBase.toBaseAPI).toEqual({
+        id: "topic",
+        title: "title",
+        update: new Date(100).toISOString(),
+        date: new Date(0).toISOString(),
+        resCount: 10,
+        type: "normal",
+        active: true,
+      });
+    });
+  });
 });
