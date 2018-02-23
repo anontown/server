@@ -30,6 +30,14 @@ describe("TopicBase", () => {
   }
   applyMixins(TopicBaseTest, [TopicBase]);
 
+  const topicBase = new TopicBaseTest("topic",
+    "title",
+    new Date(100),
+    new Date(0),
+    10,
+    new Date(50),
+    true);
+
   describe("checkData", () => {
     it("正常に動くか", () => {
       TopicBase.checkData({ title: "title", tags: ["a", "b"], body: "body" });
@@ -91,6 +99,22 @@ describe("TopicBase", () => {
       expect(() => {
         TopicBase.checkData({ body: "x".repeat(10001) });
       }).toThrow(AtError);
+    });
+  });
+
+  describe("toBaseDB", () => {
+    it("正常に変換出来るか", () => {
+      expect(topicBase.toBaseDB({})).toEqual({
+        id: "topic",
+        type: "normal",
+        body: {
+          title: "title",
+          update: new Date(100).toISOString(),
+          date: new Date(0).toISOString(),
+          ageUpdate: new Date(50).toISOString(),
+          active: true,
+        },
+      });
     });
   });
 });
