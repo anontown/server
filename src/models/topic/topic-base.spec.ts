@@ -123,7 +123,7 @@ describe("TopicBase", () => {
 
   describe("toBaseAPI", () => {
     it("正常に変換出来るか", () => {
-      expect(topicBase.toBaseAPI).toEqual({
+      expect(topicBase.toBaseAPI()).toEqual({
         id: "topic",
         title: "title",
         update: new Date(100).toISOString(),
