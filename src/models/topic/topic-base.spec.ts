@@ -8,7 +8,7 @@ import {
   Res,
   ITopicBaseDB,
   ResNormal,
-  ResTopic
+  ResTopic,
 } from "../../";
 import * as Im from "immutable";
 
@@ -184,6 +184,61 @@ describe("TopicBase", () => {
       expect(() => {
         topicBase.copy({ active: false }).resUpdate(resNormal)
       }).toThrow(AtError);
+    });
+  });
+
+  describe("hash", () => {
+    const user = new User("user",
+      "sn",
+      "pass",
+      10,
+      {
+        last: new Date(0),
+        m10: 0,
+        m30: 0,
+        h1: 0,
+        h6: 0,
+        h12: 0,
+        d1: 0,
+      },
+      new Date(0),
+      new Date(0),
+      0,
+      new Date(0));
+
+    it("時分秒msだけが違う時同じhashが生成されるか", () => {
+      expect(topicBase.hash(new Date(2000, 11, 6, 12), user))
+        .toBe(topicBase.hash(new Date(2000, 11, 6, 11), user));
+
+      expect(topicBase.hash(new Date(2000, 11, 6, 12, 10), user))
+        .toBe(topicBase.hash(new Date(2000, 11, 6, 12, 11), user));
+
+      expect(topicBase.hash(new Date(2000, 11, 6, 12, 10, 10), user))
+        .toBe(topicBase.hash(new Date(2000, 11, 6, 12, 10, 11), user));
+
+      expect(topicBase.hash(new Date(2000, 11, 6, 12, 10, 10, 100), user))
+        .toBe(topicBase.hash(new Date(2000, 11, 6, 12, 10, 10, 101), user));
+    });
+
+    it("トピックが違う時別のhashが生成されるか", () => {
+      expect(topicBase.hash(new Date(0), user))
+        .not.toBe(topicBase.copy({ id: "topic2" }).hash(new Date(0), user));
+    });
+
+    it("ユーザーが違う時別のhashが生成されるか", () => {
+      expect(topicBase.hash(new Date(0), user))
+        .not.toBe(topicBase.hash(new Date(0), user.copy({ id: "user2" })));
+    });
+
+    it("年月日が違う時別のhashが生成されるか", () => {
+      expect(topicBase.hash(new Date(2000, 11, 6), user))
+        .not.toBe(topicBase.hash(new Date(2000, 11, 7), user));
+
+      expect(topicBase.hash(new Date(2000, 11, 6), user))
+        .not.toBe(topicBase.hash(new Date(2000, 12, 6), user));
+
+      expect(topicBase.hash(new Date(2000, 11, 6), user))
+        .not.toBe(topicBase.hash(new Date(2001, 11, 6), user));
     });
   });
 });
