@@ -6,8 +6,11 @@ import {
   ITopicBaseAPI,
   User,
   Res,
-  ITopicBaseDB
+  ITopicBaseDB,
+  ResNormal,
+  ResTopic
 } from "../../";
+import * as Im from "immutable";
 
 describe("TopicBase", () => {
   class TopicBaseTest extends Copyable<TopicBaseTest> implements TopicBase<"normal", TopicBaseTest> {
@@ -129,6 +132,58 @@ describe("TopicBase", () => {
         type: "normal",
         active: true,
       });
+    });
+  });
+
+  describe("resUpdate", () => {
+    const resNormal = new ResNormal(null,
+      "body",
+      null,
+      "active",
+      null,
+      true,
+      "res",
+      "topic",
+      new Date(200),
+      "user",
+      Im.List(),
+      10,
+      "hash",
+      0);
+
+    const resTopic = new ResTopic("res",
+      "topic",
+      new Date(200),
+      "user",
+      Im.List(),
+      10,
+      "hash",
+      10);
+    it("ageの時正常に呼び出せるか", () => {
+      expect(topicBase.resUpdate(resNormal)).toEqual(topicBase.copy({
+        update: new Date(200),
+        ageUpdate: new Date(200)
+      }));
+    });
+
+    it("ResNormalかつageでない時正常に呼び出せるか", () => {
+      expect(topicBase.resUpdate(resNormal.copy({ age: false }))).toEqual(topicBase.copy({
+        update: new Date(200),
+        ageUpdate: new Date(50)
+      }));
+    });
+
+    it("ResNormalでない時正常に呼び出されるか", () => {
+      expect(topicBase.resUpdate(resTopic)).toEqual(topicBase.copy({
+        update: new Date(200),
+        ageUpdate: new Date(50)
+      }));
+    });
+
+    it("Topicが死んでいる時エラーになるか", () => {
+      expect(() => {
+        topicBase.copy({ active: false }).resUpdate(resNormal)
+      }).toThrow(AtError);
     });
   });
 });
