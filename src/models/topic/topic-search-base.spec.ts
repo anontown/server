@@ -1,17 +1,12 @@
 import * as Im from "immutable";
-import Copyable, { PartialMap } from "ts-copyable";
+import Copyable from "ts-copyable";
 import {
   applyMixins,
-  AtError,
-  IGenerator,
   ITopicBaseAPI,
   ITopicBaseDB,
   ITopicSearchBaseAPI,
   ITopicSearchBaseDB,
   Res,
-  ResNormal,
-  ResTopic,
-  TopicBase,
   TopicSearchBase,
   User,
 } from "../../";
