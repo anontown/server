@@ -22,7 +22,7 @@ describe("ResNormal", () => {
     true,
     "res",
     "topic",
-    new Date(),
+    new Date(60),
     "user",
     Im.List(),
     5,
@@ -34,10 +34,10 @@ describe("ResNormal", () => {
     "title",
     Im.List(),
     "body",
-    new Date(),
-    new Date(),
+    new Date(40),
+    new Date(30),
     10,
-    new Date(),
+    new Date(50),
     true,
   );
 
@@ -47,7 +47,7 @@ describe("ResNormal", () => {
     "pass",
     1,
     {
-      last: new Date(0),
+      last: new Date(20),
       m10: 0,
       m30: 0,
       h1: 0,
@@ -55,10 +55,10 @@ describe("ResNormal", () => {
       h12: 0,
       d1: 0,
     },
-    new Date(),
-    new Date(),
+    new Date(10),
+    new Date(0),
     0,
-    new Date());
+    new Date(15));
 
   const token: IAuthToken = {
     id: "token",
@@ -72,8 +72,8 @@ describe("ResNormal", () => {
     "user",
     "name",
     "body",
-    new Date(),
-    new Date(),
+    new Date(94),
+    new Date(95),
     "sn");
 
   describe("fromDB", () => {
@@ -83,7 +83,7 @@ describe("ResNormal", () => {
         type: "normal",
         body: {
           topic: "topic",
-          date: new Date().toISOString(),
+          date: new Date(100).toISOString(),
           user: "user",
           vote: [],
           lv: 10,
@@ -122,7 +122,7 @@ describe("ResNormal", () => {
 
   describe("create", () => {
     it("正常に作れるか", () => {
-      const date = new Date();
+      const date = new Date(100);
       const { res, user: newUser, topic: newTopic } = ResNormal.create(
         () => "res",
         topicNormal,
@@ -165,7 +165,7 @@ describe("ResNormal", () => {
     });
 
     it("replyがnullでない時正常に作れるか", () => {
-      const date = new Date();
+      const date = new Date(100);
       const { res } = ResNormal.create(
         () => "res",
         topicNormal,
@@ -182,7 +182,7 @@ describe("ResNormal", () => {
     });
 
     it("profileがnullでない時正常に作れるか", () => {
-      const date = new Date();
+      const date = new Date(100);
       const { res } = ResNormal.create(
         () => "res",
         topicNormal,
@@ -210,7 +210,7 @@ describe("ResNormal", () => {
           resNormal.copy({ id: "res2", user: "res2", topic: "topic2" }),
           null,
           true,
-          new Date());
+          new Date(100));
       }).toThrow(AtError);
     });
 
@@ -226,7 +226,7 @@ describe("ResNormal", () => {
           null,
           profile.copy({ user: "user2" }),
           true,
-          new Date());
+          new Date(100));
       }).toThrow(AtError);
     });
 
@@ -243,7 +243,7 @@ describe("ResNormal", () => {
             null,
             null,
             true,
-            new Date());
+            new Date(100));
         }).toThrow(AtError);
       }
     });
@@ -262,7 +262,7 @@ describe("ResNormal", () => {
               null,
               null,
               true,
-              new Date());
+              new Date(100));
           }).toThrow(AtError);
         }
       });
