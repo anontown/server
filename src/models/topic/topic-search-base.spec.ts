@@ -42,4 +42,33 @@ describe("TopicSearchBase", () => {
     }
   }
   applyMixins(TopicSearchBaseTest, [TopicSearchBase]);
+
+  const topic = new TopicSearchBaseTest("topic",
+    "title",
+    Im.List(),
+    "body",
+    new Date(100),
+    new Date(0),
+    10,
+    new Date(50),
+    true);
+
+  describe("toDB", () => {
+    it("正常に変換出来るか", () => {
+      expect(topic.toDB()).toEqual(topic.toBaseDB({
+        tags: Im.List(),
+        body: "body",
+      }));
+    });
+  });
+
+  describe("toAPI", () => {
+    it("正常に変換出来るか", () => {
+      expect(topic.toAPI()).toEqual({
+        ...topic.toBaseAPI(),
+        tags: [],
+        body: "body,
+      });
+    });
+  });
 });
