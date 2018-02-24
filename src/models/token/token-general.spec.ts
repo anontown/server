@@ -15,8 +15,8 @@ describe("TokenMaster", () => {
     "name",
     "https://hoge.com",
     ObjectIDGenerator(),
-    new Date(),
-    new Date());
+    new Date(100),
+    new Date(200));
 
   const auth: IAuthTokenMaster = {
     id: ObjectIDGenerator(),
@@ -30,7 +30,7 @@ describe("TokenMaster", () => {
     ObjectIDGenerator(),
     ObjectIDGenerator(),
     Im.List(),
-    new Date());
+    new Date(300));
 
   describe("fromDB", () => {
     it("正常に変換出来るか", () => {
@@ -40,7 +40,7 @@ describe("TokenMaster", () => {
         type: "general",
         client: new ObjectID(ObjectIDGenerator()),
         user: new ObjectID(ObjectIDGenerator()),
-        date: new Date(),
+        date: new Date(500),
         req: [],
       };
       const token = TokenGeneral.fromDB(db);
@@ -58,7 +58,7 @@ describe("TokenMaster", () => {
   describe("create", () => {
     it("正常に作成出来るか", () => {
       const id = ObjectIDGenerator();
-      const now = new Date();
+      const now = new Date(500);
       const token = TokenGeneral.create(() => id, auth, client, now, () => "random");
 
       expect(token.id).toBe(id);
