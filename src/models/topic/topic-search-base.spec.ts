@@ -56,7 +56,7 @@ describe("TopicSearchBase", () => {
   describe("toDB", () => {
     it("正常に変換出来るか", () => {
       expect(topic.toDB()).toEqual(topic.toBaseDB({
-        tags: Im.List(),
+        tags: [],
         body: "body",
       }));
     });
