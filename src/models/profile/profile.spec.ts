@@ -12,8 +12,8 @@ describe("Profile", () => {
       user: new ObjectID(),
       name: "名前",
       body: "本文",
-      date: new Date(),
-      update: new Date(),
+      date: new Date(0),
+      update: new Date(100),
       sn: "sn",
     });
     describe("#toDB", () => {
@@ -72,7 +72,7 @@ describe("Profile", () => {
     it("正常に作れるか", () => {
       const user = new ObjectID().toString();
       const id = new ObjectID().toString();
-      const date = new Date();
+      const date = new Date(0);
       const profile = Profile.create(() => id, {
         type: "master",
         user,

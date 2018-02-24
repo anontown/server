@@ -14,10 +14,10 @@ describe("ResHistory", () => {
     "title",
     Im.List(),
     "body",
-    new Date(),
-    new Date(),
+    new Date(100),
+    new Date(0),
     10,
-    new Date(),
+    new Date(50),
     true,
   );
 
@@ -27,7 +27,7 @@ describe("ResHistory", () => {
     "pass",
     1,
     {
-      last: new Date(0),
+      last: new Date(300),
       m10: 0,
       m30: 0,
       h1: 0,
@@ -35,10 +35,10 @@ describe("ResHistory", () => {
       h12: 0,
       d1: 0,
     },
-    new Date(),
-    new Date(),
+    new Date(240),
+    new Date(200),
     0,
-    new Date());
+    new Date(260));
 
   const token: IAuthToken = {
     id: "token",
@@ -53,11 +53,11 @@ describe("ResHistory", () => {
     "title",
     Im.List(),
     "body",
-    new Date(),
+    new Date(600),
     "hash",
     "user");
 
-  const resHistory = new ResHistory("history", "res", "topic", new Date(), "user", Im.List(), 5, "hash", 1);
+  const resHistory = new ResHistory("history", "res", "topic", new Date(700), "user", Im.List(), 5, "hash", 1);
 
   describe("fromDB", () => {
     it("正常に作れるか", () => {
@@ -66,7 +66,7 @@ describe("ResHistory", () => {
         type: "history",
         body: {
           topic: "topic",
-          date: new Date().toISOString(),
+          date: new Date(1000).toISOString(),
           user: "user",
           vote: [],
           lv: 5,
@@ -93,7 +93,7 @@ describe("ResHistory", () => {
 
   describe("create", () => {
     it("正常に作れるか", () => {
-      const date = new Date();
+      const date = new Date(1000);
       const { res, topic: newTopic } = ResHistory.create(
         () => "res",
         topicNormal,

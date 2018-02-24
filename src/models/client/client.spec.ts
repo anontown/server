@@ -9,7 +9,6 @@ import {
 describe("Client", () => {
   describe("create", () => {
     it("http:// から始まるURLで正常に呼び出せるか", () => {
-      const now = new Date();
       const client = Client.create(
         () => "client",
         {
@@ -20,15 +19,15 @@ describe("Client", () => {
         },
         "hoge",
         "http://hoge.com",
-        now,
+        new Date(0),
       );
 
       expect(client.id).toBe("client");
       expect(client.name).toBe("hoge");
       expect(client.url).toBe("http://hoge.com");
       expect(client.user).toBe("user");
-      expect(client.date).toEqual(now);
-      expect(client.update).toEqual(now);
+      expect(client.date).toEqual(new Date(0));
+      expect(client.update).toEqual(new Date(0));
     });
 
     it("https:// から始まるURLで正常に呼び出せるか", () => {
@@ -42,7 +41,7 @@ describe("Client", () => {
         },
         "hoge",
         "https://hoge.com",
-        new Date(),
+        new Date(0),
       );
 
       expect(client.url).toBe("https://hoge.com");
@@ -60,7 +59,7 @@ describe("Client", () => {
           },
           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
           "http://hoge",
-          new Date(),
+          new Date(0),
         );
       }).toThrow(AtError);
     });
@@ -77,7 +76,7 @@ describe("Client", () => {
           },
           "",
           "http://hoge",
-          new Date(),
+          new Date(0),
         );
       }).toThrow(AtError);
     });
@@ -94,7 +93,7 @@ describe("Client", () => {
           },
           "hoge",
           "hogehttp://hoge.com",
-          new Date(),
+          new Date(0),
         );
       }).toThrow(AtError);
     });
@@ -111,7 +110,7 @@ describe("Client", () => {
           },
           "http://",
           "",
-          new Date(),
+          new Date(0),
         );
       }).toThrow(AtError);
     });
@@ -128,7 +127,7 @@ describe("Client", () => {
           },
           "hoge",
           "",
-          new Date(),
+          new Date(0),
         );
       }).toThrow(AtError);
     });
@@ -141,8 +140,8 @@ describe("Client", () => {
         name: "name",
         url: "https://hoge.com",
         user: new ObjectID(),
-        date: new Date(),
-        update: new Date(),
+        date: new Date(0),
+        update: new Date(100),
       };
 
       const client = Client.fromDB(db);
@@ -165,8 +164,8 @@ describe("Client", () => {
         type: "master",
       };
 
-      const date = new Date();
-      const update = new Date(date.valueOf() + 1000);
+      const date = new Date(0);
+      const update = new Date(100);
 
       const client = Client.create(() => "client",
         auth,
@@ -197,14 +196,14 @@ describe("Client", () => {
           auth,
           "hoge",
           "http://hoge",
-          new Date());
+          new Date(0));
 
         client.changeData({
           id: ObjectIDGenerator(),
           key: "",
           user: ObjectIDGenerator(),
           type: "master",
-        }, "foo", "http://foo", new Date());
+        }, "foo", "http://foo", new Date(100));
       }).toThrow(AtError);
     });
 
@@ -221,9 +220,9 @@ describe("Client", () => {
           auth,
           "hoge",
           "http://hoge",
-          new Date());
+          new Date(0));
 
-        client.changeData(auth, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "http://foo", new Date());
+        client.changeData(auth, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "http://foo", new Date(100));
       }).toThrow(AtError);
     });
 
@@ -240,9 +239,9 @@ describe("Client", () => {
           auth,
           "hoge",
           "hogehttp://hoge",
-          new Date());
+          new Date(0));
 
-        client.changeData(auth, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "http://foo", new Date());
+        client.changeData(auth, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "http://foo", new Date(100));
       }).toThrow(AtError);
     });
   });
@@ -253,8 +252,8 @@ describe("Client", () => {
       name: "name",
       url: "https://hoge.com",
       user: new ObjectID(),
-      date: new Date(),
-      update: new Date(),
+      date: new Date(0),
+      update: new Date(100),
     });
 
     describe("#toAPI", () => {

@@ -13,7 +13,7 @@ describe("Msg", () => {
       body: {
         receiver: "user",
         body: "あいうえお",
-        date: new Date().toISOString(),
+        date: new Date(0).toISOString(),
       },
     });
 
@@ -22,7 +22,7 @@ describe("Msg", () => {
       body: {
         receiver: null,
         body: "あいうえお",
-        date: new Date().toISOString(),
+        date: new Date(0).toISOString(),
       },
     });
 
@@ -83,7 +83,7 @@ describe("Msg", () => {
         body: {
           receiver: ObjectIDGenerator(),
           body: "a",
-          date: new Date().toISOString(),
+          date: new Date(0).toISOString(),
         },
       };
 
@@ -98,7 +98,7 @@ describe("Msg", () => {
 
   describe("create", () => {
     it("receiverがnullの時正常に生成できるか", () => {
-      const date = new Date();
+      const date = new Date(0);
       const msg = Msg.create(() => "msg", null, "hoge", date);
 
       expect(msg.id).toBe("msg");
@@ -108,13 +108,13 @@ describe("Msg", () => {
     });
 
     it("receiverがnullでない時正常に生成出来るか", () => {
-      const date = new Date();
+      const date = new Date(0);
       const user = new User(
         "user",
         "sn",
         "pass",
         1, {
-          last: new Date(),
+          last: new Date(100),
           m10: 0,
           m30: 0,
           h1: 0,
@@ -122,10 +122,10 @@ describe("Msg", () => {
           h12: 0,
           d1: 0,
         },
-        new Date(),
-        new Date(),
+        new Date(200),
+        new Date(20),
         0,
-        new Date());
+        new Date(250));
       const msg = Msg.create(() => "msg", user, "hoge", date);
       expect(msg.receiver).toBe("user");
     });

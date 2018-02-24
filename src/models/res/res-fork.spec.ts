@@ -14,19 +14,19 @@ describe("ResFork", () => {
     "title",
     Im.List(),
     "body",
-    new Date(),
-    new Date(),
+    new Date(100),
+    new Date(0),
     10,
-    new Date(),
+    new Date(50),
     true,
   );
 
   const topicFork = new TopicFork("topicfork",
     "title",
-    new Date(),
-    new Date(),
+    new Date(0),
+    new Date(100),
     30,
-    new Date(),
+    new Date(50),
     true,
     "topic");
 
@@ -44,10 +44,10 @@ describe("ResFork", () => {
       h12: 0,
       d1: 0,
     },
-    new Date(),
-    new Date(),
+    new Date(20),
+    new Date(10),
     0,
-    new Date());
+    new Date(30));
 
   const token: IAuthToken = {
     id: "token",
@@ -59,7 +59,7 @@ describe("ResFork", () => {
   const resFork = new ResFork("topicfork",
     "res",
     "topic",
-    new Date(),
+    new Date(500),
     "user",
     Im.List(),
     5,
@@ -73,7 +73,7 @@ describe("ResFork", () => {
         type: "fork",
         body: {
           topic: "topic",
-          date: new Date().toISOString(),
+          date: new Date(400).toISOString(),
           user: "user",
           vote: [],
           lv: 5,
@@ -100,7 +100,7 @@ describe("ResFork", () => {
 
   describe("create", () => {
     it("正常に作れるか", () => {
-      const date = new Date();
+      const date = new Date(90);
       const { res, topic } = ResFork.create(() => "res", topicNormal, user, token, topicFork, date);
 
       expect(res.type).toBe("fork");

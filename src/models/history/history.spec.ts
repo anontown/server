@@ -18,7 +18,7 @@ describe("History", () => {
                     title: "title",
                     tags: ["a", "b"],
                     body: "body",
-                    date: new Date().toISOString(),
+                    date: new Date(0).toISOString(),
                     hash: "hogehogehogeaaa",
                     user: ObjectIDGenerator(),
                 },
@@ -46,9 +46,9 @@ describe("History", () => {
                     title: "title",
                     tags: ["a"],
                     body: "body",
-                    update: new Date().toISOString(),
-                    date: new Date().toISOString(),
-                    ageUpdate: new Date().toISOString(),
+                    update: new Date(100).toISOString(),
+                    date: new Date(0).toISOString(),
+                    ageUpdate: new Date(50).toISOString(),
                     active: true,
                 },
             }, 10);
@@ -59,7 +59,7 @@ describe("History", () => {
                 pass: "pass",
                 lv: 1,
                 resWait: {
-                    last: new Date(),
+                    last: new Date(200),
                     m10: 0,
                     m30: 0,
                     h1: 0,
@@ -67,13 +67,13 @@ describe("History", () => {
                     h12: 0,
                     d1: 0,
                 },
-                lastTopic: new Date(),
-                date: new Date(),
+                lastTopic: new Date(80),
+                date: new Date(20),
                 point: 0,
-                lastOneTopic: new Date(),
+                lastOneTopic: new Date(90),
             });
 
-            const date = new Date();
+            const date = new Date(300);
             const hash = "hash";
             const h = History.create(ObjectIDGenerator, t, date, hash, u);
 
@@ -95,7 +95,7 @@ describe("History", () => {
                 title: "title",
                 tags: ["a", "b"],
                 body: "body",
-                date: new Date().toISOString(),
+                date: new Date(0).toISOString(),
                 hash: "hogehogehogeaaa",
                 user: ObjectIDGenerator(),
             },

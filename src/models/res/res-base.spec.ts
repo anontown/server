@@ -40,7 +40,7 @@ describe("ResBase", () => {
     "pass",
     1,
     {
-      last: new Date(),
+      last: new Date(100),
       m10: 0,
       m30: 0,
       h1: 0,
@@ -48,10 +48,10 @@ describe("ResBase", () => {
       h12: 0,
       d1: 0,
     },
-    new Date(),
-    new Date(),
+    new Date(300),
+    new Date(10),
     0,
-    new Date());
+    new Date(200));
 
   const token: IAuthToken = {
     id: "token",
@@ -62,7 +62,7 @@ describe("ResBase", () => {
 
   const res = new ResBaseTest("id",
     "topic",
-    new Date(),
+    new Date(0),
     "user",
     Im.List(),
     1,
