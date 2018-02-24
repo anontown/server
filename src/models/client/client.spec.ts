@@ -9,7 +9,7 @@ import {
 describe("Client", () => {
   describe("create", () => {
     it("http:// から始まるURLで正常に呼び出せるか", () => {
-      const client = Client.create(
+      expect(Client.create(
         () => "client",
         {
           id: "token",
@@ -20,19 +20,17 @@ describe("Client", () => {
         "hoge",
         "http://hoge.com",
         new Date(0),
-      );
-
-      expect(client.id).toBe("client");
-      expect(client.name).toBe("hoge");
-      expect(client.url).toBe("http://hoge.com");
-      expect(client.user).toBe("user");
-      expect(client.date).toEqual(new Date(0));
-      expect(client.update).toEqual(new Date(0));
+      )).toEqual(new Client("client",
+        "hoge",
+        "http://hoge.com",
+        "user",
+        new Date(0),
+        new Date(0)));
     });
 
     it("https:// から始まるURLで正常に呼び出せるか", () => {
-      const client = Client.create(
-        ObjectIDGenerator,
+      expect(Client.create(
+        () => "client",
         {
           id: ObjectIDGenerator(),
           key: "",
@@ -42,9 +40,12 @@ describe("Client", () => {
         "hoge",
         "https://hoge.com",
         new Date(0),
-      );
-
-      expect(client.url).toBe("https://hoge.com");
+      )).toEqual(new Client("client",
+        "hoge",
+        "https://hoge.com",
+        "user",
+        new Date(0),
+        new Date(0)));
     });
 
     it("長い名前でエラーになるか", () => {
@@ -135,59 +136,58 @@ describe("Client", () => {
 
   describe("fromDB", () => {
     it("正常にインスタンス化出来るか", () => {
-      const db = {
-        _id: new ObjectID(),
+      const clientID = ObjectIDGenerator();
+      const userID = ObjectIDGenerator();
+      expect(Client.fromDB({
+        _id: new ObjectID(clientID),
         name: "name",
         url: "https://hoge.com",
-        user: new ObjectID(),
+        user: new ObjectID(userID),
         date: new Date(0),
         update: new Date(100),
-      };
-
-      const client = Client.fromDB(db);
-
-      expect(client.id).toBe(db._id.toHexString());
-      expect(client.name).toBe(db.name);
-      expect(client.url).toBe(db.url);
-      expect(client.user).toBe(db.user.toHexString());
-      expect(client.date).toEqual(db.date);
-      expect(client.update).toEqual(db.update);
+      })).toEqual(new Client(clientID,
+        "name",
+        "https://hoge.com",
+        userID,
+        new Date(0),
+        new Date(100)));
     });
   });
 
+  const clientID = ObjectIDGenerator();
+  const userID = ObjectIDGenerator();
+  const client = new Client(clientID,
+    "name",
+    "http://hoge.com",
+    userID,
+    new Date(0),
+    new Date(100));
+
+  const auth: IAuthTokenMaster = {
+    id: "token",
+    key: "key",
+    user: userID,
+    type: "master",
+  };
+
   describe("#changeData", () => {
     it("正常に変更できるか", () => {
-      const auth: IAuthTokenMaster = {
-        id: "token",
-        key: "",
-        user: "user",
-        type: "master",
-      };
-
-      const date = new Date(0);
-      const update = new Date(100);
-
-      const client = Client.create(() => "client",
-        auth,
-        "a",
-        "https://a",
-        date);
-
-      const newClient = client.changeData(auth, "name", "http://hoge", update);
-
-      expect(newClient.id).toBe("client");
-      expect(newClient.name).toBe("name");
-      expect(newClient.url).toBe("http://hoge");
-      expect(newClient.user).toBe("user");
-      expect(newClient.date).toEqual(date);
-      expect(newClient.update).toEqual(update);
+      expect(client.changeData(auth,
+        "name2",
+        "http://hoge2.com",
+        new Date(200))).toEqual(new Client(clientID,
+          "name2",
+          "http://hoge2.com",
+          userID,
+          new Date(0),
+          new Date(200)));
     });
 
     it("違うユーザーが変更しようとしたらエラーになるか", () => {
       expect(() => {
         const auth: IAuthTokenMaster = {
-          id: ObjectIDGenerator(),
-          key: "",
+          id: "token",
+          key: "key",
           user: ObjectIDGenerator(),
           type: "master",
         };
@@ -246,62 +246,54 @@ describe("Client", () => {
     });
   });
 
-  {
-    const client = Client.fromDB({
-      _id: new ObjectID(),
-      name: "name",
-      url: "https://hoge.com",
-      user: new ObjectID(),
-      date: new Date(0),
-      update: new Date(100),
-    });
-
-    describe("#toAPI", () => {
-      it("認証あり(同一ユーザー)", () => {
-        const api = client.toAPI({
-          id: ObjectIDGenerator(),
-          key: "",
-          user: client.user,
-          type: "master",
-        });
-
-        expect(api.id).toBe(client.id);
-        expect(api.name).toBe(client.name);
-        expect(api.url).toBe(client.url);
-        expect(api.user).toBe(client.user);
-        expect(api.date).toEqual(client.date.toISOString());
-        expect(api.update).toEqual(client.update.toISOString());
-      });
-
-      it("認証あり(別ユーザー)", () => {
-        const api = client.toAPI({
-          id: ObjectIDGenerator(),
-          key: "",
-          user: ObjectIDGenerator(),
-          type: "master",
-        });
-
-        expect(api.user).toBeNull();
-      });
-
-      it("認証無し", () => {
-        const api = client.toAPI(null);
-
-        expect(api.user).toBeNull();
+  describe("#toAPI", () => {
+    it("認証あり(同一ユーザー)", () => {
+      expect(client.toAPI(auth)).toEqual({
+        id: clientID,
+        name: "name",
+        url: "http://hoge.com",
+        user: userID,
+        date: new Date(0).toISOString(),
+        update: new Date(100).toISOString()
       });
     });
 
-    describe("#toDB", () => {
-      it("正常に出力できるか", () => {
-        const db = client.toDB();
-
-        expect(db._id).toEqual(new ObjectID(client.id));
-        expect(db.name).toBe(client.name);
-        expect(db.url).toBe(client.url);
-        expect(db.user).toEqual(new ObjectID(client.user));
-        expect(db.date).toEqual(client.date);
-        expect(db.update).toEqual(client.update);
+    it("認証あり(別ユーザー)", () => {
+      expect(client.toAPI({
+        ...auth,
+        user: ObjectIDGenerator()
+      })).toEqual({
+        id: clientID,
+        name: "name",
+        url: "http://hoge.com",
+        user: null,
+        date: new Date(0).toISOString(),
+        update: new Date(100).toISOString()
       });
     });
-  }
+
+    it("認証無し", () => {
+      expect(client.toAPI(null)).toEqual({
+        id: clientID,
+        name: "name",
+        url: "http://hoge.com",
+        user: null,
+        date: new Date(0).toISOString(),
+        update: new Date(100).toISOString()
+      });
+    });
+  });
+
+  describe("#toDB", () => {
+    it("正常に出力できるか", () => {
+      expect(client.toDB()).toEqual({
+        _id: new ObjectID(clientID),
+        name: "name",
+        url: "http://hoge.com",
+        user: new ObjectID(userID),
+        date: new Date(0),
+        update: new Date(100)
+      });
+    });
+  });
 });
