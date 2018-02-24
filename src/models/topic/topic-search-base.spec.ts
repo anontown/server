@@ -67,7 +67,7 @@ describe("TopicSearchBase", () => {
       expect(topic.toAPI()).toEqual({
         ...topic.toBaseAPI(),
         tags: [],
-        body: "body,
+        body: "body",
       });
     });
   });
