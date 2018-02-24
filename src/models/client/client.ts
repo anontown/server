@@ -86,7 +86,7 @@ export class Client extends Copyable<Client> {
       url: this.url,
       user: authToken !== null && authToken.user === this.user ? this.user : null,
       date: this.date.toISOString(),
-      update: this.date.toISOString(),
+      update: this.update.toISOString(),
     };
   }
 
