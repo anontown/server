@@ -8,7 +8,7 @@ import {
 } from "../../";
 
 describe("TokenMaster", () => {
-  const tokenMaster = new TokenMaster(ObjectIDGenerator(), "key", ObjectIDGenerator(), new Date());
+  const tokenMaster = new TokenMaster(ObjectIDGenerator(), "key", ObjectIDGenerator(), new Date(0));
 
   describe("fromDB", () => {
     it("正常に変換出来るか", () => {
@@ -17,7 +17,7 @@ describe("TokenMaster", () => {
         key: "key",
         type: "master",
         user: new ObjectID(ObjectIDGenerator()),
-        date: new Date(),
+        date: new Date(100),
       };
       const token = TokenMaster.fromDB(db);
 
@@ -31,7 +31,7 @@ describe("TokenMaster", () => {
 
   describe("create", () => {
     it("正常に生成出来るか", () => {
-      const date = new Date();
+      const date = new Date(100);
       const token = TokenMaster.create(() => "token", {
         id: "user",
         pass: "pass",
