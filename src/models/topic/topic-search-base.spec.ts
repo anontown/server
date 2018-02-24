@@ -1,24 +1,25 @@
 import * as Im from "immutable";
 import Copyable, { PartialMap } from "ts-copyable";
 import {
-  AtError,
-  TopicBase,
   applyMixins,
+  AtError,
+  IGenerator,
   ITopicBaseAPI,
-  User,
-  Res,
   ITopicBaseDB,
+  ITopicSearchBaseAPI,
+  ITopicSearchBaseDB,
+  Res,
   ResNormal,
   ResTopic,
-  IGenerator,
+  TopicBase,
   TopicSearchBase,
-  ITopicSearchBaseAPI,
-  ITopicSearchBaseDB
+  User,
 } from "../../";
 
-
 describe("TopicSearchBase", () => {
-  class TopicSearchBaseTest extends Copyable<TopicSearchBaseTest> implements TopicSearchBase<"normal", TopicSearchBaseTest> {
+  class TopicSearchBaseTest
+    extends Copyable<TopicSearchBaseTest>
+    implements TopicSearchBase<"normal", TopicSearchBaseTest> {
     readonly type: "normal" = "normal";
 
     toBaseAPI!: () => ITopicBaseAPI<"normal">;

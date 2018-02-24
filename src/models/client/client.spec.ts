@@ -254,21 +254,21 @@ describe("Client", () => {
         url: "http://hoge.com",
         user: userID,
         date: new Date(0).toISOString(),
-        update: new Date(100).toISOString()
+        update: new Date(100).toISOString(),
       });
     });
 
     it("認証あり(別ユーザー)", () => {
       expect(client.toAPI({
         ...auth,
-        user: ObjectIDGenerator()
+        user: ObjectIDGenerator(),
       })).toEqual({
         id: clientID,
         name: "name",
         url: "http://hoge.com",
         user: null,
         date: new Date(0).toISOString(),
-        update: new Date(100).toISOString()
+        update: new Date(100).toISOString(),
       });
     });
 
@@ -279,7 +279,7 @@ describe("Client", () => {
         url: "http://hoge.com",
         user: null,
         date: new Date(0).toISOString(),
-        update: new Date(100).toISOString()
+        update: new Date(100).toISOString(),
       });
     });
   });
@@ -292,7 +292,7 @@ describe("Client", () => {
         url: "http://hoge.com",
         user: new ObjectID(userID),
         date: new Date(0),
-        update: new Date(100)
+        update: new Date(100),
       });
     });
   });

@@ -95,8 +95,8 @@ describe("History", () => {
             body: "body",
             date: new Date(0).toISOString(),
             hash: "hash",
-            user: "user"
-          }
+            user: "user",
+          },
         });
       });
     });
@@ -110,7 +110,7 @@ describe("History", () => {
           tags: ["x"],
           body: "body",
           date: new Date(0).toISOString(),
-          hash: "hash"
+          hash: "hash",
         });
       });
     });
