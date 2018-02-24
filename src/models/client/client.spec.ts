@@ -32,9 +32,9 @@ describe("Client", () => {
       expect(Client.create(
         () => "client",
         {
-          id: ObjectIDGenerator(),
+          id: "token",
           key: "",
-          user: ObjectIDGenerator(),
+          user: "user",
           type: "master",
         },
         "hoge",
