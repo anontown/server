@@ -33,7 +33,7 @@ describe("TokenBase", () => {
 
   describe("toBaseDB", () => {
     it("正常に変換できるか", () => {
-      const token = new TokenBaseTest(ObjectIDGenerator(), "key", ObjectIDGenerator(), new Date());
+      const token = new TokenBaseTest(ObjectIDGenerator(), "key", ObjectIDGenerator(), new Date(0));
       expect(token.toBaseDB()).toEqual({
         _id: new ObjectID(token.id),
         key: token.key,
@@ -45,7 +45,7 @@ describe("TokenBase", () => {
   });
 
   describe("toBaseAPI", () => {
-    const token = new TokenBaseTest("token", "key", "user", new Date());
+    const token = new TokenBaseTest("token", "key", "user", new Date(0));
     expect(token.toBaseAPI()).toEqual({
       id: token.id,
       key: token.key,
