@@ -1,9 +1,6 @@
 import * as Im from "immutable";
-import { ObjectID } from "mongodb";
 import {
   History,
-  IHistoryDB,
-  ObjectIDGenerator,
   TopicNormal,
   User,
 } from "../../";
