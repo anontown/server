@@ -1,8 +1,8 @@
 import {
   AtError,
+  IAuthTokenMaster,
   Msg,
   User,
-  IAuthTokenMaster
 } from "../../";
 
 describe("Msg", () => {
@@ -22,8 +22,8 @@ describe("Msg", () => {
         body: {
           receiver: "user",
           body: "body",
-          date: new Date(0).toISOString()
-        }
+          date: new Date(0).toISOString(),
+        },
       });
     });
   });
@@ -34,7 +34,7 @@ describe("Msg", () => {
         id: "msg",
         receiver: "user",
         body: "body",
-        date: new Date(0).toISOString()
+        date: new Date(0).toISOString(),
       });
     });
 
@@ -43,7 +43,7 @@ describe("Msg", () => {
         id: "msg",
         receiver: null,
         body: "body",
-        date: new Date(0).toISOString()
+        date: new Date(0).toISOString(),
       });
     });
 
@@ -61,8 +61,8 @@ describe("Msg", () => {
         body: {
           receiver: "user",
           body: "body",
-          date: new Date(0).toISOString()
-        }
+          date: new Date(0).toISOString(),
+        },
       })).toEqual(msg);
     });
   });

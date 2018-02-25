@@ -1,9 +1,9 @@
 import { ObjectID } from "mongodb";
 
 import {
+  IAuthTokenMaster,
   ObjectIDGenerator,
   Profile,
-  IAuthTokenMaster
 } from "../../";
 
 describe("Profile", () => {
@@ -33,7 +33,7 @@ describe("Profile", () => {
         body: "body",
         date: new Date(0),
         update: new Date(100),
-        sn: "sn"
+        sn: "sn",
       });
     });
   });
@@ -47,14 +47,14 @@ describe("Profile", () => {
         body: "body",
         date: new Date(0).toISOString(),
         update: new Date(100).toISOString(),
-        sn: "sn"
+        sn: "sn",
       });
     });
 
     it("認証あり(別ユーザー)", () => {
       expect(profile.toAPI({
         ...auth,
-        user: ObjectIDGenerator()
+        user: ObjectIDGenerator(),
       })).toEqual({
         id: profileID,
         user: null,
@@ -62,7 +62,7 @@ describe("Profile", () => {
         body: "body",
         date: new Date(0).toISOString(),
         update: new Date(100).toISOString(),
-        sn: "sn"
+        sn: "sn",
       });
     });
 
@@ -74,7 +74,7 @@ describe("Profile", () => {
         body: "body",
         date: new Date(0).toISOString(),
         update: new Date(100).toISOString(),
-        sn: "sn"
+        sn: "sn",
       });
     });
   });

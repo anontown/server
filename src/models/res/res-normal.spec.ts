@@ -155,7 +155,7 @@ describe("ResNormal", () => {
           h6: 1,
           h12: 1,
           d1: 1,
-        }
+        },
       }));
 
       expect(newTopic).toEqual(topicNormal.copy({ date: new Date(60000), update: new Date(60000) }));
@@ -198,7 +198,7 @@ describe("ResNormal", () => {
           h6: 1,
           h12: 1,
           d1: 1,
-        }
+        },
       }));
 
       expect(newTopic).toEqual(topicNormal.copy({ date: new Date(60000), update: new Date(60000) }));
@@ -242,7 +242,7 @@ describe("ResNormal", () => {
           h6: 1,
           h12: 1,
           d1: 1,
-        }
+        },
       }));
 
       expect(newTopic).toEqual(topicNormal.copy({ date: new Date(60000), update: new Date(60000) }));

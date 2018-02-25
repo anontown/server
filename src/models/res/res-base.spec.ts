@@ -86,7 +86,11 @@ describe("ResBase", () => {
         "dv",
         { ...token, user: "voteuser2" });
 
-      expect(newNewRes).toEqual(newRes.copy({ vote: Im.List([{ user: voteUser.id, value: 2 }, { user: voteUser2.id, value: -1 }]) }));
+      expect(newNewRes).toEqual(newRes.copy({
+        vote: Im.List([
+          { user: voteUser.id, value: 2 },
+          { user: voteUser2.id, value: -1 }]),
+      }));
       expect(newNewResUser).toEqual(newResUser.copy({ lv: 2 }));
     });
 

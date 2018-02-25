@@ -107,7 +107,7 @@ describe("ResFork", () => {
         Im.List(),
         5,
         topicNormal.hash(new Date(90), user),
-        0
+        0,
       ));
       expect(topic).toEqual(topicNormal.copy({ update: new Date(90) }));
     });
