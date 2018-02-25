@@ -205,7 +205,11 @@ describe("ResNormal", () => {
         },
       }));
 
-      expect(newTopic).toEqual(topicNormal.copy({ date: new Date(60000), update: new Date(60000) }));
+      expect(newTopic).toEqual(topicNormal.copy({
+        date: new Date(30),
+        update: new Date(60000),
+        ageUpdate: new Date(60000)
+      }));
     });
 
     it("profileがnullでない時正常に作れるか", () => {
@@ -249,7 +253,11 @@ describe("ResNormal", () => {
         },
       }));
 
-      expect(newTopic).toEqual(topicNormal.copy({ date: new Date(60000), update: new Date(60000) }));
+      expect(newTopic).toEqual(topicNormal.copy({
+        date: new Date(30),
+        update: new Date(60000),
+        ageUpdate: new Date(60000)
+      }));
     });
 
     it("他のトピックへのリプライでエラーになるか", () => {
