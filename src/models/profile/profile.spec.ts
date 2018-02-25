@@ -86,7 +86,7 @@ describe("Profile", () => {
         "name",
         "body",
         "scn",
-        new Date(0))).toEqual(profile.copy({ update: new Date(0) }));
+        new Date(0))).toEqual(profile.copy({ update: new Date(0), sn: "scn" }));
     });
   });
 });
