@@ -93,14 +93,19 @@ describe("ResFork", () => {
 
   describe("create", () => {
     it("正常に作れるか", () => {
-      const { res, topic } = ResFork.create(() => "res", topicNormal, user, token, topicFork, new Date(90));
+      const { res, topic } = ResFork.create(() => "res",
+        topicNormal,
+        user,
+        token,
+        topicFork,
+        new Date(90));
       expect(res).toEqual(new ResFork("topicfork",
         "res",
         "topic",
         new Date(90),
         "user",
         Im.List(),
-        1,
+        5,
         topicNormal.hash(new Date(90), user),
         0
       ));
