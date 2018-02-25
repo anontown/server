@@ -77,8 +77,8 @@ describe("ResBase", () => {
         "uv",
         { ...token, user: "voteuser" });
 
-      expect(newRes.vote).toEqual(Im.List([{ user: voteUser.id, value: 2 }]));
-      expect(newResUser.lv).toBe(3);
+      expect(newRes).toEqual(res.copy({ vote: Im.List([{ user: voteUser.id, value: 2 }]) }));
+      expect(newResUser).toEqual(voteUser.copy({ lv: 3 }));
 
       const voteUser2 = voteUser.copy({ id: "voteuser2", lv: 50 });
       const { res: newNewRes, resUser: newNewResUser } = newRes.v(newResUser,
@@ -86,8 +86,8 @@ describe("ResBase", () => {
         "dv",
         { ...token, user: "voteuser2" });
 
-      expect(newNewRes.vote).toEqual(Im.List([{ user: voteUser.id, value: 2 }, { user: voteUser2.id, value: -1 }]));
-      expect(newNewResUser.lv).toBe(2);
+      expect(newNewRes).toEqual(newRes.copy({ vote: Im.List([{ user: voteUser.id, value: 2 }, { user: voteUser2.id, value: -1 }]) }));
+      expect(newNewResUser).toEqual(newResUser.copy({ lv: 2 }));
     });
 
     it("自分に投票するとエラーになるか", () => {
@@ -117,8 +117,8 @@ describe("ResBase", () => {
       const { res: newRes, resUser: newResUser }
         = votedRes.cv(resUser, voteUser, { ...token, user: "voteuser" });
 
-      expect(newRes.vote).toEqual(Im.List());
-      expect(newResUser.lv).toBe(3);
+      expect(newRes).toEqual(res.copy({ vote: Im.List() }));
+      expect(newResUser).toEqual(resUser.copy({ lv: 3 }));
     });
 
     it("投票していない時エラーになるか", () => {
