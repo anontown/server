@@ -65,13 +65,13 @@ describe("Msg", () => {
           body: "body",
           date: new Date(0).toISOString()
         }
-      })).toBe(msg);
+      })).toEqual(msg);
     });
   });
 
   describe("create", () => {
     it("receiverがnullの時正常に生成できるか", () => {
-      expect(Msg.create(() => "msg", null, "body", new Date(0))).toBe(receiverNullMsg);
+      expect(Msg.create(() => "msg", null, "body", new Date(0))).toEqual(receiverNullMsg);
     });
 
     it("receiverがnullでない時正常に生成出来るか", () => {
@@ -93,7 +93,7 @@ describe("Msg", () => {
         new Date(20),
         0,
         new Date(250));
-      expect(Msg.create(() => "msg", user, "body", new Date(0))).toBe(msg);
+      expect(Msg.create(() => "msg", user, "body", new Date(0))).toEqual(msg);
     });
   });
 });
