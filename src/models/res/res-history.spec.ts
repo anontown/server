@@ -2,7 +2,6 @@ import * as Im from "immutable";
 import {
   History,
   IAuthToken,
-  IResHistoryDB,
   ResHistory,
   TopicNormal,
   User,

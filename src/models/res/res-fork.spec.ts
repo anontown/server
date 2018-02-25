@@ -1,7 +1,6 @@
 import * as Im from "immutable";
 import {
   IAuthToken,
-  IResForkDB,
   ResFork,
   TopicFork,
   TopicNormal,
