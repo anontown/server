@@ -1,7 +1,6 @@
 import { ObjectID } from "mongodb";
 import {
   AtError,
-  ITokenMasterDB,
   ObjectIDGenerator,
   TokenBase,
   TokenMaster,

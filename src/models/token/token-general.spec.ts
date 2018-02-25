@@ -4,7 +4,6 @@ import {
   AtError,
   Client,
   IAuthTokenMaster,
-  ITokenGeneralDB,
   ObjectIDGenerator,
   TokenBase,
   TokenGeneral,
