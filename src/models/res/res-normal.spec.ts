@@ -2,7 +2,6 @@ import * as Im from "immutable";
 import {
   AtError,
   IAuthToken,
-  IResNormalDB,
   Profile,
   ResNormal,
   TopicNormal,
@@ -78,7 +77,7 @@ describe("ResNormal", () => {
 
   describe("fromDB", () => {
     it("正常に変換出来るか", () => {
-      const db: IResNormalDB = {
+      expect(ResNormal.fromDB({
         id: "res",
         type: "normal",
         body: {
@@ -98,31 +97,28 @@ describe("ResNormal", () => {
           profile: "profile",
           age: true,
         },
-      };
-
-      const replyCount = 2;
-      const res = ResNormal.fromDB(db, replyCount);
-
-      expect(res.name).toBe(db.body.name);
-      expect(res.body).toBe(db.body.body);
-      expect(res.reply).toBe(db.body.reply);
-      expect(res.deleteFlag).toBe(db.body.deleteFlag);
-      expect(res.profile).toBe(db.body.profile);
-      expect(res.age).toBe(db.body.age);
-      expect(res.id).toBe(db.id);
-      expect(res.topic).toBe(db.body.topic);
-      expect(res.date).toEqual(new Date(db.body.date));
-      expect(res.user).toBe(db.body.user);
-      expect(res.vote).toEqual(Im.List(db.body.vote));
-      expect(res.lv).toBe(db.body.lv);
-      expect(res.hash).toBe(db.body.hash);
-      expect(res.replyCount).toBe(replyCount);
+      }, 2)).toEqual(new ResNormal("name",
+        "body",
+        {
+          res: "replyres",
+          user: "replyuser",
+        },
+        "active",
+        "profile",
+        true,
+        "res",
+        "topic",
+        new Date(100),
+        "user",
+        Im.List(),
+        10,
+        "hash",
+        2));
     });
   });
 
   describe("create", () => {
     it("正常に作れるか", () => {
-      const date = new Date(60000);
       const { res, user: newUser, topic: newTopic } = ResNormal.create(
         () => "res",
         topicNormal,
@@ -133,40 +129,40 @@ describe("ResNormal", () => {
         null,
         null,
         true,
-        date);
+        new Date(60000));
 
-      expect(res.name).toBe("name");
-      expect(res.body).toBe("body");
-      expect(res.reply).toBeNull();
-      expect(res.deleteFlag).toBe("active");
-      expect(res.profile).toBeNull();
-      expect(res.age).toBe(true);
-      expect(res.id).toBe("res");
-      expect(res.topic).toBe("topic");
-      expect(res.date).toEqual(date);
-      expect(res.user).toBe("user");
-      expect(res.vote).toEqual(Im.List());
-      expect(res.lv).toBe(user.lv * 5);
-      expect(res.hash).toBe(topicNormal.hash(date, user));
-      expect(res.replyCount).toBe(0);
+      expect(res).toEqual(new ResNormal("name",
+        "body",
+        null,
+        "active",
+        null,
+        true,
+        "res",
+        "topic",
+        new Date(60000),
+        "user",
+        Im.List(),
+        1,
+        topicNormal.hash(new Date(60000), user),
+        0));
 
-      expect(newUser.resWait).toEqual({
-        last: date,
-        m10: 1,
-        m30: 1,
-        h1: 1,
-        h6: 1,
-        h12: 1,
-        d1: 1,
-      });
+      expect(newUser).toEqual(user.copy({
+        resWait: {
+          last: new Date(60000),
+          m10: 1,
+          m30: 1,
+          h1: 1,
+          h6: 1,
+          h12: 1,
+          d1: 1,
+        }
+      }));
 
-      expect(newTopic.update).toEqual(date);
-      expect(newTopic.ageUpdate).toEqual(date);
+      expect(newTopic).toEqual(topicNormal.copy({ date: new Date(60000), update: new Date(60000) }));
     });
 
     it("replyがnullでない時正常に作れるか", () => {
-      const date = new Date(60000);
-      const { res } = ResNormal.create(
+      const { res, user: newUser, topic: newTopic } = ResNormal.create(
         () => "res",
         topicNormal,
         user,
@@ -176,14 +172,41 @@ describe("ResNormal", () => {
         resNormal.copy({ id: "res2", user: "res2" }),
         null,
         true,
-        date);
+        new Date(60000));
 
-      expect(res.reply).toEqual({ res: "res2", user: "res2" });
+      expect(res).toEqual(new ResNormal("name",
+        "body",
+        { res: "res2", user: "res2" },
+        "active",
+        null,
+        true,
+        "res",
+        "topic",
+        new Date(60000),
+        "user",
+        Im.List(),
+        1,
+        topicNormal.hash(new Date(60000), user),
+        0));
+
+      expect(newUser).toEqual(user.copy({
+        resWait: {
+          last: new Date(60000),
+          m10: 1,
+          m30: 1,
+          h1: 1,
+          h6: 1,
+          h12: 1,
+          d1: 1,
+        }
+      }));
+
+      expect(newTopic).toEqual(topicNormal.copy({ date: new Date(60000), update: new Date(60000) }));
     });
 
     it("profileがnullでない時正常に作れるか", () => {
       const date = new Date(60000);
-      const { res } = ResNormal.create(
+      const { res, user: newUser, topic: newTopic } = ResNormal.create(
         () => "res",
         topicNormal,
         user,
@@ -195,7 +218,34 @@ describe("ResNormal", () => {
         true,
         date);
 
-      expect(res.profile).toEqual("profile");
+      expect(res).toEqual(new ResNormal("name",
+        "body",
+        null,
+        "active",
+        "profile",
+        true,
+        "res",
+        "topic",
+        new Date(60000),
+        "user",
+        Im.List(),
+        1,
+        topicNormal.hash(new Date(60000), user),
+        0));
+
+      expect(newUser).toEqual(user.copy({
+        resWait: {
+          last: new Date(60000),
+          m10: 1,
+          m30: 1,
+          h1: 1,
+          h6: 1,
+          h12: 1,
+          d1: 1,
+        }
+      }));
+
+      expect(newTopic).toEqual(topicNormal.copy({ date: new Date(60000), update: new Date(60000) }));
     });
 
     it("他のトピックへのリプライでエラーになるか", () => {
@@ -344,8 +394,8 @@ describe("ResNormal", () => {
     describe("#del", () => {
       it("正常に削除出来るか", () => {
         const { res: newRes, resUser: newUser } = resNormal.del(user.copy({ lv: 3 }), token);
-        expect(newUser.lv).toBe(2);
-        expect(newRes.deleteFlag).toBe("self");
+        expect(newUser).toEqual(user.copy({ lv: 2 }));
+        expect(newRes).toEqual(resNormal.copy({ deleteFlag: "self" }));
       });
 
       it("人のレスを削除しようとするとエラーになるか", () => {
