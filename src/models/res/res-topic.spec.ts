@@ -1,7 +1,6 @@
 import * as Im from "immutable";
 import {
   IAuthToken,
-  IResTopicDB,
   ResTopic,
   TopicOne,
   User,
@@ -57,7 +56,7 @@ describe("ResTopic", () => {
 
   describe("fromDB", () => {
     it("正常に作れるか", () => {
-      const db: IResTopicDB = {
+      expect(ResTopic.fromDB({
         id: "id",
         type: "topic",
         body: {
@@ -68,39 +67,30 @@ describe("ResTopic", () => {
           lv: 5,
           hash: "hash",
         },
-      };
-      const replyCount = 3;
-
-      const res = ResTopic.fromDB(db, replyCount);
-
-      expect(res.type).toBe(db.type);
-      expect(res.id).toBe(db.id);
-      expect(res.topic).toBe(db.body.topic);
-      expect(res.date).toEqual(new Date(db.body.date));
-      expect(res.user).toBe(db.body.user);
-      expect(res.vote).toEqual(Im.List(db.body.vote));
-      expect(res.lv).toBe(db.body.lv);
-      expect(res.hash).toBe(db.body.hash);
-      expect(res.replyCount).toBe(replyCount);
+      }, 3)).toEqual(new ResTopic("id",
+        "topic",
+        new Date(100),
+        "user",
+        Im.List(),
+        5,
+        "hash",
+        3));
     });
   });
 
   describe("create", () => {
     it("正常に作れるか", () => {
-      const date = new Date(100);
-      const { res, topic } = ResTopic.create(() => "res", topicOne, user, token, date);
+      const { res, topic: newTopic } = ResTopic.create(() => "res", topicOne, user, token, new Date(100));
+      expect(res).toEqual(new ResTopic("res",
+        "topic",
+        new Date(100),
+        "user",
+        Im.List(),
+        5,
+        topicOne.hash(new Date(100), user),
+        0));
 
-      expect(res.type).toBe("topic");
-      expect(res.id).toBe("res");
-      expect(res.topic).toBe("topic");
-      expect(res.date).toEqual(date);
-      expect(res.user).toBe("user");
-      expect(res.vote).toEqual(Im.List());
-      expect(res.lv).toBe(5);
-      expect(res.hash).toBe(topicOne.hash(date, user));
-      expect(res.replyCount).toBe(0);
-
-      expect(topic.update).toEqual(date);
+      expect(newTopic).toEqual(topicOne.copy({ update: new Date(100) }));
     });
   });
 
