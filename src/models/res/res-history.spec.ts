@@ -100,7 +100,7 @@ describe("ResHistory", () => {
         new Date(1000),
         "user",
         Im.List(),
-        1,
+        5,
         topicNormal.hash(new Date(1000), user),
         0));
 
