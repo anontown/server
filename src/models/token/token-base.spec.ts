@@ -27,19 +27,22 @@ describe("TokenBase", () => {
 
   describe("createTokenKey", () => {
     it("正常に生成出来るか", () => {
-      expect(TokenBase.createTokenKey(() => "key")).toBe("YwWX/R2CwHpqzfN5l6CU6ePSfmJxLQi8yL0vtOP+mCc");
+      expect(TokenBase.createTokenKey(() => "a")).not.toBe(TokenBase.createTokenKey(() => "b"));
+
     });
   });
 
   describe("toBaseDB", () => {
     it("正常に変換できるか", () => {
-      const token = new TokenBaseTest(ObjectIDGenerator(), "key", ObjectIDGenerator(), new Date(0));
+      const tokenID = ObjectIDGenerator();
+      const userID = ObjectIDGenerator();
+      const token = new TokenBaseTest(tokenID, "key", userID, new Date(0));
       expect(token.toBaseDB()).toEqual({
-        _id: new ObjectID(token.id),
-        key: token.key,
-        user: new ObjectID(token.user),
-        date: token.date,
-        type: token.type,
+        _id: new ObjectID(tokenID),
+        key: "key",
+        user: new ObjectID(userID),
+        date: new Date(0),
+        type: "general",
       });
     });
   });
@@ -47,11 +50,11 @@ describe("TokenBase", () => {
   describe("toBaseAPI", () => {
     const token = new TokenBaseTest("token", "key", "user", new Date(0));
     expect(token.toBaseAPI()).toEqual({
-      id: token.id,
-      key: token.key,
-      user: token.user,
-      date: token.date.toISOString(),
-      type: token.type,
+      id: "token",
+      key: "key",
+      user: "user",
+      date: new Date(0).toISOString(),
+      type: "general",
     });
   });
 });
