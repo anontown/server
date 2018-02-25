@@ -85,7 +85,7 @@ describe("Profile", () => {
         auth,
         "name",
         "body",
-        "sn",
+        "scn",
         new Date(0))).toEqual(profile.copy({ update: new Date(0) }));
     });
   });
