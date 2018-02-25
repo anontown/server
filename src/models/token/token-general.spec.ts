@@ -11,63 +11,51 @@ import {
 } from "../../";
 
 describe("TokenMaster", () => {
-  const client = new Client(ObjectIDGenerator(),
+  const clientID = ObjectIDGenerator();
+  const userID = ObjectIDGenerator();
+  const client = new Client(clientID,
     "name",
     "https://hoge.com",
-    ObjectIDGenerator(),
+    userID,
     new Date(100),
     new Date(200));
 
   const auth: IAuthTokenMaster = {
     id: ObjectIDGenerator(),
     key: "key",
-    user: ObjectIDGenerator(),
+    user: userID,
     type: "master",
   };
 
-  const token = new TokenGeneral(ObjectIDGenerator(),
+  const tokenID = ObjectIDGenerator();
+  const token = new TokenGeneral(tokenID,
     "key",
-    ObjectIDGenerator(),
-    ObjectIDGenerator(),
+    clientID,
+    userID,
     Im.List(),
     new Date(300));
 
   describe("fromDB", () => {
     it("正常に変換出来るか", () => {
-      const db: ITokenGeneralDB = {
-        _id: new ObjectID(ObjectIDGenerator()),
+      expect(TokenGeneral.fromDB({
+        _id: new ObjectID(tokenID),
         key: "key",
         type: "general",
-        client: new ObjectID(ObjectIDGenerator()),
-        user: new ObjectID(ObjectIDGenerator()),
-        date: new Date(500),
+        client: new ObjectID(clientID),
+        user: new ObjectID(userID),
+        date: new Date(300),
         req: [],
-      };
-      const token = TokenGeneral.fromDB(db);
-
-      expect(token.id).toBe(db._id.toHexString());
-      expect(token.key).toBe(db.key);
-      expect(token.type).toBe(db.type);
-      expect(token.user).toBe(db.user.toHexString());
-      expect(token.date).toEqual(db.date);
-      expect(token.client).toBe(db.client.toHexString());
-      expect(token.req).toEqual(Im.List(db.req));
+      })).toEqual(token);
     });
   });
 
   describe("create", () => {
     it("正常に作成出来るか", () => {
-      const id = ObjectIDGenerator();
-      const now = new Date(500);
-      const token = TokenGeneral.create(() => id, auth, client, now, () => "random");
-
-      expect(token.id).toBe(id);
-      expect(token.key).toBe(TokenBase.createTokenKey(() => "random"));
-      expect(token.type).toBe("general");
-      expect(token.user).toBe(auth.user);
-      expect(token.date).toEqual(now);
-      expect(token.client).toBe(client.id);
-      expect(token.req).toEqual(Im.List());
+      expect(TokenGeneral.create(() => tokenID,
+        auth,
+        client,
+        new Date(300),
+        () => "random")).toEqual(token.copy({ key: TokenBase.createTokenKey(() => "random") }));
     });
   });
 
@@ -75,7 +63,7 @@ describe("TokenMaster", () => {
     it("正常に変換出来るか", () => {
       expect(token.toDB()).toEqual({
         ...token.toBaseDB(),
-        client: new ObjectID(token.client),
+        client: new ObjectID(clientID),
         req: [],
       });
     });
@@ -85,7 +73,7 @@ describe("TokenMaster", () => {
     it("正常に変換出来るか", () => {
       expect(token.toAPI()).toEqual({
         ...token.toBaseAPI(),
-        client: token.client,
+        client: clientID,
       });
     });
   });
