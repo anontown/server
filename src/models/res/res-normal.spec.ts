@@ -142,7 +142,7 @@ describe("ResNormal", () => {
         new Date(60000),
         "user",
         Im.List(),
-        1,
+        5,
         topicNormal.hash(new Date(60000), user),
         0));
 
@@ -174,7 +174,7 @@ describe("ResNormal", () => {
         true,
         new Date(60000));
 
-      expect(res).toEqual(new ResNormal("name",
+      expect(res).toEqual(new ResNormal(null,
         "body",
         { res: "res2", user: "res2" },
         "active",
@@ -185,7 +185,7 @@ describe("ResNormal", () => {
         new Date(60000),
         "user",
         Im.List(),
-        1,
+        5,
         topicNormal.hash(new Date(60000), user),
         0));
 
@@ -218,7 +218,7 @@ describe("ResNormal", () => {
         true,
         date);
 
-      expect(res).toEqual(new ResNormal("name",
+      expect(res).toEqual(new ResNormal(null,
         "body",
         null,
         "active",
@@ -229,7 +229,7 @@ describe("ResNormal", () => {
         new Date(60000),
         "user",
         Im.List(),
-        1,
+        5,
         topicNormal.hash(new Date(60000), user),
         0));
 
