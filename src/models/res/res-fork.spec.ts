@@ -68,7 +68,7 @@ describe("ResFork", () => {
 
   describe("fromDB", () => {
     it("正常に作れるか", () => {
-      const db: IResForkDB = {
+      expect(ResFork.fromDB({
         id: "id",
         type: "fork",
         body: {
@@ -80,41 +80,32 @@ describe("ResFork", () => {
           hash: "hash",
           fork: "topicfork",
         },
-      };
-      const replyCount = 3;
-
-      const res = ResFork.fromDB(db, replyCount);
-
-      expect(res.type).toBe(db.type);
-      expect(res.id).toBe(db.id);
-      expect(res.topic).toBe(db.body.topic);
-      expect(res.date).toEqual(new Date(db.body.date));
-      expect(res.user).toBe(db.body.user);
-      expect(res.vote).toEqual(Im.List(db.body.vote));
-      expect(res.lv).toBe(db.body.lv);
-      expect(res.hash).toBe(db.body.hash);
-      expect(res.replyCount).toBe(replyCount);
-      expect(res.fork).toBe(db.body.fork);
+      }, 3)).toEqual(new ResFork("topicfork",
+        "id",
+        "topic",
+        new Date(400),
+        "user",
+        Im.List(),
+        5,
+        "hash",
+        3));
     });
   });
 
   describe("create", () => {
     it("正常に作れるか", () => {
-      const date = new Date(90);
-      const { res, topic } = ResFork.create(() => "res", topicNormal, user, token, topicFork, date);
-
-      expect(res.type).toBe("fork");
-      expect(res.id).toBe("res");
-      expect(res.topic).toBe("topic");
-      expect(res.date).toEqual(date);
-      expect(res.user).toBe("user");
-      expect(res.vote).toEqual(Im.List());
-      expect(res.lv).toBe(5);
-      expect(res.hash).toBe(topicNormal.hash(date, user));
-      expect(res.replyCount).toBe(0);
-      expect(res.fork).toBe("topicfork");
-
-      expect(topic.update).toEqual(date);
+      const { res, topic } = ResFork.create(() => "res", topicNormal, user, token, topicFork, new Date(90));
+      expect(res).toEqual(new ResFork("topicfork",
+        "res",
+        "topic",
+        new Date(90),
+        "user",
+        Im.List(),
+        1,
+        "hash",
+        0
+      ));
+      expect(topic).toEqual(topicNormal.copy({ update: new Date(90) }));
     });
   });
 
