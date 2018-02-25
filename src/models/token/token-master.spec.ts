@@ -8,42 +8,33 @@ import {
 } from "../../";
 
 describe("TokenMaster", () => {
-  const tokenMaster = new TokenMaster(ObjectIDGenerator(), "key", ObjectIDGenerator(), new Date(0));
+  const tokenID = ObjectIDGenerator();
+  const userID = ObjectIDGenerator();
+  const tokenMaster = new TokenMaster(tokenID, "key", userID, new Date(0));
 
   describe("fromDB", () => {
     it("正常に変換出来るか", () => {
-      const db: ITokenMasterDB = {
-        _id: new ObjectID(ObjectIDGenerator()),
+      expect(TokenMaster.fromDB({
+        _id: new ObjectID(tokenID),
         key: "key",
         type: "master",
-        user: new ObjectID(ObjectIDGenerator()),
-        date: new Date(100),
-      };
-      const token = TokenMaster.fromDB(db);
-
-      expect(token.id).toBe(db._id.toHexString());
-      expect(token.key).toBe(db.key);
-      expect(token.type).toBe(db.type);
-      expect(token.user).toBe(db.user.toHexString());
-      expect(token.date).toEqual(db.date);
+        user: new ObjectID(userID),
+        date: new Date(0),
+      })).toEqual(tokenMaster);
     });
   });
 
   describe("create", () => {
     it("正常に生成出来るか", () => {
-      const date = new Date(100);
-      const token = TokenMaster.create(() => "token", {
+      expect(TokenMaster.create(() => "token", {
         id: "user",
         pass: "pass",
       },
-        date,
-        () => "key");
-
-      expect(token.id).toBe("token");
-      expect(token.key).toBe(TokenBase.createTokenKey(() => "key"));
-      expect(token.type).toBe("master");
-      expect(token.user).toBe("user");
-      expect(token.date).toEqual(date);
+        new Date(100),
+        () => "key")).toEqual(new TokenMaster("token",
+          TokenBase.createTokenKey(() => "key"),
+          "user",
+          new Date(100)));
     });
   });
 
