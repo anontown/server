@@ -55,7 +55,8 @@ describe("TopicNormal", () => {
           topic: topic.copy({
             date: new Date(24 * 60 * 60 * 1000),
             update: new Date(24 * 60 * 60 * 1000),
-            ageUpdate: new Date(24 * 60 * 60 * 1000)
+            ageUpdate: new Date(24 * 60 * 60 * 1000),
+            resCount: 1
           }),
           history: new History("topic",
             "topic",
@@ -74,7 +75,10 @@ describe("TopicNormal", () => {
             50,
             topic.hash(new Date(24 * 60 * 60 * 1000), user),
             0),
-          user: user.copy({ lastTopic: new Date(24 * 60 * 60 * 1000) })
+          user: user.copy({
+            lastTopic: new Date(24 * 60 * 60 * 1000),
+            point: 10
+          })
         });
     });
   });
