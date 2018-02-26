@@ -102,6 +102,41 @@ describe("TopicNormal", () => {
   });
 
   describe("changeData", () => {
-
+    it("正常に変更出来るか", () => {
+      expect(topic.changeData(() => "id",
+        user,
+        auth,
+        "title2",
+        ["x"],
+        "body2",
+        new Date(1000))).toEqual({
+          topic: topic.copy({
+            update: new Date(1000),
+            title: "title2",
+            body: "body2",
+            tags: Im.List(["x"])
+          }),
+          history: new History("id",
+            "topic",
+            "title2",
+            Im.List(["x"]),
+            "body2",
+            new Date(1000),
+            topic.hash(new Date(1000), user),
+            "user"),
+          res: new ResHistory("id",
+            "id",
+            "topic",
+            new Date(1000),
+            "user",
+            Im.List(),
+            50,
+            topic.hash(new Date(1000), user),
+            0),
+          user: user.copy({
+            point: 20
+          })
+        });
+    });
   });
 });
