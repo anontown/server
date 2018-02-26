@@ -134,7 +134,7 @@ describe("TopicNormal", () => {
             topic.hash(new Date(1000), user),
             0),
           user: user.copy({
-            point: 20,
+            point: 10,
           }),
         });
     });
