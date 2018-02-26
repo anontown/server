@@ -1,10 +1,10 @@
 import * as Im from "immutable";
 import {
+  History,
+  IAuthTokenMaster,
+  ResHistory,
   TopicNormal,
   User,
-  IAuthTokenMaster,
-  History,
-  ResHistory,
 } from "../../";
 
 describe("TopicNormal", () => {
@@ -56,7 +56,7 @@ describe("TopicNormal", () => {
             date: new Date(24 * 60 * 60 * 1000),
             update: new Date(24 * 60 * 60 * 1000),
             ageUpdate: new Date(24 * 60 * 60 * 1000),
-            resCount: 1
+            resCount: 1,
           }),
           history: new History("topic",
             "topic",
@@ -77,8 +77,8 @@ describe("TopicNormal", () => {
             0),
           user: user.copy({
             lastTopic: new Date(24 * 60 * 60 * 1000),
-            point: 10
-          })
+            point: 10,
+          }),
         });
     });
   });
@@ -96,7 +96,7 @@ describe("TopicNormal", () => {
           active: true,
           tags: [],
           body: "body",
-        }
+        },
       }, 5)).toEqual(topic);
     });
   });
@@ -114,7 +114,7 @@ describe("TopicNormal", () => {
             update: new Date(1000),
             title: "title2",
             body: "body2",
-            tags: Im.List(["x"])
+            tags: Im.List(["x"]),
           }),
           history: new History("id",
             "topic",
@@ -134,8 +134,8 @@ describe("TopicNormal", () => {
             topic.hash(new Date(1000), user),
             0),
           user: user.copy({
-            point: 20
-          })
+            point: 20,
+          }),
         });
     });
   });
