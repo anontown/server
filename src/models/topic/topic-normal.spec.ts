@@ -86,7 +86,7 @@ describe("TopicNormal", () => {
   describe("fromDB", () => {
     it("正常に生成出来るか", () => {
       expect(TopicNormal.fromDB({
-        id: "normal",
+        id: "topic",
         type: "normal",
         body: {
           title: "title",
@@ -99,5 +99,9 @@ describe("TopicNormal", () => {
         }
       }, 5)).toEqual(topic);
     });
+  });
+
+  describe("changeData", () => {
+
   });
 });
