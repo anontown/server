@@ -113,4 +113,12 @@ describe("TopicFork", () => {
         });
     });
   });
+
+  describe("toDB", () => {
+    it("正常に生成出来るか", () => {
+      expect(topicFork.toDB()).toEqual(topicFork.toBaseDB({
+        parent: "parent"
+      }));
+    });
+  });
 });
