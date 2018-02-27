@@ -15,4 +15,21 @@ describe("TopicFork", () => {
     new Date(50),
     true,
     "parent");
+
+  describe("fromDB", () => {
+    it("正常に生成できるか", () => {
+      expect(TopicFork.fromDB({
+        id: "topic",
+        type: "fork",
+        body: {
+          title: "title",
+          update: new Date(100).toISOString(),
+          date: new Date(0).toISOString(),
+          ageUpdate: new Date(50).toISOString(),
+          active: true,
+          parent: "parent"
+        }
+      }, 5)).toEqual(topicFork);
+    });
+  });
 });
