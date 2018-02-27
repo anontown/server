@@ -82,7 +82,8 @@ describe("TopicFork", () => {
             id: "id",
             date: new Date(24 * 60 * 60 * 1000),
             update: new Date(24 * 60 * 60 * 1000),
-            ageUpdate: new Date(24 * 60 * 60 * 1000)
+            ageUpdate: new Date(24 * 60 * 60 * 1000),
+            resCount: 1
           }),
           res: new ResTopic("id",
             "id",
@@ -96,7 +97,7 @@ describe("TopicFork", () => {
             0),
           resParent: new ResFork("id",
             "id",
-            "topic",
+            "parent",
             new Date(24 * 60 * 60 * 1000),
             "user",
             Im.List(),
@@ -106,7 +107,9 @@ describe("TopicFork", () => {
           user: user.copy({
             lastOneTopic: new Date(24 * 60 * 60 * 1000)
           }),
-          parent: parent
+          parent: parent.copy({
+            update: new Date(24 * 60 * 60 * 1000)
+          })
         });
     });
   });
