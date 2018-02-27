@@ -82,7 +82,7 @@ describe("TopicOne", () => {
             "user",
             Im.List(),
             50,
-            topic.hash(new Date(24 * 60 * 60 * 1000), user),
+            topic.copy({ id: "id" }).hash(new Date(24 * 60 * 60 * 1000), user),
             0
           ),
           user: user.copy({ lastOneTopic: new Date(24 * 60 * 60 * 1000) }),
