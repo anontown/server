@@ -40,4 +40,22 @@ describe("TopicOne", () => {
     user: "user",
     type: "master",
   };
+
+  describe("fromDB", () => {
+    it("正常に生成できるか", () => {
+      expect(TopicOne.fromDB({
+        id: "topic",
+        type: "one",
+        body: {
+          title: "title",
+          update: new Date(100).toISOString(),
+          date: new Date(0).toISOString(),
+          ageUpdate: new Date(50).toISOString(),
+          active: true,
+          tags: [],
+          body: "body",
+        }
+      }, 5)).toEqual(topic);
+    });
+  });
 });
