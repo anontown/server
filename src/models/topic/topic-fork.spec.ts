@@ -121,4 +121,13 @@ describe("TopicFork", () => {
       }));
     });
   });
+
+  describe("toAPI", () => {
+    it("正常に生成出来るか", () => {
+      expect(topicFork.toAPI()).toEqual({
+        ...topicFork.toBaseAPI(),
+        parent: "parent"
+      });
+    });
+  });
 });
