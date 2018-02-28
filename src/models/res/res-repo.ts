@@ -6,11 +6,12 @@ import { Config } from "../../config";
 import { ESClient } from "../../db";
 import { Topic, TopicRepo } from "../topic";
 import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
+import { IResRepo } from "./ires-repo";
 
-export class ResRepo {
+export class ResRepo implements IResRepo {
   constructor(private topicRepo: TopicRepo) { }
 
-  insertEvent = new Subject<{ res: Res, count: number }>();
+  insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
 
   async findOne(id: string): Promise<Res> {
     const reses = await ESClient.search<IResDB["body"]>({
