@@ -47,7 +47,7 @@ interface ISocketAPIParams<TParams, TResult> {
 }
 
 export class AppServer {
-  private async _apiJSON<TParams>(
+  private async apiJSON<TParams>(
     parameter: {
       json: any, schema: object, isAuthToken: "master" | "all" | "no",
       isAuthUser: boolean,
@@ -120,7 +120,7 @@ export class AppServer {
         res.contentType("application/json");
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        const { auth, params } = await this._apiJSON<TParams>({
+        const { auth, params } = await this.apiJSON<TParams>({
           json: req.body,
           schema,
           isAuthToken,
@@ -194,7 +194,7 @@ export class AppServer {
         return;
       }
 
-      const { auth, params } = await this._apiJSON<any>({
+      const { auth, params } = await this.apiJSON<any>({
         json,
         schema: api.schema,
         isAuthToken: api.isAuthToken,
