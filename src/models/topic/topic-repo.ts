@@ -3,8 +3,9 @@ import { SearchResponse } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { ESClient } from "../../db";
 import { ITopicDB, ITopicForkDB, ITopicNormalDB, ITopicOneDB, Topic, TopicFork, TopicNormal, TopicOne } from "./topic";
+import { ITopicRepo } from "./itopic-repo";
 
-export class TopicRepo {
+export class TopicRepo implements ITopicRepo {
   async findOne(id: string): Promise<Topic> {
     const topics = await ESClient.search<ITopicDB["body"]>({
       index: "topics",
@@ -47,7 +48,7 @@ export class TopicRepo {
     return this.aggregate(topics);
   }
 
-  async findTags(limit: number): Promise<Array<{ name: string, count: number }>> {
+  async findTags(limit: number): Promise<{ name: string, count: number }[]> {
     const data = await ESClient.search({
       index: "topics",
       size: 0,
