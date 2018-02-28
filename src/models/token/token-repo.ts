@@ -5,15 +5,9 @@ import { Config } from "../../config";
 import { DB } from "../../db";
 import { Client, ClientRepo } from "../client";
 import { ITokenDB, Token, TokenGeneral, TokenMaster } from "./token";
+import { ITokenRepo, IStorageDB } from "./itoken-repo";
 
-export interface IStorageDB {
-  client: ObjectID | null;
-  user: ObjectID;
-  key: string;
-  value: string;
-}
-
-export class TokenRepo {
+export class TokenRepo implements ITokenRepo {
   constructor(private clientRepo: ClientRepo) { }
 
   async findOne(id: string): Promise<Token> {
