@@ -13,6 +13,7 @@ import { AuthContainer } from "./auth-container";
 import * as authFromApiParam from "./auth-from-api-param";
 import { jsonSchemaCheck } from "./json-schema-check";
 import * as schemas from "./schemas";
+import { IRepo } from "../models";
 
 export interface IHttpAPICallParams<TParams> {
   params: TParams;
@@ -46,7 +47,7 @@ interface ISocketAPIParams<TParams, TResult> {
 }
 
 export class AppServer {
-  private static async _apiJSON<TParams>(
+  private async _apiJSON<TParams>(
     parameter: {
       json: any, schema: object, isAuthToken: "master" | "all" | "no",
       isAuthUser: boolean,
@@ -72,8 +73,8 @@ export class AppServer {
 
     // 認証
     const [authTokenObj, authUserObj] = await Promise.all([
-      authFromApiParam.token(authToken, parameter.isAuthToken),
-      authFromApiParam.user(authUser, parameter.isAuthUser),
+      authFromApiParam.token(this.repo.token, authToken, parameter.isAuthToken),
+      authFromApiParam.user(this.repo.user, authUser, parameter.isAuthUser),
       authFromApiParam.recaptcha(recaptcha, parameter.isRecaptcha),
     ]);
 
@@ -88,7 +89,7 @@ export class AppServer {
   private socketAPIs = new Map<string, ISocketAPIParams<any, any>>();
   private wsServer: ws.Server;
 
-  constructor(private port: number) {
+  constructor(private port: number, private repo: IRepo) {
     this.app = express();
     this.server = http.createServer(this.app as any);
     this.wsServer = new ws.Server({ server: this.server });
@@ -119,7 +120,7 @@ export class AppServer {
         res.contentType("application/json");
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        const { auth, params } = await AppServer._apiJSON<TParams>({
+        const { auth, params } = await this._apiJSON<TParams>({
           json: req.body,
           schema,
           isAuthToken,
@@ -193,7 +194,7 @@ export class AppServer {
         return;
       }
 
-      const { auth, params } = await AppServer._apiJSON<any>({
+      const { auth, params } = await this._apiJSON<any>({
         json,
         schema: api.schema,
         isAuthToken: api.isAuthToken,

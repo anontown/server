@@ -54,7 +54,7 @@ import { AppServer } from "./server/app-server";
   await createDB();
 
   const repo: IRepo = new Repo();
-  const api = new AppServer(Config.server.port);
+  const api = new AppServer(Config.server.port,repo);
 
   // [res]
   {
