@@ -188,4 +188,23 @@ describe("User", () => {
       }).toThrow(AtError);
     });
   });
+
+  describe("usePoint", () => {
+    it("正常に使えるか", () => {
+      expect(user.usePoint(1)).toEqual(user.copy({ point: 1 }));
+      expect(user.copy({ lv: 5, point: 3 }).usePoint(1)).toEqual(user.copy({ lv: 5, point: 4 }));
+    });
+
+    it("レベル以上のポイントを使おうとするとエラーになるか", () => {
+      expect(() => {
+        user.usePoint(2);
+      }).toThrow(AtError);
+    });
+
+    it("ポイントが足りない時エラーになるか", () => {
+      expect(() => {
+        user.copy({ lv: 5, point: 3 }).usePoint(3);
+      }).toThrow(AtError);
+    });
+  });
 });
