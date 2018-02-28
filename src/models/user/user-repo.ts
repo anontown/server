@@ -4,8 +4,9 @@ import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { DB } from "../../db";
 import { Logger } from "../../logger";
 import { IUserDB, User } from "./user";
+import { IUserRepo } from "./iuser-repo";
 
-export class UserRepo {
+export class UserRepo implements IUserRepo {
   async findOne(id: string): Promise<User> {
     const db = await DB;
     const user: IUserDB | null = await db.collection("users").findOne({ _id: new ObjectID(id) });
