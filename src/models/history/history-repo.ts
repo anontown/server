@@ -5,7 +5,7 @@ import { Topic } from "../topic";
 import { History, IHistoryDB } from "./history";
 
 export class HistoryRepo {
-  static async insert(history: History): Promise<null> {
+  async insert(history: History): Promise<null> {
     const hDB = history.toDB();
     await ESClient.create({
       index: "histories",
@@ -16,7 +16,7 @@ export class HistoryRepo {
     return null;
   }
 
-  static async update(history: History): Promise<null> {
+  async update(history: History): Promise<null> {
     const hDB = history.toDB();
     await ESClient.update({
       index: "histories",
@@ -27,7 +27,7 @@ export class HistoryRepo {
     return null;
   }
 
-  static async findOne(id: string): Promise<History> {
+  async findOne(id: string): Promise<History> {
     const histories = await ESClient.search<IHistoryDB["body"]>({
       index: "histories",
       size: 1,
@@ -47,7 +47,7 @@ export class HistoryRepo {
     return History.fromDB(histories.hits.hits.map(h => ({ id: h._id, body: h._source }))[0]);
   }
 
-  static async findIn(ids: string[]): Promise<History[]> {
+  async findIn(ids: string[]): Promise<History[]> {
     const histories = await ESClient.search<IHistoryDB["body"]>({
       index: "histories",
       size: ids.length,
@@ -69,7 +69,7 @@ export class HistoryRepo {
     return histories.hits.hits.map(h => History.fromDB({ id: h._id, body: h._source }));
   }
 
-  static async findAll(topic: Topic): Promise<History[]> {
+  async findAll(topic: Topic): Promise<History[]> {
     const histories = await ESClient.search<IHistoryDB["body"]>({
       index: "histories",
       size: Config.api.limit,

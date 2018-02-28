@@ -6,7 +6,7 @@ import { Logger } from "../../logger";
 import { IUserDB, User } from "./user";
 
 export class UserRepo {
-  static async findOne(id: string): Promise<User> {
+  async findOne(id: string): Promise<User> {
     const db = await DB;
     const user: IUserDB | null = await db.collection("users").findOne({ _id: new ObjectID(id) });
 
@@ -17,7 +17,7 @@ export class UserRepo {
     return User.fromDB(user);
   }
 
-  static async findID(sn: string): Promise<ObjectID> {
+  async findID(sn: string): Promise<ObjectID> {
     const db = await DB;
     const user: IUserDB | null = await db.collection("users").findOne({ sn });
 
@@ -27,7 +27,7 @@ export class UserRepo {
 
     return user._id;
   }
-  static async findSN(id: string): Promise<string> {
+  async findSN(id: string): Promise<string> {
     const db = await DB;
     const user: IUserDB | null = await db.collection("users").findOne({ _id: new ObjectID(id) });
 
@@ -37,7 +37,7 @@ export class UserRepo {
 
     return user.sn;
   }
-  static async insert(user: User): Promise<null> {
+  async insert(user: User): Promise<null> {
     const db = await DB;
     await db.collection("users").insert(user.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
@@ -49,7 +49,7 @@ export class UserRepo {
     return null;
   }
 
-  static async update(user: User): Promise<null> {
+  async update(user: User): Promise<null> {
     const db = await DB;
     await db.collection("users").update({ _id: new ObjectID(user.id) }, user.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
@@ -61,7 +61,7 @@ export class UserRepo {
     return null;
   }
 
-  static cron() {
+  cron() {
     const start = (cronTime: string, field: string) => {
       new CronJob({
         cronTime,

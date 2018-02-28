@@ -14,7 +14,9 @@ export interface IStorageDB {
 }
 
 export class TokenRepo {
-  static async findOne(id: string): Promise<Token> {
+  constructor(private clientRepo: ClientRepo) { }
+
+  async findOne(id: string): Promise<Token> {
     const db = await DB;
     const token: ITokenDB | null = await db.collection("tokens").findOne({ _id: new ObjectID(id) });
     if (token === null) {
@@ -29,7 +31,7 @@ export class TokenRepo {
     }
   }
 
-  static async findAll(authToken: IAuthTokenMaster): Promise<Token[]> {
+  async findAll(authToken: IAuthTokenMaster): Promise<Token[]> {
     const db = await DB;
     const tokens: ITokenDB[] = await db.collection("tokens")
       .find({ user: new ObjectID(authToken.user) })
@@ -46,7 +48,7 @@ export class TokenRepo {
     });
   }
 
-  static async insert(token: Token): Promise<null> {
+  async insert(token: Token): Promise<null> {
     const db = await DB;
     await db.collection("tokens").insert(token.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
@@ -59,13 +61,13 @@ export class TokenRepo {
     return null;
   }
 
-  static async update(token: Token): Promise<null> {
+  async update(token: Token): Promise<null> {
     const db = await DB;
     await db.collection("tokens").update({ _id: new ObjectID(token.id) }, token.toDB());
     return null;
   }
 
-  static async getStorage(token: IAuthToken, name: string): Promise<string> {
+  async getStorage(token: IAuthToken, name: string): Promise<string> {
     paramsErrorMaker([
       {
         field: "name",
@@ -84,7 +86,7 @@ export class TokenRepo {
     return storage.value;
   }
 
-  static async setStorage(token: IAuthToken, name: string, value: string): Promise<void> {
+  async setStorage(token: IAuthToken, name: string, value: string): Promise<void> {
     paramsErrorMaker([
       {
         field: "name",
@@ -106,7 +108,7 @@ export class TokenRepo {
       .update(this.createStorageFindQuery(token, name), data, { upsert: true });
   }
 
-  static async deleteStorage(token: IAuthToken, name: string): Promise<void> {
+  async deleteStorage(token: IAuthToken, name: string): Promise<void> {
     paramsErrorMaker([
       {
         field: "name",
@@ -125,7 +127,7 @@ export class TokenRepo {
     }
   }
 
-  static async listStorage(token: IAuthToken): Promise<string[]> {
+  async listStorage(token: IAuthToken): Promise<string[]> {
     const db = await DB;
     const ls: IStorageDB[] = await db.collection("storages")
       .find(this.createStorageFindQuery(token, null))
@@ -133,27 +135,27 @@ export class TokenRepo {
     return ls.map(s => s.key);
   }
 
-  static async listClient(token: IAuthTokenMaster): Promise<Client[]> {
+  async listClient(token: IAuthTokenMaster): Promise<Client[]> {
     const tokens = await this.findAll(token);
     const clientIds = Array.from(new Set((tokens
       .map(t => t.type === "general" ? t.client.toString() : null)
       .filter<string>((x): x is string => x !== null))));
-    return await ClientRepo.findIn(clientIds);
+    return await this.clientRepo.findIn(clientIds);
   }
 
-  static async delClientToken(token: IAuthTokenMaster, client: Client): Promise<void> {
+  async delClientToken(token: IAuthTokenMaster, client: Client): Promise<void> {
     const db = await DB;
     await db.collection("tokens")
       .remove({ user: new ObjectID(token.user), client: new ObjectID(client.id) });
   }
 
-  static async delMasterToken(user: IAuthUser): Promise<void> {
+  async delMasterToken(user: IAuthUser): Promise<void> {
     const db = await DB;
     await db.collection("tokens")
       .remove({ user: new ObjectID(user.id), type: "master" });
   }
 
-  private static createStorageFindQuery(token: IAuthToken, name: string | null) {
+  private createStorageFindQuery(token: IAuthToken, name: string | null) {
     const q = {
       user: new ObjectID(token.user),
       client: token.type === "general" ? new ObjectID(token.client) : null,

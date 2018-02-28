@@ -3,7 +3,7 @@ import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
 import { IMsgDB, Msg } from "./msg";
 export class MsgRepo {
-  static async findOne(id: string): Promise<Msg> {
+  async findOne(id: string): Promise<Msg> {
     const msgs = await ESClient.search<IMsgDB["body"]>({
       index: "msgs",
       size: 1,
@@ -23,7 +23,7 @@ export class MsgRepo {
     return Msg.fromDB(msgs.hits.hits.map(m => ({ id: m._id, body: m._source }))[0]);
   }
 
-  static async findIn(ids: string[]): Promise<Msg[]> {
+  async findIn(ids: string[]): Promise<Msg[]> {
     const msgs = await ESClient.search<IMsgDB["body"]>({
       index: "msgs",
       size: ids.length,
@@ -45,7 +45,7 @@ export class MsgRepo {
     return msgs.hits.hits.map(m => Msg.fromDB({ id: m._id, body: m._source }));
   }
 
-  static async find(
+  async find(
     authToken: IAuthToken,
     type: "before" | "after",
     equal: boolean,
@@ -85,7 +85,7 @@ export class MsgRepo {
     return result;
   }
 
-  static async findNew(authToken: IAuthToken, limit: number): Promise<Msg[]> {
+  async findNew(authToken: IAuthToken, limit: number): Promise<Msg[]> {
     const msgs = await ESClient.search<IMsgDB["body"]>({
       index: "msgs",
       size: limit,
@@ -105,7 +105,7 @@ export class MsgRepo {
     return msgs.hits.hits.map(m => Msg.fromDB({ id: m._id, body: m._source }));
   }
 
-  static async insert(msg: Msg): Promise<null> {
+  async insert(msg: Msg): Promise<null> {
     const mDB = msg.toDB();
     await ESClient.create({
       index: "msgs",
@@ -116,7 +116,7 @@ export class MsgRepo {
     return null;
   }
 
-  static async update(msg: Msg): Promise<null> {
+  async update(msg: Msg): Promise<null> {
     const mDB = msg.toDB();
     await ESClient.update({
       index: "msgs",

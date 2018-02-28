@@ -5,7 +5,7 @@ import { ESClient } from "../../db";
 import { ITopicDB, ITopicForkDB, ITopicNormalDB, ITopicOneDB, Topic, TopicFork, TopicNormal, TopicOne } from "./topic";
 
 export class TopicRepo {
-  static async findOne(id: string): Promise<Topic> {
+  async findOne(id: string): Promise<Topic> {
     const topics = await ESClient.search<ITopicDB["body"]>({
       index: "topics",
       size: 1,
@@ -25,7 +25,7 @@ export class TopicRepo {
     return (await this.aggregate(topics))[0];
   }
 
-  static async findIn(ids: string[]): Promise<Topic[]> {
+  async findIn(ids: string[]): Promise<Topic[]> {
     const topics = await ESClient.search<ITopicDB["body"]>({
       index: "topics",
       size: ids.length,
@@ -47,7 +47,7 @@ export class TopicRepo {
     return this.aggregate(topics);
   }
 
-  static async findTags(limit: number): Promise<Array<{ name: string, count: number }>> {
+  async findTags(limit: number): Promise<Array<{ name: string, count: number }>> {
     const data = await ESClient.search({
       index: "topics",
       size: 0,
@@ -68,7 +68,7 @@ export class TopicRepo {
     return tags.map(x => ({ name: x.key, count: x.doc_count }));
   }
 
-  static async find(
+  async find(
     titles: string[],
     tags: string[],
     skip: number,
@@ -96,7 +96,7 @@ export class TopicRepo {
     return this.aggregate(topics);
   }
 
-  static async findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
+  async findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
     const topics = await ESClient.search<ITopicForkDB["body"]>({
       index: "topics",
       type: "fork",
@@ -118,7 +118,7 @@ export class TopicRepo {
     return this.aggregate(topics);
   }
 
-  static cron() {
+  cron() {
     // 毎時間トピ落ちチェック
     new CronJob({
       cronTime: "00 00 * * * *",
@@ -145,7 +145,7 @@ export class TopicRepo {
     }).start();
   }
 
-  static async insert(topic: Topic): Promise<null> {
+  async insert(topic: Topic): Promise<null> {
     const tDB = topic.toDB();
     await ESClient.create({
       index: "topics",
@@ -156,7 +156,7 @@ export class TopicRepo {
     return null;
   }
 
-  static async update(topic: Topic): Promise<null> {
+  async update(topic: Topic): Promise<null> {
     const tDB = topic.toDB();
     await ESClient.update({
       index: "topics",
@@ -167,7 +167,7 @@ export class TopicRepo {
     return null;
   }
 
-  private static async aggregate(topics: SearchResponse<ITopicDB["body"]>): Promise<Topic[]> {
+  private async aggregate(topics: SearchResponse<ITopicDB["body"]>): Promise<Topic[]> {
     const data = await ESClient.search({
       index: "reses",
       size: 0,

@@ -8,9 +8,11 @@ import { Topic, TopicRepo } from "../topic";
 import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
 
 export class ResRepo {
-  static insertEvent = new Subject<{ res: Res, count: number }>();
+  constructor(private topicRepo: TopicRepo) { }
 
-  static async findOne(id: string): Promise<Res> {
+  insertEvent = new Subject<{ res: Res, count: number }>();
+
+  async findOne(id: string): Promise<Res> {
     const reses = await ESClient.search<IResDB["body"]>({
       index: "reses",
       size: 1,
@@ -30,7 +32,7 @@ export class ResRepo {
     return (await this.aggregate(reses))[0];
   }
 
-  static async findIn(ids: string[]): Promise<Res[]> {
+  async findIn(ids: string[]): Promise<Res[]> {
     const reses = await ESClient.search<IResDB["body"]>({
       index: "reses",
       size: ids.length,
@@ -52,7 +54,7 @@ export class ResRepo {
     return this.aggregate(reses);
   }
 
-  static async find(topic: Topic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
+  async find(topic: Topic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
     const reses = await ESClient.search<IResDB["body"]>({
       index: "reses",
       size: limit,
@@ -84,7 +86,7 @@ export class ResRepo {
     return result;
   }
 
-  static async findNew(topic: Topic, limit: number): Promise<Res[]> {
+  async findNew(topic: Topic, limit: number): Promise<Res[]> {
     const reses = await ESClient.search<IResDB["body"]>({
       index: "reses",
       size: limit,
@@ -101,7 +103,7 @@ export class ResRepo {
     return await this.aggregate(reses);
   }
 
-  static async findNotice(
+  async findNotice(
     authToken: IAuthToken,
     type: "before" | "after",
     equal: boolean,
@@ -138,7 +140,7 @@ export class ResRepo {
     return result;
   }
 
-  static async findNoticeNew(authToken: IAuthToken, limit: number): Promise<Res[]> {
+  async findNoticeNew(authToken: IAuthToken, limit: number): Promise<Res[]> {
     const reses = await ESClient.search<IResDB["body"]>({
       index: "reses",
       size: limit,
@@ -155,7 +157,7 @@ export class ResRepo {
     return await this.aggregate(reses);
   }
 
-  static async findHash(topic: Topic, hash: string): Promise<Res[]> {
+  async findHash(topic: Topic, hash: string): Promise<Res[]> {
     const reses = await ESClient.search<IResNormalDB["body"]>({
       index: "reses",
       type: "normal",
@@ -174,7 +176,7 @@ export class ResRepo {
     return await this.aggregate(reses);
   }
 
-  static async findReply(topic: Topic, res: Res): Promise<Res[]> {
+  async findReply(topic: Topic, res: Res): Promise<Res[]> {
     const reses = await ESClient.search<IResNormalDB["body"]>({
       index: "reses",
       type: "normal",
@@ -193,7 +195,7 @@ export class ResRepo {
     return await this.aggregate(reses);
   }
 
-  static async insert(res: Res): Promise<null> {
+  async insert(res: Res): Promise<null> {
     const rDB = res.toDB();
     await ESClient.create({
       index: "reses",
@@ -202,13 +204,13 @@ export class ResRepo {
       body: rDB.body,
     });
 
-    const topic = await TopicRepo.findOne(res.topic);
+    const topic = await this.topicRepo.findOne(res.topic);
     this.insertEvent.next({ res, count: topic.resCount });
 
     return null;
   }
 
-  static async update(res: Res): Promise<null> {
+  async update(res: Res): Promise<null> {
     const rDB = res.toDB();
     await ESClient.update({
       index: "reses",
@@ -219,7 +221,7 @@ export class ResRepo {
     return null;
   }
 
-  private static async aggregate(reses: SearchResponse<IResDB["body"]>): Promise<Res[]> {
+  private async aggregate(reses: SearchResponse<IResDB["body"]>): Promise<Res[]> {
     const data = await ESClient.search({
       index: "reses",
       size: 0,

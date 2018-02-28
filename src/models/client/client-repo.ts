@@ -16,7 +16,7 @@ export class ClientRepo {
     return Client.fromDB(client);
   }
 
-  static async findIn(ids: string[]): Promise<Client[]> {
+  async findIn(ids: string[]): Promise<Client[]> {
     const db = await DB;
     const clients: IClientDB[] = await db.collection("clients")
       .find({ _id: { $in: ids.map(id => new ObjectID(id)) } })
@@ -31,7 +31,7 @@ export class ClientRepo {
     return clients.map(c => Client.fromDB(c));
   }
 
-  static async findAll(authToken: IAuthTokenMaster): Promise<Client[]> {
+  async findAll(authToken: IAuthTokenMaster): Promise<Client[]> {
     const db = await DB;
     const clients: IClientDB[] = await db.collection("clients")
       .find({ user: new ObjectID(authToken.user) })
@@ -40,7 +40,7 @@ export class ClientRepo {
     return clients.map(c => Client.fromDB(c));
   }
 
-  static async insert(client: Client): Promise<null> {
+  async insert(client: Client): Promise<null> {
     const db = await DB;
 
     await db.collection("clients")
@@ -49,7 +49,7 @@ export class ClientRepo {
     return null;
   }
 
-  static async update(client: Client): Promise<null> {
+  async update(client: Client): Promise<null> {
     const db = await DB;
     await db.collection("clients").update({ _id: new ObjectID(client.id) }, client.toDB());
     return null;

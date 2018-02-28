@@ -5,7 +5,7 @@ import { DB } from "../../db";
 import { IProfileDB, Profile } from "./profile";
 
 export class ProfileRepo {
-  static async findOne(id: string): Promise<Profile> {
+  async findOne(id: string): Promise<Profile> {
     const db = await DB;
     const profile: IProfileDB | null = await db.collection("profiles")
       .findOne({ _id: new ObjectID(id) });
@@ -17,7 +17,7 @@ export class ProfileRepo {
     return Profile.fromDB(profile);
   }
 
-  static async findIn(ids: string[]): Promise<Profile[]> {
+  async findIn(ids: string[]): Promise<Profile[]> {
     const db = await DB;
     const profiles: IProfileDB[] = await db.collection("profiles")
       .find({ _id: { $in: ids.map(id => new ObjectID(id)) } })
@@ -32,7 +32,7 @@ export class ProfileRepo {
     return profiles.map(p => Profile.fromDB(p));
   }
 
-  static async findAll(authToken: IAuthToken): Promise<Profile[]> {
+  async findAll(authToken: IAuthToken): Promise<Profile[]> {
     const db = await DB;
     const profiles: IProfileDB[] = await db.collection("profiles")
       .find({ user: new ObjectID(authToken.user) })
@@ -41,7 +41,7 @@ export class ProfileRepo {
     return profiles.map(p => Profile.fromDB(p));
   }
 
-  static async insert(profile: Profile): Promise<null> {
+  async insert(profile: Profile): Promise<null> {
     const db = await DB;
     await db.collection("profiles").insert(profile.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
@@ -53,7 +53,7 @@ export class ProfileRepo {
     return null;
   }
 
-  static async update(profile: Profile): Promise<null> {
+  async update(profile: Profile): Promise<null> {
     const db = await DB;
     await db.collection("profiles").update({ _id: new ObjectID(profile.id) }, profile.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
