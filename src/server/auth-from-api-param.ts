@@ -6,8 +6,8 @@ import {
 import * as request from "request";
 
 import {
-  TokenRepo,
-  UserRepo,
+  ITokenRepo,
+  IUserRepo,
 } from "../models";
 
 import {
@@ -18,6 +18,7 @@ import {
 import { Config } from "../config";
 
 export async function token(
+  tokenRepo: ITokenRepo,
   apiParamToken: { id: string, key: string } | null, isAuthToken: "master" | "all" | "no"): Promise<IAuthToken | null> {
   if (apiParamToken === null) {
     if (isAuthToken === "no") {
@@ -27,7 +28,7 @@ export async function token(
     }
   }
 
-  const token = await TokenRepo.findOne(apiParamToken.id);
+  const token = await tokenRepo.findOne(apiParamToken.id);
   const authToken = token.auth(apiParamToken.key);
 
   if (authToken.type !== "master" && isAuthToken === "master") {
@@ -38,6 +39,7 @@ export async function token(
 }
 
 export async function user(
+  userRepo: IUserRepo,
   apiParamUser: { id: string, pass: string } | null, isAuthUser: boolean): Promise<IAuthUser | null> {
   if (apiParamUser === null) {
     if (!isAuthUser) {
@@ -47,7 +49,7 @@ export async function user(
     }
   }
 
-  const user = await UserRepo.findOne(apiParamUser.id);
+  const user = await userRepo.findOne(apiParamUser.id);
   const authUser = user.auth(apiParamUser.pass);
 
   return authUser;
