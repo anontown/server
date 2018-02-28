@@ -4,8 +4,8 @@ import { IAuthToken, IAuthTokenMaster, IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { DB } from "../../db";
 import { Client, ClientRepo } from "../client";
+import { IStorageDB, ITokenRepo } from "./itoken-repo";
 import { ITokenDB, Token, TokenGeneral, TokenMaster } from "./token";
-import { ITokenRepo, IStorageDB } from "./itoken-repo";
 
 export class TokenRepo implements ITokenRepo {
   constructor(private clientRepo: ClientRepo) { }

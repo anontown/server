@@ -5,13 +5,13 @@ import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
 import { Topic, TopicRepo } from "../topic";
-import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
 import { IResRepo } from "./ires-repo";
+import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
 
 export class ResRepo implements IResRepo {
-  constructor(private topicRepo: TopicRepo) { }
-
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
+
+  constructor(private topicRepo: TopicRepo) { }
 
   async findOne(id: string): Promise<Res> {
     const reses = await ESClient.search<IResDB["body"]>({

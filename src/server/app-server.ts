@@ -9,11 +9,11 @@ import {
   AtServerError,
 } from "../at-error";
 import { Logger } from "../logger";
+import { IRepo } from "../models";
 import { AuthContainer } from "./auth-container";
 import * as authFromApiParam from "./auth-from-api-param";
 import { jsonSchemaCheck } from "./json-schema-check";
 import * as schemas from "./schemas";
-import { IRepo } from "../models";
 
 export interface IHttpAPICallParams<TParams> {
   params: TParams;
@@ -47,43 +47,6 @@ interface ISocketAPIParams<TParams, TResult> {
 }
 
 export class AppServer {
-  private async apiJSON<TParams>(
-    parameter: {
-      json: any, schema: object, isAuthToken: "master" | "all" | "no",
-      isAuthUser: boolean,
-      isRecaptcha: boolean,
-    }): Promise<{ params: TParams, auth: AuthContainer }> {
-    // パラメーターチェック
-    jsonSchemaCheck(parameter.json, {
-      type: "object",
-      additionalProperties: false,
-      required: ["authUser", "authToken", "params"],
-      properties: {
-        authUser: schemas.authUser,
-        recaptcha: schemas.recaptcha,
-        authToken: schemas.authToken,
-        params: parameter.schema,
-      },
-    });
-
-    const authUser: { id: string, pass: string } | null = parameter.json.authUser;
-    const authToken: { id: string, key: string } | null = parameter.json.authToken;
-    const recaptcha: string | null = parameter.json.recaptcha;
-    const params: TParams = parameter.json.params;
-
-    // 認証
-    const [authTokenObj, authUserObj] = await Promise.all([
-      authFromApiParam.token(this.repo.token, authToken, parameter.isAuthToken),
-      authFromApiParam.user(this.repo.user, authUser, parameter.isAuthUser),
-      authFromApiParam.recaptcha(recaptcha, parameter.isRecaptcha),
-    ]);
-
-    return {
-      params,
-      auth: new AuthContainer(authTokenObj, authUserObj),
-    };
-  }
-
   private app: express.Express;
   private server: http.Server;
   private socketAPIs = new Map<string, ISocketAPIParams<any, any>>();
@@ -237,5 +200,42 @@ export class AppServer {
     });
     this.server.listen(this.port);
     Logger.system.info(`listen port ${this.port}`);
+  }
+
+  private async apiJSON<TParams>(
+    parameter: {
+      json: any, schema: object, isAuthToken: "master" | "all" | "no",
+      isAuthUser: boolean,
+      isRecaptcha: boolean,
+    }): Promise<{ params: TParams, auth: AuthContainer }> {
+    // パラメーターチェック
+    jsonSchemaCheck(parameter.json, {
+      type: "object",
+      additionalProperties: false,
+      required: ["authUser", "authToken", "params"],
+      properties: {
+        authUser: schemas.authUser,
+        recaptcha: schemas.recaptcha,
+        authToken: schemas.authToken,
+        params: parameter.schema,
+      },
+    });
+
+    const authUser: { id: string, pass: string } | null = parameter.json.authUser;
+    const authToken: { id: string, key: string } | null = parameter.json.authToken;
+    const recaptcha: string | null = parameter.json.recaptcha;
+    const params: TParams = parameter.json.params;
+
+    // 認証
+    const [authTokenObj, authUserObj] = await Promise.all([
+      authFromApiParam.token(this.repo.token, authToken, parameter.isAuthToken),
+      authFromApiParam.user(this.repo.user, authUser, parameter.isAuthUser),
+      authFromApiParam.recaptcha(recaptcha, parameter.isRecaptcha),
+    ]);
+
+    return {
+      params,
+      auth: new AuthContainer(authTokenObj, authUserObj),
+    };
   }
 }

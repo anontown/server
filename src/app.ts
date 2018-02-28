@@ -12,6 +12,7 @@ import {
   IHistoryAPI,
   IMsgAPI,
   IProfileAPI,
+  IRepo,
   IResAPI,
   ITokenAPI,
   ITokenGeneralAPI,
@@ -20,6 +21,7 @@ import {
   ITopicAPI,
   IUserAPI,
   Profile,
+  Repo,
   ResNormal,
   TokenGeneral,
   TokenMaster,
@@ -27,8 +29,6 @@ import {
   TopicNormal,
   TopicOne,
   User,
-  Repo,
-  IRepo
 } from "./models";
 import { AppServer } from "./server/app-server";
 
@@ -54,7 +54,7 @@ import { AppServer } from "./server/app-server";
   await createDB();
 
   const repo: IRepo = new Repo();
-  const api = new AppServer(Config.server.port,repo);
+  const api = new AppServer(Config.server.port, repo);
 
   // [res]
   {

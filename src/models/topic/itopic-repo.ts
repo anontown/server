@@ -1,11 +1,11 @@
-import { Topic, TopicNormal, } from "./topic";
+import { Topic, TopicNormal } from "./topic";
 
 export interface ITopicRepo {
   findOne(id: string): Promise<Topic>;
 
   findIn(ids: string[]): Promise<Topic[]>;
 
-  findTags(limit: number): Promise<{ name: string, count: number }[]>;
+  findTags(limit: number): Promise<Array<{ name: string, count: number }>>;
 
   find(
     titles: string[],

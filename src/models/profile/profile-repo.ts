@@ -2,8 +2,8 @@ import { ObjectID, WriteError } from "mongodb";
 import { AtConflictError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { DB } from "../../db";
-import { IProfileDB, Profile } from "./profile";
 import { IProfileRepo } from "./iprofile-repo";
+import { IProfileDB, Profile } from "./profile";
 
 export class ProfileRepo implements IProfileRepo {
   async findOne(id: string): Promise<Profile> {

@@ -3,8 +3,8 @@ import { ObjectID, WriteError } from "mongodb";
 import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { DB } from "../../db";
 import { Logger } from "../../logger";
-import { IUserDB, User } from "./user";
 import { IUserRepo } from "./iuser-repo";
+import { IUserDB, User } from "./user";
 
 export class UserRepo implements IUserRepo {
   async findOne(id: string): Promise<User> {
