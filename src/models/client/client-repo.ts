@@ -5,7 +5,7 @@ import { DB } from "../../db";
 import { Client, IClientDB } from "./client";
 
 export class ClientRepo {
-  static async findOne(id: string): Promise<Client> {
+  async findOne(id: string): Promise<Client> {
     const db = await DB;
     const client: IClientDB | null = await db.collection("clients")
       .findOne({ _id: new ObjectID(id) });
