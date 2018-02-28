@@ -3,8 +3,9 @@ import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { DB } from "../../db";
 import { Client, IClientDB } from "./client";
+import { IClientRepo } from "./iclient-repo";
 
-export class ClientRepo {
+export class ClientRepo implements IClientRepo {
   async findOne(id: string): Promise<Client> {
     const db = await DB;
     const client: IClientDB | null = await db.collection("clients")
