@@ -77,7 +77,7 @@ export class TokenRepo {
 
     const db = await DB;
     const storage: IStorageDB | null = await db.collection("storages")
-      .findOne(TokenRepo.createStorageFindQuery(token, name));
+      .findOne(this.createStorageFindQuery(token, name));
     if (storage === null) {
       throw new AtNotFoundError("ストレージが見つかりません");
     }
@@ -103,7 +103,7 @@ export class TokenRepo {
       value,
     };
     await db.collection("storages")
-      .update(TokenRepo.createStorageFindQuery(token, name), data, { upsert: true });
+      .update(this.createStorageFindQuery(token, name), data, { upsert: true });
   }
 
   static async deleteStorage(token: IAuthToken, name: string): Promise<void> {
@@ -119,7 +119,7 @@ export class TokenRepo {
     const db = await DB;
 
     const r = await db.collection("storages")
-      .deleteOne(TokenRepo.createStorageFindQuery(token, name));
+      .deleteOne(this.createStorageFindQuery(token, name));
     if (r.deletedCount !== 1) {
       throw new AtNotFoundError("ストレージが見つかりません");
     }
@@ -128,13 +128,13 @@ export class TokenRepo {
   static async listStorage(token: IAuthToken): Promise<string[]> {
     const db = await DB;
     const ls: IStorageDB[] = await db.collection("storages")
-      .find(TokenRepo.createStorageFindQuery(token, null))
+      .find(this.createStorageFindQuery(token, null))
       .toArray();
     return ls.map(s => s.key);
   }
 
   static async listClient(token: IAuthTokenMaster): Promise<Client[]> {
-    const tokens = await TokenRepo.findAll(token);
+    const tokens = await this.findAll(token);
     const clientIds = Array.from(new Set((tokens
       .map(t => t.type === "general" ? t.client.toString() : null)
       .filter<string>((x): x is string => x !== null))));

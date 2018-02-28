@@ -27,7 +27,7 @@ export class ResRepo {
       throw new AtNotFoundError("レスが存在しません");
     }
 
-    return (await ResRepo.aggregate(reses))[0];
+    return (await this.aggregate(reses))[0];
   }
 
   static async findIn(ids: string[]): Promise<Res[]> {
@@ -49,7 +49,7 @@ export class ResRepo {
         reses.hits.hits.map(r => r._id));
     }
 
-    return ResRepo.aggregate(reses);
+    return this.aggregate(reses);
   }
 
   static async find(topic: Topic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
@@ -77,7 +77,7 @@ export class ResRepo {
       },
     });
 
-    const result = await ResRepo.aggregate(reses);
+    const result = await this.aggregate(reses);
     if (type === "after") {
       result.reverse();
     }
@@ -98,7 +98,7 @@ export class ResRepo {
       },
     });
 
-    return await ResRepo.aggregate(reses);
+    return await this.aggregate(reses);
   }
 
   static async findNotice(
@@ -131,7 +131,7 @@ export class ResRepo {
       },
     });
 
-    const result = await ResRepo.aggregate(reses);
+    const result = await this.aggregate(reses);
     if (type === "after") {
       result.reverse();
     }
@@ -152,7 +152,7 @@ export class ResRepo {
       },
     });
 
-    return await ResRepo.aggregate(reses);
+    return await this.aggregate(reses);
   }
 
   static async findHash(topic: Topic, hash: string): Promise<Res[]> {
@@ -171,7 +171,7 @@ export class ResRepo {
       },
     });
 
-    return await ResRepo.aggregate(reses);
+    return await this.aggregate(reses);
   }
 
   static async findReply(topic: Topic, res: Res): Promise<Res[]> {
@@ -190,7 +190,7 @@ export class ResRepo {
       },
     });
 
-    return await ResRepo.aggregate(reses);
+    return await this.aggregate(reses);
   }
 
   static async insert(res: Res): Promise<null> {
@@ -203,7 +203,7 @@ export class ResRepo {
     });
 
     const topic = await TopicRepo.findOne(res.topic);
-    ResRepo.insertEvent.next({ res, count: topic.resCount });
+    this.insertEvent.next({ res, count: topic.resCount });
 
     return null;
   }

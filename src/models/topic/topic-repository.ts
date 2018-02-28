@@ -22,7 +22,7 @@ export class TopicRepo {
       throw new AtNotFoundError("トピックが存在しません");
     }
 
-    return (await TopicRepo.aggregate(topics))[0];
+    return (await this.aggregate(topics))[0];
   }
 
   static async findIn(ids: string[]): Promise<Topic[]> {
@@ -44,7 +44,7 @@ export class TopicRepo {
         topics.hits.hits.map(t => t._id));
     }
 
-    return TopicRepo.aggregate(topics);
+    return this.aggregate(topics);
   }
 
   static async findTags(limit: number): Promise<Array<{ name: string, count: number }>> {
@@ -93,7 +93,7 @@ export class TopicRepo {
       },
     });
 
-    return TopicRepo.aggregate(topics);
+    return this.aggregate(topics);
   }
 
   static async findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
@@ -115,7 +115,7 @@ export class TopicRepo {
       },
     });
 
-    return TopicRepo.aggregate(topics);
+    return this.aggregate(topics);
   }
 
   static cron() {
