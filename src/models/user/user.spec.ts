@@ -174,5 +174,18 @@ describe("User", () => {
     });
   });
 
+  describe("auth", () => {
+    it("正常に認証出来るか", () => {
+      expect(user.auth("pass")).toEqual({
+        id: userID,
+        pass: hash("pass" + Config.salt.pass)
+      });
+    });
 
+    it("パスワードが違う時エラーになるか", () => {
+      expect(() => {
+        user.auth("pass2");
+      }).toThrow(AtError);
+    });
+  });
 });
