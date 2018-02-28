@@ -7,3 +7,4 @@ export * from "./token";
 export * from "./topic";
 export * from "./user";
 export * from "./irepo";
+export * from "./repo";
