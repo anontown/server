@@ -145,6 +145,7 @@ export class User extends Copyable<User> {
   changeLastRes(lastRes: Date): User {
     // 条件
     // 係数
+    // Config.user.lvMaxの時、Config.res.wait.maxLv倍緩和
     const coe = (this.lv / Config.user.lvMax) * (Config.res.wait.maxLv - 1) + 1;
     if (
       this.resWait.d1 < Config.res.wait.d1 * coe &&
