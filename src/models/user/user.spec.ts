@@ -131,4 +131,46 @@ describe("User", () => {
       });
     });
   });
+
+  describe("change", () => {
+    const authUser = {
+      id: userID,
+      pass: hash("pass" + Config.salt.pass)
+    };
+
+    it("正常に変更出来るか", () => {
+      expect(user.change(authUser, "pass2", "scn2")).toEqual(user.copy({
+        sn: "scn2",
+        pass: hash("pass2" + Config.salt.pass)
+      }));
+    });
+
+    it("パスワードが不正な時エラーになるか", () => {
+      expect(() => {
+        user.change(authUser, "scn", "x");
+      }).toThrow(AtError);
+
+      expect(() => {
+        user.change(authUser, "scn", "x".repeat(51));
+      }).toThrow(AtError);
+
+      expect(() => {
+        user.change(authUser, "scn", "あ");
+      }).toThrow(AtError);
+    });
+
+    it("スクリーンネームが不正な時エラーになるか", () => {
+      expect(() => {
+        user.change(authUser, "x", "pass");
+      }).toThrow(AtError);
+
+      expect(() => {
+        user.change(authUser, "x".repeat(21), "pass");
+      }).toThrow(AtError);
+
+      expect(() => {
+        user.change(authUser, "あ", "pass");
+      }).toThrow(AtError);
+    });
+  });
 });
