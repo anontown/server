@@ -1,2 +1,2 @@
 export * from "./msg";
-export * from "./msg-repository";
+export * from "./msg-repo";

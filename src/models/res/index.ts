@@ -1,2 +1,2 @@
 export * from "./res";
-export * from "./res-repository";
+export * from "./res-repo";
