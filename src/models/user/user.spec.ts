@@ -2,7 +2,8 @@ import {
   User,
   ObjectIDGenerator,
   hash,
-  Config
+  Config,
+  AtError
 } from "../../";
 import { ObjectID } from "mongodb";
 
@@ -48,6 +49,53 @@ describe("User", () => {
         point: 0,
         lastOneTopic: new Date(150)
       })).toEqual(user);
+    });
+  });
+
+  describe("create", () => {
+    it("正常に作れるか", () => {
+      expect(User.create(() => userID, "scn", "pass", new Date(0)))
+        .toEqual(user.copy({
+          resWait: {
+            last: new Date(0),
+            m10: 0,
+            m30: 0,
+            h1: 0,
+            h6: 0,
+            h12: 0,
+            d1: 0,
+          },
+          lastTopic: new Date(0),
+          lastOneTopic: new Date(0)
+        }));
+    });
+
+    it("パスワードが不正な時エラーになるか", () => {
+      expect(() => {
+        User.create(() => userID, "scn", "x", new Date(0))
+      }).toThrow(AtError);
+
+      expect(() => {
+        User.create(() => userID, "scn", "x".repeat(51), new Date(0))
+      }).toThrow(AtError);
+
+      expect(() => {
+        User.create(() => userID, "scn", "あ", new Date(0))
+      }).toThrow(AtError);
+    });
+
+    it("スクリーンネームが不正な時エラーになるか", () => {
+      expect(() => {
+        User.create(() => userID, "x", "pass", new Date(0))
+      }).toThrow(AtError);
+
+      expect(() => {
+        User.create(() => userID, "x".repeat(21), "pass", new Date(0))
+      }).toThrow(AtError);
+
+      expect(() => {
+        User.create(() => userID, "あ", "pass", new Date(0))
+      }).toThrow(AtError);
     });
   });
 });
