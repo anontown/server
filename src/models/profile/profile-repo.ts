@@ -3,8 +3,9 @@ import { AtConflictError, AtNotFoundError, AtNotFoundPartError } from "../../at-
 import { IAuthToken } from "../../auth";
 import { DB } from "../../db";
 import { IProfileDB, Profile } from "./profile";
+import { IProfileRepo } from "./iprofile-repo";
 
-export class ProfileRepo {
+export class ProfileRepo implements IProfileRepo {
   async findOne(id: string): Promise<Profile> {
     const db = await DB;
     const profile: IProfileDB | null = await db.collection("profiles")
