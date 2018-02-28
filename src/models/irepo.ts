@@ -8,12 +8,12 @@ import { ITopicRepo } from "./topic";
 import { IUserRepo } from "./user";
 
 export interface IRepo {
-  client: IClientRepo;
-  history: IHistoryRepo;
-  msg: IMsgRepo;
-  profile: IProfileRepo;
-  res: IResRepo;
-  token: ITokenRepo;
-  topic: ITopicRepo;
-  user: IUserRepo;
+  readonly client: IClientRepo;
+  readonly history: IHistoryRepo;
+  readonly msg: IMsgRepo;
+  readonly profile: IProfileRepo;
+  readonly res: IResRepo;
+  readonly token: ITokenRepo;
+  readonly topic: ITopicRepo;
+  readonly user: IUserRepo;
 }
