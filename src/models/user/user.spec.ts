@@ -221,4 +221,134 @@ describe("User", () => {
       expect(user.copy({ lv: 950 }).changeLv(100)).toEqual(user.copy({ lv: 1000 }));
     });
   });
+
+  describe("changeLastRes", () => {
+    it("正常に変更出来るか", () => {
+      expect(user.copy({
+        resWait: {
+          last: new Date(0),
+          m10: 4,
+          m30: 9,
+          h1: 14,
+          h6: 19,
+          h12: 34,
+          d1: 49,
+        }
+      }).changeLastRes(new Date(60 * 1000))).toEqual(user.copy({
+        resWait: {
+          last: new Date(60 * 1000),
+          m10: 5,
+          m30: 10,
+          h1: 15,
+          h6: 20,
+          h12: 35,
+          d1: 50,
+        }
+      }));
+    });
+
+    it("30秒以上経ってない時エラーになるか", () => {
+      expect(() => {
+        user.changeLastRes(new Date(20 * 1000))
+      }).toThrow(AtError);
+    });
+
+    describe("投稿数が多いとエラーになるか", () => {
+      it("m10", () => {
+        expect(() => {
+          user.copy({
+            resWait: {
+              last: new Date(0),
+              m10: 5,
+              m30: 5,
+              h1: 5,
+              h6: 5,
+              h12: 5,
+              d1: 5,
+            }
+          }).changeLastRes(new Date(30 * 1000))
+        }).toThrow(AtError);
+      });
+
+      it("m30", () => {
+        expect(() => {
+          user.copy({
+            resWait: {
+              last: new Date(0),
+              m10: 0,
+              m30: 10,
+              h1: 10,
+              h6: 10,
+              h12: 10,
+              d1: 10,
+            }
+          }).changeLastRes(new Date(30 * 1000))
+        }).toThrow(AtError);
+      });
+
+      it("h1", () => {
+        expect(() => {
+          user.copy({
+            resWait: {
+              last: new Date(0),
+              m10: 0,
+              m30: 0,
+              h1: 15,
+              h6: 15,
+              h12: 15,
+              d1: 15,
+            }
+          }).changeLastRes(new Date(30 * 1000))
+        }).toThrow(AtError);
+      });
+
+      it("h6", () => {
+        expect(() => {
+          user.copy({
+            resWait: {
+              last: new Date(0),
+              m10: 0,
+              m30: 0,
+              h1: 0,
+              h6: 20,
+              h12: 20,
+              d1: 20,
+            }
+          }).changeLastRes(new Date(30 * 1000))
+        }).toThrow(AtError);
+      });
+
+      it("h12", () => {
+        expect(() => {
+          user.copy({
+            resWait: {
+              last: new Date(0),
+              m10: 0,
+              m30: 0,
+              h1: 0,
+              h6: 0,
+              h12: 35,
+              d1: 35,
+            }
+          }).changeLastRes(new Date(30 * 1000))
+        }).toThrow(AtError);
+      });
+
+      it("d1", () => {
+        expect(() => {
+          user.copy({
+            resWait: {
+              last: new Date(0),
+              m10: 0,
+              m30: 0,
+              h1: 0,
+              h6: 0,
+              h12: 0,
+              d1: 50,
+            }
+          }).changeLastRes(new Date(30 * 1000))
+        }).toThrow(AtError);
+      });
+    });
+  });
 });
