@@ -207,4 +207,18 @@ describe("User", () => {
       }).toThrow(AtError);
     });
   });
+
+  describe("changeLv", () => {
+    it("正常に変更出来るか", () => {
+      expect(user.changeLv(5)).toEqual(user.copy({ lv: 6 }));
+    });
+
+    it("1未満になるとき", () => {
+      expect(user.copy({ lv: 5 }).changeLv(-10)).toEqual(user.copy({ lv: 1 }));
+    });
+
+    it("1000超過になるとき", () => {
+      expect(user.copy({ lv: 950 }).changeLv(100)).toEqual(user.copy({ lv: 1000 }));
+    });
+  });
 });
