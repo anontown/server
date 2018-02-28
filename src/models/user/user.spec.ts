@@ -147,30 +147,32 @@ describe("User", () => {
 
     it("パスワードが不正な時エラーになるか", () => {
       expect(() => {
-        user.change(authUser, "scn", "x");
+        user.change(authUser, "x", "scn");
       }).toThrow(AtError);
 
       expect(() => {
-        user.change(authUser, "scn", "x".repeat(51));
+        user.change(authUser, "x".repeat(51), "scn");
       }).toThrow(AtError);
 
       expect(() => {
-        user.change(authUser, "scn", "あ");
+        user.change(authUser, "あ", "scn");
       }).toThrow(AtError);
     });
 
     it("スクリーンネームが不正な時エラーになるか", () => {
       expect(() => {
-        user.change(authUser, "x", "pass");
+        user.change(authUser, "pass", "x");
       }).toThrow(AtError);
 
       expect(() => {
-        user.change(authUser, "x".repeat(21), "pass");
+        user.change(authUser, "pass", "x".repeat(21));
       }).toThrow(AtError);
 
       expect(() => {
-        user.change(authUser, "あ", "pass");
+        user.change(authUser, "pass", "あ");
       }).toThrow(AtError);
     });
   });
+
+
 });
