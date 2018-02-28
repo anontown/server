@@ -3,8 +3,9 @@ import { Config } from "../../config";
 import { ESClient } from "../../db";
 import { Topic } from "../topic";
 import { History, IHistoryDB } from "./history";
+import { IHistoryRepo } from "./ihistory-repo";
 
-export class HistoryRepo {
+export class HistoryRepo implements IHistoryRepo {
   async insert(history: History): Promise<null> {
     const hDB = history.toDB();
     await ESClient.create({
