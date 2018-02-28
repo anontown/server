@@ -122,4 +122,13 @@ describe("User", () => {
       });
     });
   });
+
+  describe("toAPI", () => {
+    it("正常に変換出来るか", () => {
+      expect(user.toAPI()).toEqual({
+        id: userID,
+        sn: "scn"
+      });
+    });
+  });
 });
