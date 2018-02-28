@@ -2,7 +2,7 @@ import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
 import { IMsgDB, Msg } from "./msg";
-export class MsgRepository {
+export class MsgRepo {
   static async findOne(id: string): Promise<Msg> {
     const msgs = await ESClient.search<IMsgDB["body"]>({
       index: "msgs",

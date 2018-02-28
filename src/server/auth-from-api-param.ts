@@ -6,8 +6,8 @@ import {
 import * as request from "request";
 
 import {
-  TokenRepository,
-  UserRepository,
+  TokenRepo,
+  UserRepo,
 } from "../models";
 
 import {
@@ -27,7 +27,7 @@ export async function token(
     }
   }
 
-  const token = await TokenRepository.findOne(apiParamToken.id);
+  const token = await TokenRepo.findOne(apiParamToken.id);
   const authToken = token.auth(apiParamToken.key);
 
   if (authToken.type !== "master" && isAuthToken === "master") {
@@ -47,7 +47,7 @@ export async function user(
     }
   }
 
-  const user = await UserRepository.findOne(apiParamUser.id);
+  const user = await UserRepo.findOne(apiParamUser.id);
   const authUser = user.auth(apiParamUser.pass);
 
   return authUser;

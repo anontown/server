@@ -4,7 +4,7 @@ import { IAuthToken } from "../../auth";
 import { DB } from "../../db";
 import { IProfileDB, Profile } from "./profile";
 
-export class ProfileRepository {
+export class ProfileRepo {
   static async findOne(id: string): Promise<Profile> {
     const db = await DB;
     const profile: IProfileDB | null = await db.collection("profiles")

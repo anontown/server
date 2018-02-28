@@ -4,10 +4,10 @@ import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
-import { Topic, TopicRepository } from "../topic";
+import { Topic, TopicRepo } from "../topic";
 import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
 
-export class ResRepository {
+export class ResRepo {
   static insertEvent = new Subject<{ res: Res, count: number }>();
 
   static async findOne(id: string): Promise<Res> {
@@ -27,7 +27,7 @@ export class ResRepository {
       throw new AtNotFoundError("レスが存在しません");
     }
 
-    return (await this.aggregate(reses))[0];
+    return (await ResRepo.aggregate(reses))[0];
   }
 
   static async findIn(ids: string[]): Promise<Res[]> {
@@ -49,7 +49,7 @@ export class ResRepository {
         reses.hits.hits.map(r => r._id));
     }
 
-    return this.aggregate(reses);
+    return ResRepo.aggregate(reses);
   }
 
   static async find(topic: Topic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
@@ -77,7 +77,7 @@ export class ResRepository {
       },
     });
 
-    const result = await this.aggregate(reses);
+    const result = await ResRepo.aggregate(reses);
     if (type === "after") {
       result.reverse();
     }
@@ -98,7 +98,7 @@ export class ResRepository {
       },
     });
 
-    return await this.aggregate(reses);
+    return await ResRepo.aggregate(reses);
   }
 
   static async findNotice(
@@ -131,7 +131,7 @@ export class ResRepository {
       },
     });
 
-    const result = await this.aggregate(reses);
+    const result = await ResRepo.aggregate(reses);
     if (type === "after") {
       result.reverse();
     }
@@ -152,7 +152,7 @@ export class ResRepository {
       },
     });
 
-    return await this.aggregate(reses);
+    return await ResRepo.aggregate(reses);
   }
 
   static async findHash(topic: Topic, hash: string): Promise<Res[]> {
@@ -171,7 +171,7 @@ export class ResRepository {
       },
     });
 
-    return await this.aggregate(reses);
+    return await ResRepo.aggregate(reses);
   }
 
   static async findReply(topic: Topic, res: Res): Promise<Res[]> {
@@ -190,7 +190,7 @@ export class ResRepository {
       },
     });
 
-    return await this.aggregate(reses);
+    return await ResRepo.aggregate(reses);
   }
 
   static async insert(res: Res): Promise<null> {
@@ -202,8 +202,8 @@ export class ResRepository {
       body: rDB.body,
     });
 
-    const topic = await TopicRepository.findOne(res.topic);
-    ResRepository.insertEvent.next({ res, count: topic.resCount });
+    const topic = await TopicRepo.findOne(res.topic);
+    ResRepo.insertEvent.next({ res, count: topic.resCount });
 
     return null;
   }

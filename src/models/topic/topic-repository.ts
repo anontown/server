@@ -4,7 +4,7 @@ import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { ESClient } from "../../db";
 import { ITopicDB, ITopicForkDB, ITopicNormalDB, ITopicOneDB, Topic, TopicFork, TopicNormal, TopicOne } from "./topic";
 
-export class TopicRepository {
+export class TopicRepo {
   static async findOne(id: string): Promise<Topic> {
     const topics = await ESClient.search<ITopicDB["body"]>({
       index: "topics",
@@ -22,7 +22,7 @@ export class TopicRepository {
       throw new AtNotFoundError("トピックが存在しません");
     }
 
-    return (await this.aggregate(topics))[0];
+    return (await TopicRepo.aggregate(topics))[0];
   }
 
   static async findIn(ids: string[]): Promise<Topic[]> {
@@ -44,7 +44,7 @@ export class TopicRepository {
         topics.hits.hits.map(t => t._id));
     }
 
-    return this.aggregate(topics);
+    return TopicRepo.aggregate(topics);
   }
 
   static async findTags(limit: number): Promise<Array<{ name: string, count: number }>> {
@@ -93,7 +93,7 @@ export class TopicRepository {
       },
     });
 
-    return this.aggregate(topics);
+    return TopicRepo.aggregate(topics);
   }
 
   static async findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
@@ -115,7 +115,7 @@ export class TopicRepository {
       },
     });
 
-    return this.aggregate(topics);
+    return TopicRepo.aggregate(topics);
   }
 
   static cron() {

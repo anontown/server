@@ -4,7 +4,7 @@ import { ESClient } from "../../db";
 import { Topic } from "../topic";
 import { History, IHistoryDB } from "./history";
 
-export class HistoryRepository {
+export class HistoryRepo {
   static async insert(history: History): Promise<null> {
     const hDB = history.toDB();
     await ESClient.create({
