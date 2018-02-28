@@ -364,4 +364,17 @@ describe("User", () => {
       }).toThrow(AtError);
     });
   });
+
+  describe("changeLastOneTopic", () => {
+    it("正常に変更出来るか", () => {
+      expect(user.changeLastOneTopic(new Date(100000000)))
+        .toEqual(user.copy({ lastOneTopic: new Date(100000000) }));
+    });
+
+    it("間隔が短いとエラーになるか", () => {
+      expect(() => {
+        user.changeLastOneTopic(new Date(10000));
+      }).toThrow(AtError);
+    });
+  });
 });
