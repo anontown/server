@@ -11,7 +11,7 @@ import { IResRepo } from "./ires-repo";
 export class ResRepo implements IResRepo {
   constructor(private topicRepo: TopicRepo) { }
 
-  insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
+  readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
 
   async findOne(id: string): Promise<Res> {
     const reses = await ESClient.search<IResDB["body"]>({

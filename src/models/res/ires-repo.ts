@@ -4,7 +4,7 @@ import { Topic } from "../topic";
 import { Res } from "./res";
 
 export interface IResRepo {
-  insertEvent: Subject<{ res: Res, count: number }>;
+  readonly insertEvent: Subject<{ res: Res, count: number }>;
 
   findOne(id: string): Promise<Res>;
 
