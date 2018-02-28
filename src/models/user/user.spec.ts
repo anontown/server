@@ -1,11 +1,11 @@
-import {
-  User,
-  ObjectIDGenerator,
-  hash,
-  Config,
-  AtError
-} from "../../";
 import { ObjectID } from "mongodb";
+import {
+  AtError,
+  Config,
+  hash,
+  ObjectIDGenerator,
+  User,
+} from "../../";
 
 describe("User", () => {
   const userID = ObjectIDGenerator();
@@ -25,7 +25,7 @@ describe("User", () => {
     new Date(100),
     new Date(0),
     0,
-    new Date(150)
+    new Date(150),
   );
 
   describe("fromDB", () => {
@@ -47,7 +47,7 @@ describe("User", () => {
         lastTopic: new Date(100),
         date: new Date(0),
         point: 0,
-        lastOneTopic: new Date(150)
+        lastOneTopic: new Date(150),
       })).toEqual(user);
     });
   });
@@ -66,35 +66,35 @@ describe("User", () => {
             d1: 0,
           },
           lastTopic: new Date(0),
-          lastOneTopic: new Date(0)
+          lastOneTopic: new Date(0),
         }));
     });
 
     it("パスワードが不正な時エラーになるか", () => {
       expect(() => {
-        User.create(() => userID, "scn", "x", new Date(0))
+        User.create(() => userID, "scn", "x", new Date(0));
       }).toThrow(AtError);
 
       expect(() => {
-        User.create(() => userID, "scn", "x".repeat(51), new Date(0))
+        User.create(() => userID, "scn", "x".repeat(51), new Date(0));
       }).toThrow(AtError);
 
       expect(() => {
-        User.create(() => userID, "scn", "あ", new Date(0))
+        User.create(() => userID, "scn", "あ", new Date(0));
       }).toThrow(AtError);
     });
 
     it("スクリーンネームが不正な時エラーになるか", () => {
       expect(() => {
-        User.create(() => userID, "x", "pass", new Date(0))
+        User.create(() => userID, "x", "pass", new Date(0));
       }).toThrow(AtError);
 
       expect(() => {
-        User.create(() => userID, "x".repeat(21), "pass", new Date(0))
+        User.create(() => userID, "x".repeat(21), "pass", new Date(0));
       }).toThrow(AtError);
 
       expect(() => {
-        User.create(() => userID, "あ", "pass", new Date(0))
+        User.create(() => userID, "あ", "pass", new Date(0));
       }).toThrow(AtError);
     });
   });
@@ -118,7 +118,7 @@ describe("User", () => {
         lastTopic: new Date(100),
         date: new Date(0),
         point: 0,
-        lastOneTopic: new Date(150)
+        lastOneTopic: new Date(150),
       });
     });
   });
@@ -127,7 +127,7 @@ describe("User", () => {
     it("正常に変換出来るか", () => {
       expect(user.toAPI()).toEqual({
         id: userID,
-        sn: "scn"
+        sn: "scn",
       });
     });
   });
@@ -135,13 +135,13 @@ describe("User", () => {
   describe("change", () => {
     const authUser = {
       id: userID,
-      pass: hash("pass" + Config.salt.pass)
+      pass: hash("pass" + Config.salt.pass),
     };
 
     it("正常に変更出来るか", () => {
       expect(user.change(authUser, "pass2", "scn2")).toEqual(user.copy({
         sn: "scn2",
-        pass: hash("pass2" + Config.salt.pass)
+        pass: hash("pass2" + Config.salt.pass),
       }));
     });
 
@@ -178,7 +178,7 @@ describe("User", () => {
     it("正常に認証出来るか", () => {
       expect(user.auth("pass")).toEqual({
         id: userID,
-        pass: hash("pass" + Config.salt.pass)
+        pass: hash("pass" + Config.salt.pass),
       });
     });
 
@@ -233,7 +233,7 @@ describe("User", () => {
           h6: 19,
           h12: 34,
           d1: 49,
-        }
+        },
       }).changeLastRes(new Date(60 * 1000))).toEqual(user.copy({
         resWait: {
           last: new Date(60 * 1000),
@@ -243,13 +243,13 @@ describe("User", () => {
           h6: 20,
           h12: 35,
           d1: 50,
-        }
+        },
       }));
     });
 
     it("30秒以上経ってない時エラーになるか", () => {
       expect(() => {
-        user.changeLastRes(new Date(20 * 1000))
+        user.changeLastRes(new Date(20 * 1000));
       }).toThrow(AtError);
     });
 
@@ -265,8 +265,8 @@ describe("User", () => {
               h6: 5,
               h12: 5,
               d1: 5,
-            }
-          }).changeLastRes(new Date(30 * 1000))
+            },
+          }).changeLastRes(new Date(30 * 1000));
         }).toThrow(AtError);
       });
 
@@ -281,8 +281,8 @@ describe("User", () => {
               h6: 10,
               h12: 10,
               d1: 10,
-            }
-          }).changeLastRes(new Date(30 * 1000))
+            },
+          }).changeLastRes(new Date(30 * 1000));
         }).toThrow(AtError);
       });
 
@@ -297,8 +297,8 @@ describe("User", () => {
               h6: 15,
               h12: 15,
               d1: 15,
-            }
-          }).changeLastRes(new Date(30 * 1000))
+            },
+          }).changeLastRes(new Date(30 * 1000));
         }).toThrow(AtError);
       });
 
@@ -313,8 +313,8 @@ describe("User", () => {
               h6: 20,
               h12: 20,
               d1: 20,
-            }
-          }).changeLastRes(new Date(30 * 1000))
+            },
+          }).changeLastRes(new Date(30 * 1000));
         }).toThrow(AtError);
       });
 
@@ -329,8 +329,8 @@ describe("User", () => {
               h6: 0,
               h12: 35,
               d1: 35,
-            }
-          }).changeLastRes(new Date(30 * 1000))
+            },
+          }).changeLastRes(new Date(30 * 1000));
         }).toThrow(AtError);
       });
 
@@ -345,8 +345,8 @@ describe("User", () => {
               h6: 0,
               h12: 0,
               d1: 50,
-            }
-          }).changeLastRes(new Date(30 * 1000))
+            },
+          }).changeLastRes(new Date(30 * 1000));
         }).toThrow(AtError);
       });
     });

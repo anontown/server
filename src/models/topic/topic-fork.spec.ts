@@ -1,11 +1,11 @@
 import * as Im from "immutable";
 import {
-  TopicFork,
   IAuthTokenMaster,
+  ResFork,
+  ResTopic,
+  TopicFork,
   TopicNormal,
   User,
-  ResTopic,
-  ResFork
 } from "../../";
 
 describe("TopicFork", () => {
@@ -64,8 +64,8 @@ describe("TopicFork", () => {
           date: new Date(0).toISOString(),
           ageUpdate: new Date(50).toISOString(),
           active: true,
-          parent: "parent"
-        }
+          parent: "parent",
+        },
       }, 5)).toEqual(topicFork);
     });
   });
@@ -83,7 +83,7 @@ describe("TopicFork", () => {
             date: new Date(24 * 60 * 60 * 1000),
             update: new Date(24 * 60 * 60 * 1000),
             ageUpdate: new Date(24 * 60 * 60 * 1000),
-            resCount: 1
+            resCount: 1,
           }),
           res: new ResTopic("id",
             "id",
@@ -92,7 +92,7 @@ describe("TopicFork", () => {
             Im.List(),
             50,
             topicFork.copy({
-              id: "id"
+              id: "id",
             }).hash(new Date(24 * 60 * 60 * 1000), user),
             0),
           resParent: new ResFork("id",
@@ -105,11 +105,11 @@ describe("TopicFork", () => {
             parent.hash(new Date(24 * 60 * 60 * 1000), user),
             0),
           user: user.copy({
-            lastOneTopic: new Date(24 * 60 * 60 * 1000)
+            lastOneTopic: new Date(24 * 60 * 60 * 1000),
           }),
           parent: parent.copy({
-            update: new Date(24 * 60 * 60 * 1000)
-          })
+            update: new Date(24 * 60 * 60 * 1000),
+          }),
         });
     });
   });
@@ -117,7 +117,7 @@ describe("TopicFork", () => {
   describe("toDB", () => {
     it("正常に生成出来るか", () => {
       expect(topicFork.toDB()).toEqual(topicFork.toBaseDB({
-        parent: "parent"
+        parent: "parent",
       }));
     });
   });
@@ -126,7 +126,7 @@ describe("TopicFork", () => {
     it("正常に生成出来るか", () => {
       expect(topicFork.toAPI()).toEqual({
         ...topicFork.toBaseAPI(),
-        parent: "parent"
+        parent: "parent",
       });
     });
   });

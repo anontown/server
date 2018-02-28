@@ -1,9 +1,9 @@
 import * as Im from "immutable";
 import {
   IAuthTokenMaster,
+  ResTopic,
   TopicOne,
   User,
-  ResTopic
 } from "../../";
 
 describe("TopicOne", () => {
@@ -55,7 +55,7 @@ describe("TopicOne", () => {
           active: true,
           tags: [],
           body: "body",
-        }
+        },
       }, 5)).toEqual(topic);
     });
   });
@@ -74,7 +74,7 @@ describe("TopicOne", () => {
             id: "id",
             date: new Date(24 * 60 * 60 * 1000),
             update: new Date(24 * 60 * 60 * 1000),
-            ageUpdate: new Date(24 * 60 * 60 * 1000)
+            ageUpdate: new Date(24 * 60 * 60 * 1000),
           }),
           res: new ResTopic("id",
             "id",
@@ -83,7 +83,7 @@ describe("TopicOne", () => {
             Im.List(),
             50,
             topic.copy({ id: "id" }).hash(new Date(24 * 60 * 60 * 1000), user),
-            0
+            0,
           ),
           user: user.copy({ lastOneTopic: new Date(24 * 60 * 60 * 1000) }),
         });
