@@ -9,10 +9,15 @@ import {
   TokenGeneral,
   TokenMaster,
 } from "../models";
-import { AppServer } from "../server";
+import {
+  controller,
+  http,
+  IHttpAPICallParams
+} from "../server";
 
-export function addTokenAPI(api: AppServer) {
-  api.addAPI<null, ITokenAPI>({
+@controller
+export class TokenController {
+  @http({
     url: "/token/find/one",
 
     isAuthUser: false,
@@ -20,13 +25,13 @@ export function addTokenAPI(api: AppServer) {
     schema: {
       type: "null",
     },
-    call: async ({ auth, repo }) => {
-      const token = await repo.token.findOne(auth.token.id);
-      return token.toAPI();
-    },
-  });
+  })
+  async findOne({ auth, repo }: IHttpAPICallParams<null>): Promise<ITokenAPI> {
+    const token = await repo.token.findOne(auth.token.id);
+    return token.toAPI();
+  }
 
-  api.addAPI<null, ITokenAPI[]>({
+  @http({
     url: "/token/find/all",
 
     isAuthUser: false,
@@ -34,13 +39,13 @@ export function addTokenAPI(api: AppServer) {
     schema: {
       type: "null",
     },
-    call: async ({ auth, repo }) => {
-      const tokens = await repo.token.findAll(auth.tokenMaster);
-      return tokens.map(t => t.toAPI());
-    },
-  });
+  })
+  async findAll({ auth, repo }: IHttpAPICallParams<null>): Promise<ITokenAPI[]> {
+    const tokens = await repo.token.findAll(auth.tokenMaster);
+    return tokens.map(t => t.toAPI());
+  }
 
-  api.addAPI<{ client: string }, null>({
+  @http({
     url: "/token/client/delete",
 
     isAuthUser: false,
@@ -55,14 +60,14 @@ export function addTokenAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const client = await repo.client.findOne(params.client);
-      await repo.token.delClientToken(auth.tokenMaster, client);
-      return null;
-    },
-  });
+  })
+  async deleteClient({ params, auth, repo }: IHttpAPICallParams<{ client: string }>): Promise<null> {
+    const client = await repo.client.findOne(params.client);
+    await repo.token.delClientToken(auth.tokenMaster, client);
+    return null;
+  }
 
-  api.addAPI<null, IClientAPI[]>({
+  @http({
     url: "/token/find/client/all",
 
     isAuthUser: false,
@@ -70,13 +75,13 @@ export function addTokenAPI(api: AppServer) {
     schema: {
       type: "null",
     },
-    call: async ({ auth, repo }) => {
-      const clients = await repo.token.listClient(auth.tokenMaster);
-      return clients.map(c => c.toAPI(auth.tokenMaster));
-    },
-  });
+  })
+  async findClientAll({ auth, repo }: IHttpAPICallParams<null>): Promise<IClientAPI[]> {
+    const clients = await repo.token.listClient(auth.tokenMaster);
+    return clients.map(c => c.toAPI(auth.tokenMaster));
+  }
 
-  api.addAPI<{ client: string }, ITokenGeneralAPI>({
+  @http({
     url: "/token/create/general",
 
     isAuthUser: false,
@@ -91,16 +96,16 @@ export function addTokenAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, now, repo }) => {
-      const client = await repo.client.findOne(params.client);
-      const token = TokenGeneral.create(ObjectIDGenerator, auth.tokenMaster, client, now, RandomGenerator);
-      await repo.token.insert(token);
+  })
+  async createGeneral({ params, auth, now, repo }: IHttpAPICallParams<{ client: string }>): Promise<ITokenGeneralAPI> {
+    const client = await repo.client.findOne(params.client);
+    const token = TokenGeneral.create(ObjectIDGenerator, auth.tokenMaster, client, now, RandomGenerator);
+    await repo.token.insert(token);
 
-      return token.toAPI();
-    },
-  });
+    return token.toAPI();
+  }
 
-  api.addAPI<null, ITokenMasterAPI>({
+  @http({
     url: "/token/create/master",
 
     isAuthUser: true,
@@ -108,15 +113,15 @@ export function addTokenAPI(api: AppServer) {
     schema: {
       type: "null",
     },
-    call: async ({ auth, now, repo }) => {
-      const token = TokenMaster.create(ObjectIDGenerator, auth.user, now, RandomGenerator);
-      await repo.token.insert(token);
+  })
+  async createMaster({ auth, now, repo }: IHttpAPICallParams<null>): Promise<ITokenMasterAPI> {
+    const token = TokenMaster.create(ObjectIDGenerator, auth.user, now, RandomGenerator);
+    await repo.token.insert(token);
 
-      return token.toAPI();
-    },
-  });
+    return token.toAPI();
+  }
 
-  api.addAPI<{ name: string, value: string }, null>({
+  @http({
     url: "/token/storage/set",
 
     isAuthUser: false,
@@ -134,13 +139,13 @@ export function addTokenAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      await repo.token.setStorage(auth.token, params.name, params.value);
-      return null;
-    },
-  });
+  })
+  async setStorage({ params, auth, repo }: IHttpAPICallParams<{ name: string, value: string }>): Promise<null> {
+    await repo.token.setStorage(auth.token, params.name, params.value);
+    return null;
+  }
 
-  api.addAPI<{ name: string }, string>({
+  @http({
     url: "/token/storage/get",
 
     isAuthUser: false,
@@ -155,12 +160,12 @@ export function addTokenAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      return await repo.token.getStorage(auth.token, params.name);
-    },
-  });
+  })
+  async getStorage({ params, auth, repo }: IHttpAPICallParams<{ name: string }>): Promise<string> {
+    return await repo.token.getStorage(auth.token, params.name);
+  }
 
-  api.addAPI<{ name: string }, null>({
+  @http({
     url: "/token/storage/delete",
 
     isAuthUser: false,
@@ -175,13 +180,13 @@ export function addTokenAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      await repo.token.deleteStorage(auth.token, params.name);
-      return null;
-    },
-  });
+  })
+  async deleteStorage({ params, auth, repo }: IHttpAPICallParams<{ name: string }>): Promise<null> {
+    await repo.token.deleteStorage(auth.token, params.name);
+    return null;
+  }
 
-  api.addAPI<null, string[]>({
+  @http({
     url: "/token/storage/list",
 
     isAuthUser: false,
@@ -189,12 +194,12 @@ export function addTokenAPI(api: AppServer) {
     schema: {
       type: "null",
     },
-    call: async ({ auth, repo }) => {
-      return await repo.token.listStorage(auth.token);
-    },
-  });
+  })
+  async listStorage({ auth, repo }: IHttpAPICallParams<null>): Promise<string[]> {
+    return await repo.token.listStorage(auth.token);
+  }
 
-  api.addAPI<null, ITokenReqAPI>({
+  @http({
     url: "/token/req/create",
 
     isAuthUser: false,
@@ -202,20 +207,20 @@ export function addTokenAPI(api: AppServer) {
     schema: {
       type: "null",
     },
-    call: async ({ auth, now, repo }) => {
-      const token = await repo.token.findOne(auth.token.id);
-      if (token.type !== "general") {
-        throw new AtPrerequisiteError("通常トークン以外では出来ません");
-      }
-      const { req, token: newToken } = token.createReq(now, RandomGenerator);
+  })
+  async createReq({ auth, now, repo }: IHttpAPICallParams<null>): Promise<ITokenReqAPI> {
+    const token = await repo.token.findOne(auth.token.id);
+    if (token.type !== "general") {
+      throw new AtPrerequisiteError("通常トークン以外では出来ません");
+    }
+    const { req, token: newToken } = token.createReq(now, RandomGenerator);
 
-      await repo.token.update(newToken);
+    await repo.token.update(newToken);
 
-      return req;
-    },
-  });
+    return req;
+  }
 
-  api.addAPI<{ id: string, key: string }, ITokenGeneralAPI>({
+  @http({
     url: "/token/find/req",
 
     isAuthUser: false,
@@ -233,13 +238,13 @@ export function addTokenAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, now, repo }) => {
-      const token = await repo.token.findOne(params.id);
-      if (token.type !== "general") {
-        throw new AtPrerequisiteError("通常トークン以外では出来ません");
-      }
-      token.authReq(params.key, now);
-      return token.toAPI();
-    },
-  });
+  })
+  async findReq({ params, now, repo }: IHttpAPICallParams<{ id: string, key: string }>): Promise<ITokenGeneralAPI> {
+    const token = await repo.token.findOne(params.id);
+    if (token.type !== "general") {
+      throw new AtPrerequisiteError("通常トークン以外では出来ません");
+    }
+    token.authReq(params.key, now);
+    return token.toAPI();
+  }
 }
