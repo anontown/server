@@ -51,17 +51,13 @@ export class ResController {
     profile: string | null,
     age: boolean,
   }>): Promise<IResAPI> {
-    const val = await Promise.all([
+    const [topic, user, reply, profile] = await Promise.all([
       repo.topic.findOne(params.topic),
       repo.user.findOne(auth.token.user),
       params.reply !== null ? repo.res.findOne(params.reply) : Promise.resolve(null),
       params.profile !== null ? repo.profile.findOne(params.profile) : Promise.resolve(null),
     ]);
 
-    const topic = val[0];
-    const user = val[1];
-    const reply = val[2];
-    const profile = val[3];
     const { res, user: newUser, topic: newTopic } = ResNormal.create(ObjectIDGenerator,
       topic,
       user,
@@ -240,13 +236,10 @@ export class ResController {
     },
   })
   async findReply({ params, auth, repo }: IHttpAPICallParams<{ topic: string, reply: string }>): Promise<IResAPI[]> {
-    const val = await Promise.all([
+    const [topic, res] = await Promise.all([
       repo.topic.findOne(params.topic),
       repo.res.findOne(params.reply),
     ]);
-
-    const topic = val[0];
-    const res = val[1];
 
     const reses = await repo.res.findReply(topic, res);
     return reses.map(r => r.toAPI(auth.tokenOrNull));
@@ -328,16 +321,10 @@ export class ResController {
     },
   })
   async uv({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IResAPI> {
-    const val = await Promise.all([
+    const [res, user] = await Promise.all([
       repo.res.findOne(params.id),
       repo.user.findOne(auth.token.user),
     ]);
-
-    // レス
-    const res = val[0];
-
-    // 投票するユーザー
-    const user = val[1];
 
     // レスを書き込んだユーザー
     const resUser = await repo.user.findOne(res.user);
@@ -370,15 +357,10 @@ export class ResController {
     },
   })
   async dv({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IResAPI> {
-    const val = await Promise.all([
+    const [res, user] = await Promise.all([
       repo.res.findOne(params.id),
       repo.user.findOne(auth.token.user),
     ]);
-
-    const res = val[0];
-
-    // 投票するユーザー
-    const user = val[1];
 
     // レスを書き込んだユーザー
     const resUser = await repo.user.findOne(res.user);
@@ -413,16 +395,10 @@ export class ResController {
     },
   })
   async cv({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IResAPI> {
-    const val = await Promise.all([
+    const [res, user] = await Promise.all([
       repo.res.findOne(params.id),
       repo.user.findOne(auth.token.user),
     ]);
-
-    // レス
-    const res = val[0];
-
-    // 投票するユーザー
-    const user = val[1];
 
     // レスを書き込んだユーザー
     const resUser = await repo.user.findOne(res.user);
@@ -454,7 +430,7 @@ export class ResController {
       },
     },
   })
-  async del({ params, auth, repo }:IHttpAPICallParams<{ id: string }>):Promise<IResAPI> {
+  async del({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IResAPI> {
     // レス
     const res = await repo.res.findOne(params.id);
 
