@@ -6,7 +6,7 @@ import {
 import {
   controller,
   http,
-  IHttpAPICallParams
+  IHttpAPICallParams,
 } from "../server";
 
 @controller
@@ -28,9 +28,10 @@ export class ClientController {
           type: "string",
         },
       },
-    }
+    },
   })
-  async create({ params, auth, log, now, repo }: IHttpAPICallParams<{ name: string, url: string }>): Promise<IClientAPI> {
+  async create({ params, auth, log, now, repo }: IHttpAPICallParams<{ name: string, url: string }>)
+    : Promise<IClientAPI> {
     const client = Client.create(ObjectIDGenerator, auth.tokenMaster, params.name, params.url, now);
     await repo.client.insert(client);
     log("clients", client.id);

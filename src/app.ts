@@ -10,7 +10,7 @@ import {
   ResController,
   TokenController,
   TopicController,
-  UserController
+  UserController,
 } from "./controllers";
 import { createDB } from "./create-db";
 import { } from "./generator";
@@ -43,7 +43,7 @@ import { AppServer } from "./server/app-server";
     ResController,
     TokenController,
     TopicController,
-    UserController
+    UserController,
   ]);
 
   api.run();

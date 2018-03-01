@@ -1,3 +1,4 @@
+import { Observable } from "rxjs";
 import { AtPrerequisiteError } from "../at-error";
 import { ObjectIDGenerator } from "../generator";
 import {
@@ -11,10 +12,9 @@ import {
   controller,
   http,
   IHttpAPICallParams,
+  ISocketAPICallParams,
   socket,
-  ISocketAPICallParams
 } from "../server";
-import { Observable } from "rxjs";
 
 @controller
 export class TopicController {
@@ -35,7 +35,8 @@ export class TopicController {
       },
     },
   })
-  async updateTopicStream({ auth, params, repo }: ISocketAPICallParams<{ id: string }>): Promise<Observable<{ res: IResAPI, count: number }>> {
+  async updateTopicStream({ auth, params, repo }: ISocketAPICallParams<{ id: string }>)
+    : Promise<Observable<{ res: IResAPI, count: number }>> {
     const topic = await repo.topic.findOne(params.id);
     return repo.res
       .insertEvent
@@ -94,7 +95,6 @@ export class TopicController {
     log("histories", create.history.id);
     return create.topic.toAPI();
   }
-
 
   @http({
     url: "/topic/create/one",
@@ -346,7 +346,8 @@ export class TopicController {
       },
     },
   })
-  async findTags({ params, repo }: IHttpAPICallParams<{ limit: number }>): Promise<{ name: string, count: number }[]> {
+  async findTags({ params, repo }: IHttpAPICallParams<{ limit: number }>)
+    : Promise<Array<{ name: string, count: number }>> {
     return await repo.topic.findTags(params.limit);
   }
 

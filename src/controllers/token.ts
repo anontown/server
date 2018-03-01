@@ -12,7 +12,7 @@ import {
 import {
   controller,
   http,
-  IHttpAPICallParams
+  IHttpAPICallParams,
 } from "../server";
 
 @controller

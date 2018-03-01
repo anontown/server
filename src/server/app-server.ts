@@ -12,9 +12,9 @@ import { Logger } from "../logger";
 import { IRepo } from "../models";
 import { AuthContainer } from "./auth-container";
 import * as authFromApiParam from "./auth-from-api-param";
+import { APIDatas, httpAPIs, socketAPIs } from "./decorator";
 import { jsonSchemaCheck } from "./json-schema-check";
 import * as schemas from "./schemas";
-import { APIDatas, httpAPIs, socketAPIs } from "./decorator";
 
 export interface IHttpAPICallParams<TParams> {
   params: TParams;
@@ -56,7 +56,7 @@ export class AppServer {
   private socketAPIs = new Map<string, ISocketAPIParams<any, any>>();
   private wsServer: ws.Server;
 
-  constructor(private port: number, private repo: IRepo, controllers: { new(...args: any[]): any }[]) {
+  constructor(private port: number, private repo: IRepo, controllers: Array<{ new(...args: any[]): any }>) {
     this.app = express();
     this.server = http.createServer(this.app as any);
     this.wsServer = new ws.Server({ server: this.server });
@@ -68,7 +68,7 @@ export class AppServer {
       .map(c => new c() as APIDatas)
       .forEach(c => {
         c[httpAPIs].forEach(data => this.addAPI(data));
-        c[socketAPIs].forEach(data => this.addSocketAPI(data))
+        c[socketAPIs].forEach(data => this.addSocketAPI(data));
       });
   }
 
