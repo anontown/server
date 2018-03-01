@@ -1,4 +1,3 @@
-import { } from "../generator";
 import {
   IHistoryAPI,
 } from "../models";
