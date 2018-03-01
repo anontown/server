@@ -30,7 +30,7 @@ export class ClientController {
       },
     }
   })
-  async createClient({ params, auth, log, now, repo }: IHttpAPICallParams<{ name: string, url: string }>): Promise<IClientAPI> {
+  async create({ params, auth, log, now, repo }: IHttpAPICallParams<{ name: string, url: string }>): Promise<IClientAPI> {
     const client = Client.create(ObjectIDGenerator, auth.tokenMaster, params.name, params.url, now);
     await repo.client.insert(client);
     log("clients", client.id);
@@ -59,7 +59,7 @@ export class ClientController {
       },
     },
   })
-  async updateClient({ params, auth, log, now, repo }: IHttpAPICallParams<{
+  async update({ params, auth, log, now, repo }: IHttpAPICallParams<{
     id: string,
     name: string,
     url: string,
@@ -87,7 +87,7 @@ export class ClientController {
       },
     },
   })
-  async findClientOne({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IClientAPI> {
+  async findOne({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IClientAPI> {
     const client = await repo.client.findOne(params.id);
     return client.toAPI(auth.TokenMasterOrNull);
   }
@@ -111,7 +111,7 @@ export class ClientController {
       },
     },
   })
-  async findClientIn({ params, auth, repo }: IHttpAPICallParams<{ ids: string[] }>): Promise<IClientAPI[]> {
+  async findIn({ params, auth, repo }: IHttpAPICallParams<{ ids: string[] }>): Promise<IClientAPI[]> {
     const clients = await repo.client.findIn(params.ids);
     return clients.map(c => c.toAPI(auth.TokenMasterOrNull));
   }
@@ -125,7 +125,7 @@ export class ClientController {
       type: "null",
     },
   })
-  async findClientAll({ auth, repo }: IHttpAPICallParams<null>): Promise<IClientAPI[]> {
+  async findAll({ auth, repo }: IHttpAPICallParams<null>): Promise<IClientAPI[]> {
     const clients = await repo.client.findAll(auth.tokenMaster);
     return clients.map(c => c.toAPI(auth.tokenMaster));
   }
