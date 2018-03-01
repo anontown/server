@@ -25,7 +25,7 @@ export class HistoryController {
       },
     },
   })
-  async findHistoryOne({ params, repo }: IHttpAPICallParams<{ id: string }>): Promise<IHistoryAPI> {
+  async findOne({ params, repo }: IHttpAPICallParams<{ id: string }>): Promise<IHistoryAPI> {
     return (await repo.history.findOne(params.id))
       .toAPI();
   }
@@ -49,7 +49,7 @@ export class HistoryController {
       },
     },
   })
-  async findHistoryIn({ params, repo }: IHttpAPICallParams<{ ids: string[] }>): Promise<IHistoryAPI[]> {
+  async findIn({ params, repo }: IHttpAPICallParams<{ ids: string[] }>): Promise<IHistoryAPI[]> {
     return (await repo.history.findIn(params.ids))
       .map(h => h.toAPI());
   }
@@ -70,7 +70,7 @@ export class HistoryController {
       },
     },
   })
-  async findHistoryall({ params, repo }: IHttpAPICallParams<{ topic: string }>): Promise<IHistoryAPI[]> {
+  async findAll({ params, repo }: IHttpAPICallParams<{ topic: string }>): Promise<IHistoryAPI[]> {
     return (await repo.history.findAll(await repo.topic.findOne(params.topic)))
       .map(h => h.toAPI());
   }
