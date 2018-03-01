@@ -2,7 +2,16 @@
 require("source-map-support").install();
 import * as fs from "fs-promise";
 import { Config } from "./config";
-import { addAPI } from "./controllers";
+import {
+  ClientController,
+  HistoryController,
+  MsgController,
+  ProfileController,
+  ResController,
+  TokenController,
+  TopicController,
+  UserController
+} from "./controllers";
 import { createDB } from "./create-db";
 import { } from "./generator";
 import {
@@ -26,9 +35,16 @@ import { AppServer } from "./server/app-server";
 
   await createDB();
 
-  const api = new AppServer(Config.server.port, new Repo(), []);
-
-  addAPI(api);
+  const api = new AppServer(Config.server.port, new Repo(), [
+    ClientController,
+    HistoryController,
+    MsgController,
+    ProfileController,
+    ResController,
+    TokenController,
+    TopicController,
+    UserController
+  ]);
 
   api.run();
 })();
