@@ -7,12 +7,9 @@ export const socketAPIs = Symbol();
 export type IHttpAPIDecoratorParams = ObjectOmit<IHttpAPIParams<any, any>, "call">;
 export type ISocketAPIDecoratorParams = ObjectOmit<ISocketAPIParams<any, any>, "call">;
 
-export type IHttpAPIData = IHttpAPIDecoratorParams & { key: string };
-export type ISocketAPIData = ISocketAPIDecoratorParams & { key: string };
-
 export interface APIDatas {
-  [httpAPIs]: IHttpAPIData[];
-  [socketAPIs]: ISocketAPIData[];
+  [httpAPIs]: IHttpAPIParams<any, any>[];
+  [socketAPIs]: ISocketAPIParams<any, any>[];
 }
 
 export function controller<T extends { new(...args: any[]): {} }>(target: T): T & APIDatas {
@@ -23,14 +20,14 @@ export function controller<T extends { new(...args: any[]): {} }>(target: T): T 
 }
 
 export function http(value: IHttpAPIDecoratorParams) {
-  return function (target: any, propertyKey: string, _descriptor: PropertyDescriptor) {
-    target[httpAPIs].push({ ...value, key: propertyKey });
+  return function (target: any, _propertyKey: string, descriptor: PropertyDescriptor) {
+    target[httpAPIs].push({ ...value, call: (...p: any[]) => descriptor.value(...p) });
   };
 }
 
 
 export function socket(value: IHttpAPIDecoratorParams) {
-  return function (target: any, propertyKey: string, _descriptor: PropertyDescriptor) {
-    target[socketAPIs].push({ ...value, key: propertyKey });
+  return function (target: any, _propertyKey: string, descriptor: PropertyDescriptor) {
+    target[socketAPIs].push({ ...value, call: (...p: any[]) => descriptor.value(...p) });
   };
 }
