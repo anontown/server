@@ -1,11 +1,18 @@
 import { ObjectOmit } from "typelevel-ts";
-import { IHttpAPIParams, ISocketAPIParams } from "./app-server";
+import {
+  IHttpAPIParams,
+  ISocketAPIParams,
+  IHttpAPICall,
+  ISocketAPICall,
+  IHttpAPICallParams,
+  ISocketAPICallParams
+} from "./app-server";
 
 export const httpAPIs = Symbol();
 export const socketAPIs = Symbol();
 
-export type IHttpAPIDecoratorParams = ObjectOmit<IHttpAPIParams<any, any>, "call">;
-export type ISocketAPIDecoratorParams = ObjectOmit<ISocketAPIParams<any, any>, "call">;
+export type IHttpAPIDecoratorParams<P, R> = ObjectOmit<IHttpAPIParams<P, R>, "call">;
+export type ISocketAPIDecoratorParams<P, R> = ObjectOmit<ISocketAPIParams<P, R>, "call">;
 
 export interface APIDatas {
   [httpAPIs]: Array<IHttpAPIParams<any, any>>;
@@ -19,14 +26,16 @@ export function controller<T extends { new(...args: any[]): any }>(target: T): T
   };
 }
 
-export function http(value: IHttpAPIDecoratorParams) {
-  return (target: any, _propertyKey: string, descriptor: PropertyDescriptor) => {
-    target[httpAPIs].push({ ...value, call: (...p: any[]) => descriptor.value(...p) });
+//TODO:型推論がめんどうなので初期値をanyにしてるけどそのうち改善
+export function http<P=any, R=any>(value: IHttpAPIDecoratorParams<P, R>) {
+  return (target: any, _propertyKey: string, descriptor: TypedPropertyDescriptor<IHttpAPICall<P, R>>) => {
+    target[httpAPIs].push({ ...value, call: (params: IHttpAPICallParams<P>) => descriptor.value!(params) });
   };
 }
 
-export function socket(value: ISocketAPIDecoratorParams) {
-  return (target: any, _propertyKey: string, descriptor: PropertyDescriptor) => {
-    target[socketAPIs].push({ ...value, call: (...p: any[]) => descriptor.value(...p) });
+//TODO:型推論がめんどうなので初期値をanyにしてるけどそのうち改善
+export function socket<P=any, R=any>(value: ISocketAPIDecoratorParams<P, R>) {
+  return (target: any, _propertyKey: string, descriptor: TypedPropertyDescriptor<ISocketAPICall<P, R>>) => {
+    target[socketAPIs].push({ ...value, call: (params: ISocketAPICallParams<P>) => descriptor.value!(params) });
   };
 }

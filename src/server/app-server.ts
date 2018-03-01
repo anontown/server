@@ -25,13 +25,17 @@ export interface IHttpAPICallParams<TParams> {
   repo: IRepo;
 }
 
+export interface IHttpAPICall<P, R> {
+  (params: IHttpAPICallParams<P>): Promise<R>
+}
+
 export interface IHttpAPIParams<TParams, TResult> {
   url: string;
   schema: object;
   isAuthToken: "master" | "all" | "no";
   isAuthUser: boolean;
   isRecaptcha?: boolean;
-  call: (params: IHttpAPICallParams<TParams>) => Promise<TResult>;
+  call: IHttpAPICall<TParams, TResult>;
 }
 
 export interface ISocketAPICallParams<TParams> {
@@ -41,13 +45,17 @@ export interface ISocketAPICallParams<TParams> {
   repo: IRepo;
 }
 
+export interface ISocketAPICall<P, R> {
+  (params: ISocketAPICallParams<P>): Promise<Observable<R>>
+}
+
 export interface ISocketAPIParams<TParams, TResult> {
   name: string;
   schema: object;
   isAuthToken: "master" | "all" | "no";
   isAuthUser: boolean;
   isRecaptcha: boolean;
-  call: (params: ISocketAPICallParams<TParams>) => Promise<Observable<TResult>>;
+  call: ISocketAPICall<TParams, TResult>;
 }
 
 export class AppServer {
