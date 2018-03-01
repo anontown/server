@@ -3,14 +3,15 @@ import {
   IProfileAPI,
   Profile,
 } from "../models";
-import { AppServer } from "../server";
+import {
+  controller,
+  http,
+  IHttpAPICallParams
+} from "../server";
 
-export function addProfileAPI(api: AppServer) {
-  api.addAPI<{
-    name: string,
-    body: string,
-    sn: string,
-  }, IProfileAPI>({
+@controller
+export class ProfileController {
+  @http({
     url: "/profile/create",
 
     isAuthUser: false,
@@ -31,15 +32,19 @@ export function addProfileAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, log, now, repo }) => {
-      const profile = Profile.create(ObjectIDGenerator, auth.token, params.name, params.body, params.sn, now);
-      await repo.profile.insert(profile);
-      log("profiles", profile.id);
-      return profile.toAPI(auth.token);
-    },
-  });
+  })
+  async create({ params, auth, log, now, repo }: IHttpAPICallParams<{
+    name: string,
+    body: string,
+    sn: string,
+  }>): Promise<IProfileAPI> {
+    const profile = Profile.create(ObjectIDGenerator, auth.token, params.name, params.body, params.sn, now);
+    await repo.profile.insert(profile);
+    log("profiles", profile.id);
+    return profile.toAPI(auth.token);
+  }
 
-  api.addAPI<{ id: string }, IProfileAPI>({
+  @http({
     url: "/profile/find/one",
 
     isAuthUser: false,
@@ -54,13 +59,13 @@ export function addProfileAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const profile = await repo.profile.findOne(params.id);
-      return profile.toAPI(auth.tokenOrNull);
-    },
-  });
+  })
+  async findOne({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IProfileAPI> {
+    const profile = await repo.profile.findOne(params.id);
+    return profile.toAPI(auth.tokenOrNull);
+  }
 
-  api.addAPI<{ ids: string[] }, IProfileAPI[]>({
+  @http({
     url: "/profile/find/in",
 
     isAuthUser: false,
@@ -78,13 +83,13 @@ export function addProfileAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const profiles = await repo.profile.findIn(params.ids);
-      return profiles.map(p => p.toAPI(auth.tokenOrNull));
-    },
-  });
+  })
+  async findIn({ params, auth, repo }: IHttpAPICallParams<{ ids: string[] }>): Promise<IProfileAPI[]> {
+    const profiles = await repo.profile.findIn(params.ids);
+    return profiles.map(p => p.toAPI(auth.tokenOrNull));
+  }
 
-  api.addAPI<null, IProfileAPI[]>({
+  @http({
     url: "/profile/find/all",
 
     isAuthUser: false,
@@ -92,18 +97,13 @@ export function addProfileAPI(api: AppServer) {
     schema: {
       type: "null",
     },
-    call: async ({ auth, repo }) => {
-      const profiles = await repo.profile.findAll(auth.token);
-      return profiles.map(p => p.toAPI(auth.token));
-    },
-  });
+  })
+  async findAll({ auth, repo }: IHttpAPICallParams<null>): Promise<IProfileAPI[]> {
+    const profiles = await repo.profile.findAll(auth.token);
+    return profiles.map(p => p.toAPI(auth.token));
+  }
 
-  api.addAPI<{
-    id: string,
-    name: string,
-    body: string,
-    sn: string,
-  }, IProfileAPI>({
+  @http({
     url: "/profile/update",
 
     isAuthUser: false,
@@ -127,13 +127,17 @@ export function addProfileAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, log, now, repo }) => {
-      const profile = await repo.profile.findOne(params.id);
-      const newProfile = profile.changeData(auth.token, params.name, params.body, params.sn, now);
-      await repo.profile.update(newProfile);
-      log("profiles", newProfile.id);
-      return newProfile.toAPI(auth.token);
-    },
-  });
-
+  })
+  async update({ params, auth, log, now, repo }: IHttpAPICallParams<{
+    id: string,
+    name: string,
+    body: string,
+    sn: string,
+  }>): Promise<IProfileAPI> {
+    const profile = await repo.profile.findOne(params.id);
+    const newProfile = profile.changeData(auth.token, params.name, params.body, params.sn, now);
+    await repo.profile.update(newProfile);
+    log("profiles", newProfile.id);
+    return newProfile.toAPI(auth.token);
+  }
 }
