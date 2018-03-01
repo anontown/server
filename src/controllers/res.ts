@@ -1,10 +1,10 @@
-import { AppServer } from "../server";
 import { AtPrerequisiteError } from "../at-error";
 import { ObjectIDGenerator } from "../generator";
 import {
   IResAPI,
   ResNormal,
 } from "../models";
+import { AppServer } from "../server";
 
 export function addResAPI(api: AppServer) {
   api.addAPI<{

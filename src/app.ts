@@ -2,13 +2,13 @@
 require("source-map-support").install();
 import * as fs from "fs-promise";
 import { Config } from "./config";
+import { addAPI } from "./controllers";
 import { createDB } from "./create-db";
 import {  } from "./generator";
 import {
   Repo,
 } from "./models";
 import { AppServer } from "./server/app-server";
-import { addAPI } from "./controllers";
 
 (async () => {
   // フォルダ作成

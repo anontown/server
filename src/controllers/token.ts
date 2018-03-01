@@ -1,4 +1,3 @@
-import { AppServer } from "../server";
 import { AtPrerequisiteError } from "../at-error";
 import { ObjectIDGenerator, RandomGenerator } from "../generator";
 import {
@@ -10,6 +9,7 @@ import {
   TokenGeneral,
   TokenMaster,
 } from "../models";
+import { AppServer } from "../server";
 
 export function addTokenAPI(api: AppServer) {
   api.addAPI<null, ITokenAPI>({

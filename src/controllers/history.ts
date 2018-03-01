@@ -1,8 +1,8 @@
-import { AppServer } from "../server";
 import { } from "../generator";
 import {
   IHistoryAPI,
 } from "../models";
+import { AppServer } from "../server";
 
 export function addHistoryAPI(api: AppServer) {
   api.addAPI<{ id: string }, IHistoryAPI>({

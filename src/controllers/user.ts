@@ -1,9 +1,9 @@
-import { AppServer } from "../server";
 import { ObjectIDGenerator } from "../generator";
 import {
   IUserAPI,
   User,
 } from "../models";
+import { AppServer } from "../server";
 
 export function addUserAPI(api: AppServer) {
   api.addAPI<null, null>({

@@ -1,9 +1,9 @@
-import { AppServer } from "../server";
 import { ObjectIDGenerator } from "../generator";
 import {
   IProfileAPI,
   Profile,
 } from "../models";
+import { AppServer } from "../server";
 
 export function addProfileAPI(api: AppServer) {
   api.addAPI<{

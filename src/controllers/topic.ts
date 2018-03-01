@@ -1,4 +1,3 @@
-import { AppServer } from "../server";
 import { AtPrerequisiteError } from "../at-error";
 import { ObjectIDGenerator } from "../generator";
 import {
@@ -8,6 +7,7 @@ import {
   TopicNormal,
   TopicOne,
 } from "../models";
+import { AppServer } from "../server";
 
 export function addTopicAPI(api: AppServer) {
   api.addSocketAPI<{ id: string }, { res: IResAPI, count: number }>({

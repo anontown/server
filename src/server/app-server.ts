@@ -101,7 +101,7 @@ export class AppServer {
           ip,
           now: new Date(),
           repo: this.repo,
-          log: (name, id) => Logger.app.info(url, ip, name, id)
+          log: (name, id) => Logger.app.info(url, ip, name, id),
         });
 
         res.status(200);
@@ -178,7 +178,7 @@ export class AppServer {
           params,
           auth,
           now: new Date(),
-          repo: this.repo
+          repo: this.repo,
         })).subscribe(
           onNext => {
             ws.send(JSON.stringify(onNext));

@@ -1,8 +1,8 @@
-import { AppServer } from "../server";
 import { } from "../generator";
 import {
   IMsgAPI,
 } from "../models";
+import { AppServer } from "../server";
 
 export function addMsgAPI(api: AppServer) {
   api.addAPI<{ id: string }, IMsgAPI>({

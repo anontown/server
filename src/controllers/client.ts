@@ -1,9 +1,9 @@
-import { AppServer } from "../server";
 import { ObjectIDGenerator } from "../generator";
 import {
   Client,
   IClientAPI,
 } from "../models";
+import { AppServer } from "../server";
 
 export function addClientAPI(api: AppServer) {
   api.addAPI<{ name: string, url: string }, IClientAPI>({
