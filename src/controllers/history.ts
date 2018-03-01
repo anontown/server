@@ -2,10 +2,15 @@ import { } from "../generator";
 import {
   IHistoryAPI,
 } from "../models";
-import { AppServer } from "../server";
+import {
+  controller,
+  http,
+  IHttpAPICallParams
+} from "../server";
 
-export function addHistoryAPI(api: AppServer) {
-  api.addAPI<{ id: string }, IHistoryAPI>({
+@controller
+export class HistoryController {
+  @http({
     url: "/history/find/one",
 
     isAuthUser: false,
@@ -20,13 +25,13 @@ export function addHistoryAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, repo }) => {
-      return (await repo.history.findOne(params.id))
-        .toAPI();
-    },
-  });
+  })
+  async findHistoryOne({ params, repo }: IHttpAPICallParams<{ id: string }>): Promise<IHistoryAPI> {
+    return (await repo.history.findOne(params.id))
+      .toAPI();
+  }
 
-  api.addAPI<{ ids: string[] }, IHistoryAPI[]>({
+  @http({
     url: "/history/find/in",
 
     isAuthUser: false,
@@ -44,13 +49,13 @@ export function addHistoryAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, repo }) => {
-      return (await repo.history.findIn(params.ids))
-        .map(h => h.toAPI());
-    },
-  });
+  })
+  async findHistoryIn({ params, repo }: IHttpAPICallParams<{ ids: string[] }>): Promise<IHistoryAPI[]> {
+    return (await repo.history.findIn(params.ids))
+      .map(h => h.toAPI());
+  }
 
-  api.addAPI<{ topic: string }, IHistoryAPI[]>({
+  @http({
     url: "/history/find/all",
 
     isAuthUser: false,
@@ -65,9 +70,9 @@ export function addHistoryAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, repo }) => {
-      return (await repo.history.findAll(await repo.topic.findOne(params.topic)))
-        .map(h => h.toAPI());
-    },
-  });
+  })
+  async findHistoryall({ params, repo }: IHttpAPICallParams<{ topic: string }>): Promise<IHistoryAPI[]> {
+    return (await repo.history.findAll(await repo.topic.findOne(params.topic)))
+      .map(h => h.toAPI());
+  }
 }
