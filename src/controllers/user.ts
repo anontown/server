@@ -3,10 +3,15 @@ import {
   IUserAPI,
   User,
 } from "../models";
-import { AppServer } from "../server";
+import {
+  controller,
+  http,
+  IHttpAPICallParams
+} from "../server";
 
-export function addUserAPI(api: AppServer) {
-  api.addAPI<null, null>({
+@controller
+export class UserController {
+  @http({
     url: "/user/auth",
 
     isAuthUser: true,
@@ -14,15 +19,12 @@ export function addUserAPI(api: AppServer) {
     schema: {
       type: "null",
     },
-    call: async () => {
-      return null;
-    },
-  });
+  })
+  async auth({ }: IHttpAPICallParams<null>): Promise<null> {
+    return null;
+  }
 
-  api.addAPI<{
-    sn: string,
-    pass: string,
-  }, IUserAPI>({
+  @http({
     url: "/user/create",
 
     isAuthUser: false,
@@ -41,13 +43,17 @@ export function addUserAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, now, repo }) => {
-      const user = User.create(ObjectIDGenerator, params.sn, params.pass, now);
-      await repo.user.insert(user);
-      return user.toAPI();
-    },
-  });
-  api.addAPI<{ sn: string }, string>({
+  })
+  async create({ params, now, repo }: IHttpAPICallParams<{
+    sn: string,
+    pass: string,
+  }>): Promise<IUserAPI> {
+    const user = User.create(ObjectIDGenerator, params.sn, params.pass, now);
+    await repo.user.insert(user);
+    return user.toAPI();
+  }
+
+  @http({
     url: "/user/find/id",
 
     isAuthUser: false,
@@ -62,11 +68,12 @@ export function addUserAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, repo }) => {
-      return (await repo.user.findID(params.sn)).toString();
-    },
-  });
-  api.addAPI<{ id: string }, string>({
+  })
+  async findID({ params, repo }: IHttpAPICallParams<{ sn: string }>): Promise<string> {
+    return (await repo.user.findID(params.sn)).toString();
+  }
+
+  @http({
     url: "/user/find/sn",
 
     isAuthUser: false,
@@ -81,11 +88,12 @@ export function addUserAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, repo }) => {
-      return (await repo.user.findSN(params.id));
-    },
-  });
-  api.addAPI<{ pass: string, sn: string }, IUserAPI>({
+  })
+  async findSN({ params, repo }: IHttpAPICallParams<{ id: string }>): Promise<string> {
+    return (await repo.user.findSN(params.id));
+  }
+
+  @http({
     url: "/user/update",
 
     isAuthUser: true,
@@ -103,12 +111,12 @@ export function addUserAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const user = await repo.user.findOne(auth.user.id);
-      const newUser = user.change(auth.user, params.pass, params.sn);
-      await repo.user.update(newUser);
-      await repo.token.delMasterToken(auth.user);
-      return newUser.toAPI();
-    },
-  });
+  })
+  async update({ params, auth, repo }: IHttpAPICallParams<{ pass: string, sn: string }>): Promise<IUserAPI> {
+    const user = await repo.user.findOne(auth.user.id);
+    const newUser = user.change(auth.user, params.pass, params.sn);
+    await repo.user.update(newUser);
+    await repo.token.delMasterToken(auth.user);
+    return newUser.toAPI();
+  }
 }
