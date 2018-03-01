@@ -4,17 +4,15 @@ import {
   IResAPI,
   ResNormal,
 } from "../models";
-import { AppServer } from "../server";
+import {
+  controller,
+  http,
+  IHttpAPICallParams
+} from "../server";
 
-export function addResAPI(api: AppServer) {
-  api.addAPI<{
-    topic: string,
-    name: string | null,
-    body: string,
-    reply: string | null,
-    profile: string | null,
-    age: boolean,
-  }, IResAPI>({
+@controller
+export class ResController {
+  @http({
     url: "/res/create",
 
     isAuthUser: false,
@@ -44,41 +42,48 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, now, repo, log }) => {
-      const val = await Promise.all([
-        repo.topic.findOne(params.topic),
-        repo.user.findOne(auth.token.user),
-        params.reply !== null ? repo.res.findOne(params.reply) : Promise.resolve(null),
-        params.profile !== null ? repo.profile.findOne(params.profile) : Promise.resolve(null),
-      ]);
+  })
+  async create({ params, auth, now, repo, log }: IHttpAPICallParams<{
+    topic: string,
+    name: string | null,
+    body: string,
+    reply: string | null,
+    profile: string | null,
+    age: boolean,
+  }>): Promise<IResAPI> {
+    const val = await Promise.all([
+      repo.topic.findOne(params.topic),
+      repo.user.findOne(auth.token.user),
+      params.reply !== null ? repo.res.findOne(params.reply) : Promise.resolve(null),
+      params.profile !== null ? repo.profile.findOne(params.profile) : Promise.resolve(null),
+    ]);
 
-      const topic = val[0];
-      const user = val[1];
-      const reply = val[2];
-      const profile = val[3];
-      const { res, user: newUser, topic: newTopic } = ResNormal.create(ObjectIDGenerator,
-        topic,
-        user,
-        auth.token,
-        params.name,
-        params.body,
-        reply,
-        profile,
-        params.age,
-        now);
+    const topic = val[0];
+    const user = val[1];
+    const reply = val[2];
+    const profile = val[3];
+    const { res, user: newUser, topic: newTopic } = ResNormal.create(ObjectIDGenerator,
+      topic,
+      user,
+      auth.token,
+      params.name,
+      params.body,
+      reply,
+      profile,
+      params.age,
+      now);
 
-      await Promise.all([
-        repo.res.insert(res),
-        repo.topic.update(newTopic),
-        repo.user.update(newUser),
-      ]);
+    await Promise.all([
+      repo.res.insert(res),
+      repo.topic.update(newTopic),
+      repo.user.update(newUser),
+    ]);
 
-      log("reses", res.id);
-      return res.toAPI(auth.token);
-    },
-  });
+    log("reses", res.id);
+    return res.toAPI(auth.token);
+  }
 
-  api.addAPI<{ id: string }, IResAPI>({
+  @http({
     url: "/res/find/one",
 
     isAuthUser: false,
@@ -93,13 +98,13 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const res = await repo.res.findOne(params.id);
-      return res.toAPI(auth.tokenOrNull);
-    },
-  });
+  })
+  async findOne({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IResAPI> {
+    const res = await repo.res.findOne(params.id);
+    return res.toAPI(auth.tokenOrNull);
+  }
 
-  api.addAPI<{ ids: string[] }, IResAPI[]>({
+  @http({
     url: "/res/find/in",
 
     isAuthUser: false,
@@ -117,19 +122,13 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const reses = await repo.res.findIn(params.ids);
-      return reses.map(r => r.toAPI(auth.tokenOrNull));
-    },
-  });
+  })
+  async findIn({ params, auth, repo }: IHttpAPICallParams<{ ids: string[] }>): Promise<IResAPI[]> {
+    const reses = await repo.res.findIn(params.ids);
+    return reses.map(r => r.toAPI(auth.tokenOrNull));
+  }
 
-  api.addAPI<{
-    topic: string,
-    type: "before" | "after",
-    equal: boolean,
-    date: string,
-    limit: number,
-  }, IResAPI[]>({
+  @http({
     url: "/res/find",
 
     isAuthUser: false,
@@ -158,14 +157,20 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const topic = await repo.topic.findOne(params.topic);
-      const reses = await repo.res.find(topic, params.type, params.equal, new Date(params.date), params.limit);
-      return reses.map(r => r.toAPI(auth.tokenOrNull));
-    },
-  });
+  })
+  async find({ params, auth, repo }: IHttpAPICallParams<{
+    topic: string,
+    type: "before" | "after",
+    equal: boolean,
+    date: string,
+    limit: number,
+  }>): Promise<IResAPI[]> {
+    const topic = await repo.topic.findOne(params.topic);
+    const reses = await repo.res.find(topic, params.type, params.equal, new Date(params.date), params.limit);
+    return reses.map(r => r.toAPI(auth.tokenOrNull));
+  }
 
-  api.addAPI<{ topic: string, limit: number }, IResAPI[]>({
+  @http({
     url: "/res/find/new",
 
     isAuthUser: false,
@@ -183,14 +188,14 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const topic = await repo.topic.findOne(params.topic);
-      const reses = await repo.res.findNew(topic, params.limit);
-      return reses.map(r => r.toAPI(auth.tokenOrNull));
-    },
-  });
+  })
+  async findNew({ params, auth, repo }: IHttpAPICallParams<{ topic: string, limit: number }>): Promise<IResAPI[]> {
+    const topic = await repo.topic.findOne(params.topic);
+    const reses = await repo.res.findNew(topic, params.limit);
+    return reses.map(r => r.toAPI(auth.tokenOrNull));
+  }
 
-  api.addAPI<{ topic: string, hash: string }, IResAPI[]>({
+  @http({
     url: "/res/find/hash",
 
     isAuthUser: false,
@@ -208,14 +213,14 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const topic = await repo.topic.findOne(params.topic);
-      const reses = await repo.res.findHash(topic, params.hash);
-      return reses.map(r => r.toAPI(auth.tokenOrNull));
-    },
-  });
+  })
+  async findHash({ params, auth, repo }: IHttpAPICallParams<{ topic: string, hash: string }>): Promise<IResAPI[]> {
+    const topic = await repo.topic.findOne(params.topic);
+    const reses = await repo.res.findHash(topic, params.hash);
+    return reses.map(r => r.toAPI(auth.tokenOrNull));
+  }
 
-  api.addAPI<{ topic: string, reply: string }, IResAPI[]>({
+  @http({
     url: "/res/find/reply",
 
     isAuthUser: false,
@@ -233,26 +238,21 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const val = await Promise.all([
-        repo.topic.findOne(params.topic),
-        repo.res.findOne(params.reply),
-      ]);
+  })
+  async findReply({ params, auth, repo }: IHttpAPICallParams<{ topic: string, reply: string }>): Promise<IResAPI[]> {
+    const val = await Promise.all([
+      repo.topic.findOne(params.topic),
+      repo.res.findOne(params.reply),
+    ]);
 
-      const topic = val[0];
-      const res = val[1];
+    const topic = val[0];
+    const res = val[1];
 
-      const reses = await repo.res.findReply(topic, res);
-      return reses.map(r => r.toAPI(auth.tokenOrNull));
-    },
-  });
+    const reses = await repo.res.findReply(topic, res);
+    return reses.map(r => r.toAPI(auth.tokenOrNull));
+  }
 
-  api.addAPI<{
-    type: "before" | "after",
-    equal: boolean,
-    date: string,
-    limit: number,
-  }, IResAPI[]>({
+  @http({
     url: "/res/find/notice",
 
     isAuthUser: false,
@@ -278,14 +278,19 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const res = await repo.res
-        .findNotice(auth.token, params.type, params.equal, new Date(params.date), params.limit);
-      return res.map(x => x.toAPI(auth.token));
-    },
-  });
+  })
+  async findNotice({ params, auth, repo }: IHttpAPICallParams<{
+    type: "before" | "after",
+    equal: boolean,
+    date: string,
+    limit: number,
+  }>): Promise<IResAPI[]> {
+    const res = await repo.res
+      .findNotice(auth.token, params.type, params.equal, new Date(params.date), params.limit);
+    return res.map(x => x.toAPI(auth.token));
+  }
 
-  api.addAPI<{ limit: number }, IResAPI[]>({
+  @http({
     url: "/res/find/notice/new",
 
     isAuthUser: false,
@@ -300,13 +305,13 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const res = await repo.res.findNoticeNew(auth.token, params.limit);
-      return res.map(x => x.toAPI(auth.token));
-    },
-  });
+  })
+  async findNoticeNew({ params, auth, repo }: IHttpAPICallParams<{ limit: number }>): Promise<IResAPI[]> {
+    const res = await repo.res.findNoticeNew(auth.token, params.limit);
+    return res.map(x => x.toAPI(auth.token));
+  }
 
-  api.addAPI<{ id: string }, IResAPI>({
+  @http({
     url: "/res/uv",
 
     isAuthUser: false,
@@ -321,34 +326,34 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const val = await Promise.all([
-        repo.res.findOne(params.id),
-        repo.user.findOne(auth.token.user),
-      ]);
+  })
+  async uv({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IResAPI> {
+    const val = await Promise.all([
+      repo.res.findOne(params.id),
+      repo.user.findOne(auth.token.user),
+    ]);
 
-      // レス
-      const res = val[0];
+    // レス
+    const res = val[0];
 
-      // 投票するユーザー
-      const user = val[1];
+    // 投票するユーザー
+    const user = val[1];
 
-      // レスを書き込んだユーザー
-      const resUser = await repo.user.findOne(res.user);
+    // レスを書き込んだユーザー
+    const resUser = await repo.user.findOne(res.user);
 
-      const { res: newRes, resUser: newResUser } = res.v(resUser, user, "uv", auth.token);
+    const { res: newRes, resUser: newResUser } = res.v(resUser, user, "uv", auth.token);
 
-      await Promise.all([
-        repo.res.update(newRes),
-        repo.user.update(newResUser),
-        repo.user.update(user),
-      ]);
+    await Promise.all([
+      repo.res.update(newRes),
+      repo.user.update(newResUser),
+      repo.user.update(user),
+    ]);
 
-      return newRes.toAPI(auth.token);
-    },
-  });
+    return newRes.toAPI(auth.token);
+  }
 
-  api.addAPI<{ id: string }, IResAPI>({
+  @http({
     url: "/res/dv",
 
     isAuthUser: false,
@@ -363,35 +368,35 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const val = await Promise.all([
-        repo.res.findOne(params.id),
-        repo.user.findOne(auth.token.user),
-      ]);
+  })
+  async dv({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IResAPI> {
+    const val = await Promise.all([
+      repo.res.findOne(params.id),
+      repo.user.findOne(auth.token.user),
+    ]);
 
-      const res = val[0];
+    const res = val[0];
 
-      // 投票するユーザー
-      const user = val[1];
+    // 投票するユーザー
+    const user = val[1];
 
-      // レスを書き込んだユーザー
-      const resUser = await repo.user.findOne(res.user);
+    // レスを書き込んだユーザー
+    const resUser = await repo.user.findOne(res.user);
 
-      const { res: newRes, resUser: newResUser } = res.v(resUser, user, "dv", auth.token);
+    const { res: newRes, resUser: newResUser } = res.v(resUser, user, "dv", auth.token);
 
-      const promise = [
-        repo.res.update(newRes),
-        repo.user.update(newResUser),
-        repo.user.update(user),
-      ];
+    const promise = [
+      repo.res.update(newRes),
+      repo.user.update(newResUser),
+      repo.user.update(user),
+    ];
 
-      await Promise.all(promise);
+    await Promise.all(promise);
 
-      return newRes.toAPI(auth.token);
-    },
-  });
+    return newRes.toAPI(auth.token);
+  }
 
-  api.addAPI<{ id: string }, IResAPI>({
+  @http({
     url: "/res/cv",
 
     isAuthUser: false,
@@ -406,34 +411,34 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const val = await Promise.all([
-        repo.res.findOne(params.id),
-        repo.user.findOne(auth.token.user),
-      ]);
+  })
+  async cv({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IResAPI> {
+    const val = await Promise.all([
+      repo.res.findOne(params.id),
+      repo.user.findOne(auth.token.user),
+    ]);
 
-      // レス
-      const res = val[0];
+    // レス
+    const res = val[0];
 
-      // 投票するユーザー
-      const user = val[1];
+    // 投票するユーザー
+    const user = val[1];
 
-      // レスを書き込んだユーザー
-      const resUser = await repo.user.findOne(res.user);
+    // レスを書き込んだユーザー
+    const resUser = await repo.user.findOne(res.user);
 
-      const { res: newRes, resUser: newResUser } = res.cv(resUser, user, auth.token);
+    const { res: newRes, resUser: newResUser } = res.cv(resUser, user, auth.token);
 
-      await Promise.all([
-        repo.res.update(newRes),
-        repo.user.update(newResUser),
-        repo.user.update(user),
-      ]);
+    await Promise.all([
+      repo.res.update(newRes),
+      repo.user.update(newResUser),
+      repo.user.update(user),
+    ]);
 
-      return newRes.toAPI(auth.token);
-    },
-  });
+    return newRes.toAPI(auth.token);
+  }
 
-  api.addAPI<{ id: string }, IResAPI>({
+  @http({
     url: "/res/del",
 
     isAuthUser: false,
@@ -448,26 +453,25 @@ export function addResAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      // レス
-      const res = await repo.res.findOne(params.id);
+  })
+  async del({ params, auth, repo }:IHttpAPICallParams<{ id: string }>):Promise<IResAPI> {
+    // レス
+    const res = await repo.res.findOne(params.id);
 
-      if (res.type !== "normal") {
-        throw new AtPrerequisiteError("通常レス以外は削除出来ません");
-      }
+    if (res.type !== "normal") {
+      throw new AtPrerequisiteError("通常レス以外は削除出来ません");
+    }
 
-      // レスを書き込んだユーザー
-      const resUser = await repo.user.findOne(res.user);
+    // レスを書き込んだユーザー
+    const resUser = await repo.user.findOne(res.user);
 
-      const { res: newRes, resUser: newResUser } = res.del(resUser, auth.token);
+    const { res: newRes, resUser: newResUser } = res.del(resUser, auth.token);
 
-      await Promise.all([
-        repo.res.update(newRes),
-        repo.user.update(newResUser),
-      ]);
+    await Promise.all([
+      repo.res.update(newRes),
+      repo.user.update(newResUser),
+    ]);
 
-      return newRes.toAPI(auth.token);
-    },
-  });
-
+    return newRes.toAPI(auth.token);
+  }
 }
