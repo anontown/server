@@ -1,4 +1,3 @@
-import { } from "../generator";
 import {
   IMsgAPI,
 } from "../models";
