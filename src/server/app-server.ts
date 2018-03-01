@@ -14,6 +14,7 @@ import { AuthContainer } from "./auth-container";
 import * as authFromApiParam from "./auth-from-api-param";
 import { jsonSchemaCheck } from "./json-schema-check";
 import * as schemas from "./schemas";
+import { APIDatas, httpAPIs, socketAPIs } from "./decorator";
 
 export interface IHttpAPICallParams<TParams> {
   params: TParams;
@@ -55,13 +56,20 @@ export class AppServer {
   private socketAPIs = new Map<string, ISocketAPIParams<any, any>>();
   private wsServer: ws.Server;
 
-  constructor(private port: number, private repo: IRepo) {
+  constructor(private port: number, private repo: IRepo, controllers: { new(...args: any[]): APIDatas }[]) {
     this.app = express();
     this.server = http.createServer(this.app as any);
     this.wsServer = new ws.Server({ server: this.server });
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(bodyParser.json());
     this.app.use(Logger.express);
+
+    controllers
+      .map(c => new c())
+      .forEach(c => {
+        c[httpAPIs].forEach(data => this.addAPI(data));
+        c[socketAPIs].forEach(data => this.addSocketAPI(data))
+      });
   }
 
   addSocketAPI<TParams, TResult>(param: ISocketAPIParams<TParams, TResult>) {
