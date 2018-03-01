@@ -26,7 +26,7 @@ export function http(value: IHttpAPIDecoratorParams) {
 }
 
 
-export function socket(value: IHttpAPIDecoratorParams) {
+export function socket(value: ISocketAPIDecoratorParams) {
   return function (target: any, _propertyKey: string, descriptor: PropertyDescriptor) {
     target[socketAPIs].push({ ...value, call: (...p: any[]) => descriptor.value(...p) });
   };
