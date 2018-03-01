@@ -25,9 +25,7 @@ export interface IHttpAPICallParams<TParams> {
   repo: IRepo;
 }
 
-export interface IHttpAPICall<P, R> {
-  (params: IHttpAPICallParams<P>): Promise<R>
-}
+export type IHttpAPICall<P, R> = (params: IHttpAPICallParams<P>) => Promise<R>;
 
 export interface IHttpAPIParams<TParams, TResult> {
   url: string;
@@ -45,9 +43,7 @@ export interface ISocketAPICallParams<TParams> {
   repo: IRepo;
 }
 
-export interface ISocketAPICall<P, R> {
-  (params: ISocketAPICallParams<P>): Promise<Observable<R>>
-}
+export type ISocketAPICall<P, R> = (params: ISocketAPICallParams<P>) => Promise<Observable<R>>;
 
 export interface ISocketAPIParams<TParams, TResult> {
   name: string;
