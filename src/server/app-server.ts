@@ -24,7 +24,7 @@ export interface IHttpAPICallParams<TParams> {
   repo: IRepo;
 }
 
-interface IHttpAPIParams<TParams, TResult> {
+export interface IHttpAPIParams<TParams, TResult> {
   url: string;
   schema: object;
   isAuthToken: "master" | "all" | "no";
@@ -40,7 +40,7 @@ export interface ISocketAPICallParams<TParams> {
   repo: IRepo;
 }
 
-interface ISocketAPIParams<TParams, TResult> {
+export interface ISocketAPIParams<TParams, TResult> {
   name: string;
   schema: object;
   isAuthToken: "master" | "all" | "no";
