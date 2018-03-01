@@ -4,7 +4,7 @@ import * as fs from "fs-promise";
 import { Config } from "./config";
 import { addAPI } from "./controllers";
 import { createDB } from "./create-db";
-import {  } from "./generator";
+import { } from "./generator";
 import {
   Repo,
 } from "./models";
@@ -26,7 +26,7 @@ import { AppServer } from "./server/app-server";
 
   await createDB();
 
-  const api = new AppServer(Config.server.port, new Repo());
+  const api = new AppServer(Config.server.port, new Repo(), []);
 
   addAPI(api);
 
