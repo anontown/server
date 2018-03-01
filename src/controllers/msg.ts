@@ -25,7 +25,7 @@ export class MsgController {
       },
     },
   })
-  async findMsgOne({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IMsgAPI> {
+  async findOne({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IMsgAPI> {
     const msg = await repo.msg.findOne(params.id);
     return msg.toAPI(auth.token);
   }
@@ -49,7 +49,7 @@ export class MsgController {
       },
     },
   })
-  async findMsgIn({ params, auth, repo }: IHttpAPICallParams<{ ids: string[] }>): Promise<IMsgAPI[]> {
+  async findIn({ params, auth, repo }: IHttpAPICallParams<{ ids: string[] }>): Promise<IMsgAPI[]> {
     const msgs = await repo.msg.findIn(params.ids);
     return msgs.map(m => m.toAPI(auth.token));
   }
@@ -81,7 +81,7 @@ export class MsgController {
       },
     },
   })
-  async findMsg({ params, auth, repo }: IHttpAPICallParams<{
+  async find({ params, auth, repo }: IHttpAPICallParams<{
     type: "before" | "after",
     equal: boolean,
     date: string,
@@ -108,7 +108,7 @@ export class MsgController {
       },
     },
   })
-  async findMsgNew({ params, auth, repo }: IHttpAPICallParams<{ limit: number }>): Promise<IMsgAPI[]> {
+  async findNew({ params, auth, repo }: IHttpAPICallParams<{ limit: number }>): Promise<IMsgAPI[]> {
     const msgs = await repo.msg.findNew(auth.token, params.limit);
     return msgs.map(m => m.toAPI(auth.token));
   }
