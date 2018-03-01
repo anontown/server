@@ -3,10 +3,15 @@ import {
   Client,
   IClientAPI,
 } from "../models";
-import { AppServer } from "../server";
+import {
+  controller,
+  http,
+  IHttpAPICallParams
+} from "../server";
 
-export function addClientAPI(api: AppServer) {
-  api.addAPI<{ name: string, url: string }, IClientAPI>({
+@controller
+export class ClientController {
+  @http({
     url: "/client/create",
 
     isAuthUser: false,
@@ -23,20 +28,16 @@ export function addClientAPI(api: AppServer) {
           type: "string",
         },
       },
-    },
-    call: async ({ params, auth, log, now, repo }) => {
-      const client = Client.create(ObjectIDGenerator, auth.tokenMaster, params.name, params.url, now);
-      await repo.client.insert(client);
-      log("clients", client.id);
-      return client.toAPI(auth.tokenMaster);
-    },
-  });
+    }
+  })
+  async createClient({ params, auth, log, now, repo }: IHttpAPICallParams<{ name: string, url: string }>): Promise<IClientAPI> {
+    const client = Client.create(ObjectIDGenerator, auth.tokenMaster, params.name, params.url, now);
+    await repo.client.insert(client);
+    log("clients", client.id);
+    return client.toAPI(auth.tokenMaster);
+  }
 
-  api.addAPI<{
-    id: string,
-    name: string,
-    url: string,
-  }, IClientAPI>({
+  @http({
     url: "/client/update",
 
     isAuthUser: false,
@@ -57,16 +58,20 @@ export function addClientAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, log, now, repo }) => {
-      const client = await repo.client.findOne(params.id);
-      const newClient = client.changeData(auth.tokenMaster, params.name, params.url, now);
-      await repo.client.update(newClient);
-      log("clients", newClient.id);
-      return newClient.toAPI(auth.tokenMaster);
-    },
-  });
+  })
+  async updateClient({ params, auth, log, now, repo }: IHttpAPICallParams<{
+    id: string,
+    name: string,
+    url: string,
+  }>): Promise<IClientAPI> {
+    const client = await repo.client.findOne(params.id);
+    const newClient = client.changeData(auth.tokenMaster, params.name, params.url, now);
+    await repo.client.update(newClient);
+    log("clients", newClient.id);
+    return newClient.toAPI(auth.tokenMaster);
+  }
 
-  api.addAPI<{ id: string }, IClientAPI>({
+  @http({
     url: "/client/find/one",
 
     isAuthUser: false,
@@ -81,13 +86,13 @@ export function addClientAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const client = await repo.client.findOne(params.id);
-      return client.toAPI(auth.TokenMasterOrNull);
-    },
-  });
+  })
+  async findClientOne({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IClientAPI> {
+    const client = await repo.client.findOne(params.id);
+    return client.toAPI(auth.TokenMasterOrNull);
+  }
 
-  api.addAPI<{ ids: string[] }, IClientAPI[]>({
+  @http({
     url: "/client/find/in",
 
     isAuthUser: false,
@@ -105,13 +110,13 @@ export function addClientAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const clients = await repo.client.findIn(params.ids);
-      return clients.map(c => c.toAPI(auth.TokenMasterOrNull));
-    },
-  });
+  })
+  async findClientIn({ params, auth, repo }: IHttpAPICallParams<{ ids: string[] }>): Promise<IClientAPI[]> {
+    const clients = await repo.client.findIn(params.ids);
+    return clients.map(c => c.toAPI(auth.TokenMasterOrNull));
+  }
 
-  api.addAPI<null, IClientAPI[]>({
+  @http({
     url: "/client/find/all",
 
     isAuthUser: false,
@@ -119,9 +124,9 @@ export function addClientAPI(api: AppServer) {
     schema: {
       type: "null",
     },
-    call: async ({ auth, repo }) => {
-      const clients = await repo.client.findAll(auth.tokenMaster);
-      return clients.map(c => c.toAPI(auth.tokenMaster));
-    },
-  });
+  })
+  async findClientAll({ auth, repo }: IHttpAPICallParams<null>): Promise<IClientAPI[]> {
+    const clients = await repo.client.findAll(auth.tokenMaster);
+    return clients.map(c => c.toAPI(auth.tokenMaster));
+  }
 }
