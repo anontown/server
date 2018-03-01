@@ -12,11 +12,11 @@ export interface APIDatas {
   [socketAPIs]: ISocketAPIParams<any, any>[];
 }
 
-export function controller<T extends { new(...args: any[]): {} }>(target: T): T & APIDatas {
+export function controller<T extends { new(...args: any[]): any }>(target: T): T {
   return class extends target {
     [httpAPIs] = [];
     [socketAPIs] = [];
-  } as any;
+  };
 }
 
 export function http(value: IHttpAPIDecoratorParams) {

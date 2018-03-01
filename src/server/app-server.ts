@@ -56,7 +56,7 @@ export class AppServer {
   private socketAPIs = new Map<string, ISocketAPIParams<any, any>>();
   private wsServer: ws.Server;
 
-  constructor(private port: number, private repo: IRepo, controllers: { new(...args: any[]): APIDatas }[]) {
+  constructor(private port: number, private repo: IRepo, controllers: { new(...args: any[]): any }[]) {
     this.app = express();
     this.server = http.createServer(this.app as any);
     this.wsServer = new ws.Server({ server: this.server });
@@ -65,7 +65,7 @@ export class AppServer {
     this.app.use(Logger.express);
 
     controllers
-      .map(c => new c())
+      .map(c => new c() as APIDatas)
       .forEach(c => {
         c[httpAPIs].forEach(data => this.addAPI(data));
         c[socketAPIs].forEach(data => this.addSocketAPI(data))
