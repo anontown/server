@@ -20,6 +20,8 @@ export interface IHttpAPICallParams<TParams> {
   auth: AuthContainer;
   ip: string;
   now: Date;
+  log: (name: string, id: string) => void;
+  repo: IRepo;
 }
 
 interface IHttpAPIParams<TParams, TResult> {
@@ -35,6 +37,7 @@ export interface ISocketAPICallParams<TParams> {
   params: TParams;
   auth: AuthContainer;
   now: Date;
+  repo: IRepo;
 }
 
 interface ISocketAPIParams<TParams, TResult> {
@@ -91,11 +94,14 @@ export class AppServer {
           isRecaptcha,
         });
 
+        const ip = req.headers["X-Real-IP"] || req.connection.remoteAddress;
         const result = await call({
           params,
           auth,
-          ip: req.headers["X-Real-IP"] || req.connection.remoteAddress,
+          ip,
           now: new Date(),
+          repo: this.repo,
+          log: (name, id) => Logger.app.info(url, ip, name, id)
         });
 
         res.status(200);
@@ -172,6 +178,7 @@ export class AppServer {
           params,
           auth,
           now: new Date(),
+          repo: this.repo
         })).subscribe(
           onNext => {
             ws.send(JSON.stringify(onNext));
@@ -200,6 +207,9 @@ export class AppServer {
     });
     this.server.listen(this.port);
     Logger.system.info(`listen port ${this.port}`);
+
+    this.repo.user.cron();
+    this.repo.topic.cron();
   }
 
   private async apiJSON<TParams>(

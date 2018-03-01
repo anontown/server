@@ -5,14 +5,12 @@ import { AtPrerequisiteError } from "./at-error";
 import { Config } from "./config";
 import { createDB } from "./create-db";
 import { ObjectIDGenerator, RandomGenerator } from "./generator";
-import { Logger } from "./logger";
 import {
   Client,
- IClientAPI,
+  IClientAPI,
   IHistoryAPI,
   IMsgAPI,
   IProfileAPI,
-  IRepo,
   IResAPI,
   ITokenAPI,
   ITokenGeneralAPI,
@@ -46,15 +44,9 @@ import { AppServer } from "./server/app-server";
     /* tslint:disable:no-empty */
   }
 
-  // ロガー
-  function appLog(method: string, ip: string, idName: string, id: string) {
-    Logger.app.info(method, ip, idName, id);
-  }
-
   await createDB();
 
-  const repo: IRepo = new Repo();
-  const api = new AppServer(Config.server.port, repo);
+  const api = new AppServer(Config.server.port, new Repo());
 
   // [res]
   {
@@ -95,7 +87,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth, ip, now }) => {
+      call: async ({ params, auth, now, repo, log }) => {
         const val = await Promise.all([
           repo.topic.findOne(params.topic),
           repo.user.findOne(auth.token.user),
@@ -124,7 +116,7 @@ import { AppServer } from "./server/app-server";
           repo.user.update(newUser),
         ]);
 
-        appLog("create/res", ip, "reses", res.id);
+        log("reses", res.id);
         return res.toAPI(auth.token);
       },
     });
@@ -144,7 +136,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const res = await repo.res.findOne(params.id);
         return res.toAPI(auth.tokenOrNull);
       },
@@ -168,7 +160,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const reses = await repo.res.findIn(params.ids);
         return reses.map(r => r.toAPI(auth.tokenOrNull));
       },
@@ -209,7 +201,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const topic = await repo.topic.findOne(params.topic);
         const reses = await repo.res.find(topic, params.type, params.equal, new Date(params.date), params.limit);
         return reses.map(r => r.toAPI(auth.tokenOrNull));
@@ -234,7 +226,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const topic = await repo.topic.findOne(params.topic);
         const reses = await repo.res.findNew(topic, params.limit);
         return reses.map(r => r.toAPI(auth.tokenOrNull));
@@ -259,7 +251,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const topic = await repo.topic.findOne(params.topic);
         const reses = await repo.res.findHash(topic, params.hash);
         return reses.map(r => r.toAPI(auth.tokenOrNull));
@@ -284,7 +276,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const val = await Promise.all([
           repo.topic.findOne(params.topic),
           repo.res.findOne(params.reply),
@@ -329,7 +321,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const res = await repo.res
           .findNotice(auth.token, params.type, params.equal, new Date(params.date), params.limit);
         return res.map(x => x.toAPI(auth.token));
@@ -351,7 +343,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const res = await repo.res.findNoticeNew(auth.token, params.limit);
         return res.map(x => x.toAPI(auth.token));
       },
@@ -372,7 +364,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const val = await Promise.all([
           repo.res.findOne(params.id),
           repo.user.findOne(auth.token.user),
@@ -414,7 +406,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const val = await Promise.all([
           repo.res.findOne(params.id),
           repo.user.findOne(auth.token.user),
@@ -457,7 +449,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const val = await Promise.all([
           repo.res.findOne(params.id),
           repo.user.findOne(auth.token.user),
@@ -499,7 +491,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         // レス
         const res = await repo.res.findOne(params.id);
 
@@ -551,7 +543,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth, ip, now }) => {
+      call: async ({ params, auth, log, now, repo }) => {
         const user = await repo.user.findOne(auth.token.user);
         const create = TopicNormal.create(ObjectIDGenerator,
           params.title,
@@ -567,9 +559,9 @@ import { AppServer } from "./server/app-server";
           repo.res.insert(create.res),
           repo.history.insert(create.history),
         ]);
-        appLog("topic/create", ip, "topics", create.topic.id);
-        appLog("topic/create", ip, "reses", create.res.id);
-        appLog("topic/create", ip, "histories", create.history.id);
+        log("topics", create.topic.id);
+        log("reses", create.res.id);
+        log("histories", create.history.id);
         return create.topic.toAPI();
       },
     });
@@ -602,7 +594,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth, ip, now }) => {
+      call: async ({ params, auth, log, now, repo }) => {
         const user = await repo.user.findOne(auth.token.user);
         const create = TopicOne.create(ObjectIDGenerator,
           params.title,
@@ -618,8 +610,8 @@ import { AppServer } from "./server/app-server";
           repo.res.insert(create.res),
         ]);
 
-        appLog("topic/create", ip, "topics", create.topic.id);
-        appLog("topic/create", ip, "reses", create.res.id);
+        log("topics", create.topic.id);
+        log("reses", create.res.id);
 
         return create.topic.toAPI();
       },
@@ -646,7 +638,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth, ip, now }) => {
+      call: async ({ params, auth, log, now, repo }) => {
         const user = await repo.user.findOne(auth.token.user);
         const parent = await repo.topic.findOne(params.parent);
 
@@ -669,9 +661,9 @@ import { AppServer } from "./server/app-server";
           repo.res.insert(create.resParent),
         ]);
 
-        appLog("topic/create", ip, "topics", create.topic.id);
-        appLog("topic/create", ip, "reses", create.res.id);
-        appLog("topic/create", ip, "reses", create.resParent.id);
+        log("topics", create.topic.id);
+        log("reses", create.res.id);
+        log("reses", create.resParent.id);
 
         return create.topic.toAPI();
       },
@@ -692,7 +684,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params }) => {
+      call: async ({ params, repo }) => {
         const topic = await repo.topic.findOne(params.id);
         return topic.toAPI();
       },
@@ -716,7 +708,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params }) => {
+      call: async ({ params, repo }) => {
         const topics = await repo.topic.findIn(params.ids);
         return topics.map(t => t.toAPI());
       },
@@ -761,7 +753,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params }) => {
+      call: async ({ params, repo }) => {
         const topic = await repo.topic
           .find(params.title, params.tags, params.skip, params.limit, params.activeOnly);
         return topic.map(t => t.toAPI());
@@ -797,7 +789,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params }) => {
+      call: async ({ params, repo }) => {
         const parent = await repo.topic.findOne(params.parent);
         if (parent.type !== "normal") {
           throw new AtPrerequisiteError("親トピックは通常トピックのみ指定できます");
@@ -823,7 +815,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params }) => {
+      call: async ({ params, repo }) => {
         return await repo.topic.findTags(params.limit);
       },
     });
@@ -860,7 +852,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth, ip, now }) => {
+      call: async ({ params, auth, log, now, repo }) => {
         const [topic, user] = await Promise.all([
           repo.topic.findOne(params.id),
           repo.user.findOne(auth.token.user),
@@ -879,8 +871,8 @@ import { AppServer } from "./server/app-server";
           repo.user.update(val.user),
         ]);
 
-        appLog("topic/update", ip, "reses", val.res.id);
-        appLog("topic/update", ip, "histories", val.history.id);
+        log("reses", val.res.id);
+        log("histories", val.history.id);
         return topic.toAPI();
       },
     });
@@ -902,7 +894,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params }) => {
+      call: async ({ params, repo }) => {
         return (await repo.history.findOne(params.id))
           .toAPI();
       },
@@ -926,7 +918,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params }) => {
+      call: async ({ params, repo }) => {
         return (await repo.history.findIn(params.ids))
           .map(h => h.toAPI());
       },
@@ -947,7 +939,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params }) => {
+      call: async ({ params, repo }) => {
         return (await repo.history.findAll(await repo.topic.findOne(params.topic)))
           .map(h => h.toAPI());
       },
@@ -970,7 +962,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const msg = await repo.msg.findOne(params.id);
         return msg.toAPI(auth.token);
       },
@@ -994,7 +986,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const msgs = await repo.msg.findIn(params.ids);
         return msgs.map(m => m.toAPI(auth.token));
       },
@@ -1031,7 +1023,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const msgs = await repo.msg
           .find(auth.token, params.type, params.equal, new Date(params.date), params.limit);
         return msgs.map(m => m.toAPI(auth.token));
@@ -1053,7 +1045,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const msgs = await repo.msg.findNew(auth.token, params.limit);
         return msgs.map(m => m.toAPI(auth.token));
       },
@@ -1086,10 +1078,10 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth, ip, now }) => {
+      call: async ({ params, auth, log, now, repo }) => {
         const profile = Profile.create(ObjectIDGenerator, auth.token, params.name, params.body, params.sn, now);
         await repo.profile.insert(profile);
-        appLog("profile/create", ip, "profiles", profile.id);
+        log("profiles", profile.id);
         return profile.toAPI(auth.token);
       },
     });
@@ -1109,7 +1101,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const profile = await repo.profile.findOne(params.id);
         return profile.toAPI(auth.tokenOrNull);
       },
@@ -1133,7 +1125,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const profiles = await repo.profile.findIn(params.ids);
         return profiles.map(p => p.toAPI(auth.tokenOrNull));
       },
@@ -1147,7 +1139,7 @@ import { AppServer } from "./server/app-server";
       schema: {
         type: "null",
       },
-      call: async ({ auth }) => {
+      call: async ({ auth, repo }) => {
         const profiles = await repo.profile.findAll(auth.token);
         return profiles.map(p => p.toAPI(auth.token));
       },
@@ -1182,11 +1174,11 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth, ip, now }) => {
+      call: async ({ params, auth, log, now, repo }) => {
         const profile = await repo.profile.findOne(params.id);
         const newProfile = profile.changeData(auth.token, params.name, params.body, params.sn, now);
         await repo.profile.update(newProfile);
-        appLog("profile/update", ip, "profiles", newProfile.id);
+        log("profiles", newProfile.id);
         return newProfile.toAPI(auth.token);
       },
     });
@@ -1201,7 +1193,7 @@ import { AppServer } from "./server/app-server";
       schema: {
         type: "null",
       },
-      call: async ({ auth }) => {
+      call: async ({ auth, repo }) => {
         const token = await repo.token.findOne(auth.token.id);
         return token.toAPI();
       },
@@ -1215,7 +1207,7 @@ import { AppServer } from "./server/app-server";
       schema: {
         type: "null",
       },
-      call: async ({ auth }) => {
+      call: async ({ auth, repo }) => {
         const tokens = await repo.token.findAll(auth.tokenMaster);
         return tokens.map(t => t.toAPI());
       },
@@ -1236,7 +1228,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const client = await repo.client.findOne(params.client);
         await repo.token.delClientToken(auth.tokenMaster, client);
         return null;
@@ -1251,7 +1243,7 @@ import { AppServer } from "./server/app-server";
       schema: {
         type: "null",
       },
-      call: async ({ auth }) => {
+      call: async ({ auth, repo }) => {
         const clients = await repo.token.listClient(auth.tokenMaster);
         return clients.map(c => c.toAPI(auth.tokenMaster));
       },
@@ -1272,7 +1264,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth, now }) => {
+      call: async ({ params, auth, now, repo }) => {
         const client = await repo.client.findOne(params.client);
         const token = TokenGeneral.create(ObjectIDGenerator, auth.tokenMaster, client, now, RandomGenerator);
         await repo.token.insert(token);
@@ -1289,7 +1281,7 @@ import { AppServer } from "./server/app-server";
       schema: {
         type: "null",
       },
-      call: async ({ auth, now }) => {
+      call: async ({ auth, now, repo }) => {
         const token = TokenMaster.create(ObjectIDGenerator, auth.user, now, RandomGenerator);
         await repo.token.insert(token);
 
@@ -1315,7 +1307,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         await repo.token.setStorage(auth.token, params.name, params.value);
         return null;
       },
@@ -1336,7 +1328,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         return await repo.token.getStorage(auth.token, params.name);
       },
     });
@@ -1356,7 +1348,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         await repo.token.deleteStorage(auth.token, params.name);
         return null;
       },
@@ -1370,7 +1362,7 @@ import { AppServer } from "./server/app-server";
       schema: {
         type: "null",
       },
-      call: async ({ auth }) => {
+      call: async ({ auth, repo }) => {
         return await repo.token.listStorage(auth.token);
       },
     });
@@ -1383,7 +1375,7 @@ import { AppServer } from "./server/app-server";
       schema: {
         type: "null",
       },
-      call: async ({ auth, now }) => {
+      call: async ({ auth, now, repo }) => {
         const token = await repo.token.findOne(auth.token.id);
         if (token.type !== "general") {
           throw new AtPrerequisiteError("通常トークン以外では出来ません");
@@ -1414,7 +1406,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, now }) => {
+      call: async ({ params, now, repo }) => {
         const token = await repo.token.findOne(params.id);
         if (token.type !== "general") {
           throw new AtPrerequisiteError("通常トークン以外では出来ません");
@@ -1448,7 +1440,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, now }) => {
+      call: async ({ params, now, repo }) => {
         const user = User.create(ObjectIDGenerator, params.sn, params.pass, now);
         await repo.user.insert(user);
         return user.toAPI();
@@ -1469,7 +1461,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params }) => {
+      call: async ({ params, repo }) => {
         return (await repo.user.findID(params.sn)).toString();
       },
     });
@@ -1488,7 +1480,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params }) => {
+      call: async ({ params, repo }) => {
         return (await repo.user.findSN(params.id));
       },
     });
@@ -1510,7 +1502,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const user = await repo.user.findOne(auth.user.id);
         const newUser = user.change(auth.user, params.pass, params.sn);
         await repo.user.update(newUser);
@@ -1539,10 +1531,10 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth, ip, now }) => {
+      call: async ({ params, auth, log, now, repo }) => {
         const client = Client.create(ObjectIDGenerator, auth.tokenMaster, params.name, params.url, now);
         await repo.client.insert(client);
-        appLog("client/create", ip, "clients", client.id);
+        log("clients", client.id);
         return client.toAPI(auth.tokenMaster);
       },
     });
@@ -1572,11 +1564,11 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth, ip, now }) => {
+      call: async ({ params, auth, log, now, repo }) => {
         const client = await repo.client.findOne(params.id);
         const newClient = client.changeData(auth.tokenMaster, params.name, params.url, now);
         await repo.client.update(newClient);
-        appLog("client/update", ip, "clients", newClient.id);
+        log("clients", newClient.id);
         return newClient.toAPI(auth.tokenMaster);
       },
     });
@@ -1596,7 +1588,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const client = await repo.client.findOne(params.id);
         return client.toAPI(auth.TokenMasterOrNull);
       },
@@ -1620,7 +1612,7 @@ import { AppServer } from "./server/app-server";
           },
         },
       },
-      call: async ({ params, auth }) => {
+      call: async ({ params, auth, repo }) => {
         const clients = await repo.client.findIn(params.ids);
         return clients.map(c => c.toAPI(auth.TokenMasterOrNull));
       },
@@ -1634,7 +1626,7 @@ import { AppServer } from "./server/app-server";
       schema: {
         type: "null",
       },
-      call: async ({ auth }) => {
+      call: async ({ auth, repo }) => {
         const clients = await repo.client.findAll(auth.tokenMaster);
         return clients.map(c => c.toAPI(auth.tokenMaster));
       },
@@ -1670,7 +1662,7 @@ import { AppServer } from "./server/app-server";
         },
       },
     },
-    call: async ({ auth, params }) => {
+    call: async ({ auth, params, repo }) => {
       const topic = await repo.topic.findOne(params.id);
       return repo.res
         .insertEvent
@@ -1681,8 +1673,4 @@ import { AppServer } from "./server/app-server";
   });
 
   api.run();
-
-  // cron
-  repo.user.cron();
-  repo.topic.cron();
 })();
