@@ -1,10 +1,15 @@
 import {
   IMsgAPI,
 } from "../models";
-import { AppServer } from "../server";
+import {
+  controller,
+  http,
+  IHttpAPICallParams
+} from "../server";
 
-export function addMsgAPI(api: AppServer) {
-  api.addAPI<{ id: string }, IMsgAPI>({
+@controller
+export class MsgController {
+  @http({
     url: "/msg/find/one",
 
     isAuthUser: false,
@@ -19,13 +24,13 @@ export function addMsgAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const msg = await repo.msg.findOne(params.id);
-      return msg.toAPI(auth.token);
-    },
-  });
+  })
+  async findMsgOne({ params, auth, repo }: IHttpAPICallParams<{ id: string }>): Promise<IMsgAPI> {
+    const msg = await repo.msg.findOne(params.id);
+    return msg.toAPI(auth.token);
+  }
 
-  api.addAPI<{ ids: string[] }, IMsgAPI[]>({
+  @http({
     url: "/msg/find/in",
 
     isAuthUser: false,
@@ -43,18 +48,13 @@ export function addMsgAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const msgs = await repo.msg.findIn(params.ids);
-      return msgs.map(m => m.toAPI(auth.token));
-    },
-  });
+  })
+  async findMsgIn({ params, auth, repo }: IHttpAPICallParams<{ ids: string[] }>): Promise<IMsgAPI[]> {
+    const msgs = await repo.msg.findIn(params.ids);
+    return msgs.map(m => m.toAPI(auth.token));
+  }
 
-  api.addAPI<{
-    type: "before" | "after",
-    equal: boolean,
-    date: string,
-    limit: number,
-  }, IMsgAPI[]>({
+  @http({
     url: "/msg/find",
 
     isAuthUser: false,
@@ -80,14 +80,19 @@ export function addMsgAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const msgs = await repo.msg
-        .find(auth.token, params.type, params.equal, new Date(params.date), params.limit);
-      return msgs.map(m => m.toAPI(auth.token));
-    },
-  });
+  })
+  async findMsg({ params, auth, repo }: IHttpAPICallParams<{
+    type: "before" | "after",
+    equal: boolean,
+    date: string,
+    limit: number,
+  }>): Promise<IMsgAPI[]> {
+    const msgs = await repo.msg
+      .find(auth.token, params.type, params.equal, new Date(params.date), params.limit);
+    return msgs.map(m => m.toAPI(auth.token));
+  }
 
-  api.addAPI<{ limit: number }, IMsgAPI[]>({
+  @http({
     url: "/msg/find/new",
 
     isAuthUser: false,
@@ -102,10 +107,9 @@ export function addMsgAPI(api: AppServer) {
         },
       },
     },
-    call: async ({ params, auth, repo }) => {
-      const msgs = await repo.msg.findNew(auth.token, params.limit);
-      return msgs.map(m => m.toAPI(auth.token));
-    },
-  });
-
+  })
+  async findMsgNew({ params, auth, repo }: IHttpAPICallParams<{ limit: number }>): Promise<IMsgAPI[]> {
+    const msgs = await repo.msg.findNew(auth.token, params.limit);
+    return msgs.map(m => m.toAPI(auth.token));
+  }
 }
