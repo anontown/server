@@ -1,7 +1,14 @@
-language: node_js
-node_js:
-- '8'
+sudo: required
+services:
+  - docker
+env:
+  COMPOSE_VERSION: 1.4.1
 before_install:
-- npm i
+ - sudo apt-get update
+ - sudo apt-get -y -q -o Dpkg::Options::="--force-confnew" install docker-engine
+ - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+ - chmod +x docker-compose
+ - sudo mv docker-compose /usr/local/bin
+ - AT_MODE=TEST docker-compose up -d
 script:
-- npm test
+  - docker-compose run app npm test
