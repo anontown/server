@@ -71,8 +71,13 @@ export class AppServer {
     controllers
       .map(c => new c() as APIDatas)
       .forEach(c => {
-        c[httpAPIs].forEach(data => this.addAPI(data));
-        c[socketAPIs].forEach(data => this.addSocketAPI(data));
+        if (c[httpAPIs] !== undefined) {
+          c[httpAPIs]!.forEach(data => this.addAPI(data));
+        }
+
+        if (c[socketAPIs] !== undefined) {
+          c[socketAPIs]!.forEach(data => this.addSocketAPI(data));
+        }
       });
   }
 
