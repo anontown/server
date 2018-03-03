@@ -20,15 +20,15 @@ export interface APIDatas {
 }
 
 export function controller<T extends { new(...args: any[]): any }>(target: T): T {
-  return class extends target {
-    [httpAPIs] = [];
-    [socketAPIs] = [];
-  };
+  return target;
 }
 
 // TODO:型推論がめんどうなので初期値をanyにしてるけどそのうち改善
 export function http<P= any, R= any>(value: IHttpAPIDecoratorParams<P, R>) {
   return (target: any, _propertyKey: string, descriptor: TypedPropertyDescriptor<IHttpAPICall<P, R>>) => {
+    if (!target[httpAPIs]) {
+      target[httpAPIs] = [];
+    }
     target[httpAPIs].push({ ...value, call: (params: IHttpAPICallParams<P>) => descriptor.value!(params) });
   };
 }
@@ -36,6 +36,9 @@ export function http<P= any, R= any>(value: IHttpAPIDecoratorParams<P, R>) {
 // TODO:型推論がめんどうなので初期値をanyにしてるけどそのうち改善
 export function socket<P= any, R= any>(value: ISocketAPIDecoratorParams<P, R>) {
   return (target: any, _propertyKey: string, descriptor: TypedPropertyDescriptor<ISocketAPICall<P, R>>) => {
+    if (!target[socketAPIs]) {
+      target[socketAPIs] = [];
+    }
     target[socketAPIs].push({ ...value, call: (params: ISocketAPICallParams<P>) => descriptor.value!(params) });
   };
 }
