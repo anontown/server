@@ -2,7 +2,7 @@ sudo: required
 services:
   - docker
 env:
-  COMPOSE_VERSION: 1.4.1
+  COMPOSE_VERSION: 1.14.0
 before_install:
  - sudo apt-get update
  - sudo apt-get -y -q -o Dpkg::Options::="--force-confnew" install docker-engine
