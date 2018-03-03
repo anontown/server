@@ -15,4 +15,4 @@ RUN npm run build
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh $APP_HOME/wait-for-it.sh
 RUN chmod +x ./wait-for-it.sh
 
-CMD if [ "$AT_MODE" = "TEST" ] ; then sleep infinity ; else ./wait-for-it.sh -t 0 $ES_HOST -- npm start ; fi
+CMD if [ "$AT_MODE" = "TEST" ] ; then echo "TEST MODE"&&sleep infinity ; else ./wait-for-it.sh -t 0 $ES_HOST -- npm start ; fi
