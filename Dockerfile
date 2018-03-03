@@ -13,4 +13,4 @@ COPY tsconfig.json $APP_HOME/
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh $APP_HOME/wait-for-it.sh
 RUN chmod +x ./wait-for-it.sh
 
-CMD ./wait-for-it.sh -t 0 $ES_HOST -- npm start
+CMD if [ "$AT_MODE" = "TEST" ] ; then npm test ; else ./wait-for-it.sh -t 0 $ES_HOST -- npm start ; fi
