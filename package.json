@@ -43,7 +43,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "tsc&&node ./dist/scripts/app.js",
+    "start": "node ./dist/app.js",
     "test": "jest",
     "lint": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts'",
     "lint:fix": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts' --fix",
