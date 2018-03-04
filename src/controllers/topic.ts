@@ -347,7 +347,7 @@ export class TopicController {
     },
   })
   async findTags({ params, repo }: IHttpAPICallParams<{ limit: number }>)
-    : Promise<Array<{ name: string, count: number }>> {
+    : Promise<{ name: string, count: number }[]> {
     return await repo.topic.findTags(params.limit);
   }
 

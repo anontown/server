@@ -48,7 +48,7 @@ export class TopicRepo implements ITopicRepo {
     return this.aggregate(topics);
   }
 
-  async findTags(limit: number): Promise<Array<{ name: string, count: number }>> {
+  async findTags(limit: number): Promise<{ name: string, count: number }[]> {
     const data = await ESClient.search({
       index: "topics",
       size: 0,
@@ -64,7 +64,7 @@ export class TopicRepo implements ITopicRepo {
       },
     });
 
-    const tags: Array<{ key: string, doc_count: number }> = data.aggregations.tags_count.buckets;
+    const tags: { key: string, doc_count: number }[] = data.aggregations.tags_count.buckets;
 
     return tags.map(x => ({ name: x.key, count: x.doc_count }));
   }
@@ -188,7 +188,7 @@ export class TopicRepo implements ITopicRepo {
       },
     });
 
-    const countArr: Array<{ key: string, doc_count: number }> = data.aggregations.res_count.buckets;
+    const countArr: { key: string, doc_count: number }[] = data.aggregations.res_count.buckets;
     const count = new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
 
     return topics.hits.hits.map(t => {

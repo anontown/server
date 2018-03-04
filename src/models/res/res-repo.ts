@@ -242,7 +242,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    const countArr: Array<{ key: string, doc_count: number }> = data.aggregations.reply_count.buckets;
+    const countArr: { key: string, doc_count: number }[] = data.aggregations.reply_count.buckets;
     const count = new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
 
     return reses.hits.hits.map(r => fromDBToRes({

@@ -15,8 +15,8 @@ export type IHttpAPIDecoratorParams<P, R> = ObjectOmit<IHttpAPIParams<P, R>, "ca
 export type ISocketAPIDecoratorParams<P, R> = ObjectOmit<ISocketAPIParams<P, R>, "call">;
 
 export interface APIDatas {
-  [httpAPIs]?: Array<IHttpAPIParams<any, any>>;
-  [socketAPIs]?: Array<ISocketAPIParams<any, any>>;
+  [httpAPIs]?: IHttpAPIParams<any, any>[];
+  [socketAPIs]?: ISocketAPIParams<any, any>[];
 }
 
 export function controller<T extends { new(...args: any[]): any }>(target: T): T {

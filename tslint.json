@@ -29,7 +29,11 @@
       "spaces",
       2
     ],
-    "no-shadowed-variable": false
+    "no-shadowed-variable": false,
+    "array-type": [
+      true,
+      "array"
+    ]
   },
   "rulesDirectory": []
 }

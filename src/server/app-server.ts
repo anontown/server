@@ -60,7 +60,7 @@ export class AppServer {
   private socketAPIs = new Map<string, ISocketAPIParams<any, any>>();
   private wsServer: ws.Server;
 
-  constructor(private port: number, private repo: IRepo, controllers: Array<{ new(...args: any[]): any }>) {
+  constructor(private port: number, private repo: IRepo, controllers: { new(...args: any[]): any }[]) {
     this.app = express();
     this.server = http.createServer(this.app as any);
     this.wsServer = new ws.Server({ server: this.server });

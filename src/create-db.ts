@@ -6,7 +6,7 @@ import { Logger } from "./logger";
 import { IProfileDB } from "./models/profile";
 import { hash } from "./utils";
 
-const updateFunc: Array<() => Promise<void>> = [];
+const updateFunc: (() => Promise<void>)[] = [];
 
 updateFunc.push((async () => {
   const db = await DB;
@@ -50,19 +50,19 @@ updateFunc.push((async () => {
   // reply:ObjectID(ResID)|nullをreply:{res:ObjectID,User:ObjectID}|nullに変換
 
   // replyがnullでないレス取得
-  const targetReses: Array<{ _id: ObjectID, reply: ObjectID }> =
+  const targetReses: { _id: ObjectID, reply: ObjectID }[] =
     await db.collection("reses")
       .find({ reply: { $ne: null } })
       .toArray();
 
   // reply先のレス取得
-  const replyReses: Array<{ _id: ObjectID, user: ObjectID }> =
+  const replyReses: { _id: ObjectID, user: ObjectID }[] =
     await db.collection("reses")
       .find({ _id: { $in: targetReses.map(x => x.reply) } })
       .toArray();
 
   // 更新
-  const promises: Array<Promise<any>> = [];
+  const promises: Promise<any>[] = [];
   targetReses.forEach(x => {
     promises.push(db.collection("reses")
       .update(
@@ -85,14 +85,14 @@ updateFunc.push((async () => {
 updateFunc.push((async () => {
   // HASHのイコール削除
   const db = await DB;
-  const promises: Array<Promise<any>> = [];
+  const promises: Promise<any>[] = [];
 
-  const reses: Array<{ _id: ObjectID, hash: string }> = await db.collection("reses").find().toArray();
+  const reses: { _id: ObjectID, hash: string }[] = await db.collection("reses").find().toArray();
   reses.forEach(r => {
     promises.push(db.collection("reses").update({ _id: r._id }, { $set: { hash: r.hash.replace(/=/, "") } }));
   });
 
-  const histories: Array<{ _id: ObjectID, hash: string }> = await db.collection("histories").find().toArray();
+  const histories: { _id: ObjectID, hash: string }[] = await db.collection("histories").find().toArray();
   histories.forEach(h => {
     promises.push(db.collection("histories").update({ _id: h._id }, { $set: { hash: h.hash.replace(/=/, "") } }));
   });
@@ -124,7 +124,7 @@ updateFunc.push((async () => {
   const reses = await rdb.find().toArray();
   const histories = await hdb.find().toArray();
 
-  const promises: Array<Promise<any>> = [];
+  const promises: Promise<any>[] = [];
   reses.forEach(r => {
     promises.push(rdb.update({ _id: r._id }, { $set: { hash: hashFunc(r.user, r.topic, r.date) } }));
   });
@@ -138,7 +138,7 @@ updateFunc.push((async () => {
 updateFunc.push((async () => {
   // topicにsage機能を実装するための修正
   const db = await DB;
-  const promises: Array<Promise<any>> = [];
+  const promises: Promise<any>[] = [];
 
   const topics = await db.collection("topics").find().toArray();
   topics.forEach(t => {
@@ -151,7 +151,7 @@ updateFunc.push((async () => {
 
 updateFunc.push((async () => {
   const db = await DB;
-  const promises: Array<Promise<any>> = [];
+  const promises: Promise<any>[] = [];
 
   const profiles: IProfileDB[] = await db.collection("profiles").find().toArray();
   profiles.forEach(p => {
@@ -187,8 +187,8 @@ updateFunc.push((async () => {
 updateFunc.push((async () => {
   const db = await DB;
 
-  const ts: Array<{ _id: ObjectID, storage: string }> = await db.collection("tokens").find().toArray();
-  const ps: Array<Promise<void>> = [];
+  const ts: { _id: ObjectID, storage: string }[] = await db.collection("tokens").find().toArray();
+  const ps: Promise<void>[] = [];
   await fs.mkdir("./storage");
   ts.forEach(t => {
     const dir = "./storage/" + t._id.toString() + "/";
@@ -225,7 +225,7 @@ updateFunc.push((async () => {
         return null;
       }
     }).filter(x => x !== null) as ObjectID[];
-  const tokens: Array<{ _id: ObjectID, client?: ObjectID, user: ObjectID }> = await db.collection("tokens")
+  const tokens: { _id: ObjectID, client?: ObjectID, user: ObjectID }[] = await db.collection("tokens")
     .find({ _id: { $in: tokenIDs } })
     .toArray();
 
@@ -271,7 +271,7 @@ updateFunc.push((async () => {
   // 名前の●プロフィール削除
   {
     // 名前に●が付くレス
-    const reses: Array<{ name: string, _id: ObjectID }> =
+    const reses: { name: string, _id: ObjectID }[] =
       await resesCol.find({ name: /●/ }).toArray();
     for (const res of reses) {
       const [name] = res.name.split("●");

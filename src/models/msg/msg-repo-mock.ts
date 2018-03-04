@@ -42,7 +42,7 @@ export class MsgRepoMock implements IMsgRepo {
         const xDateV = new Date(x.body.date).valueOf();
         return type === "after"
           ? (equal ? dateV <= xDateV : dateV < xDateV)
-          : (equal ? xDateV <= dateV : xDateV < dateV)
+          : (equal ? xDateV <= dateV : xDateV < dateV);
       })
       .sort((a, b) => {
         const av = new Date(a.body.date).valueOf();
