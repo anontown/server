@@ -90,7 +90,7 @@ export class UserController {
     },
   })
   async findSN({ params, repo }: IHttpAPICallParams<{ id: string }>): Promise<string> {
-    return (await repo.user.findSN(params.id));
+    return (await repo.user.findOne(params.id)).sn;
   }
 
   @http({

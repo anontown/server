@@ -28,16 +28,7 @@ export class UserRepo implements IUserRepo {
 
     return user._id;
   }
-  async findSN(id: string): Promise<string> {
-    const db = await DB;
-    const user: IUserDB | null = await db.collection("users").findOne({ _id: new ObjectID(id) });
 
-    if (user === null) {
-      throw new AtNotFoundError("ユーザーが存在しません");
-    }
-
-    return user.sn;
-  }
   async insert(user: User): Promise<null> {
     const db = await DB;
     await db.collection("users").insert(user.toDB()).catch((e: WriteError) => {
