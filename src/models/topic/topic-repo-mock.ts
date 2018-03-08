@@ -1,5 +1,4 @@
 import { CronJob } from "cron";
-import { SearchResponse } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { ESClient } from "../../db";
 import { ITopicRepo } from "./itopic-repo";
