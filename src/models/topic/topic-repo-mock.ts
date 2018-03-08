@@ -79,7 +79,7 @@ export class TopicRepoMock implements ITopicRepo {
     new CronJob({
       cronTime: "00 00 * * * *",
       onTick: () => {
-        const topics = this.topics.filter<ITopicNormalDB | ITopicOneDB>
+        this.topics.filter<ITopicNormalDB | ITopicOneDB>
           ((x): x is ITopicNormalDB | ITopicOneDB => x.type === "normal" || x.type === "one")
           .filter(x => new Date(x.body.update).valueOf() < new Date(Date.now() - 1000 * 60 * 60 * 24).valueOf())
           .map(x => ({ ...x, body: { ...x.body, active: false } }))
