@@ -1,4 +1,4 @@
-import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { AtNotFoundError, AtNotFoundPartError, AtConflictError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { IProfileRepo } from "./iprofile-repo";
 import { IProfileDB, Profile } from "./profile";
@@ -38,10 +38,18 @@ export class ProfileRepoMock implements IProfileRepo {
   }
 
   async insert(profile: Profile): Promise<void> {
+    if (this.profiles.findIndex(x => x.sn === profile.sn) !== -1) {
+      throw new AtConflictError("スクリーンネームが使われています");
+    }
+
     this.profiles.push(profile.toDB());
   }
 
   async update(profile: Profile): Promise<void> {
+    if (this.profiles.findIndex(x => x.sn === profile.sn && x._id.toHexString() !== profile.id) !== -1) {
+      throw new AtConflictError("スクリーンネームが使われています");
+    }
+
     this.profiles[this.profiles.findIndex(x => x._id.toHexString() === profile.id)] = profile.toDB();
   }
 }
