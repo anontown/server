@@ -30,4 +30,6 @@ export interface IResRepo {
   insert(res: Res): Promise<null>;
 
   update(res: Res): Promise<null>;
+
+  resCount(topics: Topic[]): Promise<Map<string, number>>;
 }

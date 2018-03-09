@@ -144,4 +144,11 @@ export class ResRepoMock implements IResRepo {
       .reduce((c, x) => c.set(x, (c.get(x) || 0) + 1), new Map<string, number>())
     return reses.map(r => fromDBToRes(r, data.get(r.id) || 0));
   }
+
+  async resCount(topics: Topic[]): Promise<Map<string, number>> {
+    return this.reses
+      .filter(x => topics.map(x => x.id).includes(x.body.topic))
+      .map(x => x.body.topic)
+      .reduce((c, x) => c.set(x, (c.get(x) || 0) + 1), new Map<string, number>());
+  }
 }

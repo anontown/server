@@ -251,4 +251,28 @@ export class ResRepo implements IResRepo {
       body: r._source,
     } as IResDB, count.get(r._id) || 0));
   }
+
+  async resCount(topics: Topic[]): Promise<Map<string, number>> {
+    const data = await ESClient.search({
+      index: "reses",
+      size: 0,
+      body: {
+        query: {
+          terms: {
+            topic: topics.map(t => t.id),
+          },
+        },
+        aggs: {
+          res_count: {
+            terms: {
+              field: "topic",
+            },
+          },
+        },
+      },
+    });
+
+    const countArr: { key: string, doc_count: number }[] = data.aggregations.res_count.buckets;
+    return new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
+  }
 }
