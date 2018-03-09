@@ -228,6 +228,7 @@ export class ResRepo implements IResRepo {
       body: {
         query: {
           terms: {
+            //TODO:ここのクエリおかしい気がする
             id: reses.hits.hits.map(r => r._id),
           },
         },
