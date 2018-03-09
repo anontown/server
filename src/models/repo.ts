@@ -23,8 +23,8 @@ export class Repo implements IRepo {
     this.history = new HistoryRepo();
     this.msg = new MsgRepo();
     this.profile = new ProfileRepo();
-    this.topic = new TopicRepo();
-    this.res = new ResRepo(this.topic);
+    this.res = new ResRepo();
+    this.topic = new TopicRepo(this.res);
     this.token = new TokenRepo(this.client);
     this.user = new UserRepo();
   }
