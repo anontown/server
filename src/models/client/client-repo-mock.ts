@@ -36,14 +36,11 @@ export class ClientRepoMock implements IClientRepo {
     return clients.map(c => Client.fromDB(c));
   }
 
-  async insert(client: Client): Promise<null> {
+  async insert(client: Client): Promise<void> {
     this.clients.push(client.toDB());
-
-    return null;
   }
 
-  async update(client: Client): Promise<null> {
+  async update(client: Client): Promise<void> {
     this.clients[this.clients.findIndex(c => c._id.toHexString() === client.id)] = client.toDB();
-    return null;
   }
 }

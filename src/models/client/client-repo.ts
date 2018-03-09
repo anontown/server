@@ -41,18 +41,15 @@ export class ClientRepo implements IClientRepo {
     return clients.map(c => Client.fromDB(c));
   }
 
-  async insert(client: Client): Promise<null> {
+  async insert(client: Client): Promise<void> {
     const db = await DB;
 
     await db.collection("clients")
       .insert(client.toDB());
-
-    return null;
   }
 
-  async update(client: Client): Promise<null> {
+  async update(client: Client): Promise<void> {
     const db = await DB;
     await db.collection("clients").update({ _id: new ObjectID(client.id) }, client.toDB());
-    return null;
   }
 }
