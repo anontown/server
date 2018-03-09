@@ -161,7 +161,6 @@ export class ResRepo implements IResRepo {
   async findHash(topic: Topic, hash: string): Promise<Res[]> {
     const reses = await ESClient.search<IResNormalDB["body"]>({
       index: "reses",
-      type: "normal",
       size: Config.api.limit,
       body: {
         query: {
