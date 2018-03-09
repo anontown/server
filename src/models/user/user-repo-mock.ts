@@ -1,9 +1,9 @@
 import { CronJob } from "cron";
 import { ObjectID } from "mongodb";
 import { AtConflictError, AtNotFoundError } from "../../at-error";
-import { IUserRepo } from "./iuser-repo";
-import { IUserDB, User, ResWaitCountKey } from "./user";
 import { Logger } from "../../logger";
+import { IUserRepo } from "./iuser-repo";
+import { IUserDB, ResWaitCountKey, User } from "./user";
 
 export class UserRepoMock implements IUserRepo {
   private users: IUserDB[] = [];

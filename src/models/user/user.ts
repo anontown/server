@@ -1,11 +1,11 @@
 import { ObjectID } from "mongodb";
 import Copyable from "ts-copyable";
+import { StringOmit } from "typelevel-ts";
 import { AtPrerequisiteError, AtUserAuthError, paramsErrorMaker } from "../../at-error";
 import { IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
 import { hash } from "../../utils";
-import { StringOmit } from "typelevel-ts";
 
 export interface IUserDB {
   readonly _id: ObjectID;

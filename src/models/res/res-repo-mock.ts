@@ -133,17 +133,17 @@ export class ResRepoMock implements IResRepo {
     this.reses[this.reses.findIndex(x => x.id === res.id)] = res.toDB();
   }
 
-  private async aggregate(reses: IResDB[]): Promise<Res[]> {
-    const data = this.reses.map(x => x.type === "normal" && x.body.reply !== null ? x.body.reply.res : null)
-      .filter<string>((x): x is string => x !== null && reses.map(x => x.id).includes(x))
-      .reduce((c, x) => c.set(x, (c.get(x) || 0) + 1), new Map<string, number>())
-    return reses.map(r => fromDBToRes(r, data.get(r.id) || 0));
-  }
-
   async resCount(topicIDs: string[]): Promise<Map<string, number>> {
     return this.reses
       .filter(x => topicIDs.includes(x.body.topic))
       .map(x => x.body.topic)
       .reduce((c, x) => c.set(x, (c.get(x) || 0) + 1), new Map<string, number>());
+  }
+
+  private async aggregate(reses: IResDB[]): Promise<Res[]> {
+    const data = this.reses.map(x => x.type === "normal" && x.body.reply !== null ? x.body.reply.res : null)
+      .filter<string>((x): x is string => x !== null && reses.map(x => x.id).includes(x))
+      .reduce((c, x) => c.set(x, (c.get(x) || 0) + 1), new Map<string, number>());
+    return reses.map(r => fromDBToRes(r, data.get(r.id) || 0));
   }
 }

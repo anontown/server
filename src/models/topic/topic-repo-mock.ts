@@ -1,5 +1,6 @@
 import { CronJob } from "cron";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { IResRepo } from "../res";
 import { ITopicRepo } from "./itopic-repo";
 import {
   ITopicDB,
@@ -11,7 +12,6 @@ import {
   TopicNormal,
   TopicOne,
 } from "./topic";
-import { IResRepo } from "../res";
 export class TopicRepoMock implements ITopicRepo {
   private topics: ITopicDB[] = [];
 

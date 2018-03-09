@@ -2,6 +2,7 @@ import { CronJob } from "cron";
 import { SearchResponse } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { ESClient } from "../../db";
+import { IResRepo } from "../res";
 import { ITopicRepo } from "./itopic-repo";
 import {
   ITopicDB,
@@ -11,9 +12,8 @@ import {
   Topic,
   TopicFork,
   TopicNormal,
-  TopicOne
+  TopicOne,
 } from "./topic";
-import { IResRepo } from "../res";
 
 export class TopicRepo implements ITopicRepo {
   constructor(private resRepo: IResRepo) { }

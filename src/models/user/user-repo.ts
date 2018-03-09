@@ -4,7 +4,7 @@ import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { DB } from "../../db";
 import { Logger } from "../../logger";
 import { IUserRepo } from "./iuser-repo";
-import { IUserDB, User, ResWaitCountKey } from "./user";
+import { IUserDB, ResWaitCountKey, User } from "./user";
 
 export class UserRepo implements IUserRepo {
   async findOne(id: string): Promise<User> {

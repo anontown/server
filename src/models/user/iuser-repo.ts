@@ -1,5 +1,5 @@
 import { ObjectID } from "mongodb";
-import { User, ResWaitCountKey } from "./user";
+import { ResWaitCountKey, User } from "./user";
 
 export interface IUserRepo {
   findOne(id: string): Promise<User>;

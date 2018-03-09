@@ -216,37 +216,6 @@ export class ResRepo implements IResRepo {
     });
   }
 
-  private async aggregate(reses: SearchResponse<IResDB["body"]>): Promise<Res[]> {
-    const data = await ESClient.search({
-      index: "reses",
-      size: 0,
-      body: {
-        query: {
-          terms: {
-            //TODO:ここのクエリおかしい気がする
-            id: reses.hits.hits.map(r => r._id),
-          },
-        },
-        aggs: {
-          reply_count: {
-            terms: {
-              field: "reply.res",
-            },
-          },
-        },
-      },
-    });
-
-    const countArr: { key: string, doc_count: number }[] = data.aggregations.reply_count.buckets;
-    const count = new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
-
-    return reses.hits.hits.map(r => fromDBToRes({
-      id: r._id,
-      type: r._type,
-      body: r._source,
-    } as IResDB, count.get(r._id) || 0));
-  }
-
   async resCount(topicIDs: string[]): Promise<Map<string, number>> {
     const data = await ESClient.search({
       index: "reses",
@@ -269,5 +238,36 @@ export class ResRepo implements IResRepo {
 
     const countArr: { key: string, doc_count: number }[] = data.aggregations.res_count.buckets;
     return new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
+  }
+
+  private async aggregate(reses: SearchResponse<IResDB["body"]>): Promise<Res[]> {
+    const data = await ESClient.search({
+      index: "reses",
+      size: 0,
+      body: {
+        query: {
+          terms: {
+            // TODO:ここのクエリおかしい気がする
+            id: reses.hits.hits.map(r => r._id),
+          },
+        },
+        aggs: {
+          reply_count: {
+            terms: {
+              field: "reply.res",
+            },
+          },
+        },
+      },
+    });
+
+    const countArr: { key: string, doc_count: number }[] = data.aggregations.reply_count.buckets;
+    const count = new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
+
+    return reses.hits.hits.map(r => fromDBToRes({
+      id: r._id,
+      type: r._type,
+      body: r._source,
+    } as IResDB, count.get(r._id) || 0));
   }
 }

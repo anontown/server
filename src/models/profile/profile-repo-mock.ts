@@ -1,4 +1,4 @@
-import { AtNotFoundError, AtNotFoundPartError, AtConflictError } from "../../at-error";
+import { AtConflictError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { IProfileRepo } from "./iprofile-repo";
 import { IProfileDB, Profile } from "./profile";
