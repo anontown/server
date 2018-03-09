@@ -5,6 +5,6 @@ export interface IProfileRepo {
   findOne(id: string): Promise<Profile>;
   findIn(ids: string[]): Promise<Profile[]>;
   findAll(authToken: IAuthToken): Promise<Profile[]>;
-  insert(profile: Profile): Promise<null>;
-  update(profile: Profile): Promise<null>;
+  insert(profile: Profile): Promise<void>;
+  update(profile: Profile): Promise<void>;
 }

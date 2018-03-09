@@ -42,7 +42,7 @@ export class ProfileRepo implements IProfileRepo {
     return profiles.map(p => Profile.fromDB(p));
   }
 
-  async insert(profile: Profile): Promise<null> {
+  async insert(profile: Profile): Promise<void> {
     const db = await DB;
     await db.collection("profiles").insert(profile.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
@@ -51,10 +51,9 @@ export class ProfileRepo implements IProfileRepo {
         throw e;
       }
     });
-    return null;
   }
 
-  async update(profile: Profile): Promise<null> {
+  async update(profile: Profile): Promise<void> {
     const db = await DB;
     await db.collection("profiles").update({ _id: new ObjectID(profile.id) }, profile.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
@@ -63,6 +62,5 @@ export class ProfileRepo implements IProfileRepo {
         throw e;
       }
     });
-    return null;
   }
 }

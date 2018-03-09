@@ -37,13 +37,11 @@ export class ProfileRepoMock implements IProfileRepo {
     return profiles.map(p => Profile.fromDB(p));
   }
 
-  async insert(profile: Profile): Promise<null> {
+  async insert(profile: Profile): Promise<void> {
     this.profiles.push(profile.toDB());
-    return null;
   }
 
-  async update(profile: Profile): Promise<null> {
+  async update(profile: Profile): Promise<void> {
     this.profiles[this.profiles.findIndex(x => x._id.toHexString() === profile.id)] = profile.toDB();
-    return null;
   }
 }
