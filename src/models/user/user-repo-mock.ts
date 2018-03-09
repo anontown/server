@@ -45,6 +45,10 @@ export class UserRepoMock implements IUserRepo {
     return null;
   }
 
+  async cronPointReset(): Promise<void> {
+    this.users = this.users.map(x => ({ ...x, point: 0 }));
+  }
+
   cron() {
     const start = (cronTime: string, field: string) => {
       new CronJob({
@@ -66,7 +70,7 @@ export class UserRepoMock implements IUserRepo {
     new CronJob({
       cronTime: "00 00 00 * * *",
       onTick: async () => {
-        this.users = this.users.map(x => ({ ...x, point: 0 }));
+        await this.cronPointReset();
       },
       start: false,
       timeZone: "Asia/Tokyo",

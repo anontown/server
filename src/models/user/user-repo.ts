@@ -53,6 +53,11 @@ export class UserRepo implements IUserRepo {
     return null;
   }
 
+  async cronPointReset(): Promise<void> {
+    const db = await DB;
+    await db.collection("users").update({}, { $set: { point: 0 } }, { multi: true });
+  }
+
   cron() {
     const start = (cronTime: string, field: string) => {
       new CronJob({
@@ -76,8 +81,7 @@ export class UserRepo implements IUserRepo {
     new CronJob({
       cronTime: "00 00 00 * * *",
       onTick: async () => {
-        const db = await DB;
-        await db.collection("users").update({}, { $set: { point: 0 } }, { multi: true });
+        await this.cronPointReset();
       },
       start: false,
       timeZone: "Asia/Tokyo",

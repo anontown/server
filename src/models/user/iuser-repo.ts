@@ -10,4 +10,6 @@ export interface IUserRepo {
   update(user: User): Promise<null>;
 
   cron(): void;
+
+  cronPointReset(): Promise<void>;
 }
