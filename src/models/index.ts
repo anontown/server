@@ -8,3 +8,4 @@ export * from "./topic";
 export * from "./user";
 export * from "./irepo";
 export * from "./repo";
+export * from "./repo-mock";
