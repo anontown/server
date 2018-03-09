@@ -2,7 +2,7 @@ import { Subject } from "rxjs";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
-import { Topic, TopicRepo } from "../topic";
+import { Topic, TopicRepo, ITopicDB } from "../topic";
 import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
 
@@ -145,7 +145,7 @@ export class ResRepoMock implements IResRepo {
     return reses.map(r => fromDBToRes(r, data.get(r.id) || 0));
   }
 
-  async resCount(topics: Topic[]): Promise<Map<string, number>> {
+  async resCount(topics: ITopicDB[]): Promise<Map<string, number>> {
     return this.reses
       .filter(x => topics.map(x => x.id).includes(x.body.topic))
       .map(x => x.body.topic)

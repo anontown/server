@@ -4,7 +4,7 @@ import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
-import { Topic, TopicRepo } from "../topic";
+import { Topic, TopicRepo, ITopicDB } from "../topic";
 import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
 
@@ -252,7 +252,7 @@ export class ResRepo implements IResRepo {
     } as IResDB, count.get(r._id) || 0));
   }
 
-  async resCount(topics: Topic[]): Promise<Map<string, number>> {
+  async resCount(topics: ITopicDB[]): Promise<Map<string, number>> {
     const data = await ESClient.search({
       index: "reses",
       size: 0,
