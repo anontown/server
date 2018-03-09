@@ -2,7 +2,7 @@ import { Subject } from "rxjs";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
-import { Topic, ITopicDB } from "../topic";
+import { Topic } from "../topic";
 import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
 
@@ -125,8 +125,8 @@ export class ResRepoMock implements IResRepo {
   async insert(res: Res): Promise<null> {
     this.reses.push(res.toDB());
 
-    const topic = await this.topicRepo.findOne(res.topic);
-    this.insertEvent.next({ res, count: topic.resCount });
+    const resCount = (await this.resCount([res.topic])).get(res.topic) || 0;
+    this.insertEvent.next({ res, count: resCount });
 
     return null;
   }

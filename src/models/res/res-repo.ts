@@ -4,7 +4,7 @@ import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
-import { Topic, ITopicDB } from "../topic";
+import { Topic } from "../topic";
 import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
 
@@ -202,8 +202,8 @@ export class ResRepo implements IResRepo {
       body: rDB.body,
     });
 
-    const topic = await this.topicRepo.findOne(res.topic);
-    this.insertEvent.next({ res, count: topic.resCount });
+    const resCount = (await this.resCount([res.topic])).get(res.topic) || 0;
+    this.insertEvent.next({ res, count: resCount });
 
     return null;
   }
