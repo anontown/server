@@ -27,9 +27,9 @@ export interface IResRepo {
 
   findReply(topic: Topic, res: Res): Promise<Res[]>;
 
-  insert(res: Res): Promise<null>;
+  insert(res: Res): Promise<void>;
 
-  update(res: Res): Promise<null>;
+  update(res: Res): Promise<void>;
 
   resCount(topicIDs: string[]): Promise<Map<string, number>>;
 }

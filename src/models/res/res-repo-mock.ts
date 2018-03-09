@@ -122,18 +122,15 @@ export class ResRepoMock implements IResRepo {
     return await this.aggregate(reses);
   }
 
-  async insert(res: Res): Promise<null> {
+  async insert(res: Res): Promise<void> {
     this.reses.push(res.toDB());
 
     const resCount = (await this.resCount([res.topic])).get(res.topic) || 0;
     this.insertEvent.next({ res, count: resCount });
-
-    return null;
   }
 
-  async update(res: Res): Promise<null> {
+  async update(res: Res): Promise<void> {
     this.reses[this.reses.findIndex(x => x.id === res.id)] = res.toDB();
-    return null;
   }
 
   private async aggregate(reses: IResDB[]): Promise<Res[]> {

@@ -193,7 +193,7 @@ export class ResRepo implements IResRepo {
     return await this.aggregate(reses);
   }
 
-  async insert(res: Res): Promise<null> {
+  async insert(res: Res): Promise<void> {
     const rDB = res.toDB();
     await ESClient.create({
       index: "reses",
@@ -204,11 +204,9 @@ export class ResRepo implements IResRepo {
 
     const resCount = (await this.resCount([res.topic])).get(res.topic) || 0;
     this.insertEvent.next({ res, count: resCount });
-
-    return null;
   }
 
-  async update(res: Res): Promise<null> {
+  async update(res: Res): Promise<void> {
     const rDB = res.toDB();
     await ESClient.update({
       index: "reses",
@@ -216,7 +214,6 @@ export class ResRepo implements IResRepo {
       id: rDB.id,
       body: rDB.body,
     });
-    return null;
   }
 
   private async aggregate(reses: SearchResponse<IResDB["body"]>): Promise<Res[]> {
