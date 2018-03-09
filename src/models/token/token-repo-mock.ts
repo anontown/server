@@ -2,7 +2,7 @@ import { ObjectID } from "mongodb";
 import { AtNotFoundError, paramsErrorMaker } from "../../at-error";
 import { IAuthToken, IAuthTokenMaster, IAuthUser } from "../../auth";
 import { Config } from "../../config";
-import { Client, ClientRepo } from "../client";
+import { Client, IClientRepo } from "../client";
 import { IStorageDB, ITokenRepo } from "./itoken-repo";
 import { ITokenDB, Token, TokenGeneral, TokenMaster } from "./token";
 
@@ -10,7 +10,7 @@ export class TokenRepoMock implements ITokenRepo {
   private tokens: ITokenDB[] = [];
   private storages: IStorageDB[] = [];
 
-  constructor(private clientRepo: ClientRepo) { }
+  constructor(private clientRepo: IClientRepo) { }
 
   async findOne(id: string): Promise<Token> {
     const token = this.tokens.find(x => x._id.toHexString() === id);

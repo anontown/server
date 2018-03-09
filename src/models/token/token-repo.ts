@@ -3,12 +3,12 @@ import { AtConflictError, AtNotFoundError, paramsErrorMaker } from "../../at-err
 import { IAuthToken, IAuthTokenMaster, IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { DB } from "../../db";
-import { Client, ClientRepo } from "../client";
+import { Client, IClientRepo } from "../client";
 import { IStorageDB, ITokenRepo } from "./itoken-repo";
 import { ITokenDB, Token, TokenGeneral, TokenMaster } from "./token";
 
 export class TokenRepo implements ITokenRepo {
-  constructor(private clientRepo: ClientRepo) { }
+  constructor(private clientRepo: IClientRepo) { }
 
   async findOne(id: string): Promise<Token> {
     const db = await DB;
