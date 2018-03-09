@@ -1,6 +1,5 @@
 import { CronJob } from "cron";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
-import { ESClient } from "../../db";
 import { ITopicRepo } from "./itopic-repo";
 import {
   ITopicDB,
@@ -12,9 +11,11 @@ import {
   TopicNormal,
   TopicOne,
 } from "./topic";
-
+import { IResRepo } from "../res";
 export class TopicRepoMock implements ITopicRepo {
   private topics: ITopicDB[] = [];
+
+  constructor(private resRepo: IResRepo) { }
 
   async findOne(id: string): Promise<Topic> {
     const topic = this.topics.find(x => x.id === id);
@@ -103,27 +104,7 @@ export class TopicRepoMock implements ITopicRepo {
   }
 
   private async aggregate(topics: ITopicDB[]): Promise<Topic[]> {
-    const data = await ESClient.search({
-      index: "reses",
-      size: 0,
-      body: {
-        query: {
-          terms: {
-            topic: topics.map(t => t.id),
-          },
-        },
-        aggs: {
-          res_count: {
-            terms: {
-              field: "topic",
-            },
-          },
-        },
-      },
-    });
-
-    const countArr: { key: string, doc_count: number }[] = data.aggregations.res_count.buckets;
-    const count = new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
+    const count = await this.resRepo.resCount(topics);
 
     return topics.map(t => {
       const c = count.get(t.id) || 0;
