@@ -103,19 +103,18 @@ export class ResRepoMock implements IResRepo {
     return await this.aggregate(reses);
   }
 
-  async findHash(topic: Topic, hash: string): Promise<Res[]> {
+  async findHash(hash: string): Promise<Res[]> {
     const reses = this.reses
-      .filter(x => x.body.topic === topic.id && x.body.hash === hash)
+      .filter(x => x.body.hash === hash)
       .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf())
       .slice(0, Config.api.limit);
 
     return await this.aggregate(reses);
   }
 
-  async findReply(topic: Topic, res: Res): Promise<Res[]> {
+  async findReply(res: Res): Promise<Res[]> {
     const reses = this.reses
-      .filter(x => x.body.topic === topic.id &&
-        x.type === "normal" && x.body.reply !== null && x.body.reply.res === res.id)
+      .filter(x => x.type === "normal" && x.body.reply !== null && x.body.reply.res === res.id)
       .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf())
       .slice(0, Config.api.limit);
 

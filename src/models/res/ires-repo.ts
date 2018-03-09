@@ -23,9 +23,9 @@ export interface IResRepo {
 
   findNoticeNew(authToken: IAuthToken, limit: number): Promise<Res[]>;
 
-  findHash(topic: Topic, hash: string): Promise<Res[]>;
+  findHash(hash: string): Promise<Res[]>;
 
-  findReply(topic: Topic, res: Res): Promise<Res[]>;
+  findReply(res: Res): Promise<Res[]>;
 
   insert(res: Res): Promise<void>;
 

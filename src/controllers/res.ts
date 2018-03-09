@@ -199,20 +199,16 @@ export class ResController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["topic", "hash"],
+      required: ["hash"],
       properties: {
-        topic: {
-          type: "string",
-        },
         hash: {
           type: "string",
         },
       },
     },
   })
-  async findHash({ params, auth, repo }: IHttpAPICallParams<{ topic: string, hash: string }>): Promise<IResAPI[]> {
-    const topic = await repo.topic.findOne(params.topic);
-    const reses = await repo.res.findHash(topic, params.hash);
+  async findHash({ params, auth, repo }: IHttpAPICallParams<{ hash: string }>): Promise<IResAPI[]> {
+    const reses = await repo.res.findHash(params.hash);
     return reses.map(r => r.toAPI(auth.tokenOrNull));
   }
 
@@ -224,24 +220,18 @@ export class ResController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["topic", "reply"],
+      required: ["reply"],
       properties: {
-        topic: {
-          type: "string",
-        },
         reply: {
           type: "string",
         },
       },
     },
   })
-  async findReply({ params, auth, repo }: IHttpAPICallParams<{ topic: string, reply: string }>): Promise<IResAPI[]> {
-    const [topic, res] = await Promise.all([
-      repo.topic.findOne(params.topic),
-      repo.res.findOne(params.reply),
-    ]);
+  async findReply({ params, auth, repo }: IHttpAPICallParams<{ reply: string }>): Promise<IResAPI[]> {
+    const res = await repo.res.findOne(params.reply);
 
-    const reses = await repo.res.findReply(topic, res);
+    const reses = await repo.res.findReply(res);
     return reses.map(r => r.toAPI(auth.tokenOrNull));
   }
 

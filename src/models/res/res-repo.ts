@@ -156,14 +156,13 @@ export class ResRepo implements IResRepo {
     return await this.aggregate(reses);
   }
 
-  async findHash(topic: Topic, hash: string): Promise<Res[]> {
+  async findHash(hash: string): Promise<Res[]> {
     const reses = await ESClient.search<IResNormalDB["body"]>({
       index: "reses",
       size: Config.api.limit,
       body: {
         query: {
           term: {
-            topic: topic.id,
             hash,
           },
         },
@@ -174,7 +173,7 @@ export class ResRepo implements IResRepo {
     return await this.aggregate(reses);
   }
 
-  async findReply(topic: Topic, res: Res): Promise<Res[]> {
+  async findReply(res: Res): Promise<Res[]> {
     const reses = await ESClient.search<IResNormalDB["body"]>({
       index: "reses",
       type: "normal",
@@ -182,7 +181,6 @@ export class ResRepo implements IResRepo {
       body: {
         query: {
           term: {
-            "topic": topic.id,
             "reply.res": res.id,
           },
         },
