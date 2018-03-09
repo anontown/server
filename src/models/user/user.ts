@@ -5,6 +5,7 @@ import { IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
 import { hash } from "../../utils";
+import { StringOmit } from "typelevel-ts";
 
 export interface IUserDB {
   readonly _id: ObjectID;
@@ -17,6 +18,8 @@ export interface IUserDB {
   readonly point: number;
   readonly lastOneTopic: Date;
 }
+
+export type ResWaitCountKey = StringOmit<keyof IResWait, "last">;
 
 export interface IUserAPI {
   readonly id: string;
