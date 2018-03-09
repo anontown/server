@@ -107,7 +107,7 @@ export class MsgRepo implements IMsgRepo {
     return msgs.hits.hits.map(m => Msg.fromDB({ id: m._id, body: m._source }));
   }
 
-  async insert(msg: Msg): Promise<null> {
+  async insert(msg: Msg): Promise<void> {
     const mDB = msg.toDB();
     await ESClient.create({
       index: "msgs",
@@ -115,10 +115,9 @@ export class MsgRepo implements IMsgRepo {
       id: mDB.id,
       body: mDB.body,
     });
-    return null;
   }
 
-  async update(msg: Msg): Promise<null> {
+  async update(msg: Msg): Promise<void> {
     const mDB = msg.toDB();
     await ESClient.update({
       index: "msgs",
@@ -126,6 +125,5 @@ export class MsgRepo implements IMsgRepo {
       id: mDB.id,
       body: mDB.body,
     });
-    return null;
   }
 }

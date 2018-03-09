@@ -10,6 +10,6 @@ export interface IMsgRepo {
     date: Date,
     limit: number): Promise<Msg[]>;
   findNew(authToken: IAuthToken, limit: number): Promise<Msg[]>;
-  insert(msg: Msg): Promise<null>;
-  update(msg: Msg): Promise<null>;
+  insert(msg: Msg): Promise<void>;
+  update(msg: Msg): Promise<void>;
 }

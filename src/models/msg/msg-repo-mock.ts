@@ -67,13 +67,11 @@ export class MsgRepoMock implements IMsgRepo {
     return msgs.map(x => Msg.fromDB(x));
   }
 
-  async insert(msg: Msg): Promise<null> {
+  async insert(msg: Msg): Promise<void> {
     this.msgs.push(msg.toDB());
-    return null;
   }
 
-  async update(msg: Msg): Promise<null> {
+  async update(msg: Msg): Promise<void> {
     this.msgs[this.msgs.findIndex(x => x.id === msg.id)] = msg.toDB();
-    return null;
   }
 }
