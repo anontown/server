@@ -3,9 +3,21 @@ import { SearchResponse } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { ESClient } from "../../db";
 import { ITopicRepo } from "./itopic-repo";
-import { ITopicDB, ITopicForkDB, ITopicNormalDB, ITopicOneDB, Topic, TopicFork, TopicNormal, TopicOne } from "./topic";
+import {
+  ITopicDB,
+  ITopicForkDB,
+  ITopicNormalDB,
+  ITopicOneDB,
+  Topic,
+  TopicFork,
+  TopicNormal,
+  TopicOne
+} from "./topic";
+import { IResRepo } from "../res";
 
 export class TopicRepo implements ITopicRepo {
+  constructor(private resRepo: IResRepo) { }
+
   async findOne(id: string): Promise<Topic> {
     const topics = await ESClient.search<ITopicDB["body"]>({
       index: "topics",
@@ -169,38 +181,18 @@ export class TopicRepo implements ITopicRepo {
   }
 
   private async aggregate(topics: SearchResponse<ITopicDB["body"]>): Promise<Topic[]> {
-    const data = await ESClient.search({
-      index: "reses",
-      size: 0,
-      body: {
-        query: {
-          terms: {
-            topic: topics.hits.hits.map(t => t._id),
-          },
-        },
-        aggs: {
-          res_count: {
-            terms: {
-              field: "topic",
-            },
-          },
-        },
-      },
-    });
+    const dbs = topics.hits.hits.map(x => ({ id: x._id, type: x._type, body: x._source }) as ITopicDB);
+    const count = await this.resRepo.resCount(dbs);
 
-    const countArr: { key: string, doc_count: number }[] = data.aggregations.res_count.buckets;
-    const count = new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
-
-    return topics.hits.hits.map(t => {
-      const c = count.get(t._id) || 0;
-      const dbObj = { id: t._id, type: t._type, body: t._source } as ITopicDB;
-      switch (dbObj.type) {
+    return dbs.map(x => {
+      const c = count.get(x.id) || 0;
+      switch (x.type) {
         case "normal":
-          return TopicNormal.fromDB(dbObj, c);
+          return TopicNormal.fromDB(x, c);
         case "one":
-          return TopicOne.fromDB(dbObj, c);
+          return TopicOne.fromDB(x, c);
         case "fork":
-          return TopicFork.fromDB(dbObj, c);
+          return TopicFork.fromDB(x, c);
       }
     });
 
