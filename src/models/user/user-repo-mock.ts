@@ -37,7 +37,7 @@ export class UserRepoMock implements IUserRepo {
   }
 
   async update(user: User): Promise<void> {
-    if (this.users.findIndex(x => x.sn === user.sn) !== -1) {
+    if (this.users.findIndex(x => x.sn === user.sn && x._id.toHexString() !== user.id) !== -1) {
       throw new AtConflictError("スクリーンネームが使われています");
     }
 
