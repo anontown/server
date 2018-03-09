@@ -650,3 +650,17 @@ export async function createDB() {
     encoding: "utf8",
   });
 }
+
+export async function allRemove() {
+  if (process.env.AT_MODE === "TEST") {
+    const db = await DB;
+    const cls = await db.collections();
+    for (let cl of cls) {
+      await cl.drop();
+    }
+
+    await ESClient.indices.delete({ index: "*" });
+  } else {
+    throw new Error("allRemove:not test");
+  }
+}
