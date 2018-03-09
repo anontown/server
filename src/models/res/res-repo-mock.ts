@@ -2,15 +2,13 @@ import { Subject } from "rxjs";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
-import { Topic, TopicRepo, ITopicDB } from "../topic";
+import { Topic, ITopicDB } from "../topic";
 import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
 
 export class ResRepoMock implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
   private reses: IResDB[] = [];
-
-  constructor(private topicRepo: TopicRepo) { }
 
   async findOne(id: string): Promise<Res> {
     const res = this.reses.find(x => x.id === id);
@@ -145,9 +143,9 @@ export class ResRepoMock implements IResRepo {
     return reses.map(r => fromDBToRes(r, data.get(r.id) || 0));
   }
 
-  async resCount(topics: ITopicDB[]): Promise<Map<string, number>> {
+  async resCount(topicIDs: string[]): Promise<Map<string, number>> {
     return this.reses
-      .filter(x => topics.map(x => x.id).includes(x.body.topic))
+      .filter(x => topicIDs.includes(x.body.topic))
       .map(x => x.body.topic)
       .reduce((c, x) => c.set(x, (c.get(x) || 0) + 1), new Map<string, number>());
   }

@@ -1,6 +1,6 @@
 import { Subject } from "rxjs";
 import { IAuthToken } from "../../auth";
-import { Topic, ITopicDB } from "../topic";
+import { Topic } from "../topic";
 import { Res } from "./res";
 
 export interface IResRepo {
@@ -31,5 +31,5 @@ export interface IResRepo {
 
   update(res: Res): Promise<null>;
 
-  resCount(topics: ITopicDB[]): Promise<Map<string, number>>;
+  resCount(topicIDs: string[]): Promise<Map<string, number>>;
 }
