@@ -6,14 +6,12 @@ import { IHistoryRepo } from "./ihistory-repo";
 export class HistoryRepoMock implements IHistoryRepo {
   private histories: IHistoryDB[] = [];
 
-  async insert(history: History): Promise<null> {
+  async insert(history: History): Promise<void> {
     this.histories.push(history.toDB());
-    return null;
   }
 
-  async update(history: History): Promise<null> {
+  async update(history: History): Promise<void> {
     this.histories[this.histories.findIndex(h => h.id === history.id)] = history.toDB();
-    return null;
   }
 
   async findOne(id: string): Promise<History> {

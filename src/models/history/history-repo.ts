@@ -6,7 +6,7 @@ import { History, IHistoryDB } from "./history";
 import { IHistoryRepo } from "./ihistory-repo";
 
 export class HistoryRepo implements IHistoryRepo {
-  async insert(history: History): Promise<null> {
+  async insert(history: History): Promise<void> {
     const hDB = history.toDB();
     await ESClient.create({
       index: "histories",
@@ -14,10 +14,9 @@ export class HistoryRepo implements IHistoryRepo {
       id: hDB.id,
       body: hDB.body,
     });
-    return null;
   }
 
-  async update(history: History): Promise<null> {
+  async update(history: History): Promise<void> {
     const hDB = history.toDB();
     await ESClient.update({
       index: "histories",
@@ -25,7 +24,6 @@ export class HistoryRepo implements IHistoryRepo {
       id: hDB.id,
       body: hDB.body,
     });
-    return null;
   }
 
   async findOne(id: string): Promise<History> {
