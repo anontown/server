@@ -42,7 +42,7 @@ export class TokenRepo implements ITokenRepo {
     });
   }
 
-  async insert(token: Token): Promise<null> {
+  async insert(token: Token): Promise<void> {
     const db = await DB;
     await db.collection("tokens").insert(token.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
@@ -51,14 +51,11 @@ export class TokenRepo implements ITokenRepo {
         throw e;
       }
     });
-
-    return null;
   }
 
-  async update(token: Token): Promise<null> {
+  async update(token: Token): Promise<void> {
     const db = await DB;
     await db.collection("tokens").update({ _id: new ObjectID(token.id) }, token.toDB());
-    return null;
   }
 
   async getStorage(token: IAuthToken, name: string): Promise<string> {

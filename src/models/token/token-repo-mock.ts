@@ -41,14 +41,12 @@ export class TokenRepoMock implements ITokenRepo {
     });
   }
 
-  async insert(token: Token): Promise<null> {
+  async insert(token: Token): Promise<void> {
     this.tokens.push(token.toDB());
-    return null;
   }
 
-  async update(token: Token): Promise<null> {
+  async update(token: Token): Promise<void> {
     this.tokens[this.tokens.findIndex(x => x._id.toHexString() === token.id)] = token.toDB();
-    return null;
   }
 
   async getStorage(token: IAuthToken, name: string): Promise<string> {

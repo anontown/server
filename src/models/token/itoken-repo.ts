@@ -15,9 +15,9 @@ export interface ITokenRepo {
 
   findAll(authToken: IAuthTokenMaster): Promise<Token[]>;
 
-  insert(token: Token): Promise<null>;
+  insert(token: Token): Promise<void>;
 
-  update(token: Token): Promise<null>;
+  update(token: Token): Promise<void>;
 
   getStorage(token: IAuthToken, name: string): Promise<string>;
 
