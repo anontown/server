@@ -1,5 +1,5 @@
 import { ObjectID } from "mongodb";
-import { User } from "./user";
+import { User, ResWaitCountKey } from "./user";
 
 export interface IUserRepo {
   findOne(id: string): Promise<User>;
@@ -12,4 +12,6 @@ export interface IUserRepo {
   cron(): void;
 
   cronPointReset(): Promise<void>;
+
+  cronCountReset(key: ResWaitCountKey): Promise<void>;
 }

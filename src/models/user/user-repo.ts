@@ -4,7 +4,7 @@ import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { DB } from "../../db";
 import { Logger } from "../../logger";
 import { IUserRepo } from "./iuser-repo";
-import { IUserDB, User } from "./user";
+import { IUserDB, User, ResWaitCountKey } from "./user";
 
 export class UserRepo implements IUserRepo {
   async findOne(id: string): Promise<User> {
@@ -58,14 +58,18 @@ export class UserRepo implements IUserRepo {
     await db.collection("users").update({}, { $set: { point: 0 } }, { multi: true });
   }
 
+  async cronCountReset(key: ResWaitCountKey): Promise<void> {
+    const db = await DB;
+    await db.collection("users").update({}, { $set: { ["resWait." + key]: 0 } }, { multi: true });
+  }
+
   cron() {
-    const start = (cronTime: string, field: string) => {
+    const start = (cronTime: string, key: ResWaitCountKey) => {
       new CronJob({
         cronTime,
         onTick: async () => {
-          Logger.system.info("UserCron", field);
-          const db = await DB;
-          await db.collection("users").update({}, { $set: { ["resWait." + field]: 0 } }, { multi: true });
+          Logger.system.info("UserCron", key);
+          await this.cronCountReset(key);
         },
         start: false,
         timeZone: "Asia/Tokyo",

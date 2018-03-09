@@ -2,7 +2,8 @@ import { CronJob } from "cron";
 import { ObjectID } from "mongodb";
 import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { IUserRepo } from "./iuser-repo";
-import { IUserDB, User } from "./user";
+import { IUserDB, User, ResWaitCountKey } from "./user";
+import { Logger } from "../../logger";
 
 export class UserRepoMock implements IUserRepo {
   private users: IUserDB[] = [];
@@ -49,12 +50,17 @@ export class UserRepoMock implements IUserRepo {
     this.users = this.users.map(x => ({ ...x, point: 0 }));
   }
 
+  async cronCountReset(key: ResWaitCountKey): Promise<void> {
+    this.users = this.users.map(x => ({ ...x, resWait: { ...x.resWait, [key]: 0 } }));
+  }
+
   cron() {
-    const start = (cronTime: string, field: string) => {
+    const start = (cronTime: string, key: ResWaitCountKey) => {
       new CronJob({
         cronTime,
         onTick: async () => {
-          this.users = this.users.map(x => ({ ...x, resWait: { ...x.resWait, [field]: 0 } }));
+          Logger.system.info("UserCron", key);
+          await this.cronCountReset(key);
         },
         start: false,
         timeZone: "Asia/Tokyo",
