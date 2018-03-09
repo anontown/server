@@ -5,9 +5,9 @@ export interface IUserRepo {
   findOne(id: string): Promise<User>;
 
   findID(sn: string): Promise<ObjectID>;
-  insert(user: User): Promise<null>;
+  insert(user: User): Promise<void>;
 
-  update(user: User): Promise<null>;
+  update(user: User): Promise<void>;
 
   cron(): void;
 

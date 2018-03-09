@@ -28,22 +28,20 @@ export class UserRepoMock implements IUserRepo {
     return user._id;
   }
 
-  async insert(user: User): Promise<null> {
+  async insert(user: User): Promise<void> {
     if (this.users.findIndex(x => x.sn === user.sn) !== -1) {
       throw new AtConflictError("スクリーンネームが使われています");
     }
 
     this.users.push(user.toDB());
-    return null;
   }
 
-  async update(user: User): Promise<null> {
+  async update(user: User): Promise<void> {
     if (this.users.findIndex(x => x.sn === user.sn) !== -1) {
       throw new AtConflictError("スクリーンネームが使われています");
     }
 
     this.users[this.users.findIndex(x => x._id.toHexString() === user.id)] = user.toDB();
-    return null;
   }
 
   async cronPointReset(): Promise<void> {

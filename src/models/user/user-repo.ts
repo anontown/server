@@ -29,7 +29,7 @@ export class UserRepo implements IUserRepo {
     return user._id;
   }
 
-  async insert(user: User): Promise<null> {
+  async insert(user: User): Promise<void> {
     const db = await DB;
     await db.collection("users").insert(user.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
@@ -38,10 +38,9 @@ export class UserRepo implements IUserRepo {
         throw e;
       }
     });
-    return null;
   }
 
-  async update(user: User): Promise<null> {
+  async update(user: User): Promise<void> {
     const db = await DB;
     await db.collection("users").update({ _id: new ObjectID(user.id) }, user.toDB()).catch((e: WriteError) => {
       if (e.code === 11000) {
@@ -50,7 +49,6 @@ export class UserRepo implements IUserRepo {
         throw e;
       }
     });
-    return null;
   }
 
   async cronPointReset(): Promise<void> {
