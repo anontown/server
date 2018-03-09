@@ -104,7 +104,7 @@ export class TopicRepoMock implements ITopicRepo {
   }
 
   private async aggregate(topics: ITopicDB[]): Promise<Topic[]> {
-    const count = await this.resRepo.resCount(topics);
+    const count = await this.resRepo.resCount(topics.map(x => x.id));
 
     return topics.map(t => {
       const c = count.get(t.id) || 0;

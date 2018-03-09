@@ -182,7 +182,7 @@ export class TopicRepo implements ITopicRepo {
 
   private async aggregate(topics: SearchResponse<ITopicDB["body"]>): Promise<Topic[]> {
     const dbs = topics.hits.hits.map(x => ({ id: x._id, type: x._type, body: x._source }) as ITopicDB);
-    const count = await this.resRepo.resCount(dbs);
+    const count = await this.resRepo.resCount(dbs.map(x => x.id));
 
     return dbs.map(x => {
       const c = count.get(x.id) || 0;
