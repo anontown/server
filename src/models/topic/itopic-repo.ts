@@ -18,9 +18,9 @@ export interface ITopicRepo {
 
   cron(): void;
 
-  insert(topic: Topic): Promise<null>;
+  insert(topic: Topic): Promise<void>;
 
-  update(topic: Topic): Promise<null>;
+  update(topic: Topic): Promise<void>;
 
   cronTopicCheck(now: Date): Promise<void>;
 }

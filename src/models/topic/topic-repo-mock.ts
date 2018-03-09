@@ -97,14 +97,12 @@ export class TopicRepoMock implements ITopicRepo {
     }).start();
   }
 
-  async insert(topic: Topic): Promise<null> {
+  async insert(topic: Topic): Promise<void> {
     this.topics.push(topic.toDB());
-    return null;
   }
 
-  async update(topic: Topic): Promise<null> {
+  async update(topic: Topic): Promise<void> {
     this.topics[this.topics.findIndex(x => x.id === topic.id)] = topic.toDB();
-    return null;
   }
 
   private async aggregate(topics: ITopicDB[]): Promise<Topic[]> {

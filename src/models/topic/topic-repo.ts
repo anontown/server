@@ -162,7 +162,7 @@ export class TopicRepo implements ITopicRepo {
     }).start();
   }
 
-  async insert(topic: Topic): Promise<null> {
+  async insert(topic: Topic): Promise<void> {
     const tDB = topic.toDB();
     await ESClient.create({
       index: "topics",
@@ -170,10 +170,9 @@ export class TopicRepo implements ITopicRepo {
       id: tDB.id,
       body: tDB.body,
     });
-    return null;
   }
 
-  async update(topic: Topic): Promise<null> {
+  async update(topic: Topic): Promise<void> {
     const tDB = topic.toDB();
     await ESClient.update({
       index: "topics",
@@ -181,7 +180,6 @@ export class TopicRepo implements ITopicRepo {
       id: tDB.id,
       body: tDB.body,
     });
-    return null;
   }
 
   private async aggregate(topics: SearchResponse<ITopicDB["body"]>): Promise<Topic[]> {
