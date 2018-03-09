@@ -66,16 +66,16 @@ updateFunc.push((async () => {
   targetReses.forEach(x => {
     promises.push(db.collection("reses")
       .update(
-      {
-        _id: x._id,
-      },
-      {
-        $set: {
-          reply: {
-            res: x.reply, user: replyReses.find(y => x.reply.equals(y._id))!.user,
+        {
+          _id: x._id,
+        },
+        {
+          $set: {
+            reply: {
+              res: x.reply, user: replyReses.find(y => x.reply.equals(y._id))!.user,
+            },
           },
         },
-      },
     ));
   });
 
@@ -624,14 +624,7 @@ updateFunc.push(async () => {
 /*
   -----------------------------------------------------------------------------
 */
-export async function createDB() {
-  let ver: number;
-  try {
-    ver = JSON.parse(fs.readFileSync("./data/db-version.json", "utf8"));
-  } catch (e) {
-    // ファイルがなければ0
-    ver = 0;
-  }
+export async function createDBVer(ver: number): Promise<number> {
   Logger.system.info(`現在のDBバージョン:${ver}`);
 
   for (let i = ver; i < updateFunc.length; i++) {
@@ -640,8 +633,20 @@ export async function createDB() {
     Logger.system.info(`updated db:${i}`);
   }
 
-  fs.writeFileSync("./data/db-version.json", JSON.stringify(updateFunc.length), {
+  Logger.system.info(`DBアップデート完了:${updateFunc.length}`);
+  return updateFunc.length;
+}
+
+export async function createDB() {
+  let ver: number;
+  try {
+    ver = JSON.parse(fs.readFileSync("./data/db-version.json", "utf8"));
+  } catch (e) {
+    // ファイルがなければ0
+    ver = 0;
+  }
+  const newVer = await createDBVer(ver);
+  fs.writeFileSync("./data/db-version.json", JSON.stringify(newVer), {
     encoding: "utf8",
   });
-  Logger.system.info(`DBアップデート完了:${updateFunc.length}`);
 }
