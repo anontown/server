@@ -131,27 +131,31 @@ export class TopicRepo implements ITopicRepo {
     return this.aggregate(topics);
   }
 
+  async cronTopicCheck(now: Date): Promise<void> {
+    await ESClient.updateByQuery({
+      index: "topics",
+      type: ["one", "fork"],
+      body: {
+        script: {
+          inline: "ctx._source.active = false",
+        },
+        query: {
+          range: {
+            update: {
+              lt: new Date(now.valueOf() - 1000 * 60 * 60 * 24).toISOString(),
+            },
+          },
+        },
+      },
+    });
+  }
+
   cron() {
     // 毎時間トピ落ちチェック
     new CronJob({
       cronTime: "00 00 * * * *",
       onTick: async () => {
-        await ESClient.updateByQuery({
-          index: "topics",
-          type: ["one", "fork"],
-          body: {
-            script: {
-              inline: "ctx._source.active = false",
-            },
-            query: {
-              range: {
-                update: {
-                  lt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-                },
-              },
-            },
-          },
-        });
+        await this.cronTopicCheck(new Date());
       },
       start: false,
       timeZone: "Asia/Tokyo",

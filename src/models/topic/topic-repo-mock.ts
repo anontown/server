@@ -75,18 +75,22 @@ export class TopicRepoMock implements ITopicRepo {
       .slice(0, limit));
   }
 
+  async cronTopicCheck(now: Date): Promise<void> {
+    this.topics.filter<ITopicNormalDB | ITopicOneDB>
+      ((x): x is ITopicNormalDB | ITopicOneDB => x.type === "normal" || x.type === "one")
+      .filter(x => new Date(x.body.update).valueOf() < new Date(now.valueOf() - 1000 * 60 * 60 * 24).valueOf())
+      .map(x => ({ ...x, body: { ...x.body, active: false } }))
+      .forEach(x => {
+        this.topics[this.topics.findIndex(y => y.id === x.id)] = x;
+      });
+  }
+
   cron() {
     // 毎時間トピ落ちチェック
     new CronJob({
       cronTime: "00 00 * * * *",
-      onTick: () => {
-        this.topics.filter<ITopicNormalDB | ITopicOneDB>
-          ((x): x is ITopicNormalDB | ITopicOneDB => x.type === "normal" || x.type === "one")
-          .filter(x => new Date(x.body.update).valueOf() < new Date(Date.now() - 1000 * 60 * 60 * 24).valueOf())
-          .map(x => ({ ...x, body: { ...x.body, active: false } }))
-          .forEach(x => {
-            this.topics[this.topics.findIndex(y => y.id === x.id)] = x;
-          });
+      onTick: async () => {
+        await this.cronTopicCheck(new Date());
       },
       start: false,
       timeZone: "Asia/Tokyo",
