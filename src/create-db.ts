@@ -651,7 +651,7 @@ export async function createDB() {
   });
 }
 
-export async function allRemove() {
+export async function dbReset() {
   if (process.env.AT_MODE === "TEST") {
     const db = await DB;
     const cls = await db.collections();
@@ -660,7 +660,8 @@ export async function allRemove() {
     }
 
     await ESClient.indices.delete({ index: "*" });
+    await createDBVer(0);
   } else {
-    throw new Error("allRemove:not test");
+    throw new Error("dbReset:not test");
   }
 }
