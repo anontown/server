@@ -1,11 +1,11 @@
 import {
   AtError,
   Client,
-  ObjectIDGenerator,
-  IClientRepo,
   ClientRepo,
   ClientRepoMock,
-  dbReset
+  dbReset,
+  IClientRepo,
+  ObjectIDGenerator,
 } from "../../";
 
 function run(repoGene: () => IClientRepo, isReset: boolean) {
@@ -47,7 +47,6 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
       await expect(repo.findOne(ObjectIDGenerator())).rejects.toThrow(AtError);
     });
   });
-
 
 }
 

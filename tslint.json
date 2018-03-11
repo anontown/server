@@ -35,5 +35,6 @@
       "array"
     ]
   },
-  "rulesDirectory": []
+  "rulesDirectory": [],
+  "no-floating-promises": true
 }

@@ -655,7 +655,7 @@ export async function dbReset() {
   if (process.env.AT_MODE === "TEST") {
     const db = await DB;
     const cls = await db.collections();
-    for (let cl of cls) {
+    for (const cl of cls) {
       if (cl.collectionName.indexOf("system.") !== 0) {
         await cl.drop();
       }
