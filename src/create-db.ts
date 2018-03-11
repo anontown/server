@@ -656,7 +656,9 @@ export async function dbReset() {
     const db = await DB;
     const cls = await db.collections();
     for (let cl of cls) {
-      await cl.drop();
+      if (cl.collectionName.indexOf("system.") !== 0) {
+        await cl.drop();
+      }
     }
 
     await ESClient.indices.delete({ index: "*" });
