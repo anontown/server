@@ -44,7 +44,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
         new Date(0),
         new Date(10)));
 
-      expect(repo.findOne(ObjectIDGenerator())).rejects.toThrow(AtError);
+      await expect(repo.findOne(ObjectIDGenerator())).rejects.toThrow(AtError);
     });
   });
 
