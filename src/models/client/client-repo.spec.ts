@@ -12,7 +12,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
   describe("findOne", () => {
     it("正常に探せるか", async () => {
       if (isReset) {
-        dbReset();
+        await dbReset();
       }
       const repo = repoGene();
       expect.assertions(1);
@@ -32,7 +32,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
 
     it("存在しない時エラーになるか", async () => {
       if (isReset) {
-        dbReset();
+        await dbReset();
       }
       const repo = repoGene();
       expect.assertions(1);
