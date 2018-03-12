@@ -9,13 +9,16 @@ import {
 } from "../../";
 
 function run(repoGene: () => IClientRepo, isReset: boolean) {
+  async function pre(assertions: number) {
+    expect.assertions(assertions);
+    if (isReset) {
+      await dbReset();
+    }
+    return repoGene();
+  }
   describe("findOne", () => {
     it("正常に探せるか", async () => {
-      if (isReset) {
-        await dbReset();
-      }
-      const repo = repoGene();
-      expect.assertions(1);
+      const repo = await pre(1);
 
       const client = new Client(ObjectIDGenerator(),
         "name",
@@ -31,11 +34,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
     });
 
     it("存在しない時エラーになるか", async () => {
-      if (isReset) {
-        await dbReset();
-      }
-      const repo = repoGene();
-      expect.assertions(1);
+      const repo = await pre(1);
 
       await repo.insert(new Client(ObjectIDGenerator(),
         "name",
