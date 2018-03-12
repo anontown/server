@@ -1,3 +1,4 @@
+import fsExtra from "fs-extra";
 import * as fs from "fs-promise";
 import { ObjectID } from "mongodb";
 import { Config } from "./config";
@@ -5,7 +6,6 @@ import { DB, ESClient } from "./db";
 import { Logger } from "./logger";
 import { IProfileDB } from "./models/profile";
 import { hash } from "./utils";
-import fsExtra from "fs-extra";
 
 const updateFunc: (() => Promise<void>)[] = [];
 
@@ -248,7 +248,7 @@ updateFunc.push((async () => {
 
   // トークン削除
   await db.collection("tokens").remove({});
-  //storageディレクトリ削除
+  // storageディレクトリ削除
   await fsExtra.remove("./storage/");
 }));
 
