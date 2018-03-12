@@ -30,7 +30,7 @@ export class TopicRepoMock implements ITopicRepo {
   async findIn(ids: string[]): Promise<Topic[]> {
     const topics = this.topics
       .filter(x => ids.includes(x.id))
-      .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf());
+      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf());
 
     if (topics.length !== ids.length) {
       throw new AtNotFoundPartError("トピックが存在しません",
@@ -61,7 +61,7 @@ export class TopicRepoMock implements ITopicRepo {
       .filter(x => titles.every(t => x.body.title.includes(t)))
       .filter(x => tags.every(t => x.body.tags.includes(t)))
       .filter(x => activeOnly || x.body.active)
-      .sort((a, b) => new Date(a.body.ageUpdate).valueOf() - new Date(b.body.ageUpdate).valueOf())
+      .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf())
       .slice(skip)
       .slice(0, limit));
   }
@@ -71,7 +71,7 @@ export class TopicRepoMock implements ITopicRepo {
       ((x): x is ITopicForkDB => x.type === "fork")
       .filter(x => x.body.parent === parent.id)
       .filter(x => activeOnly || x.body.active)
-      .sort((a, b) => new Date(a.body.ageUpdate).valueOf() - new Date(b.body.ageUpdate).valueOf())
+      .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf())
       .slice(skip)
       .slice(0, limit));
   }

@@ -27,7 +27,7 @@ export class HistoryRepoMock implements IHistoryRepo {
   async findIn(ids: string[]): Promise<History[]> {
     const histories = this.histories
       .filter(x => ids.includes(x.id))
-      .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf());
+      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf());
 
     if (histories.length !== ids.length) {
       throw new AtNotFoundPartError("編集履歴が存在しません",
@@ -40,7 +40,7 @@ export class HistoryRepoMock implements IHistoryRepo {
   async findAll(topic: Topic): Promise<History[]> {
     const histories = this.histories
       .filter(x => x.body.topic === topic.id)
-      .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf());
+      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf());
 
     return histories.map(h => History.fromDB(h));
   }

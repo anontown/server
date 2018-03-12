@@ -19,7 +19,7 @@ export class MsgRepoMock implements IMsgRepo {
   async findIn(ids: string[]): Promise<Msg[]> {
     const msgs = this.msgs
       .filter(x => ids.includes(x.id))
-      .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf());
+      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf());
 
     if (msgs.length !== ids.length) {
       throw new AtNotFoundPartError("メッセージが存在しません",
@@ -47,7 +47,7 @@ export class MsgRepoMock implements IMsgRepo {
       .sort((a, b) => {
         const av = new Date(a.body.date).valueOf();
         const bv = new Date(b.body.date).valueOf();
-        return type === "after" ? bv - av : av - bv;
+        return type === "after" ? av - bv : bv - av;
       })
       .slice(0, limit);
 
@@ -61,7 +61,7 @@ export class MsgRepoMock implements IMsgRepo {
   async findNew(authToken: IAuthToken, limit: number): Promise<Msg[]> {
     const msgs = this.msgs
       .filter(x => x.body.receiver === null || x.body.receiver === authToken.user)
-      .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf())
+      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
       .slice(0, limit);
 
     return msgs.map(x => Msg.fromDB(x));

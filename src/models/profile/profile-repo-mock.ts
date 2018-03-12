@@ -19,7 +19,7 @@ export class ProfileRepoMock implements IProfileRepo {
   async findIn(ids: string[]): Promise<Profile[]> {
     const profiles = this.profiles
       .filter(x => ids.includes(x._id.toHexString()))
-      .sort((a, b) => a.date.valueOf() - b.date.valueOf());
+      .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
     if (profiles.length !== ids.length) {
       throw new AtNotFoundPartError("プロフィールが存在しません",
@@ -32,7 +32,7 @@ export class ProfileRepoMock implements IProfileRepo {
   async findAll(authToken: IAuthToken): Promise<Profile[]> {
     const profiles = this.profiles
       .filter(x => x.user.toHexString() === authToken.user)
-      .sort((a, b) => a.date.valueOf() - b.date.valueOf());
+      .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
     return profiles.map(p => Profile.fromDB(p));
   }

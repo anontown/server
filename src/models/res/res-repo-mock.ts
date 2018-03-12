@@ -23,7 +23,7 @@ export class ResRepoMock implements IResRepo {
   async findIn(ids: string[]): Promise<Res[]> {
     const reses = this.reses
       .filter(x => ids.includes(x.id))
-      .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf());
+      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf());
 
     if (reses.length !== ids.length) {
       throw new AtNotFoundPartError("レスが存在しません",
@@ -46,7 +46,7 @@ export class ResRepoMock implements IResRepo {
       .sort((a, b) => {
         const av = new Date(a.body.date).valueOf();
         const bv = new Date(b.body.date).valueOf();
-        return type === "after" ? bv - av : av - bv;
+        return type === "after" ? av - bv : bv - av;
       })
       .slice(0, limit);
 
@@ -60,7 +60,7 @@ export class ResRepoMock implements IResRepo {
   async findNew(topic: Topic, limit: number): Promise<Res[]> {
     const reses = this.reses
       .filter(x => x.body.topic === topic.id)
-      .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf())
+      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
       .slice(0, limit);
 
     return await this.aggregate(reses);
@@ -84,7 +84,7 @@ export class ResRepoMock implements IResRepo {
       .sort((a, b) => {
         const av = new Date(a.body.date).valueOf();
         const bv = new Date(b.body.date).valueOf();
-        return type === "after" ? bv - av : av - bv;
+        return type === "after" ? av - bv : bv - av;
       })
       .slice(0, limit);
 
@@ -98,7 +98,7 @@ export class ResRepoMock implements IResRepo {
   async findNoticeNew(authToken: IAuthToken, limit: number): Promise<Res[]> {
     const reses = this.reses
       .filter(x => x.type === "normal" && x.body.reply !== null && x.body.reply.user === authToken.user)
-      .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf())
+      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
       .slice(0, limit);
 
     return await this.aggregate(reses);
@@ -107,7 +107,7 @@ export class ResRepoMock implements IResRepo {
   async findHash(hash: string): Promise<Res[]> {
     const reses = this.reses
       .filter(x => x.body.hash === hash)
-      .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf())
+      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
       .slice(0, Config.api.limit);
 
     return await this.aggregate(reses);
@@ -116,7 +116,7 @@ export class ResRepoMock implements IResRepo {
   async findReply(res: Res): Promise<Res[]> {
     const reses = this.reses
       .filter(x => x.type === "normal" && x.body.reply !== null && x.body.reply.res === res.id)
-      .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf())
+      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
       .slice(0, Config.api.limit);
 
     return await this.aggregate(reses);
