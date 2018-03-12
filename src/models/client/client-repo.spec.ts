@@ -80,7 +80,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
     });
   });
 
-  describe("存在しない物がある時エラーになるか", async () => {
+  it("存在しない物がある時エラーになるか", async () => {
     const repo = repoGene();
 
     const client = new Client(ObjectIDGenerator(),
