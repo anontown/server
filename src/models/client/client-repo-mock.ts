@@ -18,7 +18,7 @@ export class ClientRepoMock implements IClientRepo {
   async findIn(ids: string[]): Promise<Client[]> {
     const clients = this.clients
       .filter(x => ids.includes(x._id.toHexString()))
-      .sort((a, b) => a.date.valueOf() - b.date.valueOf());
+      .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
     if (clients.length !== ids.length) {
       throw new AtNotFoundPartError("クライアントが存在しません",
@@ -31,7 +31,7 @@ export class ClientRepoMock implements IClientRepo {
   async findAll(authToken: IAuthTokenMaster): Promise<Client[]> {
     const clients = this.clients
       .filter(c => c.user.toHexString() === authToken.user)
-      .sort((a, b) => a.date.valueOf() - b.date.valueOf());
+      .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
     return clients.map(c => Client.fromDB(c));
   }

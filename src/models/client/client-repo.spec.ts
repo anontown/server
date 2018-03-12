@@ -71,9 +71,9 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
         client2.id,
         client3.id
       ])).toEqual([
-        client3,
+        client2,
         client1,
-        client2
+        client3
       ]);
 
       expect(await repo.findIn([])).toEqual([]);
