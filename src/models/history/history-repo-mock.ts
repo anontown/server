@@ -26,7 +26,7 @@ export class HistoryRepoMock implements IHistoryRepo {
 
   async findIn(ids: string[]): Promise<History[]> {
     const histories = this.histories
-      .filter(x => ids.findIndex(id => x.id === id))
+      .filter(x => ids.includes(x.id))
       .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf());
 
     if (histories.length !== ids.length) {

@@ -17,7 +17,7 @@ export class ClientRepoMock implements IClientRepo {
 
   async findIn(ids: string[]): Promise<Client[]> {
     const clients = this.clients
-      .filter(x => ids.findIndex(id => x._id.toHexString() === id))
+      .filter(x => ids.includes(x._id.toHexString()))
       .sort((a, b) => a.date.valueOf() - b.date.valueOf());
 
     if (clients.length !== ids.length) {

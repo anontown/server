@@ -18,7 +18,7 @@ export class MsgRepoMock implements IMsgRepo {
 
   async findIn(ids: string[]): Promise<Msg[]> {
     const msgs = this.msgs
-      .filter(x => ids.findIndex(id => x.id === id))
+      .filter(x => ids.includes(x.id))
       .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf());
 
     if (msgs.length !== ids.length) {

@@ -21,7 +21,8 @@ export class ResRepoMock implements IResRepo {
   }
 
   async findIn(ids: string[]): Promise<Res[]> {
-    const reses = this.reses.filter(x => ids.findIndex(id => x.id === id))
+    const reses = this.reses
+      .filter(x => ids.includes(x.id))
       .sort((a, b) => new Date(a.body.date).valueOf() - new Date(b.body.date).valueOf());
 
     if (reses.length !== ids.length) {

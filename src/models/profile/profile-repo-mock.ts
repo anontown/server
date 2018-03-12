@@ -18,7 +18,7 @@ export class ProfileRepoMock implements IProfileRepo {
 
   async findIn(ids: string[]): Promise<Profile[]> {
     const profiles = this.profiles
-      .filter(x => ids.findIndex(id => x._id.toHexString() === id))
+      .filter(x => ids.includes(x._id.toHexString()))
       .sort((a, b) => a.date.valueOf() - b.date.valueOf());
 
     if (profiles.length !== ids.length) {
