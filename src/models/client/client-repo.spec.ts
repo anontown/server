@@ -78,22 +78,22 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
 
       expect(await repo.findIn([])).toEqual([]);
     });
-  });
 
-  it("存在しない物がある時エラーになるか", async () => {
-    const repo = repoGene();
+    it("存在しない物がある時エラーになるか", async () => {
+      const repo = repoGene();
 
-    const client = new Client(ObjectIDGenerator(),
-      "name",
-      "https://hoge.com",
-      ObjectIDGenerator(),
-      new Date(0),
-      new Date(100));
+      const client = new Client(ObjectIDGenerator(),
+        "name",
+        "https://hoge.com",
+        ObjectIDGenerator(),
+        new Date(0),
+        new Date(100));
 
-    await repo.insert(client);
+      await repo.insert(client);
 
-    await expect(repo.findIn([ObjectIDGenerator()])).rejects.toThrow(AtError);
-    await expect(repo.findIn([ObjectIDGenerator(), client.id])).rejects.toThrow(AtError);
+      await expect(repo.findIn([ObjectIDGenerator()])).rejects.toThrow(AtError);
+      await expect(repo.findIn([ObjectIDGenerator(), client.id])).rejects.toThrow(AtError);
+    });
   });
 }
 
