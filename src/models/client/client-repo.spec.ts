@@ -166,6 +166,31 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
       expect(await repo.findOne(client.id)).toEqual(client);
     });
   });
+
+  describe("update", () => {
+    it("正常に更新出来るか", async () => {
+      const repo = repoGene();
+
+      const client = new Client(ObjectIDGenerator(),
+        "name",
+        "https://hoge.com",
+        ObjectIDGenerator(),
+        new Date(0),
+        new Date(10));
+
+      const client1 = client.copy({ id: ObjectIDGenerator(), name: "client1" });
+      const client2 = client.copy({ id: ObjectIDGenerator(), name: "client2" });
+      const client1update = client.copy({ name: "update" });
+
+      await repo.insert(client1);
+      await repo.insert(client2);
+
+      await repo.update(client1update);
+
+      expect(await repo.findOne(client1.id)).toEqual(client1update);
+      expect(await repo.findOne(client2.id)).toEqual(client2);
+    });
+  });
 }
 
 describe("ClientRepoMock", () => {
