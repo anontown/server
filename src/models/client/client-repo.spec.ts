@@ -149,6 +149,23 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
       })).toEqual([]);
     });
   });
+
+  describe("insert", () => {
+    it("正常に保存出来るか", async () => {
+      const repo = repoGene();
+
+      const client = new Client(ObjectIDGenerator(),
+        "name",
+        "https://hoge.com",
+        ObjectIDGenerator(),
+        new Date(0),
+        new Date(10));
+
+      await repo.insert(client);
+
+      expect(await repo.findOne(client.id)).toEqual(client);
+    });
+  });
 }
 
 describe("ClientRepoMock", () => {
