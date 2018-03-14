@@ -165,6 +165,8 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
 
       expect(await repo.findOne(client.id)).toEqual(client);
     });
+
+    //TODO:ID被り
   });
 
   describe("update", () => {
@@ -190,6 +192,8 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
       expect(await repo.findOne(client1.id)).toEqual(client1update);
       expect(await repo.findOne(client2.id)).toEqual(client2);
     });
+
+    //TODO:存在しないID
   });
 }
 
