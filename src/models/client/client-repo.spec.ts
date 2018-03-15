@@ -182,7 +182,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
 
       const client1 = client.copy({ id: ObjectIDGenerator(), name: "client1" });
       const client2 = client.copy({ id: ObjectIDGenerator(), name: "client2" });
-      const client1update = client.copy({ name: "update" });
+      const client1update = client1.copy({ name: "update" });
 
       await repo.insert(client1);
       await repo.insert(client2);
