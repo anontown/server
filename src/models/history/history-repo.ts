@@ -32,7 +32,7 @@ export class HistoryRepo implements IHistoryRepo {
       size: 1,
       body: {
         query: {
-          term: {
+          match: {
             _id: id,
           },
         },
