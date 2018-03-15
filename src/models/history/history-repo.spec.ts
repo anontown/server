@@ -5,7 +5,6 @@ import {
   HistoryRepoMock,
   dbReset,
   IHistoryRepo,
-  ObjectIDGenerator,
 } from "../../";
 import * as Im from "immutable";
 
