@@ -27,23 +27,17 @@ export class HistoryRepo implements IHistoryRepo {
   }
 
   async findOne(id: string): Promise<History> {
-    const histories = await ESClient.search<IHistoryDB["body"]>({
-      index: "histories",
-      size: 1,
-      body: {
-        query: {
-          match: {
-            _id: id,
-          },
-        },
-      },
-    });
+    try {
+      const history = await ESClient.get<IHistoryDB["body"]>({
+        index: "histories",
+        type: "normal",
+        id
+      });
 
-    if (histories.hits.total === 0) {
+      return History.fromDB(({ id: history._id, body: history._source }));
+    } catch{
       throw new AtNotFoundError("編集履歴が存在しません");
     }
-
-    return History.fromDB(histories.hits.hits.map(h => ({ id: h._id, body: h._source }))[0]);
   }
 
   async findIn(ids: string[]): Promise<History[]> {
