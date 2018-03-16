@@ -43,18 +43,12 @@ export class HistoryRepo implements IHistoryRepo {
   async findIn(ids: string[]): Promise<History[]> {
     const histories = await ESClient.search<IHistoryDB["body"]>({
       index: "histories",
+      type: "normal",
       size: ids.length,
       body: {
         query: {
-          filtered: {
-            query: {
-              match_all: {}
-            },
-            filter: {
-              terms: {
-                _id: ids
-              }
-            }
+          terms: {
+            _id: ids
           }
         },
         sort: { date: { order: "desc" } },
