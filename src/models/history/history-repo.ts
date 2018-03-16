@@ -46,9 +46,10 @@ export class HistoryRepo implements IHistoryRepo {
       size: ids.length,
       body: {
         query: {
-          terms: {
-            _id: ids,
-          },
+          ids: {
+            type: "normal",
+            values: ids
+          }
         },
         sort: { ageUpdate: { order: "desc" } },
       },
