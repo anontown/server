@@ -51,7 +51,7 @@ export class HistoryRepo implements IHistoryRepo {
             values: ids
           }
         },
-        sort: { ageUpdate: { order: "desc" } },
+        sort: { date: { order: "desc" } },
       },
     });
 
@@ -73,7 +73,7 @@ export class HistoryRepo implements IHistoryRepo {
             topic: topic.id,
           },
         },
-        sort: { ageUpdate: { order: "desc" } },
+        sort: { date: { order: "desc" } },
       },
     });
 
