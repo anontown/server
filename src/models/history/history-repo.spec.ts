@@ -18,7 +18,7 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
     it("正常に探せるか", async () => {
       const repo = repoGene();
 
-      const topic = new History("history",
+      const history = new History("history",
         "topic",
         "title",
         Im.List(["x"]),
@@ -27,10 +27,10 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
         "hash",
         "user");
 
-      await repo.insert(topic);
-      await repo.insert(topic.copy({ id: "topic2" }));
+      await repo.insert(history);
+      await repo.insert(history.copy({ id: "topic2" }));
 
-      expect(await repo.findOne(topic.id)).toEqual(topic);
+      expect(await repo.findOne(history.id)).toEqual(history);
     });
 
     it("存在しない時エラーになるか", async () => {
