@@ -80,7 +80,7 @@ export class TopicRepoMock implements ITopicRepo {
     this.topics.filter<ITopicForkDB | ITopicOneDB>
       ((x): x is ITopicForkDB | ITopicOneDB => x.body.type === "fork" || x.body.type === "one")
       .filter(x => new Date(x.body.update).valueOf() < new Date(now.valueOf() - 1000 * 60 * 60 * 24).valueOf())
-      .map(x => ({ ...x, body: { ...x.body, active: false } }))
+      .map(x => ({ ...x, body: { ...x.body, active: false } }) as ITopicForkDB | ITopicOneDB)
       .forEach(x => {
         this.topics[this.topics.findIndex(y => y.id === x.id)] = x;
       });
