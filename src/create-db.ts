@@ -386,43 +386,12 @@ updateFunc.push(async () => {
   await db.collection("reses").update({}, { $rename: { text: "body" }, $unset: { "vote.lv": 1 } }, { multi: true });
   await db.collection("topics").update({}, { $rename: { text: "body" } }, { multi: true });
 
-  const resBaseProps = {
-    topic: {
-      type: "keyword",
-    },
-    date: {
-      type: "date",
-    },
-    user: {
-      type: "keyword",
-    },
-    vote: {
-      type: "nested",
-      properties: {
-        user: {
-          type: "keyword",
-        },
-        value: {
-          type: "integer",
-        },
-        lv: {
-          type: "integer",
-        },
-      },
-    },
-    lv: {
-      type: "integer",
-    },
-    hash: {
-      type: "keyword",
-    },
-  };
-
   await ESClient.putTemplate({
-    id: "analyzer_template",
+    id: "template",
     body: {
       index_patterns: ["*"],
       settings: {
+        "mapping.single_type": true,
         analysis: {
           analyzer: {
             default: {
@@ -450,10 +419,43 @@ updateFunc.push(async () => {
     index: "reses",
     body: {
       mappings: {
-        normal: {
+        doc: {
           dynamic: "strict",
           properties: {
-            ...resBaseProps,
+            // Base
+            type: {
+              type: "keyword",
+            },
+            topic: {
+              type: "keyword",
+            },
+            date: {
+              type: "date",
+            },
+            user: {
+              type: "keyword",
+            },
+            vote: {
+              type: "nested",
+              properties: {
+                user: {
+                  type: "keyword",
+                },
+                value: {
+                  type: "integer",
+                },
+                lv: {
+                  type: "integer",
+                },
+              },
+            },
+            lv: {
+              type: "integer",
+            },
+            hash: {
+              type: "keyword",
+            },
+            // Normal
             name: {
               type: "text",
             },
@@ -480,31 +482,16 @@ updateFunc.push(async () => {
             age: {
               type: "boolean",
             },
-          },
-        },
-        history: {
-          dynamic: "strict",
-          properties: {
-            ...resBaseProps,
+            // History
             history: {
               type: "keyword",
             },
-          },
-        },
-        topic: {
-          dynamic: "strict",
-          properties: {
-            ...resBaseProps,
-          },
-        },
-        fork: {
-          dynamic: "strict",
-          properties: {
-            ...resBaseProps,
+            // Topic
+            // Fork
             fork: {
               type: "keyword",
             },
-          },
+          }
         },
       },
     },
@@ -514,7 +501,7 @@ updateFunc.push(async () => {
     index: "histories",
     body: {
       mappings: {
-        normal: {
+        doc: {
           dynamic: "strict",
           properties: {
             topic: {
@@ -548,7 +535,7 @@ updateFunc.push(async () => {
     index: "msgs",
     body: {
       mappings: {
-        normal: {
+        doc: {
           dynamic: "strict",
           properties: {
             receiver: {
@@ -566,54 +553,44 @@ updateFunc.push(async () => {
     },
   });
 
-  const topicBaseProps = {
-    title: {
-      type: "text",
-    },
-    update: {
-      type: "date",
-    },
-    date: {
-      type: "date",
-    },
-    ageUpdate: {
-      type: "date",
-    },
-    active: {
-      type: "boolean",
-    },
-  };
-
-  const topicSearchBaseProps = {
-    ...topicBaseProps,
-    tags: {
-      type: "keyword",
-    },
-    body: {
-      type: "text",
-    },
-  };
-
   await ESClient.indices.create({
     index: "topics",
     body: {
       mappings: {
-        normal: {
+        doc: {
           dynamic: "strict",
           properties: {
-            ...topicSearchBaseProps,
-          },
-        },
-        one: {
-          dynamic: "strict",
-          properties: {
-            ...topicSearchBaseProps,
-          },
-        },
-        fork: {
-          dynamic: "strict",
-          properties: {
-            ...topicBaseProps,
+            // Base
+            type: {
+              type: "keyword",
+            },
+            title: {
+              type: "text",
+            },
+            update: {
+              type: "date",
+            },
+            date: {
+              type: "date",
+            },
+            ageUpdate: {
+              type: "date",
+            },
+            active: {
+              type: "boolean",
+            },
+
+            // Search
+            tags: {
+              type: "keyword",
+            },
+            body: {
+              type: "text",
+            },
+
+            // Normal
+            // One
+            // Fork
             parent: {
               type: "keyword",
             },

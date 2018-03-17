@@ -73,7 +73,7 @@ export class ResRepoMock implements IResRepo {
     date: Date,
     limit: number): Promise<Res[]> {
     const reses = this.reses
-      .filter(x => x.type === "normal" && x.body.reply !== null && x.body.reply.user === authToken.user)
+      .filter(x => x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === authToken.user)
       .filter(x => {
         const dateV = date.valueOf();
         const xDateV = new Date(x.body.date).valueOf();
@@ -97,7 +97,7 @@ export class ResRepoMock implements IResRepo {
 
   async findNoticeNew(authToken: IAuthToken, limit: number): Promise<Res[]> {
     const reses = this.reses
-      .filter(x => x.type === "normal" && x.body.reply !== null && x.body.reply.user === authToken.user)
+      .filter(x => x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === authToken.user)
       .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
       .slice(0, limit);
 
@@ -115,7 +115,7 @@ export class ResRepoMock implements IResRepo {
 
   async findReply(res: Res): Promise<Res[]> {
     const reses = this.reses
-      .filter(x => x.type === "normal" && x.body.reply !== null && x.body.reply.res === res.id)
+      .filter(x => x.body.type === "normal" && x.body.reply !== null && x.body.reply.res === res.id)
       .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
       .slice(0, Config.api.limit);
 
@@ -141,7 +141,7 @@ export class ResRepoMock implements IResRepo {
   }
 
   private async aggregate(reses: IResDB[]): Promise<Res[]> {
-    const data = this.reses.map(x => x.type === "normal" && x.body.reply !== null ? x.body.reply.res : null)
+    const data = this.reses.map(x => x.body.type === "normal" && x.body.reply !== null ? x.body.reply.res : null)
       .filter<string>((x): x is string => x !== null && reses.map(x => x.id).includes(x))
       .reduce((c, x) => c.set(x, (c.get(x) || 0) + 1), new Map<string, number>());
     return reses.map(r => fromDBToRes(r, data.get(r.id) || 0));

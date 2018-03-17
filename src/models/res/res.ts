@@ -29,22 +29,22 @@ export function fromDBToRes(db: IResTopicDB, replyCount: number): ResTopic;
 export function fromDBToRes(db: IResForkDB, replyCount: number): ResFork;
 export function fromDBToRes(db: IResDB, replyCount: number): Res;
 export function fromDBToRes(db: IResDB, replyCount: number): Res {
-  switch (db.type) {
+  switch (db.body.type) {
     case "normal":
-      return ResNormal.fromDB(db, replyCount);
+      return ResNormal.fromDB({ id: db.id, body: db.body }, replyCount);
     case "history":
-      return ResHistory.fromDB(db, replyCount);
+      return ResHistory.fromDB({ id: db.id, body: db.body }, replyCount);
     case "topic":
-      return ResTopic.fromDB(db, replyCount);
+      return ResTopic.fromDB({ id: db.id, body: db.body }, replyCount);
     case "fork":
-      return ResFork.fromDB(db, replyCount);
+      return ResFork.fromDB({ id: db.id, body: db.body }, replyCount);
   }
 }
 
 export interface IResBaseDB<T extends ResType, Body> {
   readonly id: string;
-  readonly type: T;
   readonly body: {
+    readonly type: T;
     readonly topic: string,
     readonly date: string,
     readonly user: string,
@@ -169,8 +169,8 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
   toBaseDB<Body extends object>(body: Body): IResBaseDB<T, Body> {
     return {
       id: this.id,
-      type: this.type,
       body: Object.assign({}, body, {
+        type: this.type,
         topic: this.topic,
         date: this.date.toISOString(),
         user: this.user,

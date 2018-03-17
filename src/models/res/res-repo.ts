@@ -176,12 +176,12 @@ export class ResRepo implements IResRepo {
   async findReply(res: Res): Promise<Res[]> {
     const reses = await ESClient.search<IResNormalDB["body"]>({
       index: "reses",
-      type: "normal",
       size: Config.api.limit,
       body: {
         query: {
           term: {
             "reply.res": res.id,
+            type: "normal",
           },
         },
         sort: { date: { order: "desc" } },
@@ -195,7 +195,7 @@ export class ResRepo implements IResRepo {
     const rDB = res.toDB();
     await ESClient.create({
       index: "reses",
-      type: rDB.type,
+      type: "doc",
       id: rDB.id,
       body: rDB.body,
     });
@@ -208,7 +208,7 @@ export class ResRepo implements IResRepo {
     const rDB = res.toDB();
     await ESClient.update({
       index: "reses",
-      type: rDB.type,
+      type: "doc",
       id: rDB.id,
       body: rDB.body,
     });
@@ -264,7 +264,6 @@ export class ResRepo implements IResRepo {
 
     return reses.hits.hits.map(r => fromDBToRes({
       id: r._id,
-      type: r._type,
       body: r._source,
     } as IResDB, count.get(r._id) || 0));
   }
