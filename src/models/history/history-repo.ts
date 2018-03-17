@@ -10,7 +10,7 @@ export class HistoryRepo implements IHistoryRepo {
     const hDB = history.toDB();
     await ESClient.create({
       index: "histories",
-      type: "normal",
+      type: "doc",
       id: hDB.id,
       body: hDB.body,
     });
@@ -20,7 +20,7 @@ export class HistoryRepo implements IHistoryRepo {
     const hDB = history.toDB();
     await ESClient.update({
       index: "histories",
-      type: "normal",
+      type: "doc",
       id: hDB.id,
       body: hDB.body,
     });
@@ -30,7 +30,7 @@ export class HistoryRepo implements IHistoryRepo {
     try {
       const history = await ESClient.get<IHistoryDB["body"]>({
         index: "histories",
-        type: "normal",
+        type: "doc",
         id
       });
 
@@ -43,7 +43,7 @@ export class HistoryRepo implements IHistoryRepo {
   async findIn(ids: string[]): Promise<History[]> {
     const histories = await ESClient.search<IHistoryDB["body"]>({
       index: "histories",
-      type: "normal",
+      type: "doc",
       size: ids.length,
       body: {
         query: {
