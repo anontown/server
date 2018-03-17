@@ -14,8 +14,8 @@ export type ITopicDB = ITopicNormalDB | ITopicOneDB | ITopicForkDB;
 
 export interface ITopicBaseDB<T extends TopicType, Body> {
   readonly id: string;
-  readonly type: T;
   readonly body: {
+    readonly type: T;
     readonly title: string,
     readonly update: string,
     readonly date: string,
@@ -137,8 +137,8 @@ export abstract class TopicBase<T extends TopicType, C extends TopicBase<T, C>> 
   toBaseDB<Body extends object>(body: Body): ITopicBaseDB<T, Body> {
     return {
       id: this.id,
-      type: this.type,
       body: Object.assign({}, body, {
+        type: this.type,
         title: this.title,
         update: this.update.toISOString(),
         date: this.date.toISOString(),

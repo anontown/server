@@ -111,7 +111,7 @@ export class MsgRepo implements IMsgRepo {
     const mDB = msg.toDB();
     await ESClient.create({
       index: "msgs",
-      type: "normal",
+      type: "doc",
       id: mDB.id,
       body: mDB.body,
     });
@@ -121,7 +121,7 @@ export class MsgRepo implements IMsgRepo {
     const mDB = msg.toDB();
     await ESClient.update({
       index: "msgs",
-      type: "normal",
+      type: "doc",
       id: mDB.id,
       body: mDB.body,
     });

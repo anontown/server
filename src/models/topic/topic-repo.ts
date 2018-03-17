@@ -89,7 +89,6 @@ export class TopicRepo implements ITopicRepo {
     activeOnly: boolean): Promise<Topic[]> {
     const topics = await ESClient.search<ITopicOneDB["body"] | ITopicNormalDB["body"]>({
       index: "topics",
-      type: ["normal", "one"],
       size: limit,
       from: skip,
       body: {
@@ -101,6 +100,9 @@ export class TopicRepo implements ITopicRepo {
               ...activeOnly ? [{ match: { active: true } }] : [],
             ],
           },
+          terms: {
+            type: ["normal", "one"]
+          }
         },
         sort: { ageUpdate: { order: "desc" } },
       },
@@ -112,7 +114,6 @@ export class TopicRepo implements ITopicRepo {
   async findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
     const topics = await ESClient.search<ITopicForkDB["body"]>({
       index: "topics",
-      type: "fork",
       size: limit,
       from: skip,
       body: {
@@ -123,6 +124,9 @@ export class TopicRepo implements ITopicRepo {
               ...activeOnly ? [{ match: { active: true } }] : [],
             ],
           },
+          term: {
+            type: "fork",
+          }
         },
         sort: { ageUpdate: { order: "desc" } },
       },
@@ -134,7 +138,7 @@ export class TopicRepo implements ITopicRepo {
   async cronTopicCheck(now: Date): Promise<void> {
     await ESClient.updateByQuery({
       index: "topics",
-      type: ["one", "fork"],
+      type: "doc",
       body: {
         script: {
           inline: "ctx._source.active = false",
@@ -145,6 +149,9 @@ export class TopicRepo implements ITopicRepo {
               lt: new Date(now.valueOf() - 1000 * 60 * 60 * 24).toISOString(),
             },
           },
+          terms: {
+            type: ["one", "fork"],
+          }
         },
       },
     });
@@ -166,7 +173,7 @@ export class TopicRepo implements ITopicRepo {
     const tDB = topic.toDB();
     await ESClient.create({
       index: "topics",
-      type: tDB.type,
+      type: "doc",
       id: tDB.id,
       body: tDB.body,
     });
@@ -176,25 +183,25 @@ export class TopicRepo implements ITopicRepo {
     const tDB = topic.toDB();
     await ESClient.update({
       index: "topics",
-      type: tDB.type,
+      type: "doc",
       id: tDB.id,
       body: tDB.body,
     });
   }
 
   private async aggregate(topics: SearchResponse<ITopicDB["body"]>): Promise<Topic[]> {
-    const dbs = topics.hits.hits.map(x => ({ id: x._id, type: x._type, body: x._source }) as ITopicDB);
+    const dbs = topics.hits.hits.map(x => ({ id: x._id, body: x._source }) as ITopicDB);
     const count = await this.resRepo.resCount(dbs.map(x => x.id));
 
     return dbs.map(x => {
       const c = count.get(x.id) || 0;
-      switch (x.type) {
+      switch (x.body.type) {
         case "normal":
-          return TopicNormal.fromDB(x, c);
+          return TopicNormal.fromDB({ id: x.id, body: x.body }, c);
         case "one":
-          return TopicOne.fromDB(x, c);
+          return TopicOne.fromDB({ id: x.id, body: x.body }, c);
         case "fork":
-          return TopicFork.fromDB(x, c);
+          return TopicFork.fromDB({ id: x.id, body: x.body }, c);
       }
     });
 

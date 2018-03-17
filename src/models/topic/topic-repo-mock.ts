@@ -42,7 +42,7 @@ export class TopicRepoMock implements ITopicRepo {
 
   async findTags(limit: number): Promise<{ name: string, count: number }[]> {
     return Array.from(this.topics
-      .map(x => x.type !== "fork" ? x.body.tags : [])
+      .map(x => x.body.type !== "fork" ? x.body.tags : [])
       .reduce((a, b) => a.concat(...b), [])
       .reduce((a, b) => a.set(b, (a.get(b) || 0) + 1), new Map<string, number>()))
       .map(([name, count]) => ({ name, count }))
@@ -57,7 +57,7 @@ export class TopicRepoMock implements ITopicRepo {
     limit: number,
     activeOnly: boolean): Promise<Topic[]> {
     return this.aggregate(this.topics.filter<ITopicNormalDB | ITopicOneDB>
-      ((x): x is ITopicNormalDB | ITopicOneDB => x.type === "normal" || x.type === "one")
+      ((x): x is ITopicNormalDB | ITopicOneDB => x.body.type === "normal" || x.body.type === "one")
       .filter(x => titles.every(t => x.body.title.includes(t)))
       .filter(x => tags.every(t => x.body.tags.includes(t)))
       .filter(x => activeOnly || x.body.active)
@@ -68,7 +68,7 @@ export class TopicRepoMock implements ITopicRepo {
 
   async findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
     return this.aggregate(this.topics.filter<ITopicForkDB>
-      ((x): x is ITopicForkDB => x.type === "fork")
+      ((x): x is ITopicForkDB => x.body.type === "fork")
       .filter(x => x.body.parent === parent.id)
       .filter(x => activeOnly || x.body.active)
       .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf())
@@ -77,8 +77,8 @@ export class TopicRepoMock implements ITopicRepo {
   }
 
   async cronTopicCheck(now: Date): Promise<void> {
-    this.topics.filter<ITopicNormalDB | ITopicOneDB>
-      ((x): x is ITopicNormalDB | ITopicOneDB => x.type === "normal" || x.type === "one")
+    this.topics.filter<ITopicForkDB | ITopicOneDB>
+      ((x): x is ITopicForkDB | ITopicOneDB => x.body.type === "fork" || x.body.type === "one")
       .filter(x => new Date(x.body.update).valueOf() < new Date(now.valueOf() - 1000 * 60 * 60 * 24).valueOf())
       .map(x => ({ ...x, body: { ...x.body, active: false } }))
       .forEach(x => {
@@ -111,7 +111,7 @@ export class TopicRepoMock implements ITopicRepo {
 
     return topics.map(t => {
       const c = count.get(t.id) || 0;
-      switch (t.type) {
+      switch (t.body.type) {
         case "normal":
           return TopicNormal.fromDB(t, c);
         case "one":
