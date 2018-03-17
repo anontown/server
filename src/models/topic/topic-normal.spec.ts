@@ -87,8 +87,8 @@ describe("TopicNormal", () => {
     it("正常に生成出来るか", () => {
       expect(TopicNormal.fromDB({
         id: "topic",
-        type: "normal",
         body: {
+          type: "normal",
           title: "title",
           update: new Date(100).toISOString(),
           date: new Date(0).toISOString(),

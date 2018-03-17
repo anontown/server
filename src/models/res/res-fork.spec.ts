@@ -69,8 +69,8 @@ describe("ResFork", () => {
     it("正常に作れるか", () => {
       expect(ResFork.fromDB({
         id: "id",
-        type: "fork",
         body: {
+          type: "fork",
           topic: "topic",
           date: new Date(400).toISOString(),
           user: "user",

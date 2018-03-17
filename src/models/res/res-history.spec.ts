@@ -62,8 +62,8 @@ describe("ResHistory", () => {
     it("正常に作れるか", () => {
       expect(ResHistory.fromDB({
         id: "id",
-        type: "history",
         body: {
+          type: "history",
           topic: "topic",
           date: new Date(1000).toISOString(),
           user: "user",

@@ -113,11 +113,11 @@ export class TopicRepoMock implements ITopicRepo {
       const c = count.get(t.id) || 0;
       switch (t.body.type) {
         case "normal":
-          return TopicNormal.fromDB(t, c);
+          return TopicNormal.fromDB({ id: t.id, body: t.body }, c);
         case "one":
-          return TopicOne.fromDB(t, c);
+          return TopicOne.fromDB({ id: t.id, body: t.body }, c);
         case "fork":
-          return TopicFork.fromDB(t, c);
+          return TopicFork.fromDB({ id: t.id, body: t.body }, c);
       }
     });
 

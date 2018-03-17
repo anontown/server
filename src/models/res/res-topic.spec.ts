@@ -58,8 +58,8 @@ describe("ResTopic", () => {
     it("正常に作れるか", () => {
       expect(ResTopic.fromDB({
         id: "id",
-        type: "topic",
         body: {
+          type: "topic",
           topic: "topic",
           date: new Date(100).toISOString(),
           user: "user",

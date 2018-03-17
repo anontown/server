@@ -57,8 +57,8 @@ describe("TopicFork", () => {
     it("正常に生成できるか", () => {
       expect(TopicFork.fromDB({
         id: "topic",
-        type: "fork",
         body: {
+          type: "fork",
           title: "title",
           update: new Date(100).toISOString(),
           date: new Date(0).toISOString(),

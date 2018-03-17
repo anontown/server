@@ -79,8 +79,8 @@ describe("ResNormal", () => {
     it("正常に変換出来るか", () => {
       expect(ResNormal.fromDB({
         id: "res",
-        type: "normal",
         body: {
+          type: "normal",
           topic: "topic",
           date: new Date(100).toISOString(),
           user: "user",
