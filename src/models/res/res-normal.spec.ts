@@ -336,8 +336,8 @@ describe("ResNormal", () => {
       const db = resNormal.toDB();
       expect(db).toEqual({
         id: resNormal.id,
-        type: resNormal.type,
         body: {
+          type: resNormal.type,
           topic: resNormal.topic,
           date: resNormal.date.toISOString(),
           user: resNormal.user,

@@ -140,8 +140,8 @@ describe("ResBase", () => {
       const db = res.toBaseDB({});
       expect(db).toEqual({
         id: res.id,
-        type: res.type,
         body: {
+          type: res.type,
           topic: res.topic,
           date: res.date.toISOString(),
           user: res.user,

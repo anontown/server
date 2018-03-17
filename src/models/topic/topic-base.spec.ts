@@ -27,7 +27,7 @@ describe("TopicBase", () => {
       readonly date: Date,
       readonly resCount: number,
       readonly ageUpdate: Date,
-      readonly active: boolean ) {
+      readonly active: boolean) {
       super(TopicBaseTest);
     }
   }
@@ -109,8 +109,8 @@ describe("TopicBase", () => {
     it("正常に変換出来るか", () => {
       expect(topicBase.toBaseDB({})).toEqual({
         id: "topic",
-        type: "normal",
         body: {
+          type: "normal",
           title: "title",
           update: new Date(100).toISOString(),
           date: new Date(0).toISOString(),
