@@ -4,8 +4,11 @@ import { ESClient } from "../../db";
 import { Topic } from "../topic";
 import { History, IHistoryDB } from "./history";
 import { IHistoryRepo } from "./ihistory-repo";
+import { Refresh } from "elasticsearch";
 
 export class HistoryRepo implements IHistoryRepo {
+  constructor(private refresh?: Refresh) { }
+
   async insert(history: History): Promise<void> {
     const hDB = history.toDB();
     await ESClient.create({
@@ -13,6 +16,7 @@ export class HistoryRepo implements IHistoryRepo {
       type: "doc",
       id: hDB.id,
       body: hDB.body,
+      refresh: this.refresh,
     });
   }
 
@@ -23,6 +27,7 @@ export class HistoryRepo implements IHistoryRepo {
       type: "doc",
       id: hDB.id,
       body: hDB.body,
+      refresh: this.refresh,
     });
   }
 

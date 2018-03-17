@@ -110,5 +110,5 @@ describe("HistoryRepoMock", () => {
 });
 
 describe("HistoryRepo", () => {
-  run(() => new HistoryRepo(), true);
+  run(() => new HistoryRepo(true), true);
 });
