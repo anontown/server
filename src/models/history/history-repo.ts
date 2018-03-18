@@ -73,7 +73,7 @@ export class HistoryRepo implements IHistoryRepo {
       size: Config.api.limit,
       body: {
         query: {
-          terms: {
+          term: {
             topic: topicID,
           },
         },
