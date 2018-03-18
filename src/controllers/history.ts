@@ -71,7 +71,7 @@ export class HistoryController {
     },
   })
   async findAll({ params, repo }: IHttpAPICallParams<{ topic: string }>): Promise<IHistoryAPI[]> {
-    return (await repo.history.findAll(await repo.topic.findOne(params.topic)))
+    return (await repo.history.findAll((await repo.topic.findOne(params.topic)).id))
       .map(h => h.toAPI());
   }
 }

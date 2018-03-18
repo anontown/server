@@ -1,7 +1,6 @@
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
-import { Topic } from "../topic";
 import { History, IHistoryDB } from "./history";
 import { IHistoryRepo } from "./ihistory-repo";
 import { Refresh } from "elasticsearch";
@@ -68,14 +67,14 @@ export class HistoryRepo implements IHistoryRepo {
     return histories.hits.hits.map(h => History.fromDB({ id: h._id, body: h._source }));
   }
 
-  async findAll(topic: Topic): Promise<History[]> {
+  async findAll(topicID: string): Promise<History[]> {
     const histories = await ESClient.search<IHistoryDB["body"]>({
       index: "histories",
       size: Config.api.limit,
       body: {
         query: {
           terms: {
-            topic: topic.id,
+            topic: topicID,
           },
         },
         sort: { date: { order: "desc" } },

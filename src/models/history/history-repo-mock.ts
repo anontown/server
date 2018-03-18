@@ -1,5 +1,4 @@
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
-import { Topic } from "../topic";
 import { History, IHistoryDB } from "./history";
 import { IHistoryRepo } from "./ihistory-repo";
 
@@ -37,9 +36,9 @@ export class HistoryRepoMock implements IHistoryRepo {
     return histories.map(h => History.fromDB(h));
   }
 
-  async findAll(topic: Topic): Promise<History[]> {
+  async findAll(topicID: string): Promise<History[]> {
     const histories = this.histories
-      .filter(x => x.body.topic === topic.id)
+      .filter(x => x.body.topic === topicID)
       .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf());
 
     return histories.map(h => History.fromDB(h));
