@@ -3,8 +3,11 @@ import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
 import { IMsgRepo } from "./imsg-repo";
 import { IMsgDB, Msg } from "./msg";
+import { Refresh } from "elasticsearch";
 
 export class MsgRepo implements IMsgRepo {
+  constructor(private refresh?: Refresh) { }
+
   async findOne(id: string): Promise<Msg> {
     const msgs = await ESClient.search<IMsgDB["body"]>({
       index: "msgs",
@@ -114,6 +117,7 @@ export class MsgRepo implements IMsgRepo {
       type: "doc",
       id: mDB.id,
       body: mDB.body,
+      refresh: this.refresh,
     });
   }
 
@@ -124,6 +128,7 @@ export class MsgRepo implements IMsgRepo {
       type: "doc",
       id: mDB.id,
       body: mDB.body,
+      refresh: this.refresh,
     });
   }
 }
