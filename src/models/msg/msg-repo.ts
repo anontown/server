@@ -9,23 +9,17 @@ export class MsgRepo implements IMsgRepo {
   constructor(private refresh?: Refresh) { }
 
   async findOne(id: string): Promise<Msg> {
-    const msgs = await ESClient.search<IMsgDB["body"]>({
-      index: "msgs",
-      size: 1,
-      body: {
-        query: {
-          term: {
-            _id: id,
-          },
-        },
-      },
-    });
+    try {
+      const msg = await ESClient.get<IMsgDB["body"]>({
+        index: "msgs",
+        type: "doc",
+        id
+      });
 
-    if (msgs.hits.total === 0) {
+      return Msg.fromDB(({ id: msg._id, body: msg._source }));
+    } catch{
       throw new AtNotFoundError("メッセージが存在しません");
     }
-
-    return Msg.fromDB(msgs.hits.hits.map(m => ({ id: m._id, body: m._source }))[0]);
   }
 
   async findIn(ids: string[]): Promise<Msg[]> {
