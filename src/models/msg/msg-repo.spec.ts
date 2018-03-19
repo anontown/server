@@ -6,7 +6,6 @@ import {
   dbReset,
   IMsgRepo,
 } from "../../";
-import * as Im from "immutable";
 
 function run(repoGene: () => IMsgRepo, isReset: boolean) {
   beforeEach(async () => {
@@ -43,9 +42,9 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         "body",
         new Date(0)));
 
-    await expect(repo.findOne("msg2")).rejects.toThrow(AtError);
+      await expect(repo.findOne("msg2")).rejects.toThrow(AtError);
+    });
   });
-});
 }
 
 describe("MsgRepoMock", () => {
