@@ -25,6 +25,7 @@ export class MsgRepo implements IMsgRepo {
   async findIn(ids: string[]): Promise<Msg[]> {
     const msgs = await ESClient.search<IMsgDB["body"]>({
       index: "msgs",
+      type: "doc",
       size: ids.length,
       body: {
         query: {
@@ -32,7 +33,7 @@ export class MsgRepo implements IMsgRepo {
             _id: ids,
           },
         },
-        sort: { ageUpdate: { order: "desc" } },
+        sort: { date: { order: "desc" } },
       },
     });
 
