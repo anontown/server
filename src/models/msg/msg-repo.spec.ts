@@ -17,12 +17,6 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
     it("正常に探せるか", async () => {
       const repo = repoGene();
 
-      /*
-      readonly id: string,
-    readonly receiver: string | null,
-    readonly body: string,
-    readonly date: Date
-      */
       const msg = new Msg("msg",
         "user",
         "body",
