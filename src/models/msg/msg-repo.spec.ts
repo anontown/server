@@ -172,6 +172,52 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.find(token, "before", false, new Date(30), 0)).toEqual([]);
     });
   });
+
+  describe("findNew", () => {
+    it("正常に検索出来るか", async () => {
+      const repo = repoGene();
+
+      const user1 = "user1";
+      const user2 = "user2";
+
+      const token: IAuthTokenMaster = {
+        id: "token",
+        key: "key",
+        user: user1,
+        type: "master"
+      };
+
+      expect(await repo.findNew(token, 100)).toEqual([]);
+
+      const msg = new Msg("msg",
+        "user",
+        "body",
+        new Date(0));
+
+      const msg1 = msg.copy({ id: "msg1", date: new Date(50), receiver: null });
+      const msg2 = msg.copy({ id: "msg2", date: new Date(80), receiver: user2 });
+      const msg3 = msg.copy({ id: "msg3", date: new Date(30), receiver: user1 });
+      const msg4 = msg.copy({ id: "msg4", date: new Date(90), receiver: user1 });
+
+      await repo.insert(msg1);
+      await repo.insert(msg2);
+      await repo.insert(msg3);
+      await repo.insert(msg4);
+
+      expect(await repo.findNew(token, 100)).toEqual([
+        msg4,
+        msg1,
+        msg3,
+      ]);
+
+      expect(await repo.findNew(token, 2)).toEqual([
+        msg4,
+        msg1,
+      ]);
+
+      expect(await repo.findNew(token, 0)).toEqual([]);
+    });
+  });
 }
 
 describe("MsgRepoMock", () => {
