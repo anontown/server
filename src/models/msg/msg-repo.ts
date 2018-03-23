@@ -103,10 +103,18 @@ export class MsgRepo implements IMsgRepo {
         query: {
           bool: {
             should: [
-              { term: { receiver: null } },
+              {
+                bool: {
+                  must_not: {
+                    exists: {
+                      field: "receiver"
+                    }
+                  }
+                }
+              },
               { term: { receiver: authToken.user } },
             ],
-          },
+          }
         },
         sort: { date: { order: "desc" } },
       },
