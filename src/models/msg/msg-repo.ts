@@ -136,11 +136,15 @@ export class MsgRepo implements IMsgRepo {
 
   async update(msg: Msg): Promise<void> {
     const mDB = msg.toDB();
+    await ESClient.bulk
     await ESClient.update({
       index: "msgs",
       type: "doc",
       id: mDB.id,
-      body: mDB.body,
+      body: {
+        doc: mDB.body,
+        doc_as_upsert: true
+      },
       refresh: this.refresh,
     });
   }

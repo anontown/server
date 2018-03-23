@@ -25,7 +25,10 @@ export class HistoryRepo implements IHistoryRepo {
       index: "histories",
       type: "doc",
       id: hDB.id,
-      body: hDB.body,
+      body: {
+        doc: hDB.body,
+        doc_as_upsert: true
+      },
       refresh: this.refresh,
     });
   }
