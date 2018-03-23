@@ -140,6 +140,56 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
       expect(await repo.findAll("topic3")).toEqual([]);
     });
   });
+
+  describe("insert", () => {
+    it("正常に保存出来るか", async () => {
+      const repo = repoGene();
+
+      const history = new History("history",
+        "topic",
+        "title",
+        Im.List(["x"]),
+        "body",
+        new Date(0),
+        "hash",
+        "user");
+
+      await repo.insert(history);
+
+      expect(await repo.findOne(history.id)).toEqual(history);
+    });
+
+    //TODO:ID被り
+  });
+
+  describe("update", () => {
+    it("正常に更新出来るか", async () => {
+      const repo = repoGene();
+
+      const history = new History("history",
+        "topic",
+        "title",
+        Im.List(["x"]),
+        "body",
+        new Date(0),
+        "hash",
+        "user");
+
+      const history1 = history.copy({ id: "history1" });
+      const history2 = history.copy({ id: "history2" });
+      const history1update = history1.copy({ body: "update" });
+
+      await repo.insert(history1);
+      await repo.insert(history2);
+
+      await repo.update(history1update);
+
+      expect(await repo.findOne(history1.id)).toEqual(history1update);
+      expect(await repo.findOne(history2.id)).toEqual(history2);
+    });
+
+    //TODO:存在しないID
+  });
 }
 
 describe("HistoryRepoMock", () => {
