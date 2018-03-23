@@ -21,15 +21,12 @@ export class HistoryRepo implements IHistoryRepo {
 
   async update(history: History): Promise<void> {
     const hDB = history.toDB();
-    await ESClient.update({
+    await ESClient.index({
       index: "histories",
       type: "doc",
       id: hDB.id,
-      body: {
-        doc: hDB.body,
-        doc_as_upsert: true
-      },
-      refresh: this.refresh,
+      body: hDB.body,
+      refresh: this.refresh !== undefined ? this.refresh.toString() : undefined,
     });
   }
 
