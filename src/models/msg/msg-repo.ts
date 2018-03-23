@@ -66,12 +66,9 @@ export class MsgRepo implements IMsgRepo {
                 },
               },
               {
-                bool: {
-                  should: [
-                    { term: { receiver: null } },
-                    { term: { receiver: authToken.user } },
-                  ],
-                },
+                terms: {
+                  receiver: [null, authToken.user]
+                }
               },
             ],
           },
