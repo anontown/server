@@ -60,7 +60,9 @@ export class MsgRepo implements IMsgRepo {
             filter: [
               {
                 range: {
-                  [type === "after" ? (equal ? "gte" : "gt") : (equal ? "lte" : "lt")]: date.toISOString(),
+                  date: {
+                    [type === "after" ? (equal ? "gte" : "gt") : (equal ? "lte" : "lt")]: date.toISOString(),
+                  }
                 },
               },
               {
