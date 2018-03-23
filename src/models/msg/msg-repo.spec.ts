@@ -218,6 +218,48 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.findNew(token, 0)).toEqual([]);
     });
   });
+
+  describe("insert", () => {
+    it("正常に保存出来るか", async () => {
+      const repo = repoGene();
+
+      const msg = new Msg("msg",
+        "user",
+        "body",
+        new Date(0));
+
+      await repo.insert(msg);
+
+      expect(await repo.findOne(msg.id)).toEqual(msg);
+    });
+
+    //TODO:ID被り
+  });
+
+  describe("update", () => {
+    it("正常に更新出来るか", async () => {
+      const repo = repoGene();
+
+      const msg = new Msg("msg",
+        "user",
+        "body",
+        new Date(0));
+
+      const msg1 = msg.copy({ id: "msg1" });
+      const msg2 = msg.copy({ id: "msg2" });
+      const msg1update = msg1.copy({ body: "update" });
+
+      await repo.insert(msg1);
+      await repo.insert(msg2);
+
+      await repo.update(msg1update);
+
+      expect(await repo.findOne(msg1.id)).toEqual(msg1update);
+      expect(await repo.findOne(msg2.id)).toEqual(msg2);
+    });
+
+    //TODO:存在しないID
+  });
 }
 
 describe("MsgRepoMock", () => {
