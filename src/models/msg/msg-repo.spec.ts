@@ -132,6 +132,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg4,
         msg9,
         msg7,
+        msg1,
         msg8,
         msg3,
         msg5,
