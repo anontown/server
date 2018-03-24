@@ -101,8 +101,8 @@ export class TopicRepo implements ITopicRepo {
             ],
           },
           terms: {
-            type: ["normal", "one"]
-          }
+            type: ["normal", "one"],
+          },
         },
         sort: { ageUpdate: { order: "desc" } },
       },
@@ -126,7 +126,7 @@ export class TopicRepo implements ITopicRepo {
           },
           term: {
             type: "fork",
-          }
+          },
         },
         sort: { ageUpdate: { order: "desc" } },
       },
@@ -151,7 +151,7 @@ export class TopicRepo implements ITopicRepo {
           },
           terms: {
             type: ["one", "fork"],
-          }
+          },
         },
       },
     });

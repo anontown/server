@@ -1,9 +1,9 @@
+import { Refresh } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
 import { IMsgRepo } from "./imsg-repo";
 import { IMsgDB, Msg } from "./msg";
-import { Refresh } from "elasticsearch";
 
 export class MsgRepo implements IMsgRepo {
   constructor(private refresh?: Refresh) { }
@@ -13,11 +13,11 @@ export class MsgRepo implements IMsgRepo {
       const msg = await ESClient.get<IMsgDB["body"]>({
         index: "msgs",
         type: "doc",
-        id
+        id,
       });
 
       return Msg.fromDB(({ id: msg._id, body: msg._source }));
-    } catch{
+    } catch {
       throw new AtNotFoundError("メッセージが存在しません");
     }
   }
@@ -62,7 +62,7 @@ export class MsgRepo implements IMsgRepo {
                 range: {
                   date: {
                     [type === "after" ? (equal ? "gte" : "gt") : (equal ? "lte" : "lt")]: date.toISOString(),
-                  }
+                  },
                 },
               },
               {
@@ -72,10 +72,10 @@ export class MsgRepo implements IMsgRepo {
                       bool: {
                         must_not: {
                           exists: {
-                            field: "receiver"
-                          }
-                        }
-                      }
+                            field: "receiver",
+                          },
+                        },
+                      },
                     },
                     { term: { receiver: authToken.user } },
                   ],
@@ -107,14 +107,14 @@ export class MsgRepo implements IMsgRepo {
                 bool: {
                   must_not: {
                     exists: {
-                      field: "receiver"
-                    }
-                  }
-                }
+                      field: "receiver",
+                    },
+                  },
+                },
               },
               { term: { receiver: authToken.user } },
             ],
-          }
+          },
         },
         sort: { date: { order: "desc" } },
       },
@@ -136,7 +136,6 @@ export class MsgRepo implements IMsgRepo {
 
   async update(msg: Msg): Promise<void> {
     const mDB = msg.toDB();
-    await ESClient.bulk
     await ESClient.index({
       index: "msgs",
       type: "doc",

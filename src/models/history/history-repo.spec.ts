@@ -1,12 +1,12 @@
+import * as Im from "immutable";
 import {
   AtError,
+  dbReset,
   History,
   HistoryRepo,
   HistoryRepoMock,
-  dbReset,
   IHistoryRepo,
 } from "../../";
-import * as Im from "immutable";
 
 function run(repoGene: () => IHistoryRepo, isReset: boolean) {
   beforeEach(async () => {
@@ -134,7 +134,7 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
       ]);
 
       expect(await repo.findAll("topic2")).toEqual([
-        history4
+        history4,
       ]);
 
       expect(await repo.findAll("topic3")).toEqual([]);
@@ -159,7 +159,7 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
       expect(await repo.findOne(history.id)).toEqual(history);
     });
 
-    //TODO:ID被り
+    // TODO:ID被り
   });
 
   describe("update", () => {
@@ -188,7 +188,7 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
       expect(await repo.findOne(history2.id)).toEqual(history2);
     });
 
-    //TODO:存在しないID
+    // TODO:存在しないID
   });
 }
 

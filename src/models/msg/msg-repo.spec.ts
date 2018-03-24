@@ -1,11 +1,11 @@
 import {
   AtError,
+  dbReset,
+  IAuthTokenMaster,
+  IMsgRepo,
   Msg,
   MsgRepo,
   MsgRepoMock,
-  dbReset,
-  IMsgRepo,
-  IAuthTokenMaster,
 } from "../../";
 
 function run(repoGene: () => IMsgRepo, isReset: boolean) {
@@ -97,7 +97,6 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         "body",
         new Date(0));
 
-
       const user1 = "user1";
       const user2 = "user2";
 
@@ -105,7 +104,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         id: "token",
         key: "key",
         user: user1,
-        type: "master"
+        type: "master",
       };
 
       const msg1 = msg.copy({ id: "msg1", date: new Date(50), receiver: null });
@@ -136,7 +135,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg8,
         msg3,
         msg5,
-        msg6
+        msg6,
       ]);
 
       expect(await repo.find(token, "after", true, new Date(70), 100)).toEqual([
@@ -155,7 +154,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.find(token, "before", true, new Date(30), 100)).toEqual([
         msg3,
         msg5,
-        msg6
+        msg6,
       ]);
 
       expect(await repo.find(token, "before", true, new Date(30), 2)).toEqual([
@@ -165,7 +164,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
 
       expect(await repo.find(token, "before", false, new Date(30), 100)).toEqual([
         msg5,
-        msg6
+        msg6,
       ]);
 
       expect(await repo.find(token, "after", false, new Date(90), 100)).toEqual([]);
@@ -184,7 +183,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         id: "token",
         key: "key",
         user: user1,
-        type: "master"
+        type: "master",
       };
 
       expect(await repo.findNew(token, 100)).toEqual([]);
@@ -233,7 +232,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.findOne(msg.id)).toEqual(msg);
     });
 
-    //TODO:ID被り
+    // TODO:ID被り
   });
 
   describe("update", () => {
@@ -258,7 +257,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.findOne(msg2.id)).toEqual(msg2);
     });
 
-    //TODO:存在しないID
+    // TODO:存在しないID
   });
 }
 

@@ -392,7 +392,7 @@ updateFunc.push(async () => {
       index_patterns: ["*"],
       settings: {
         "mapping.single_type": true,
-        analysis: {
+        "analysis": {
           analyzer: {
             default: {
               type: "custom",
@@ -491,7 +491,7 @@ updateFunc.push(async () => {
             fork: {
               type: "keyword",
             },
-          }
+          },
         },
       },
     },

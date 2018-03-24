@@ -125,7 +125,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
         id: ObjectIDGenerator(),
         key: "key",
         user: user1,
-        type: "master"
+        type: "master",
       })).toEqual([
         client2,
         client1,
@@ -136,7 +136,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
         id: ObjectIDGenerator(),
         key: "key",
         user: user2,
-        type: "master"
+        type: "master",
       })).toEqual([
         client4,
       ]);
@@ -145,7 +145,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
         id: ObjectIDGenerator(),
         key: "key",
         user: user3,
-        type: "master"
+        type: "master",
       })).toEqual([]);
     });
   });
@@ -166,7 +166,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
       expect(await repo.findOne(client.id)).toEqual(client);
     });
 
-    //TODO:ID被り
+    // TODO:ID被り
   });
 
   describe("update", () => {
@@ -193,7 +193,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
       expect(await repo.findOne(client2.id)).toEqual(client2);
     });
 
-    //TODO:存在しないID
+    // TODO:存在しないID
   });
 }
 

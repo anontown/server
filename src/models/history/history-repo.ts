@@ -1,9 +1,9 @@
+import { Refresh } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
 import { History, IHistoryDB } from "./history";
 import { IHistoryRepo } from "./ihistory-repo";
-import { Refresh } from "elasticsearch";
 
 export class HistoryRepo implements IHistoryRepo {
   constructor(private refresh?: Refresh) { }
@@ -35,11 +35,11 @@ export class HistoryRepo implements IHistoryRepo {
       const history = await ESClient.get<IHistoryDB["body"]>({
         index: "histories",
         type: "doc",
-        id
+        id,
       });
 
       return History.fromDB(({ id: history._id, body: history._source }));
-    } catch{
+    } catch {
       throw new AtNotFoundError("編集履歴が存在しません");
     }
   }
@@ -52,8 +52,8 @@ export class HistoryRepo implements IHistoryRepo {
       body: {
         query: {
           terms: {
-            _id: ids
-          }
+            _id: ids,
+          },
         },
         sort: { date: { order: "desc" } },
       },

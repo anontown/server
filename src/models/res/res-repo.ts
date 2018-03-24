@@ -181,7 +181,7 @@ export class ResRepo implements IResRepo {
         query: {
           term: {
             "reply.res": res.id,
-            type: "normal",
+            "type": "normal",
           },
         },
         sort: { date: { order: "desc" } },
