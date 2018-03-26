@@ -1,11 +1,11 @@
 import {
   AtError,
-  Profile,
-  ProfileRepo,
-  ProfileRepoMock,
   dbReset,
   IProfileRepo,
   ObjectIDGenerator,
+  Profile,
+  ProfileRepo,
+  ProfileRepoMock,
 } from "../../";
 
 function run(repoGene: () => IProfileRepo, isReset: boolean) {
