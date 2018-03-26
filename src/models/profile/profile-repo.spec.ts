@@ -46,6 +46,59 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       await expect(repo.findOne(ObjectIDGenerator())).rejects.toThrow(AtError);
     });
   });
+
+  describe("findIn", () => {
+    it("正常に探せるか", async () => {
+      const repo = repoGene();
+
+      const profile = new Profile(ObjectIDGenerator(),
+        "user",
+        "name",
+        "body",
+        new Date(0),
+        new Date(10),
+        "sn");
+
+      const profile1 = profile.copy({ id: ObjectIDGenerator(), date: new Date(50), sn: "sn1" });
+      const profile2 = profile.copy({ id: ObjectIDGenerator(), date: new Date(80), sn: "sn2" });
+      const profile3 = profile.copy({ id: ObjectIDGenerator(), date: new Date(30), sn: "sn3" });
+      const profile4 = profile.copy({ id: ObjectIDGenerator(), date: new Date(90), sn: "sn4" });
+
+      await repo.insert(profile1);
+      await repo.insert(profile2);
+      await repo.insert(profile3);
+      await repo.insert(profile4);
+
+      expect(await repo.findIn([
+        profile1.id,
+        profile2.id,
+        profile3.id,
+      ])).toEqual([
+        profile2,
+        profile1,
+        profile3,
+      ]);
+
+      expect(await repo.findIn([])).toEqual([]);
+    });
+
+    it("存在しない物がある時エラーになるか", async () => {
+      const repo = repoGene();
+
+      const profile = new Profile(ObjectIDGenerator(),
+        "user",
+        "name",
+        "body",
+        new Date(0),
+        new Date(10),
+        "sn");
+
+      await repo.insert(profile);
+
+      await expect(repo.findIn([ObjectIDGenerator()])).rejects.toThrow(AtError);
+      await expect(repo.findIn([ObjectIDGenerator(), profile.id])).rejects.toThrow(AtError);
+    });
+  });
 }
 
 describe("ProfileRepoMock", () => {
