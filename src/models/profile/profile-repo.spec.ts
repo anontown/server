@@ -19,7 +19,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       const repo = repoGene();
 
       const profile = new Profile(ObjectIDGenerator(),
-        "user",
+        ObjectIDGenerator(),
         "name",
         "body",
         new Date(0),
@@ -36,7 +36,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       const repo = repoGene();
 
       await repo.insert(new Profile(ObjectIDGenerator(),
-        "user",
+        ObjectIDGenerator(),
         "name",
         "body",
         new Date(0),
@@ -52,7 +52,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       const repo = repoGene();
 
       const profile = new Profile(ObjectIDGenerator(),
-        "user",
+        ObjectIDGenerator(),
         "name",
         "body",
         new Date(0),
@@ -86,7 +86,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       const repo = repoGene();
 
       const profile = new Profile(ObjectIDGenerator(),
-        "user",
+        ObjectIDGenerator(),
         "name",
         "body",
         new Date(0),
@@ -105,7 +105,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       const repo = repoGene();
 
       const profile = new Profile(ObjectIDGenerator(),
-        "user",
+        ObjectIDGenerator(),
         "name",
         "body",
         new Date(0),
@@ -160,7 +160,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       const repo = repoGene();
 
       const profile = new Profile(ObjectIDGenerator(),
-        "user",
+        ObjectIDGenerator(),
         "name",
         "body",
         new Date(0),
@@ -176,7 +176,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       const repo = repoGene();
 
       const profile = new Profile(ObjectIDGenerator(),
-        "user",
+        ObjectIDGenerator(),
         "name",
         "body",
         new Date(0),
@@ -197,7 +197,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       const repo = repoGene();
 
       const profile = new Profile(ObjectIDGenerator(),
-        "user",
+        ObjectIDGenerator(),
         "name",
         "body",
         new Date(0),
@@ -225,7 +225,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       const repo = repoGene();
 
       const profile = new Profile(ObjectIDGenerator(),
-        "user",
+        ObjectIDGenerator(),
         "name",
         "body",
         new Date(0),
