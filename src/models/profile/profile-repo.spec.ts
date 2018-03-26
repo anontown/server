@@ -191,6 +191,59 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
 
     // TODO:ID被り
   });
+
+  describe("update", () => {
+    it("正常に更新出来るか", async () => {
+      const repo = repoGene();
+
+      const profile = new Profile(ObjectIDGenerator(),
+        "user",
+        "name",
+        "body",
+        new Date(0),
+        new Date(10),
+        "sn");
+
+      const profile1 = profile.copy({ id: ObjectIDGenerator(), sn: "sn1" });
+      const profile2 = profile.copy({ id: ObjectIDGenerator(), sn: "sn2" });
+      const profile1update = profile1.copy({ sn: "update" });
+      const profile1update2 = profile1.copy({ name: "newname" });
+
+      await repo.insert(profile1);
+      await repo.insert(profile2);
+
+      await repo.update(profile1update);
+
+      expect(await repo.findOne(profile1.id)).toEqual(profile1update);
+      expect(await repo.findOne(profile2.id)).toEqual(profile2);
+
+      await repo.update(profile1update2);
+      expect(await repo.findOne(profile1.id)).toEqual(profile1update2);
+    });
+
+    it("sn被りでエラーになるか", async () => {
+      const repo = repoGene();
+
+      const profile = new Profile(ObjectIDGenerator(),
+        "user",
+        "name",
+        "body",
+        new Date(0),
+        new Date(10),
+        "sn");
+
+      const profile1 = profile.copy({ id: ObjectIDGenerator(), sn: "sn1" });
+      const profile2 = profile.copy({ id: ObjectIDGenerator(), sn: "sn2" });
+      const profile1update = profile1.copy({ sn: "sn2" });
+
+      await repo.insert(profile1);
+      await repo.insert(profile2);
+
+      await expect(await repo.update(profile1update)).rejects.toThrow(AtError);
+    });
+
+    // TODO:存在しないID
+  });
 }
 
 describe("ProfileRepoMock", () => {
