@@ -186,7 +186,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       const profile2 = profile.copy({ id: ObjectIDGenerator() });
 
       await repo.insert(profile);
-      await expect(await repo.insert(profile2)).rejects.toThrow(AtError);
+      await expect(repo.insert(profile2)).rejects.toThrow(AtError);
     });
 
     // TODO:ID被り
@@ -239,7 +239,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       await repo.insert(profile1);
       await repo.insert(profile2);
 
-      await expect(await repo.update(profile1update)).rejects.toThrow(AtError);
+      await expect(repo.update(profile1update)).rejects.toThrow(AtError);
     });
 
     // TODO:存在しないID
