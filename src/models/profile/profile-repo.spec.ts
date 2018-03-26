@@ -154,6 +154,43 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       })).toEqual([]);
     });
   });
+
+  describe("insert", () => {
+    it("正常に保存出来るか", async () => {
+      const repo = repoGene();
+
+      const profile = new Profile(ObjectIDGenerator(),
+        "user",
+        "name",
+        "body",
+        new Date(0),
+        new Date(10),
+        "sn");
+
+      await repo.insert(profile);
+
+      expect(await repo.findOne(profile.id)).toEqual(profile);
+    });
+
+    it("sn被りでエラーになるか", async () => {
+      const repo = repoGene();
+
+      const profile = new Profile(ObjectIDGenerator(),
+        "user",
+        "name",
+        "body",
+        new Date(0),
+        new Date(10),
+        "sn");
+
+      const profile2 = profile.copy({ id: ObjectIDGenerator() });
+
+      await repo.insert(profile);
+      await expect(await repo.insert(profile2)).rejects.toThrow(AtError);
+    });
+
+    // TODO:ID被り
+  });
 }
 
 describe("ProfileRepoMock", () => {
