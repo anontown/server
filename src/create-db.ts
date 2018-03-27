@@ -466,10 +466,10 @@ updateFunc.push(async () => {
               type: "nested",
               properties: {
                 res: {
-                  type: "text",
+                  type: "keyword",
                 },
                 user: {
-                  type: "text",
+                  type: "keyword",
                 },
               },
             },
