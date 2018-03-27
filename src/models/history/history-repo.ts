@@ -1,4 +1,4 @@
-import { Refresh } from "elasticsearch";
+import { Refresh, GetResponse } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
@@ -31,17 +31,18 @@ export class HistoryRepo implements IHistoryRepo {
   }
 
   async findOne(id: string): Promise<History> {
+    let history: GetResponse<IHistoryDB["body"]>;
     try {
-      const history = await ESClient.get<IHistoryDB["body"]>({
+      history = await ESClient.get<IHistoryDB["body"]>({
         index: "histories",
         type: "doc",
         id,
       });
-
-      return History.fromDB(({ id: history._id, body: history._source }));
     } catch {
       throw new AtNotFoundError("編集履歴が存在しません");
     }
+
+    return History.fromDB(({ id: history._id, body: history._source }));
   }
 
   async findIn(ids: string[]): Promise<History[]> {
