@@ -121,9 +121,14 @@ export class ResRepo implements IResRepo {
                 },
               },
               {
-                term: {
-                  "reply.user": authToken.user,
-                },
+                nested: {
+                  path: "reply",
+                  query: {
+                    term: {
+                      "reply.user": authToken.user,
+                    }
+                  }
+                }
               },
             ],
           },
