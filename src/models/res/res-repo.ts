@@ -6,9 +6,12 @@ import { ESClient } from "../../db";
 import { Topic } from "../topic";
 import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
+import { Refresh } from "elasticsearch";
 
 export class ResRepo implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
+
+  constructor(private refresh?: Refresh) { }
 
   async findOne(id: string): Promise<Res> {
     try {
@@ -192,6 +195,7 @@ export class ResRepo implements IResRepo {
       type: "doc",
       id: rDB.id,
       body: rDB.body,
+      refresh: this.refresh,
     });
 
     const resCount = (await this.resCount([res.topic])).get(res.topic) || 0;
@@ -200,11 +204,12 @@ export class ResRepo implements IResRepo {
 
   async update(res: Res): Promise<void> {
     const rDB = res.toDB();
-    await ESClient.update({
+    await ESClient.index({
       index: "reses",
       type: "doc",
       id: rDB.id,
       body: rDB.body,
+      refresh: this.refresh !== undefined ? this.refresh.toString() : undefined,
     });
   }
 

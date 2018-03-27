@@ -139,5 +139,5 @@ describe("ResRepoMock", () => {
 });
 
 describe("ResRepo", () => {
-  run(() => new ResRepo(), true);
+  run(() => new ResRepo(true), true);
 });
