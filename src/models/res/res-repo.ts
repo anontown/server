@@ -150,9 +150,14 @@ export class ResRepo implements IResRepo {
       size: limit,
       body: {
         query: {
-          term: {
-            "reply.user": authToken.user,
-          },
+          nested: {
+            path: "reply",
+            query: {
+              term: {
+                "reply.user": authToken.user,
+              }
+            }
+          }
         },
         sort: { date: { order: "desc" } },
       },
