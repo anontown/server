@@ -27,6 +27,7 @@ export class ResRepo implements IResRepo {
   async findIn(ids: string[]): Promise<Res[]> {
     const reses = await ESClient.search<IResDB["body"]>({
       index: "reses",
+      type: "doc",
       size: ids.length,
       body: {
         query: {
