@@ -6,7 +6,7 @@ import { ESClient } from "../../db";
 import { Topic } from "../topic";
 import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
-import { Refresh } from "elasticsearch";
+import { Refresh, GetResponse } from "elasticsearch";
 
 export class ResRepo implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
@@ -14,17 +14,17 @@ export class ResRepo implements IResRepo {
   constructor(private refresh?: Refresh) { }
 
   async findOne(id: string): Promise<Res> {
+    let res: GetResponse<IResDB["body"]>;
     try {
-      const res = await ESClient.get<IResDB["body"]>({
+      res = await ESClient.get<IResDB["body"]>({
         index: "reses",
         type: "doc",
         id,
       });
-
-      return (await this.aggregate([{ id: res._id, body: res._source } as IResDB]))[0];
     } catch {
       throw new AtNotFoundError("レスが存在しません");
     }
+    return (await this.aggregate([{ id: res._id, body: res._source } as IResDB]))[0];
   }
 
   async findIn(ids: string[]): Promise<Res[]> {
