@@ -217,6 +217,53 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       expect(await repo.find("topic", "before", false, new Date(30), 0)).toEqual([]);
     });
   });
+
+  describe("findNew", () => {
+    it("正常に検索出来るか", async () => {
+      const repo = repoGene();
+
+      expect(await repo.findNew("topic", 100)).toEqual([]);
+
+      const res = new ResNormal("name",
+        "body",
+        null,
+        "active",
+        null,
+        true,
+        "res",
+        "topic",
+        new Date(0),
+        "user",
+        Im.List(),
+        5,
+        "hash",
+        0,
+      );
+
+      const topic1 = res.copy({ id: "topic1", date: new Date(50) });
+      const topic2 = res.copy({ id: "topic2", date: new Date(80), topic: "topic2" });
+      const topic3 = res.copy({ id: "topic3", date: new Date(30) });
+      const topic4 = res.copy({ id: "topic4", date: new Date(90) });
+
+      await repo.insert(topic1);
+      await repo.insert(topic2);
+      await repo.insert(topic3);
+      await repo.insert(topic4);
+
+      expect(await repo.findNew("topic", 100)).toEqual([
+        topic4,
+        topic1,
+        topic3,
+      ]);
+
+      expect(await repo.findNew("topic", 2)).toEqual([
+        topic4,
+        topic1,
+      ]);
+
+      expect(await repo.findNew("topic", 0)).toEqual([]);
+    });
+  });
 }
 
 describe("ResRepoMock", () => {
