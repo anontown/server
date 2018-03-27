@@ -2,7 +2,6 @@ import { Subject } from "rxjs";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
-import { Topic } from "../topic";
 import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
 
@@ -33,9 +32,9 @@ export class ResRepoMock implements IResRepo {
     return this.aggregate(reses);
   }
 
-  async find(topic: Topic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
+  async find(topicID: string, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
     const reses = this.reses
-      .filter(x => x.body.topic === topic.id)
+      .filter(x => x.body.topic === topicID)
       .filter(x => {
         const dateV = date.valueOf();
         const xDateV = new Date(x.body.date).valueOf();
@@ -57,9 +56,9 @@ export class ResRepoMock implements IResRepo {
     return result;
   }
 
-  async findNew(topic: Topic, limit: number): Promise<Res[]> {
+  async findNew(topicID: string, limit: number): Promise<Res[]> {
     const reses = this.reses
-      .filter(x => x.body.topic === topic.id)
+      .filter(x => x.body.topic === topicID)
       .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
       .slice(0, limit);
 

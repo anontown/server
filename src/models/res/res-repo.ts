@@ -3,7 +3,6 @@ import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
-import { Topic } from "../topic";
 import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
 import { Refresh, GetResponse } from "elasticsearch";
@@ -50,7 +49,7 @@ export class ResRepo implements IResRepo {
     return this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
   }
 
-  async find(topic: Topic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
+  async find(topicID: string, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
     const reses = await ESClient.search<IResDB["body"]>({
       index: "reses",
       size: limit,
@@ -65,7 +64,7 @@ export class ResRepo implements IResRepo {
               },
               {
                 term: {
-                  topic: topic.id,
+                  topic: topicID,
                 },
               },
             ],
@@ -82,14 +81,14 @@ export class ResRepo implements IResRepo {
     return result;
   }
 
-  async findNew(topic: Topic, limit: number): Promise<Res[]> {
+  async findNew(topicID: string, limit: number): Promise<Res[]> {
     const reses = await ESClient.search<IResDB["body"]>({
       index: "reses",
       size: limit,
       body: {
         query: {
           term: {
-            topic: topic.id,
+            topic: topicID,
           },
         },
         sort: { date: { order: "desc" } },

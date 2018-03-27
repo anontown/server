@@ -1,6 +1,5 @@
 import { Subject } from "rxjs";
 import { IAuthToken } from "../../auth";
-import { Topic } from "../topic";
 import { Res } from "./res";
 
 export interface IResRepo {
@@ -10,9 +9,9 @@ export interface IResRepo {
 
   findIn(ids: string[]): Promise<Res[]>;
 
-  find(topic: Topic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]>;
+  find(topic: string, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]>;
 
-  findNew(topic: Topic, limit: number): Promise<Res[]>;
+  findNew(topicID: string, limit: number): Promise<Res[]>;
 
   findNotice(
     authToken: IAuthToken,
