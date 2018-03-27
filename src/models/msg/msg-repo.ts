@@ -1,4 +1,4 @@
-import { Refresh } from "elasticsearch";
+import { Refresh, GetResponse } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
@@ -9,17 +9,18 @@ export class MsgRepo implements IMsgRepo {
   constructor(private refresh?: Refresh) { }
 
   async findOne(id: string): Promise<Msg> {
+    let msg: GetResponse<IMsgDB["body"]>;
     try {
-      const msg = await ESClient.get<IMsgDB["body"]>({
+      msg = await ESClient.get<IMsgDB["body"]>({
         index: "msgs",
         type: "doc",
         id,
       });
-
-      return Msg.fromDB(({ id: msg._id, body: msg._source }));
     } catch {
       throw new AtNotFoundError("メッセージが存在しません");
     }
+
+    return Msg.fromDB(({ id: msg._id, body: msg._source }));
   }
 
   async findIn(ids: string[]): Promise<Msg[]> {
