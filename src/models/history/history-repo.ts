@@ -1,4 +1,4 @@
-import { Refresh, GetResponse } from "elasticsearch";
+import { GetResponse, Refresh } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { Config } from "../../config";
 import { ESClient } from "../../db";

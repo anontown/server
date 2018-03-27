@@ -1,3 +1,4 @@
+import * as Im from "immutable";
 import {
   AtError,
   dbReset,
@@ -6,7 +7,6 @@ import {
   ResRepo,
   ResRepoMock,
 } from "../../";
-import * as Im from "immutable";
 
 function run(repoGene: () => IResRepo, isReset: boolean) {
   beforeEach(async () => {
@@ -32,7 +32,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         Im.List(),
         5,
         "hash",
-        0
+        0,
       );
 
       await repo.insert(res);
@@ -57,7 +57,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         Im.List(),
         5,
         "hash",
-        0
+        0,
       ));
 
       await expect(repo.findOne("res2")).rejects.toThrow(AtError);
@@ -81,7 +81,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         Im.List(),
         5,
         "hash",
-        0
+        0,
       );
 
       const res1 = res.copy({ id: "res1", date: new Date(50) });
@@ -123,7 +123,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         Im.List(),
         5,
         "hash",
-        0
+        0,
       );
 
       await repo.insert(res);
@@ -150,7 +150,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         Im.List(),
         5,
         "hash",
-        0
+        0,
       );
 
       const res1 = res.copy({ id: "res1", date: new Date(50) });

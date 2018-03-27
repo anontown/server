@@ -1,3 +1,4 @@
+import { GetResponse, Refresh } from "elasticsearch";
 import { Subject } from "rxjs";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
@@ -5,7 +6,6 @@ import { Config } from "../../config";
 import { ESClient } from "../../db";
 import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
-import { Refresh, GetResponse } from "elasticsearch";
 
 export class ResRepo implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
@@ -61,7 +61,7 @@ export class ResRepo implements IResRepo {
                 range: {
                   date: {
                     [type === "after" ? (equal ? "gte" : "gt") : (equal ? "lte" : "lt")]: date.toISOString(),
-                  }
+                  },
                 },
               },
               {
@@ -117,7 +117,7 @@ export class ResRepo implements IResRepo {
                 range: {
                   date: {
                     [type === "after" ? (equal ? "gte" : "gt") : (equal ? "lte" : "lt")]: date.toISOString(),
-                  }
+                  },
                 },
               },
               {
