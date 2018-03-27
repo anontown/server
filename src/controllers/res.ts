@@ -162,7 +162,7 @@ export class ResController {
     limit: number,
   }>): Promise<IResAPI[]> {
     const topic = await repo.topic.findOne(params.topic);
-    const reses = await repo.res.find(topic, params.type, params.equal, new Date(params.date), params.limit);
+    const reses = await repo.res.find(topic.id, params.type, params.equal, new Date(params.date), params.limit);
     return reses.map(r => r.toAPI(auth.tokenOrNull));
   }
 
@@ -187,7 +187,7 @@ export class ResController {
   })
   async findNew({ params, auth, repo }: IHttpAPICallParams<{ topic: string, limit: number }>): Promise<IResAPI[]> {
     const topic = await repo.topic.findOne(params.topic);
-    const reses = await repo.res.findNew(topic, params.limit);
+    const reses = await repo.res.findNew(topic.id, params.limit);
     return reses.map(r => r.toAPI(auth.tokenOrNull));
   }
 
