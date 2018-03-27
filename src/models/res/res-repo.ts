@@ -1,4 +1,3 @@
-import { SearchResponse } from "elasticsearch";
 import { Subject } from "rxjs";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
@@ -12,23 +11,17 @@ export class ResRepo implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
 
   async findOne(id: string): Promise<Res> {
-    const reses = await ESClient.search<IResDB["body"]>({
-      index: "reses",
-      size: 1,
-      body: {
-        query: {
-          term: {
-            _id: id,
-          },
-        },
-      },
-    });
+    try {
+      const res = await ESClient.get<IResDB["body"]>({
+        index: "reses",
+        type: "doc",
+        id,
+      });
 
-    if (reses.hits.total === 0) {
+      return (await this.aggregate([{ id: res._id, body: res._source } as IResDB]))[0];
+    } catch {
       throw new AtNotFoundError("レスが存在しません");
     }
-
-    return (await this.aggregate(reses))[0];
   }
 
   async findIn(ids: string[]): Promise<Res[]> {
@@ -50,7 +43,7 @@ export class ResRepo implements IResRepo {
         reses.hits.hits.map(r => r._id));
     }
 
-    return this.aggregate(reses);
+    return this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
   }
 
   async find(topic: Topic, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
@@ -78,7 +71,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    const result = await this.aggregate(reses);
+    const result = await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
     if (type === "after") {
       result.reverse();
     }
@@ -99,7 +92,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    return await this.aggregate(reses);
+    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
   }
 
   async findNotice(
@@ -132,7 +125,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    const result = await this.aggregate(reses);
+    const result = await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
     if (type === "after") {
       result.reverse();
     }
@@ -153,7 +146,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    return await this.aggregate(reses);
+    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
   }
 
   async findHash(hash: string): Promise<Res[]> {
@@ -170,7 +163,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    return await this.aggregate(reses);
+    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
   }
 
   async findReply(res: Res): Promise<Res[]> {
@@ -188,7 +181,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    return await this.aggregate(reses);
+    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
   }
 
   async insert(res: Res): Promise<void> {
@@ -238,7 +231,7 @@ export class ResRepo implements IResRepo {
     return new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
   }
 
-  private async aggregate(reses: SearchResponse<IResDB["body"]>): Promise<Res[]> {
+  private async aggregate(reses: IResDB[]): Promise<Res[]> {
     const data = await ESClient.search({
       index: "reses",
       size: 0,
@@ -246,7 +239,7 @@ export class ResRepo implements IResRepo {
         query: {
           terms: {
             // TODO:ここのクエリおかしい気がする
-            id: reses.hits.hits.map(r => r._id),
+            id: reses.map(r => r.id),
           },
         },
         aggs: {
@@ -262,9 +255,6 @@ export class ResRepo implements IResRepo {
     const countArr: { key: string, doc_count: number }[] = data.aggregations.reply_count.buckets;
     const count = new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
 
-    return reses.hits.hits.map(r => fromDBToRes({
-      id: r._id,
-      body: r._source,
-    } as IResDB, count.get(r._id) || 0));
+    return reses.map(r => fromDBToRes(r, count.get(r.id) || 0));
   }
 }
