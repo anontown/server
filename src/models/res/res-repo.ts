@@ -59,7 +59,9 @@ export class ResRepo implements IResRepo {
             filter: [
               {
                 range: {
+                 date:{
                   [type === "after" ? (equal ? "gte" : "gt") : (equal ? "lte" : "lt")]: date.toISOString(),
+                 }
                 },
               },
               {
