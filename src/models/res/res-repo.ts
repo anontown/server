@@ -266,7 +266,7 @@ export class ResRepo implements IResRepo {
           nested: {
             path: "reply",
             query: {
-              term: {
+              terms: {
                 "reply.res": reses.map(r => r.id),
               }
             }
