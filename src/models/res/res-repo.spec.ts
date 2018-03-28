@@ -510,8 +510,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       await repo.insert(res9);
 
       expect(await repo.findReply("res3")).toEqual([]);
-      expect(await repo.findHash("res1")).toEqual([res2.copy({ replyCount: 7 })]);
-      expect(await repo.findHash("res2")).toEqual([
+      expect(await repo.findReply("res1")).toEqual([res2.copy({ replyCount: 7 })]);
+      expect(await repo.findReply("res2")).toEqual([
         res4,
         res9,
         res7,
