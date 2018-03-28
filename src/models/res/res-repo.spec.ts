@@ -359,6 +359,61 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       expect(await repo.findNotice(token, "before", false, new Date(30), 0)).toEqual([]);
     });
   });
+
+  describe("findNoticeNew", () => {
+    it("正常に検索出来るか", async () => {
+      const repo = repoGene();
+
+      const user1 = "user1";
+      const user2 = "user2";
+
+      const token: IAuthTokenMaster = {
+        id: "token",
+        key: "key",
+        user: user1,
+        type: "master",
+      };
+
+      expect(await repo.findNoticeNew(token, 100)).toEqual([]);
+
+      const res = new ResNormal("name",
+        "body",
+        null,
+        "active",
+        null,
+        true,
+        "res",
+        "topic",
+        new Date(0),
+        user1,
+        Im.List(),
+        5,
+        "hash",
+        0,
+      );
+
+      const res1 = res.copy({ id: "res1", date: new Date(50), reply: null, user: user2 });
+      const res2 = res.copy({ id: "res2", date: new Date(80), reply: { res: "res1", user: user2 } });
+      const res3 = res.copy({ id: "res3", date: new Date(30), reply: { user: "user1", res: "res1" }, user: user2 });
+      const res4 = res.copy({ id: "res4", date: new Date(90), reply: { user: "user1", res: "res1" }, user: user2 });
+
+      await repo.insert(res1);
+      await repo.insert(res2);
+      await repo.insert(res3);
+      await repo.insert(res4);
+
+      expect(await repo.findNoticeNew(token, 100)).toEqual([
+        res4,
+        res3,
+      ]);
+
+      expect(await repo.findNoticeNew(token, 1)).toEqual([
+        res4,
+      ]);
+
+      expect(await repo.findNoticeNew(token, 0)).toEqual([]);
+    });
+  });
 }
 
 describe("ResRepoMock", () => {
