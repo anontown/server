@@ -255,6 +255,9 @@ export class ResRepo implements IResRepo {
   }
 
   private async aggregate(reses: IResDB[]): Promise<Res[]> {
+    if (reses.length === 0) {
+      return [];
+    }
     const data = await ESClient.search({
       index: "reses",
       size: 0,
