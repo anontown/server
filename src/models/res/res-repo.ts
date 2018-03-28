@@ -261,15 +261,22 @@ export class ResRepo implements IResRepo {
       body: {
         aggs: {
           reply_count: {
-            terms: {
-              field: "reply.res"
+            nested: {
+              path: "reply"
+            },
+            aggs: {
+              reply_count: {
+                terms: {
+                  field: "reply.res"
+                }
+              }
             }
           },
         },
       },
     });
 
-    const countArr: { key: string, doc_count: number }[] = data.aggregations.reply_count.buckets;
+    const countArr: { key: string, doc_count: number }[] = data.aggregations.reply_count.reply_count.buckets;
     const count = new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
 
     return reses.map(r => fromDBToRes(r, count.get(r.id) || 0));
