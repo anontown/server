@@ -510,7 +510,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       await repo.insert(res9);
 
       expect(await repo.findReply("res3")).toEqual([]);
-      expect(await repo.findHash("res1")).toEqual([res2]);
+      expect(await repo.findHash("res1")).toEqual([res2.copy({ replyCount: 7 })]);
       expect(await repo.findHash("res2")).toEqual([
         res4,
         res9,
@@ -521,6 +521,34 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         res6,
       ]);
     });
+  });
+
+  describe("insert", () => {
+    it("正常に検索できるか", async () => {
+      const repo = repoGene();
+
+      const res = new ResNormal("name",
+        "body",
+        null,
+        "active",
+        null,
+        true,
+        "res",
+        "topic",
+        new Date(0),
+        "user",
+        Im.List(),
+        5,
+        "hash",
+        0,
+      );
+
+      await repo.insert(res);
+
+      expect(await repo.findOne(res.id)).toEqual(res);
+    });
+
+    // TODO:ID被り
   });
 }
 
