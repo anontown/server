@@ -267,9 +267,10 @@ export class ResRepo implements IResRepo {
             aggs: {
               reply_count: {
                 terms: {
-                  field: "reply.res"
+                  field: "reply.res",
+                  size: reses.length
                 }
-              }
+              },
             }
           },
         },
