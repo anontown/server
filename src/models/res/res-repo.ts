@@ -257,17 +257,21 @@ export class ResRepo implements IResRepo {
   private async aggregate(reses: IResDB[]): Promise<Res[]> {
     const data = await ESClient.search({
       index: "reses",
-      size: 0,
+      size: reses.length,
       body: {
         query: {
-          terms: {
-            // TODO:ここのクエリおかしい気がする
-            id: reses.map(r => r.id),
-          },
+          nested: {
+            path: "reply",
+            query: {
+              terms: {
+                "reply.res": reses.map(r => r.id)
+              }
+            }
+          }
         },
         aggs: {
           reply_count: {
-            terms: {
+            value_count: {
               field: "reply.res",
             },
           },
