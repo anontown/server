@@ -24,7 +24,7 @@ export interface IResRepo {
 
   findHash(hash: string): Promise<Res[]>;
 
-  findReply(res: Res): Promise<Res[]>;
+  findReply(resID: string): Promise<Res[]>;
 
   insert(res: Res): Promise<void>;
 

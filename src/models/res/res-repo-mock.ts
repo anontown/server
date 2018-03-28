@@ -112,9 +112,9 @@ export class ResRepoMock implements IResRepo {
     return await this.aggregate(reses);
   }
 
-  async findReply(res: Res): Promise<Res[]> {
+  async findReply(resID: string): Promise<Res[]> {
     const reses = this.reses
-      .filter(x => x.body.type === "normal" && x.body.reply !== null && x.body.reply.res === res.id)
+      .filter(x => x.body.type === "normal" && x.body.reply !== null && x.body.reply.res === resID)
       .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
       .slice(0, Config.api.limit);
 

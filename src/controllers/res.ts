@@ -231,7 +231,7 @@ export class ResController {
   async findReply({ params, auth, repo }: IHttpAPICallParams<{ reply: string }>): Promise<IResAPI[]> {
     const res = await repo.res.findOne(params.reply);
 
-    const reses = await repo.res.findReply(res);
+    const reses = await repo.res.findReply(res.id);
     return reses.map(r => r.toAPI(auth.tokenOrNull));
   }
 

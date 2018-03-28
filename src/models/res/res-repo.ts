@@ -183,16 +183,20 @@ export class ResRepo implements IResRepo {
     return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
   }
 
-  async findReply(res: Res): Promise<Res[]> {
+  async findReply(resID: string): Promise<Res[]> {
     const reses = await ESClient.search<IResNormalDB["body"]>({
       index: "reses",
       size: Config.api.limit,
       body: {
         query: {
-          term: {
-            "reply.res": res.id,
-            "type": "normal",
-          },
+          nested: {
+            path: "reply",
+            query: {
+              term: {
+                "reply.res": resID,
+              }
+            }
+          }
         },
         sort: { date: { order: "desc" } },
       },
