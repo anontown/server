@@ -259,22 +259,10 @@ export class ResRepo implements IResRepo {
       index: "reses",
       size: 0,
       body: {
-        query: {
-          nested: {
-            path: "reply",
-            query: {
-              terms: {
-                "reply.res": reses.map(r => r.id)
-              }
-            }
-          }
-        },
         aggs: {
           reply_count: {
             terms: {
-              field: "reply.res",
-              order: { "_count": "desc" },
-              size: reses.length
+              field: "reply.res"
             }
           },
         },
