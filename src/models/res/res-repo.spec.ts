@@ -241,25 +241,25 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         0,
       );
 
-      const topic1 = res.copy({ id: "topic1", date: new Date(50) });
-      const topic2 = res.copy({ id: "topic2", date: new Date(80), topic: "topic2" });
-      const topic3 = res.copy({ id: "topic3", date: new Date(30) });
-      const topic4 = res.copy({ id: "topic4", date: new Date(90) });
+      const res1 = res.copy({ id: "res1", date: new Date(50) });
+      const res2 = res.copy({ id: "res2", date: new Date(80), topic: "topic2" });
+      const res3 = res.copy({ id: "res3", date: new Date(30) });
+      const res4 = res.copy({ id: "res4", date: new Date(90) });
 
-      await repo.insert(topic1);
-      await repo.insert(topic2);
-      await repo.insert(topic3);
-      await repo.insert(topic4);
+      await repo.insert(res1);
+      await repo.insert(res2);
+      await repo.insert(res3);
+      await repo.insert(res4);
 
       expect(await repo.findNew("topic", 100)).toEqual([
-        topic4,
-        topic1,
-        topic3,
+        res4,
+        res1,
+        res3,
       ]);
 
       expect(await repo.findNew("topic", 2)).toEqual([
-        topic4,
-        topic1,
+        res4,
+        res1,
       ]);
 
       expect(await repo.findNew("topic", 0)).toEqual([]);
