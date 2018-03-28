@@ -550,6 +550,42 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
 
     // TODO:ID被り
   });
+
+  describe("update", () => {
+    it("正常に更新出来るか", async () => {
+      const repo = repoGene();
+
+      const res = new ResNormal("name",
+        "body",
+        null,
+        "active",
+        null,
+        true,
+        "res",
+        "topic",
+        new Date(0),
+        "user",
+        Im.List(),
+        5,
+        "hash",
+        0,
+      );
+
+      const res1 = res.copy({ id: "res1" });
+      const res2 = res.copy({ id: "res2" });
+      const res1update = res1.copy({ body: "update" });
+
+      await repo.insert(res1);
+      await repo.insert(res2);
+
+      await repo.update(res1update);
+
+      expect(await repo.findOne(res1.id)).toEqual(res1update);
+      expect(await repo.findOne(res2.id)).toEqual(res2);
+    });
+
+    // TODO:存在しないID
+  });
 }
 
 describe("ResRepoMock", () => {
