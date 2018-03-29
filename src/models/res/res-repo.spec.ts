@@ -616,7 +616,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       expect(await repo.resCount([])).toEqual(new Map());
       expect(await repo.resCount(["topic1"])).toEqual(new Map([["topic1", 100]]));
       expect(await repo.resCount(["topic2"])).toEqual(new Map([["topic2", 1]]));
-      expect(await repo.resCount(["topic3"])).toEqual(new Map([["topic3", 0]]));
+      expect(await repo.resCount(["topic3"])).toEqual(new Map());
       expect(await repo.resCount(["topic1", "topic2"])).toEqual(new Map([["topic1", 100], ["topic2", 1]]));
     });
   });
@@ -650,7 +650,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       expect(await repo.replyCount([])).toEqual(new Map());
       expect(await repo.replyCount(["res1"])).toEqual(new Map([["res1", 1]]));
       expect(await repo.replyCount(range(0, 100).map(x => "res" + x)))
-        .toEqual(new Map([["res99", 0], ...range(0, 99).map<[string, number]>(x => ["res" + x, 1])]));
+        .toEqual(new Map(range(0, 99).map<[string, number]>(x => ["res" + x, 1])));
     });
   });
 }
