@@ -231,6 +231,10 @@ export class ResRepo implements IResRepo {
   }
 
   async resCount(topicIDs: string[]): Promise<Map<string, number>> {
+    if (topicIDs.length === 0) {
+      return new Map();
+    }
+
     const data = await ESClient.search({
       index: "reses",
       size: 0,
