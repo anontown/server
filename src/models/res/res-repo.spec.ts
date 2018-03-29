@@ -648,6 +648,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       }
 
       expect(await repo.replyCount([])).toEqual(new Map());
+      expect(await repo.replyCount(["res1"])).toEqual(new Map([["res1", 1]]));
       expect(await repo.replyCount(range(0, 100).map(x => "res" + x)))
         .toEqual(new Map([["res99", 0], ...range(0, 99).map<[string, number]>(x => ["res" + x, 1])]));
     });
