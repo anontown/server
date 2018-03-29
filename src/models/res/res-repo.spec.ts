@@ -586,6 +586,39 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
 
     // TODO:存在しないID
   });
+
+  describe("resCount", () => {
+    it("正常に取得出来るか", async () => {
+      const repo = repoGene();
+      const res = new ResNormal("name",
+        "body",
+        null,
+        "active",
+        null,
+        true,
+        "res",
+        "topic",
+        new Date(0),
+        "user",
+        Im.List(),
+        5,
+        "hash",
+        0,
+      );
+
+      for (let i = 0; i < 100; i++) {
+        await repo.insert(res.copy({ id: "res" + 1, topic: "topic1" }));
+      }
+
+      await repo.insert(res.copy({ id: "resres", topic: "topic2" }));
+
+      expect(await repo.resCount([])).toEqual(new Map());
+      expect(await repo.resCount(["topic1"])).toEqual(new Map([["topic1", 100]]));
+      expect(await repo.resCount(["topic2"])).toEqual(new Map([["topic2", 1]]));
+      expect(await repo.resCount(["topic3"])).toEqual(new Map([["topic3", 0]]));
+      expect(await repo.resCount(["topic1", "topic2"])).toEqual(new Map([["topic1", 100], ["topic2", 1]]));
+    });
+  });
 }
 
 describe("ResRepoMock", () => {
