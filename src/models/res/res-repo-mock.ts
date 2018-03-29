@@ -142,7 +142,7 @@ export class ResRepoMock implements IResRepo {
   async replyCount(resIDs: string[]): Promise<Map<string, number>> {
     return this.reses.map(x => x.body.type === "normal" && x.body.reply !== null ? x.body.reply.res : null)
       .filter<string>((x): x is string => x !== null && resIDs.includes(x))
-      .reduce((c, x) => c.set(x, (c.get(x) || 0) + 1), new Map<string, number>())
+      .reduce((c, x) => c.set(x, (c.get(x) || 0) + 1), new Map<string, number>());
   }
 
   private async aggregate(reses: IResDB[]): Promise<Res[]> {

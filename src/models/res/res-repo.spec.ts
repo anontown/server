@@ -1,14 +1,14 @@
+import range from "array-range";
 import * as Im from "immutable";
 import {
   AtError,
   dbReset,
+  IAuthTokenMaster,
   IResRepo,
   ResNormal,
   ResRepo,
   ResRepoMock,
-  IAuthTokenMaster,
 } from "../../";
-import range from "array-range";
 
 function run(repoGene: () => IResRepo, isReset: boolean) {
   beforeEach(async () => {
@@ -643,7 +643,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
 
       await repo.insert(res.copy({ id: "res0" }));
 
-      for (let i of range(1, 100)) {
+      for (const i of range(1, 100)) {
         await repo.insert(res.copy({ id: "res" + i, reply: { user: "user", res: "res" + (i - 1) } }));
       }
 

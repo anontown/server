@@ -126,9 +126,9 @@ export class ResRepo implements IResRepo {
                   query: {
                     term: {
                       "reply.user": authToken.user,
-                    }
-                  }
-                }
+                    },
+                  },
+                },
               },
             ],
           },
@@ -155,9 +155,9 @@ export class ResRepo implements IResRepo {
             query: {
               term: {
                 "reply.user": authToken.user,
-              }
-            }
-          }
+              },
+            },
+          },
         },
         sort: { date: { order: "desc" } },
       },
@@ -194,9 +194,9 @@ export class ResRepo implements IResRepo {
             query: {
               term: {
                 "reply.res": resID,
-              }
-            }
-          }
+              },
+            },
+          },
         },
         sort: { date: { order: "desc" } },
       },
@@ -272,23 +272,23 @@ export class ResRepo implements IResRepo {
             query: {
               terms: {
                 "reply.res": resIDs,
-              }
-            }
-          }
+              },
+            },
+          },
         },
         aggs: {
           reply_count: {
             nested: {
-              path: "reply"
+              path: "reply",
             },
             aggs: {
               reply_count: {
                 terms: {
                   field: "reply.res",
-                  size: resIDs.length
-                }
+                  size: resIDs.length,
+                },
               },
-            }
+            },
           },
         },
       },

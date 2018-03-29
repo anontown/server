@@ -1,5 +1,4 @@
 declare module "array-range" {
-  function range(start: number, end: number): number[]
-  function range(len: number): number[]
+  function range(a: number, b?: number): number[];
   export default range;
 }
