@@ -607,7 +607,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       );
 
       for (let i = 0; i < 100; i++) {
-        await repo.insert(res.copy({ id: "res" + 1, topic: "topic1" }));
+        await repo.insert(res.copy({ id: "res" + i, topic: "topic1" }));
       }
 
       await repo.insert(res.copy({ id: "resres", topic: "topic2" }));
@@ -619,6 +619,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       expect(await repo.resCount(["topic1", "topic2"])).toEqual(new Map([["topic1", 100], ["topic2", 1]]));
     });
   });
+
+
 }
 
 describe("ResRepoMock", () => {
