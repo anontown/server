@@ -8,6 +8,7 @@ import {
   ResRepoMock,
   IAuthTokenMaster,
 } from "../../";
+import range from "array-range";
 
 function run(repoGene: () => IResRepo, isReset: boolean) {
   beforeEach(async () => {
@@ -620,7 +621,37 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
     });
   });
 
+  describe("replyCount", () => {
+    it("正常に取得出来るか", async () => {
+      const repo = repoGene();
 
+      const res = new ResNormal("name",
+        "body",
+        null,
+        "active",
+        null,
+        true,
+        "res",
+        "topic",
+        new Date(0),
+        "user",
+        Im.List(),
+        5,
+        "hash",
+        0,
+      );
+
+      await repo.insert(res.copy({ id: "res0" }));
+
+      for (let i of range(1, 100)) {
+        await repo.insert(res.copy({ id: "res" + i, reply: { user: "user", res: "res" + (i - 1) } }));
+      }
+
+      expect(await repo.replyCount([])).toEqual(new Map());
+      expect(await repo.replyCount(range(0, 100).map(x => "res" + x)))
+        .toEqual(new Map([["res99", 0], ...range(0, 99).map<[string, number]>(x => ["res" + x, 1])]));
+    });
+  });
 }
 
 describe("ResRepoMock", () => {
