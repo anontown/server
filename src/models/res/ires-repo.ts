@@ -31,4 +31,6 @@ export interface IResRepo {
   update(res: Res): Promise<void>;
 
   resCount(topicIDs: string[]): Promise<Map<string, number>>;
+
+  replyCount(resIDs: string[]): Promise<Map<string, number>>;
 }

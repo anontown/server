@@ -254,9 +254,9 @@ export class ResRepo implements IResRepo {
     return new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
   }
 
-  private async aggregate(reses: IResDB[]): Promise<Res[]> {
-    if (reses.length === 0) {
-      return [];
+  async replyCount(resIDs: string[]): Promise<Map<string, number>> {
+    if (resIDs.length === 0) {
+      return new Map();
     }
     const data = await ESClient.search({
       index: "reses",
@@ -267,7 +267,7 @@ export class ResRepo implements IResRepo {
             path: "reply",
             query: {
               terms: {
-                "reply.res": reses.map(r => r.id),
+                "reply.res": resIDs,
               }
             }
           }
@@ -281,7 +281,7 @@ export class ResRepo implements IResRepo {
               reply_count: {
                 terms: {
                   field: "reply.res",
-                  size: reses.length
+                  size: resIDs.length
                 }
               },
             }
@@ -291,8 +291,11 @@ export class ResRepo implements IResRepo {
     });
 
     const countArr: { key: string, doc_count: number }[] = data.aggregations.reply_count.reply_count.buckets;
-    const count = new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
+    return new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
+  }
 
+  private async aggregate(reses: IResDB[]): Promise<Res[]> {
+    const count = await this.replyCount(reses.map(x => x.id));
     return reses.map(r => fromDBToRes(r, count.get(r.id) || 0));
   }
 }
