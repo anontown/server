@@ -7,7 +7,7 @@ import {
 @controller
 export class StorageController {
   @http({
-    url: "/token/storage/set",
+    url: "/storage/set",
 
     isAuthUser: false,
     isAuthToken: "all",
@@ -33,7 +33,7 @@ export class StorageController {
   }
 
   @http({
-    url: "/token/storage/get",
+    url: "/storage/get",
 
     isAuthUser: false,
     isAuthToken: "all",
@@ -54,7 +54,7 @@ export class StorageController {
   }
 
   @http({
-    url: "/token/storage/delete",
+    url: "/storage/delete",
 
     isAuthUser: false,
     isAuthToken: "all",
@@ -76,7 +76,7 @@ export class StorageController {
   }
 
   @http({
-    url: "/token/storage/list",
+    url: "/storage/list",
 
     isAuthUser: false,
     isAuthToken: "all",
