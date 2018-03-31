@@ -3,6 +3,7 @@ import {
   ObjectIDGenerator,
   IAuthTokenGeneral,
   IAuthTokenMaster,
+  AtError,
 } from "../../";
 import { ObjectID } from "mongodb";
 
@@ -66,7 +67,7 @@ describe("Storage", () => {
     it("ユーザーが違う時エラーになるか", () => {
       expect(() => {
         storage.toAPI({ ...authMaster, user: ObjectIDGenerator() })
-      });
+      }).toThrow(AtError);
     });
   });
 });
