@@ -33,14 +33,14 @@ export class Storage extends Copyable<Storage> {
       {
         field: "key",
         val: key,
-        regex: Config.user.token.storage.regex,
-        message: Config.user.token.storage.msg,
+        regex: Config.user.storage.key.regex,
+        message: Config.user.storage.key.msg,
       },
       {
         field: "value",
         val: value,
-        regex: Config.user.token.storageValue.regex,
-        message: Config.user.token.storageValue.msg,
+        regex: Config.user.storage.value.regex,
+        message: Config.user.storage.value.msg,
       },
     ]);
 
@@ -88,8 +88,8 @@ export class Storage extends Copyable<Storage> {
       {
         field: "value",
         val: value,
-        regex: Config.user.token.storageValue.regex,
-        message: Config.user.token.storageValue.msg,
+        regex: Config.user.storage.value.regex,
+        message: Config.user.storage.value.msg,
       },
     ]);
 
