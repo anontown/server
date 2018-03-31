@@ -94,6 +94,23 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
       })).toEqual([]);
     });
   });
+
+  describe("insert", () => {
+    it("正常に保存出来るか", async () => {
+      const repo = repoGene();
+
+      const token = new TokenMaster(ObjectIDGenerator(),
+        "key",
+        ObjectIDGenerator(),
+        new Date(0));
+
+      await repo.insert(token);
+
+      expect(await repo.findOne(token.id)).toEqual(token);
+    });
+
+    // TODO:ID被り
+  });
 }
 
 describe("TokenRepoMock", () => {
