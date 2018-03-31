@@ -69,5 +69,11 @@ describe("Storage", () => {
         storage.toAPI({ ...authMaster, user: ObjectIDGenerator() })
       }).toThrow(AtError);
     });
+
+    it("マスターIDでクライアントがnullでないものを変換するときエラーになるか", () => {
+      expect(() => {
+        storage.toAPI(authMaster)
+      }).toThrow(AtError);
+    });
   });
 });
