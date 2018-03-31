@@ -53,4 +53,10 @@ describe("Storage", () => {
       })).toEqual(storage.copy({ client: null }));
     });
   });
+
+  describe("toAPI", () => {
+    it("通常トークンで正常に変換出来るか", () => {
+      expect(storage.toAPI(authGeneral)).toEqual("value");
+    });
+  });
 });
