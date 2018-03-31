@@ -58,5 +58,9 @@ describe("Storage", () => {
     it("通常トークンで正常に変換出来るか", () => {
       expect(storage.toAPI(authGeneral)).toEqual("value");
     });
+
+    it("マスタートークンで正常に変換出来るか", () => {
+      expect(storage.copy({ client: null }).toAPI(authMaster)).toEqual("value");
+    });
   });
 });
