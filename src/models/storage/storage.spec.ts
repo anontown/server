@@ -62,5 +62,11 @@ describe("Storage", () => {
     it("マスタートークンで正常に変換出来るか", () => {
       expect(storage.copy({ client: null }).toAPI(authMaster)).toEqual("value");
     });
+
+    it("ユーザーが違う時エラーになるか", () => {
+      expect(() => {
+        storage.toAPI({ ...authMaster, user: ObjectIDGenerator() })
+      });
+    });
   });
 });
