@@ -44,13 +44,7 @@ export class TokenRepo implements ITokenRepo {
 
   async insert(token: Token): Promise<void> {
     const db = await DB;
-    await db.collection("tokens").insert(token.toDB()).catch((e: WriteError) => {
-      if (e.code === 11000) {
-        throw new AtConflictError("トークンが既にあります");
-      } else {
-        throw e;
-      }
-    });
+    await db.collection("tokens").insert(token.toDB());
   }
 
   async update(token: Token): Promise<void> {
