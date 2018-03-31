@@ -4,29 +4,53 @@ import {
   IAuthTokenGeneral,
   IAuthTokenMaster,
 } from "../../";
+import { ObjectID } from "mongodb";
 
 describe("Storage", () => {
   const cleintID = ObjectIDGenerator();
   const userID = ObjectIDGenerator();
+  const storageID = ObjectIDGenerator();
+  const authMasterID = ObjectIDGenerator();
+  const authGeneralID = ObjectIDGenerator();
 
-  const storage = new Storage(ObjectIDGenerator(),
+  const storage = new Storage(storageID,
     cleintID,
     userID,
     "key",
     "value");
 
   const authMaster: IAuthTokenMaster = {
-    id: ObjectIDGenerator(),
+    id: authMasterID,
     key: "tokenkey",
     user: userID,
     type: "master",
   };
 
   const authGeneral: IAuthTokenGeneral = {
-    id: ObjectIDGenerator(),
+    id: authGeneralID,
     key: "tokenkey",
     user: userID,
     type: "general",
     client: cleintID
   };
+
+  describe("fromDB", () => {
+    it("正常に変換出来るか", () => {
+      expect(Storage.fromDB({
+        _id: new ObjectID(storageID),
+        client: new ObjectID(cleintID),
+        user: new ObjectID(userID),
+        key: "key",
+        value: "value"
+      })).toEqual(storage);
+
+      expect(Storage.fromDB({
+        _id: new ObjectID(storageID),
+        client: null,
+        user: new ObjectID(userID),
+        key: "key",
+        value: "value"
+      })).toEqual(storage.copy({ client: null }));
+    });
+  });
 });
