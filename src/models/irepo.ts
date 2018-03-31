@@ -3,10 +3,10 @@ import { IHistoryRepo } from "./history";
 import { IMsgRepo } from "./msg";
 import { IProfileRepo } from "./profile";
 import { IResRepo } from "./res";
+import { IStorageRepo } from "./storage";
 import { ITokenRepo } from "./token";
 import { ITopicRepo } from "./topic";
 import { IUserRepo } from "./user";
-import { IStorageRepo } from "./storage";
 
 export interface IRepo {
   readonly client: IClientRepo;

@@ -1,11 +1,11 @@
+import { ObjectID } from "mongodb";
 import {
-  Storage,
-  ObjectIDGenerator,
+  AtError,
   IAuthTokenGeneral,
   IAuthTokenMaster,
-  AtError,
+  ObjectIDGenerator,
+  Storage,
 } from "../../";
-import { ObjectID } from "mongodb";
 
 describe("Storage", () => {
   const cleintID = ObjectIDGenerator();
@@ -32,7 +32,7 @@ describe("Storage", () => {
     key: "tokenkey",
     user: userID,
     type: "general",
-    client: cleintID
+    client: cleintID,
   };
 
   describe("fromDB", () => {
@@ -42,7 +42,7 @@ describe("Storage", () => {
         client: new ObjectID(cleintID),
         user: new ObjectID(userID),
         key: "key",
-        value: "value"
+        value: "value",
       })).toEqual(storage);
 
       expect(Storage.fromDB({
@@ -50,7 +50,7 @@ describe("Storage", () => {
         client: null,
         user: new ObjectID(userID),
         key: "key",
-        value: "value"
+        value: "value",
       })).toEqual(storage.copy({ client: null }));
     });
   });
@@ -66,19 +66,19 @@ describe("Storage", () => {
 
     it("ユーザーが違う時エラーになるか", () => {
       expect(() => {
-        storage.toAPI({ ...authMaster, user: ObjectIDGenerator() })
+        storage.toAPI({ ...authMaster, user: ObjectIDGenerator() });
       }).toThrow(AtError);
     });
 
     it("マスターIDでクライアントがnullでないものを変換するときエラーになるか", () => {
       expect(() => {
-        storage.toAPI(authMaster)
+        storage.toAPI(authMaster);
       }).toThrow(AtError);
     });
 
     it("通常IDでクライアントがnullのものを変換する時エラーになるか", () => {
       expect(() => {
-        storage.copy({ client: null }).toAPI(authGeneral)
+        storage.copy({ client: null }).toAPI(authGeneral);
       }).toThrow(AtError);
     });
   });
@@ -90,16 +90,16 @@ describe("Storage", () => {
     });
 
     it("keyが不正な時エラーになるか", () => {
-      for (let key of ["", "x".repeat(101)]) {
+      for (const key of ["", "x".repeat(101)]) {
         expect(() => {
-          Storage.create(() => storageID, authGeneral, key, "value")
+          Storage.create(() => storageID, authGeneral, key, "value");
         }).toThrow(AtError);
       }
     });
 
     it("valueが不正な時エラーになるか", () => {
       expect(() => {
-        Storage.create(() => storageID, authGeneral, "key", "x".repeat(100001))
+        Storage.create(() => storageID, authGeneral, "key", "x".repeat(100001));
       }).toThrow(AtError);
     });
   });
@@ -111,7 +111,7 @@ describe("Storage", () => {
         client: new ObjectID(cleintID),
         user: new ObjectID(userID),
         key: "key",
-        value: "value"
+        value: "value",
       });
 
       expect(storage.copy({ client: null }).toDB()).toEqual({
@@ -119,7 +119,7 @@ describe("Storage", () => {
         client: null,
         user: new ObjectID(userID),
         key: "key",
-        value: "value"
+        value: "value",
       });
     });
   });

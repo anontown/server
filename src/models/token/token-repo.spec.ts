@@ -1,12 +1,12 @@
 import {
   AtError,
-  TokenMaster,
-  TokenRepo,
-  TokenRepoMock,
+  ClientRepoMock,
   dbReset,
   ITokenRepo,
   ObjectIDGenerator,
-  ClientRepoMock,
+  TokenMaster,
+  TokenRepo,
+  TokenRepoMock,
 } from "../../";
 
 function run(repoGene: () => ITokenRepo, isReset: boolean) {

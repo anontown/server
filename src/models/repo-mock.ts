@@ -4,10 +4,10 @@ import { IRepo } from "./irepo";
 import { MsgRepoMock } from "./msg";
 import { ProfileRepoMock } from "./profile";
 import { ResRepoMock } from "./res";
+import { StorageRepoMock } from "./storage";
 import { TokenRepoMock } from "./token";
 import { TopicRepoMock } from "./topic";
 import { UserRepoMock } from "./user";
-import { StorageRepoMock } from "./storage";
 
 export class RepoMock implements IRepo {
   readonly client: ClientRepoMock;

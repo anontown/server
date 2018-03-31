@@ -8,10 +8,10 @@ import {
   MsgController,
   ProfileController,
   ResController,
+  StorageController,
   TokenController,
   TopicController,
   UserController,
-  StorageController
 } from "./controllers";
 import { createDB } from "./create-db";
 import { } from "./generator";
@@ -45,7 +45,7 @@ import { AppServer } from "./server/app-server";
     TokenController,
     TopicController,
     UserController,
-    StorageController
+    StorageController,
   ]);
 
   api.run();

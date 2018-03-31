@@ -1,12 +1,12 @@
 import { ObjectID } from "mongodb";
+import Copyable from "ts-copyable";
+import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import Copyable from "ts-copyable";
-import { AtRightError, paramsErrorMaker } from "../../at-error";
 
 export interface IStorageDB {
-  _id: ObjectID,
+  _id: ObjectID;
   client: ObjectID | null;
   user: ObjectID;
   key: string;
@@ -70,13 +70,6 @@ export class Storage extends Copyable<Storage> {
     };
   }
 
-  private auth(authToken: IAuthToken) {
-    if (!(authToken.user === this.user && ((authToken.type === "master" && this.client === null) ||
-      authToken.type === "general" && authToken.client === this.client))) {
-      throw new AtRightError("権限がありません");
-    }
-  }
-
   toAPI(authToken: IAuthToken): IStorageAPI {
     this.auth(authToken);
     return this.value;
@@ -94,5 +87,12 @@ export class Storage extends Copyable<Storage> {
     ]);
 
     return this.copy({ value });
+  }
+
+  private auth(authToken: IAuthToken) {
+    if (!(authToken.user === this.user && ((authToken.type === "master" && this.client === null) ||
+      authToken.type === "general" && authToken.client === this.client))) {
+      throw new AtRightError("権限がありません");
+    }
   }
 }

@@ -4,10 +4,10 @@ import { IRepo } from "./irepo";
 import { MsgRepo } from "./msg";
 import { ProfileRepo } from "./profile";
 import { ResRepo } from "./res";
+import { StorageRepo } from "./storage";
 import { TokenRepo } from "./token";
 import { TopicRepo } from "./topic";
 import { UserRepo } from "./user";
-import { StorageRepo } from "./storage";
 
 export class Repo implements IRepo {
   readonly client: ClientRepo;

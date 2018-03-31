@@ -1,9 +1,9 @@
 import { ObjectID } from "mongodb";
+import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { DB } from "../../db";
 import { IStorageRepo } from "./istorage-repo";
-import { Storage, IStorageDB } from "./storage";
-import { AtNotFoundError } from "../../at-error";
+import { IStorageDB, Storage } from "./storage";
 
 export class StorageRepo implements IStorageRepo {
   async findOneKey(token: IAuthToken, key: string): Promise<Storage> {
@@ -12,7 +12,7 @@ export class StorageRepo implements IStorageRepo {
       .findOne({
         user: new ObjectID(token.user),
         client: token.type === "general" ? new ObjectID(token.client) : null,
-        key
+        key,
       });
     if (storage === null) {
       throw new AtNotFoundError("ストレージが見つかりません");
@@ -26,7 +26,7 @@ export class StorageRepo implements IStorageRepo {
       .update({
         user: new ObjectID(storage.user),
         client: storage.client !== null ? new ObjectID(storage.client) : null,
-        key: storage.key
+        key: storage.key,
       }, storage.toDB(), { upsert: true });
   }
   async del(storage: Storage): Promise<void> {
@@ -36,7 +36,7 @@ export class StorageRepo implements IStorageRepo {
       .deleteOne({
         user: new ObjectID(storage.user),
         client: storage.client !== null ? new ObjectID(storage.client) : null,
-        key: storage.key
+        key: storage.key,
       });
   }
   async list(token: IAuthToken): Promise<string[]> {

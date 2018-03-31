@@ -1,7 +1,7 @@
+import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { IStorageRepo } from "./istorage-repo";
-import { Storage, IStorageDB } from "./storage";
-import { AtNotFoundError } from "../../at-error";
+import { IStorageDB, Storage } from "./storage";
 
 export class StorageRepoMock implements IStorageRepo {
   private storages: IStorageDB[] = [];
