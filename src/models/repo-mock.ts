@@ -7,6 +7,7 @@ import { ResRepoMock } from "./res";
 import { TokenRepoMock } from "./token";
 import { TopicRepoMock } from "./topic";
 import { UserRepoMock } from "./user";
+import { StorageRepoMock } from "./storage";
 
 export class RepoMock implements IRepo {
   readonly client: ClientRepoMock;
@@ -17,6 +18,7 @@ export class RepoMock implements IRepo {
   readonly token: TokenRepoMock;
   readonly topic: TopicRepoMock;
   readonly user: UserRepoMock;
+  readonly storage: StorageRepoMock;
 
   constructor() {
     this.client = new ClientRepoMock();
@@ -27,5 +29,6 @@ export class RepoMock implements IRepo {
     this.topic = new TopicRepoMock(this.res);
     this.token = new TokenRepoMock(this.client);
     this.user = new UserRepoMock();
+    this.storage = new StorageRepoMock();
   }
 }

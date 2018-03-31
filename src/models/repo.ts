@@ -7,6 +7,7 @@ import { ResRepo } from "./res";
 import { TokenRepo } from "./token";
 import { TopicRepo } from "./topic";
 import { UserRepo } from "./user";
+import { StorageRepo } from "./storage";
 
 export class Repo implements IRepo {
   readonly client: ClientRepo;
@@ -17,6 +18,7 @@ export class Repo implements IRepo {
   readonly token: TokenRepo;
   readonly topic: TopicRepo;
   readonly user: UserRepo;
+  readonly storage: StorageRepo;
 
   constructor() {
     this.client = new ClientRepo();
@@ -27,5 +29,6 @@ export class Repo implements IRepo {
     this.topic = new TopicRepo(this.res);
     this.token = new TokenRepo(this.client);
     this.user = new UserRepo();
+    this.storage = new StorageRepo();
   }
 }
