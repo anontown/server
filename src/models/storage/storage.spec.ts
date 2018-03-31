@@ -96,6 +96,12 @@ describe("Storage", () => {
         }).toThrow(AtError);
       }
     });
+
+    it("valueが不正な時エラーになるか", () => {
+      expect(() => {
+        Storage.create(() => storageID, authGeneral, "key", "x".repeat(100001))
+      }).toThrow(AtError);
+    });
   });
 
   describe("toDB", () => {
