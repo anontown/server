@@ -29,7 +29,7 @@ export class TokenRepoMock implements ITokenRepo {
   async findAll(authToken: IAuthTokenMaster): Promise<Token[]> {
     const tokens = this.tokens
       .filter(x => x.user.toHexString() === authToken.user)
-      .sort((a, b) => a.date.valueOf() - b.date.valueOf());
+      .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
     return tokens.map(t => {
       switch (t.type) {
