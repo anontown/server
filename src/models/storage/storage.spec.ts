@@ -82,4 +82,11 @@ describe("Storage", () => {
       }).toThrow(AtError);
     });
   });
+
+  describe("create", () => {
+    it("正常に作成出来るか", () => {
+      expect(Storage.create(() => storageID, authGeneral, "key", "value")).toEqual(storage);
+      expect(Storage.create(() => storageID, authMaster, "key", "value")).toEqual(storage.copy({ client: null }));
+    });
+  });
 });
