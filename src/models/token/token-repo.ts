@@ -1,5 +1,5 @@
-import { ObjectID, WriteError } from "mongodb";
-import { AtConflictError, AtNotFoundError, paramsErrorMaker } from "../../at-error";
+import { ObjectID } from "mongodb";
+import { AtNotFoundError, paramsErrorMaker } from "../../at-error";
 import { IAuthToken, IAuthTokenMaster, IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { DB } from "../../db";
