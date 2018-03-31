@@ -111,6 +111,31 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
 
     // TODO:ID被り
   });
+
+  describe("update", () => {
+    it("正常に更新出来るか", async () => {
+      const repo = repoGene();
+
+      const token = new TokenMaster(ObjectIDGenerator(),
+        "key",
+        ObjectIDGenerator(),
+        new Date(0));
+
+      const token1 = token.copy({ id: ObjectIDGenerator(), key: "key1" });
+      const token2 = token.copy({ id: ObjectIDGenerator(), key: "key2" });
+      const token1update = token1.copy({ key: "update" });
+
+      await repo.insert(token1);
+      await repo.insert(token2);
+
+      await repo.update(token1update);
+
+      expect(await repo.findOne(token1.id)).toEqual(token1update);
+      expect(await repo.findOne(token2.id)).toEqual(token2);
+    });
+
+    // TODO:存在しないID
+  });
 }
 
 describe("TokenRepoMock", () => {
