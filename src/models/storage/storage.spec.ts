@@ -89,4 +89,24 @@ describe("Storage", () => {
       expect(Storage.create(() => storageID, authMaster, "key", "value")).toEqual(storage.copy({ client: null }));
     });
   });
+
+  describe("toDB", () => {
+    it("正常に変換出来るか", () => {
+      expect(storage.toDB()).toEqual({
+        _id: new ObjectID(storageID),
+        client: new ObjectID(cleintID),
+        user: new ObjectID(userID),
+        key: "key",
+        value: "value"
+      });
+
+      expect(storage.copy({ client: null }).toDB()).toEqual({
+        _id: new ObjectID(storageID),
+        client: null,
+        user: new ObjectID(userID),
+        key: "key",
+        value: "value"
+      });
+    });
+  });
 });
