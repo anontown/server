@@ -123,4 +123,10 @@ describe("Storage", () => {
       });
     });
   });
+
+  describe("changeData", () => {
+    it("正常に変更出来るか", () => {
+      expect(storage.changeData(authGeneral, "value2")).toEqual(storage.copy({ value: "value2" }));
+    });
+  });
 });
