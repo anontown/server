@@ -14,9 +14,9 @@ export class StorageController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["name", "value"],
+      required: ["key", "value"],
       properties: {
-        name: {
+        key: {
           type: "string",
         },
         value: {
@@ -25,8 +25,8 @@ export class StorageController {
       },
     },
   })
-  async setStorage({ params, auth, repo }: IHttpAPICallParams<{ name: string, value: string }>): Promise<null> {
-    const storage = await repo.storage.findOneKey(auth.token, params.name);
+  async setStorage({ params, auth, repo }: IHttpAPICallParams<{ key: string, value: string }>): Promise<null> {
+    const storage = await repo.storage.findOneKey(auth.token, params.key);
     storage.changeData(auth.token, params.value);
     await repo.storage.save(storage);
     return null;
@@ -40,16 +40,16 @@ export class StorageController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["name"],
+      required: ["key"],
       properties: {
-        name: {
+        key: {
           type: "string",
         },
       },
     },
   })
-  async getStorage({ params, auth, repo }: IHttpAPICallParams<{ name: string }>): Promise<string> {
-    const storage = await repo.storage.findOneKey(auth.token, params.name);
+  async getStorage({ params, auth, repo }: IHttpAPICallParams<{ key: string }>): Promise<string> {
+    const storage = await repo.storage.findOneKey(auth.token, params.key);
     return storage.toAPI(auth.token);
   }
 
@@ -61,16 +61,16 @@ export class StorageController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["name"],
+      required: ["key"],
       properties: {
-        name: {
+        key: {
           type: "string",
         },
       },
     },
   })
-  async deleteStorage({ params, auth, repo }: IHttpAPICallParams<{ name: string }>): Promise<null> {
-    const storage = await repo.storage.findOneKey(auth.token, params.name);
+  async deleteStorage({ params, auth, repo }: IHttpAPICallParams<{ key: string }>): Promise<null> {
+    const storage = await repo.storage.findOneKey(auth.token, params.key);
     await repo.storage.del(storage);
     return null;
   }
