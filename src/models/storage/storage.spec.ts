@@ -75,5 +75,11 @@ describe("Storage", () => {
         storage.toAPI(authMaster)
       }).toThrow(AtError);
     });
+
+    it("通常IDでクライアントがnullのものを変換する時エラーになるか", () => {
+      expect(() => {
+        storage.copy({ client: null }).toAPI(authGeneral)
+      }).toThrow(AtError);
+    });
   });
 });
