@@ -6,6 +6,7 @@ export * from "./res";
 export * from "./token";
 export * from "./topic";
 export * from "./user";
+export * from "./storage";
 export * from "./irepo";
 export * from "./repo";
 export * from "./repo-mock";

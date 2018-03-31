@@ -66,6 +66,10 @@ export const Config = {
                 regex: /^.{1,100}$/,
                 msg: "ストレージ名は1～100文字にして下さい",
             },
+            storageValue: {
+                regex: /^.{0,100000}$/,
+                msg: "ストレージの値は0～100000文字にして下さい",
+            },
         },
         client: {
             name: {
