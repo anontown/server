@@ -88,6 +88,14 @@ describe("Storage", () => {
       expect(Storage.create(() => storageID, authGeneral, "key", "value")).toEqual(storage);
       expect(Storage.create(() => storageID, authMaster, "key", "value")).toEqual(storage.copy({ client: null }));
     });
+
+    it("keyが不正な時エラーになるか", () => {
+      for (let key of ["", "x".repeat(101)]) {
+        expect(() => {
+          Storage.create(() => storageID, authGeneral, key, "value")
+        }).toThrow(AtError);
+      }
+    });
   });
 
   describe("toDB", () => {
