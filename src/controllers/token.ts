@@ -141,7 +141,9 @@ export class TokenController {
     },
   })
   async setStorage({ params, auth, repo }: IHttpAPICallParams<{ name: string, value: string }>): Promise<null> {
-    await repo.token.setStorage(auth.token, params.name, params.value);
+    const storage = await repo.storage.findOneKey(auth.token, params.name);
+    storage.changeData(auth.token, params.value);
+    await repo.storage.save(storage);
     return null;
   }
 
@@ -162,7 +164,8 @@ export class TokenController {
     },
   })
   async getStorage({ params, auth, repo }: IHttpAPICallParams<{ name: string }>): Promise<string> {
-    return await repo.token.getStorage(auth.token, params.name);
+    const storage = await repo.storage.findOneKey(auth.token, params.name);
+    return storage.toAPI(auth.token);
   }
 
   @http({
@@ -182,7 +185,8 @@ export class TokenController {
     },
   })
   async deleteStorage({ params, auth, repo }: IHttpAPICallParams<{ name: string }>): Promise<null> {
-    await repo.token.deleteStorage(auth.token, params.name);
+    const storage = await repo.storage.findOneKey(auth.token, params.name);
+    await repo.storage.del(storage);
     return null;
   }
 
@@ -196,7 +200,7 @@ export class TokenController {
     },
   })
   async listStorage({ auth, repo }: IHttpAPICallParams<null>): Promise<string[]> {
-    return await repo.token.listStorage(auth.token);
+    return await repo.storage.list(auth.token);
   }
 
   @http({

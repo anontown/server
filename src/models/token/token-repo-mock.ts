@@ -1,14 +1,11 @@
-import { ObjectID } from "mongodb";
-import { AtNotFoundError, paramsErrorMaker } from "../../at-error";
-import { IAuthToken, IAuthTokenMaster, IAuthUser } from "../../auth";
-import { Config } from "../../config";
+import { AtNotFoundError } from "../../at-error";
+import { IAuthTokenMaster, IAuthUser } from "../../auth";
 import { Client, IClientRepo } from "../client";
-import { IStorageDB, ITokenRepo } from "./itoken-repo";
+import { ITokenRepo } from "./itoken-repo";
 import { ITokenDB, Token, TokenGeneral, TokenMaster } from "./token";
 
 export class TokenRepoMock implements ITokenRepo {
   private tokens: ITokenDB[] = [];
-  private storages: IStorageDB[] = [];
 
   constructor(private clientRepo: IClientRepo) { }
 
@@ -49,73 +46,6 @@ export class TokenRepoMock implements ITokenRepo {
     this.tokens[this.tokens.findIndex(x => x._id.toHexString() === token.id)] = token.toDB();
   }
 
-  async getStorage(token: IAuthToken, name: string): Promise<string> {
-    paramsErrorMaker([
-      {
-        field: "name",
-        val: name,
-        regex: Config.user.token.storage.regex,
-        message: Config.user.token.storage.msg,
-      },
-    ]);
-
-    const storage = this.storages.find(this.createStorageFindQuery(token, name));
-
-    if (storage === undefined) {
-      throw new AtNotFoundError("ストレージが見つかりません");
-    }
-    return storage.value;
-  }
-
-  async setStorage(token: IAuthToken, name: string, value: string): Promise<void> {
-    paramsErrorMaker([
-      {
-        field: "name",
-        val: name,
-        regex: Config.user.token.storage.regex,
-        message: Config.user.token.storage.msg,
-      },
-    ]);
-
-    const data: IStorageDB = {
-      user: new ObjectID(token.user),
-      client: token.type === "general" ? new ObjectID(token.client) : null,
-      key: name,
-      value,
-    };
-
-    const index = this.storages.findIndex(this.createStorageFindQuery(token, name));
-    if (index === -1) {
-      this.storages.push(data);
-    } else {
-      this.storages[index] = data;
-    }
-  }
-
-  async deleteStorage(token: IAuthToken, name: string): Promise<void> {
-    paramsErrorMaker([
-      {
-        field: "name",
-        val: name,
-        regex: Config.user.token.storage.regex,
-        message: Config.user.token.storage.msg,
-      },
-    ]);
-
-    const index = this.storages.findIndex(this.createStorageFindQuery(token, name));
-    if (index === -1) {
-      throw new AtNotFoundError("ストレージが見つかりません");
-    } else {
-      this.storages.splice(index, 1);
-    }
-  }
-
-  async listStorage(token: IAuthToken): Promise<string[]> {
-    return this.storages
-      .filter(this.createStorageFindQuery(token, null))
-      .map(x => x.key);
-  }
-
   async listClient(token: IAuthTokenMaster): Promise<Client[]> {
     const tokens = await this.findAll(token);
     const clientIds = Array.from(new Set((tokens
@@ -133,11 +63,5 @@ export class TokenRepoMock implements ITokenRepo {
   async delMasterToken(user: IAuthUser): Promise<void> {
     this.tokens = this.tokens.filter(x => !(x.user.toHexString() === user.id
       && x.type === "master"));
-  }
-
-  private createStorageFindQuery(token: IAuthToken, name: string | null) {
-    return (x: IStorageDB) => x.user.toHexString() === token.user
-      && x.client === (token.type === "general" ? token.client : null)
-      && (name === null || x.key === name);
   }
 }
