@@ -2,13 +2,11 @@ import { ObjectID } from "mongodb";
 import { AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster, IAuthUser } from "../../auth";
 import { DB } from "../../db";
-import { Client, IClientRepo } from "../client";
+import { Client } from "../client";
 import { ITokenRepo } from "./itoken-repo";
 import { ITokenDB, Token, TokenGeneral, TokenMaster } from "./token";
 
 export class TokenRepo implements ITokenRepo {
-  constructor(public clientRepo: IClientRepo) { }
-
   async findOne(id: string): Promise<Token> {
     const db = await DB;
     const token: ITokenDB | null = await db.collection("tokens").findOne({ _id: new ObjectID(id) });
@@ -49,14 +47,6 @@ export class TokenRepo implements ITokenRepo {
   async update(token: Token): Promise<void> {
     const db = await DB;
     await db.collection("tokens").update({ _id: new ObjectID(token.id) }, token.toDB());
-  }
-
-  async listClient(token: IAuthTokenMaster): Promise<Client[]> {
-    const tokens = await this.findAll(token);
-    const clientIds = [...new Set((tokens
-      .map(t => t.type === "general" ? t.client.toString() : null)
-      .filter<string>((x): x is string => x !== null)))];
-    return await this.clientRepo.findIn(clientIds);
   }
 
   async delClientToken(token: IAuthTokenMaster, client: Client): Promise<void> {

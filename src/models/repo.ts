@@ -27,7 +27,7 @@ export class Repo implements IRepo {
     this.profile = new ProfileRepo();
     this.res = new ResRepo();
     this.topic = new TopicRepo(this.res);
-    this.token = new TokenRepo(this.client);
+    this.token = new TokenRepo();
     this.user = new UserRepo();
     this.storage = new StorageRepo();
   }

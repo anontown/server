@@ -27,7 +27,7 @@ export class RepoMock implements IRepo {
     this.profile = new ProfileRepoMock();
     this.res = new ResRepoMock();
     this.topic = new TopicRepoMock(this.res);
-    this.token = new TokenRepoMock(this.client);
+    this.token = new TokenRepoMock();
     this.user = new UserRepoMock();
     this.storage = new StorageRepoMock();
   }

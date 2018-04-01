@@ -1,6 +1,5 @@
 import {
   AtError,
-  ClientRepoMock,
   dbReset,
   ITokenRepo,
   ObjectIDGenerator,
@@ -139,9 +138,9 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
 }
 
 describe("TokenRepoMock", () => {
-  run(() => new TokenRepoMock(new ClientRepoMock()), false);
+  run(() => new TokenRepoMock(), false);
 });
 
 describe("TokenRepo", () => {
-  run(() => new TokenRepo(new ClientRepoMock()), true);
+  run(() => new TokenRepo(), true);
 });

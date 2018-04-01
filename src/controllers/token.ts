@@ -1,7 +1,6 @@
 import { AtPrerequisiteError } from "../at-error";
 import { ObjectIDGenerator, RandomGenerator } from "../generator";
 import {
-  IClientAPI,
   ITokenAPI,
   ITokenGeneralAPI,
   ITokenMasterAPI,
@@ -65,20 +64,6 @@ export class TokenController {
     const client = await repo.client.findOne(params.client);
     await repo.token.delClientToken(auth.tokenMaster, client);
     return null;
-  }
-
-  @http({
-    url: "/token/find/client/all",
-
-    isAuthUser: false,
-    isAuthToken: "master",
-    schema: {
-      type: "null",
-    },
-  })
-  async findClientAll({ auth, repo }: IHttpAPICallParams<null>): Promise<IClientAPI[]> {
-    const clients = await repo.token.listClient(auth.tokenMaster);
-    return clients.map(c => c.toAPI(auth.tokenMaster));
   }
 
   @http({
