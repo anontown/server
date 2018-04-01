@@ -1,6 +1,9 @@
 import { Topic, TopicNormal } from "./topic";
+import { IResRepo } from "../res";
 
 export interface ITopicRepo {
+  resRepo: IResRepo;
+
   findOne(id: string): Promise<Topic>;
 
   findIn(ids: string[]): Promise<Topic[]>;

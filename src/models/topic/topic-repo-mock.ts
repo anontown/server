@@ -15,7 +15,7 @@ import {
 export class TopicRepoMock implements ITopicRepo {
   private topics: ITopicDB[] = [];
 
-  constructor(private resRepo: IResRepo) { }
+  constructor(public resRepo: IResRepo) { }
 
   async findOne(id: string): Promise<Topic> {
     const topic = this.topics.find(x => x.id === id);

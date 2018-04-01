@@ -1,8 +1,10 @@
 import { IAuthTokenMaster, IAuthUser } from "../../auth";
-import { Client } from "../client";
+import { Client, IClientRepo } from "../client";
 import { Token } from "./token";
 
 export interface ITokenRepo {
+  clientRepo: IClientRepo;
+
   findOne(id: string): Promise<Token>;
 
   findAll(authToken: IAuthTokenMaster): Promise<Token[]>;

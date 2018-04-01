@@ -7,7 +7,7 @@ import { ITokenDB, Token, TokenGeneral, TokenMaster } from "./token";
 export class TokenRepoMock implements ITokenRepo {
   private tokens: ITokenDB[] = [];
 
-  constructor(private clientRepo: IClientRepo) { }
+  constructor(public clientRepo: IClientRepo) { }
 
   async findOne(id: string): Promise<Token> {
     const token = this.tokens.find(x => x._id.toHexString() === id);

@@ -7,7 +7,7 @@ import { ITokenRepo } from "./itoken-repo";
 import { ITokenDB, Token, TokenGeneral, TokenMaster } from "./token";
 
 export class TokenRepo implements ITokenRepo {
-  constructor(private clientRepo: IClientRepo) { }
+  constructor(public clientRepo: IClientRepo) { }
 
   async findOne(id: string): Promise<Token> {
     const db = await DB;

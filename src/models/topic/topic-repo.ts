@@ -16,7 +16,7 @@ import {
 } from "./topic";
 
 export class TopicRepo implements ITopicRepo {
-  constructor(private resRepo: IResRepo) { }
+  constructor(public resRepo: IResRepo) { }
 
   async findOne(id: string): Promise<Topic> {
     const topics = await ESClient.search<ITopicDB["body"]>({
