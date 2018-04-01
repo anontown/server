@@ -53,9 +53,9 @@ export class TokenRepo implements ITokenRepo {
 
   async listClient(token: IAuthTokenMaster): Promise<Client[]> {
     const tokens = await this.findAll(token);
-    const clientIds = Array.from(new Set((tokens
+    const clientIds = [...new Set((tokens
       .map(t => t.type === "general" ? t.client.toString() : null)
-      .filter<string>((x): x is string => x !== null))));
+      .filter<string>((x): x is string => x !== null)))];
     return await this.clientRepo.findIn(clientIds);
   }
 
