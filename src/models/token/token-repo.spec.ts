@@ -160,6 +160,13 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
       await repo.insert(token3);
       await repo.insert(token4);
 
+      await repo.delClientToken({
+        id: ObjectIDGenerator(),
+        key: "key",
+        user: token.user,
+        type: "master"
+      }, token.client);
+
       await expect(repo.findOne(token1.id)).rejects.toThrow(AtError);
       await expect(repo.findOne(token2.id)).rejects.toThrow(AtError);
       expect(await repo.findOne(token3.id)).toEqual(token3);
