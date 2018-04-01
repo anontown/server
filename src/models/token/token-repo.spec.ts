@@ -166,6 +166,34 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
       expect(await repo.findOne(token4.id)).toEqual(token4);
     });
   });
+
+  describe("delMasterToken", () => {
+    it("正常に削除出来るか", async () => {
+      const repo = repoGene();
+
+      const token = new TokenMaster(ObjectIDGenerator(),
+        "key",
+        ObjectIDGenerator(),
+        new Date(0));
+
+      const token1 = token.copy({ id: ObjectIDGenerator() });
+      const token2 = token.copy({ id: ObjectIDGenerator() });
+      const token3 = token.copy({ id: ObjectIDGenerator(), user: ObjectIDGenerator() });
+
+      await repo.insert(token1);
+      await repo.insert(token2);
+      await repo.insert(token3);
+
+      await repo.delMasterToken({
+        id: token1.user,
+        pass: "pass"
+      });
+
+      await expect(repo.findOne(token1.id)).rejects.toThrow(AtError);
+      await expect(repo.findOne(token2.id)).rejects.toThrow(AtError);
+      expect(await repo.findOne(token3.id)).toEqual(token3);
+    });
+  });
 }
 
 describe("TokenRepoMock", () => {
