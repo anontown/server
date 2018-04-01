@@ -1,6 +1,5 @@
 import { AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster, IAuthUser } from "../../auth";
-import { Client } from "../client";
 import { ITokenRepo } from "./itoken-repo";
 import { ITokenDB, Token, TokenGeneral, TokenMaster } from "./token";
 
@@ -44,10 +43,10 @@ export class TokenRepoMock implements ITokenRepo {
     this.tokens[this.tokens.findIndex(x => x._id.toHexString() === token.id)] = token.toDB();
   }
 
-  async delClientToken(token: IAuthTokenMaster, client: Client): Promise<void> {
+  async delClientToken(token: IAuthTokenMaster, clientID: string): Promise<void> {
     this.tokens = this.tokens.filter(x => !(x.user.toHexString() === token.user
       && x.type === "general"
-      && x.client.toHexString() === client.id));
+      && x.client.toHexString() === clientID));
   }
 
   async delMasterToken(user: IAuthUser): Promise<void> {

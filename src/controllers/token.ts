@@ -62,7 +62,7 @@ export class TokenController {
   })
   async deleteClient({ params, auth, repo }: IHttpAPICallParams<{ client: string }>): Promise<null> {
     const client = await repo.client.findOne(params.client);
-    await repo.token.delClientToken(auth.tokenMaster, client);
+    await repo.token.delClientToken(auth.tokenMaster, client.id);
     return null;
   }
 

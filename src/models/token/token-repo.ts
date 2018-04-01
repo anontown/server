@@ -2,7 +2,6 @@ import { ObjectID } from "mongodb";
 import { AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster, IAuthUser } from "../../auth";
 import { DB } from "../../db";
-import { Client } from "../client";
 import { ITokenRepo } from "./itoken-repo";
 import { ITokenDB, Token, TokenGeneral, TokenMaster } from "./token";
 
@@ -49,10 +48,10 @@ export class TokenRepo implements ITokenRepo {
     await db.collection("tokens").update({ _id: new ObjectID(token.id) }, token.toDB());
   }
 
-  async delClientToken(token: IAuthTokenMaster, client: Client): Promise<void> {
+  async delClientToken(token: IAuthTokenMaster, clientID: string): Promise<void> {
     const db = await DB;
     await db.collection("tokens")
-      .remove({ user: new ObjectID(token.user), client: new ObjectID(client.id) });
+      .remove({ user: new ObjectID(token.user), client: new ObjectID(clientID) });
   }
 
   async delMasterToken(user: IAuthUser): Promise<void> {

@@ -1,5 +1,4 @@
 import { IAuthTokenMaster, IAuthUser } from "../../auth";
-import { Client } from "../client";
 import { Token } from "./token";
 
 export interface ITokenRepo {
@@ -11,7 +10,7 @@ export interface ITokenRepo {
 
   update(token: Token): Promise<void>;
 
-  delClientToken(token: IAuthTokenMaster, client: Client): Promise<void>;
+  delClientToken(token: IAuthTokenMaster, clientID: string): Promise<void>;
 
   delMasterToken(user: IAuthUser): Promise<void>;
 }
