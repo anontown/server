@@ -123,16 +123,4 @@ describe("Storage", () => {
       });
     });
   });
-
-  describe("changeData", () => {
-    it("正常に変更出来るか", () => {
-      expect(storage.changeData(authGeneral, "value2")).toEqual(storage.copy({ value: "value2" }));
-    });
-
-    it("valueが不正な時エラーになるか", () => {
-      expect(() => {
-        storage.changeData(authGeneral, "x".repeat(100001));
-      }).toThrow(AtError);
-    });
-  });
 });

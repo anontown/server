@@ -71,28 +71,11 @@ export class Storage extends Copyable<Storage> {
   }
 
   toAPI(authToken: IAuthToken): IStorageAPI {
-    this.auth(authToken);
-    return this.value;
-  }
-
-  changeData(authToken: IAuthToken, value: string): Storage {
-    this.auth(authToken);
-    paramsErrorMaker([
-      {
-        field: "value",
-        val: value,
-        regex: Config.user.storage.value.regex,
-        message: Config.user.storage.value.msg,
-      },
-    ]);
-
-    return this.copy({ value });
-  }
-
-  private auth(authToken: IAuthToken) {
     if (!(authToken.user === this.user && ((authToken.type === "master" && this.client === null) ||
       authToken.type === "general" && authToken.client === this.client))) {
       throw new AtRightError("権限がありません");
     }
+
+    return this.value;
   }
 }

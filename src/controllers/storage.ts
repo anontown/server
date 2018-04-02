@@ -3,6 +3,7 @@ import {
   http,
   IHttpAPICallParams,
 } from "../server";
+import { Storage, ObjectIDGenerator } from "../index";
 
 @controller
 export class StorageController {
@@ -26,8 +27,7 @@ export class StorageController {
     },
   })
   async setStorage({ params, auth, repo }: IHttpAPICallParams<{ key: string, value: string }>): Promise<null> {
-    const storage = await repo.storage.findOneKey(auth.token, params.key);
-    storage.changeData(auth.token, params.value);
+    const storage = Storage.create(ObjectIDGenerator, auth.token, params.key, params.value);
     await repo.storage.save(storage);
     return null;
   }
