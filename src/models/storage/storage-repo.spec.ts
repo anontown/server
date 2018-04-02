@@ -188,6 +188,30 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       expect(await repo.findOneKey(authGeneral, key)).toEqual(storageUpdate);
     });
   });
+
+  describe("del", () => {
+    it("正常に削除出来るか", async () => {
+      const repo = repoGene();
+
+      const client = ObjectIDGenerator();
+      const user = ObjectIDGenerator();
+      const key = "key";
+
+      const storage = new Storage(ObjectIDGenerator(), client, user, key, "value");
+      await repo.save(storage);
+      await repo.del(storage.copy({ id: ObjectIDGenerator() }));
+
+      const authGeneral: IAuthTokenGeneral = {
+        id: ObjectIDGenerator(),
+        key: "tk",
+        user: user,
+        type: "general",
+        client: client
+      };
+
+      expect(await repo.findOneKey(authGeneral, key)).rejects.toThrow(AtError);
+    });
+  });
 }
 
 describe("StorageRepoMock", () => {
