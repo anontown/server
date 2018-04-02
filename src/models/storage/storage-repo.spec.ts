@@ -141,6 +141,53 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       await expect(repo.findOneKey(authMaster, key)).rejects.toThrow(AtError);
     });
   });
+
+  describe("save", () => {
+    it("新しく作れるか", async () => {
+      const repo = repoGene();
+
+      const client = ObjectIDGenerator();
+      const user = ObjectIDGenerator();
+      const key = "key";
+
+      const storage = new Storage(ObjectIDGenerator(), client, user, key, "value");
+      await repo.save(storage);
+
+      const authGeneral: IAuthTokenGeneral = {
+        id: ObjectIDGenerator(),
+        key: "tk",
+        user: user,
+        type: "general",
+        client: client
+      };
+
+      expect(await repo.findOneKey(authGeneral, key)).toEqual(storage);
+    });
+
+    it("更新出来るか", async () => {
+      const repo = repoGene();
+
+      const client = ObjectIDGenerator();
+      const user = ObjectIDGenerator();
+      const key = "key";
+
+      const storage = new Storage(ObjectIDGenerator(), client, user, key, "value");
+      await repo.save(storage);
+
+      const storageUpdate = new Storage(ObjectIDGenerator(), client, user, key, "value2");
+      await repo.save(storageUpdate);
+
+      const authGeneral: IAuthTokenGeneral = {
+        id: ObjectIDGenerator(),
+        key: "tk",
+        user: user,
+        type: "general",
+        client: client
+      };
+
+      expect(await repo.findOneKey(authGeneral, key)).toEqual(storageUpdate);
+    });
+  });
 }
 
 describe("StorageRepoMock", () => {
