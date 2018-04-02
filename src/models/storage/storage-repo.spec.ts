@@ -22,7 +22,7 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
     it("正常に検索出来るか", async () => {
       const repo = repoGene();
 
-      const storage = new Storage(ObjectIDGenerator(), null, ObjectIDGenerator(), "key", "value");
+      const storage = new Storage(null, ObjectIDGenerator(), "key", "value");
 
       const client1 = ObjectIDGenerator();
       const client2 = ObjectIDGenerator();
@@ -49,49 +49,42 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       };
 
       const storage1 = storage.copy({
-        id: ObjectIDGenerator(),
         client: null,
         user: user1,
         key: key1
       });
 
       const storage2 = storage.copy({
-        id: ObjectIDGenerator(),
         client: null,
         user: user1,
         key: key2
       });
 
       const storage3 = storage.copy({
-        id: ObjectIDGenerator(),
         client: null,
         user: user2,
         key: key1
       });
 
       const storage4 = storage.copy({
-        id: ObjectIDGenerator(),
         client: client1,
         user: user1,
         key: key1
       });
 
       const storage5 = storage.copy({
-        id: ObjectIDGenerator(),
         client: client1,
         user: user1,
         key: key2
       });
 
       const storage6 = storage.copy({
-        id: ObjectIDGenerator(),
         client: client1,
         user: user2,
         key: key1
       });
 
       const storage7 = storage.copy({
-        id: ObjectIDGenerator(),
         client: client2,
         user: user1,
         key: key1
@@ -131,7 +124,7 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
         type: "master",
       };
 
-      const storage = new Storage(ObjectIDGenerator(), client, user, key, "value");
+      const storage = new Storage(client, user, key, "value");
 
       await repo.save(storage);
 
@@ -150,7 +143,7 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       const user = ObjectIDGenerator();
       const key = "key";
 
-      const storage = new Storage(ObjectIDGenerator(), client, user, key, "value");
+      const storage = new Storage(client, user, key, "value");
       await repo.save(storage);
 
       const authGeneral: IAuthTokenGeneral = {
@@ -171,10 +164,10 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       const user = ObjectIDGenerator();
       const key = "key";
 
-      const storage = new Storage(ObjectIDGenerator(), client, user, key, "value");
+      const storage = new Storage(client, user, key, "value");
       await repo.save(storage);
 
-      const storageUpdate = new Storage(ObjectIDGenerator(), client, user, key, "value2");
+      const storageUpdate = new Storage(client, user, key, "value2");
       await repo.save(storageUpdate);
 
       const authGeneral: IAuthTokenGeneral = {
@@ -197,9 +190,9 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       const user = ObjectIDGenerator();
       const key = "key";
 
-      const storage = new Storage(ObjectIDGenerator(), client, user, key, "value");
+      const storage = new Storage(client, user, key, "value");
       await repo.save(storage);
-      await repo.del(storage.copy({ id: ObjectIDGenerator() }));
+      await repo.del(storage);
 
       const authGeneral: IAuthTokenGeneral = {
         id: ObjectIDGenerator(),
@@ -220,12 +213,12 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       const client = ObjectIDGenerator();
       const user = ObjectIDGenerator();
 
-      const storage = new Storage(ObjectIDGenerator(), client, user, "key", "value");
-      await repo.save(storage.copy({ id: ObjectIDGenerator(), key: "a" }));
-      await repo.save(storage.copy({ id: ObjectIDGenerator(), key: "b" }));
-      await repo.save(storage.copy({ id: ObjectIDGenerator(), key: "c", user: ObjectIDGenerator() }));
-      await repo.save(storage.copy({ id: ObjectIDGenerator(), key: "d" }));
-      await repo.save(storage.copy({ id: ObjectIDGenerator(), key: "d", client: null }));
+      const storage = new Storage(client, user, "key", "value");
+      await repo.save(storage.copy({ key: "a" }));
+      await repo.save(storage.copy({ key: "b" }));
+      await repo.save(storage.copy({ key: "c", user: ObjectIDGenerator() }));
+      await repo.save(storage.copy({ key: "d" }));
+      await repo.save(storage.copy({ key: "d", client: null }));
 
       const authGeneral: IAuthTokenGeneral = {
         id: ObjectIDGenerator(),

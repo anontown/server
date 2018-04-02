@@ -10,12 +10,10 @@ import {
 describe("Storage", () => {
   const cleintID = ObjectIDGenerator();
   const userID = ObjectIDGenerator();
-  const storageID = ObjectIDGenerator();
   const authMasterID = ObjectIDGenerator();
   const authGeneralID = ObjectIDGenerator();
 
-  const storage = new Storage(storageID,
-    cleintID,
+  const storage = new Storage(cleintID,
     userID,
     "key",
     "value");
@@ -38,7 +36,6 @@ describe("Storage", () => {
   describe("fromDB", () => {
     it("正常に変換出来るか", () => {
       expect(Storage.fromDB({
-        _id: new ObjectID(storageID),
         client: new ObjectID(cleintID),
         user: new ObjectID(userID),
         key: "key",
@@ -46,7 +43,6 @@ describe("Storage", () => {
       })).toEqual(storage);
 
       expect(Storage.fromDB({
-        _id: new ObjectID(storageID),
         client: null,
         user: new ObjectID(userID),
         key: "key",
@@ -85,21 +81,21 @@ describe("Storage", () => {
 
   describe("create", () => {
     it("正常に作成出来るか", () => {
-      expect(Storage.create(() => storageID, authGeneral, "key", "value")).toEqual(storage);
-      expect(Storage.create(() => storageID, authMaster, "key", "value")).toEqual(storage.copy({ client: null }));
+      expect(Storage.create(authGeneral, "key", "value")).toEqual(storage);
+      expect(Storage.create(authMaster, "key", "value")).toEqual(storage.copy({ client: null }));
     });
 
     it("keyが不正な時エラーになるか", () => {
       for (const key of ["", "x".repeat(101)]) {
         expect(() => {
-          Storage.create(() => storageID, authGeneral, key, "value");
+          Storage.create(authGeneral, key, "value");
         }).toThrow(AtError);
       }
     });
 
     it("valueが不正な時エラーになるか", () => {
       expect(() => {
-        Storage.create(() => storageID, authGeneral, "key", "x".repeat(100001));
+        Storage.create(authGeneral, "key", "x".repeat(100001));
       }).toThrow(AtError);
     });
   });
@@ -107,7 +103,6 @@ describe("Storage", () => {
   describe("toDB", () => {
     it("正常に変換出来るか", () => {
       expect(storage.toDB()).toEqual({
-        _id: new ObjectID(storageID),
         client: new ObjectID(cleintID),
         user: new ObjectID(userID),
         key: "key",
@@ -115,7 +110,6 @@ describe("Storage", () => {
       });
 
       expect(storage.copy({ client: null }).toDB()).toEqual({
-        _id: new ObjectID(storageID),
         client: null,
         user: new ObjectID(userID),
         key: "key",
