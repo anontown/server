@@ -108,6 +108,38 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       expect(await repo.findOneKey(authMaster, key1)).toEqual(storage1);
       expect(await repo.findOneKey(authGeneral, key1)).toEqual(storage4);
     });
+
+    it("存在しない時エラーになるか(通常トークン)", async () => {
+      const repo = repoGene();
+
+      const client = ObjectIDGenerator();
+      const user = ObjectIDGenerator();
+      const key = "key";
+
+      const authGeneral: IAuthTokenGeneral = {
+        id: ObjectIDGenerator(),
+        key: "tk",
+        user: user,
+        type: "general",
+        client: client
+      };
+
+      const authMaster: IAuthTokenMaster = {
+        id: ObjectIDGenerator(),
+        key: "tk",
+        user: user,
+        type: "master",
+      };
+
+      const storage = new Storage(ObjectIDGenerator(), client, user, key, "value");
+
+      await repo.save(storage);
+
+      await expect(repo.findOneKey({ ...authGeneral, user: ObjectIDGenerator() }, key)).rejects.toThrow(AtError);
+      await expect(repo.findOneKey({ ...authGeneral, client: ObjectIDGenerator() }, key)).rejects.toThrow(AtError);
+      await expect(repo.findOneKey(authGeneral, "key2")).rejects.toThrow(AtError);
+      await expect(repo.findOneKey(authMaster, key)).rejects.toThrow(AtError);
+    });
   });
 }
 
