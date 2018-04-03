@@ -81,7 +81,7 @@ export class TopicRepo implements ITopicRepo {
   }
 
   async find(
-    titles: string[],
+    title: string,
     tags: string[],
     skip: number,
     limit: number,
@@ -94,7 +94,11 @@ export class TopicRepo implements ITopicRepo {
         query: {
           bool: {
             filter: [
-              ...titles.map(t => ({ match: { title: t } })),
+              {
+                match: {
+                  title: title
+                }
+              },
               ...tags.map(t => ({ match: { tags: t } })),
               ...activeOnly ? [{ match: { active: true } }] : [],
             ],

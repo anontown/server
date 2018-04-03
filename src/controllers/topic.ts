@@ -255,10 +255,7 @@ export class TopicController {
       required: ["title", "tags", "skip", "limit", "activeOnly"],
       properties: {
         title: {
-          type: "array",
-          items: {
-            type: "string",
-          },
+          type: "string",
         },
         tags: {
           type: "array",
@@ -279,7 +276,7 @@ export class TopicController {
     },
   })
   async find({ params, repo }: IHttpAPICallParams<{
-    title: string[],
+    title: string,
     tags: string[],
     skip: number,
     limit: number,

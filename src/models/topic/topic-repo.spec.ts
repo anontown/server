@@ -151,7 +151,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       await repo.insert(topic5);
 
 
-      expect(await repo.find([], [], 0, 10, true)).toEqual([
+      expect(await repo.find("", [], 0, 10, true)).toEqual([
         topic5,
         topic3,
         topic4,
@@ -159,29 +159,29 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic1,
       ]);
 
-      expect(await repo.find([], [], 1, 2, true)).toEqual([
+      expect(await repo.find("", [], 1, 2, true)).toEqual([
         topic3,
         topic4,
       ]);
 
-      expect(await repo.find([], ["a"], 0, 10, true)).toEqual([
+      expect(await repo.find("", ["a"], 0, 10, true)).toEqual([
         topic5,
         topic4,
         topic2,
         topic1,
       ]);
 
-      expect(await repo.find([], ["a", "b"], 0, 10, true)).toEqual([
+      expect(await repo.find("", ["a", "b"], 0, 10, true)).toEqual([
         topic2,
       ]);
 
-      expect(await repo.find(["x"], [], 0, 10, true)).toEqual([
+      expect(await repo.find("x", [], 0, 10, true)).toEqual([
         topic3,
         topic4,
         topic1,
       ]);
 
-      expect(await repo.find(["x", "y"], [], 0, 10, true)).toEqual([
+      expect(await repo.find("y x", [], 0, 10, true)).toEqual([
         topic3,
       ]);
     });

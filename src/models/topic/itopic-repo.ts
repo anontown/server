@@ -11,7 +11,7 @@ export interface ITopicRepo {
   findTags(limit: number): Promise<{ name: string, count: number }[]>;
 
   find(
-    titles: string[],
+    title: string,
     tags: string[],
     skip: number,
     limit: number,

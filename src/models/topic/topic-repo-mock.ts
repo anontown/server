@@ -51,11 +51,15 @@ export class TopicRepoMock implements ITopicRepo {
   }
 
   async find(
-    titles: string[],
+    title: string,
     tags: string[],
     skip: number,
     limit: number,
     activeOnly: boolean): Promise<Topic[]> {
+    const titles = title
+      .split(/\s/)
+      .filter(x => x.length !== 0);
+
     return this.aggregate(this.topics.filter<ITopicNormalDB | ITopicOneDB>
       ((x): x is ITopicNormalDB | ITopicOneDB => x.body.type === "normal" || x.body.type === "one")
       .filter(x => titles.every(t => x.body.title.includes(t)))
