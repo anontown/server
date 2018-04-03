@@ -89,7 +89,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
     it("正常に検索出来るか", async () => {
       const repo = repoGene();
       await repo.insert(topicNormal.copy({ id: "topic1", tags: Im.List(["a"]) }));
-      await repo.insert(topicNormal.copy({ id: "topic2", tags: Im.List([""]) }));
+      await repo.insert(topicNormal.copy({ id: "topic2", tags: Im.List([]) }));
       await repo.insert(topicNormal.copy({ id: "topic3", tags: Im.List(["a", "b"]) }));
       await repo.insert(topicNormal.copy({ id: "topic4", tags: Im.List(["b"]) }));
       await repo.insert(topicNormal.copy({ id: "topic5", tags: Im.List(["b", "c"]) }));
