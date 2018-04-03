@@ -1,5 +1,5 @@
 import { CronJob } from "cron";
-import { SearchResponse } from "elasticsearch";
+import { SearchResponse, Refresh } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { ESClient } from "../../db";
 import { IResRepo } from "../res";
@@ -16,7 +16,7 @@ import {
 } from "./topic";
 
 export class TopicRepo implements ITopicRepo {
-  constructor(public resRepo: IResRepo) { }
+  constructor(public resRepo: IResRepo, private refresh?: Refresh) { }
 
   async findOne(id: string): Promise<Topic> {
     const topics = await ESClient.search<ITopicDB["body"]>({
@@ -176,16 +176,18 @@ export class TopicRepo implements ITopicRepo {
       type: "doc",
       id: tDB.id,
       body: tDB.body,
+      refresh: this.refresh,
     });
   }
 
   async update(topic: Topic): Promise<void> {
     const tDB = topic.toDB();
-    await ESClient.update({
+    await ESClient.index({
       index: "topics",
       type: "doc",
       id: tDB.id,
       body: tDB.body,
+      refresh: this.refresh !== undefined ? this.refresh.toString() : undefined,
     });
   }
 
