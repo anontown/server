@@ -1,5 +1,5 @@
 import { CronJob } from "cron";
-import { SearchResponse, Refresh } from "elasticsearch";
+import { SearchResponse, Refresh, GetResponse } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { ESClient } from "../../db";
 import { IResRepo } from "../res";
@@ -19,23 +19,17 @@ export class TopicRepo implements ITopicRepo {
   constructor(public resRepo: IResRepo, private refresh?: Refresh) { }
 
   async findOne(id: string): Promise<Topic> {
-    const topics = await ESClient.search<ITopicDB["body"]>({
-      index: "topics",
-      size: 1,
-      body: {
-        query: {
-          term: {
-            _id: id,
-          },
-        },
-      },
-    });
-
-    if (topics.hits.total === 0) {
-      throw new AtNotFoundError("トピックが存在しません");
+    let topic: GetResponse<ITopicDB["body"]>;
+    try {
+      topic = await ESClient.get<ITopicDB["body"]>({
+        index: "topics",
+        type: "doc",
+        id,
+      });
+    } catch {
+      throw new AtNotFoundError("レスが存在しません");
     }
-
-    return (await this.aggregate(topics))[0];
+    return (await this.aggregate([{ id: topic._id, body: topic._source } as ITopicDB]))[0];
   }
 
   async findIn(ids: string[]): Promise<Topic[]> {
@@ -57,7 +51,7 @@ export class TopicRepo implements ITopicRepo {
         topics.hits.hits.map(t => t._id));
     }
 
-    return this.aggregate(topics);
+    return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source }) as ITopicDB));
   }
 
   async findTags(limit: number): Promise<{ name: string, count: number }[]> {
@@ -108,7 +102,7 @@ export class TopicRepo implements ITopicRepo {
       },
     });
 
-    return this.aggregate(topics);
+    return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source }) as ITopicDB));
   }
 
   async findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
@@ -132,7 +126,7 @@ export class TopicRepo implements ITopicRepo {
       },
     });
 
-    return this.aggregate(topics);
+    return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source }) as ITopicDB));
   }
 
   async cronTopicCheck(now: Date): Promise<void> {
@@ -191,11 +185,10 @@ export class TopicRepo implements ITopicRepo {
     });
   }
 
-  private async aggregate(topics: SearchResponse<ITopicDB["body"]>): Promise<Topic[]> {
-    const dbs = topics.hits.hits.map(x => ({ id: x._id, body: x._source }) as ITopicDB);
-    const count = await this.resRepo.resCount(dbs.map(x => x.id));
+  private async aggregate(topics: ITopicDB[]): Promise<Topic[]> {
+    const count = await this.resRepo.resCount(topics.map(x => x.id));
 
-    return dbs.map(x => {
+    return topics.map(x => {
       const c = count.get(x.id) || 0;
       switch (x.body.type) {
         case "normal":
