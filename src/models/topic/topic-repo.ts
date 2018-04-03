@@ -1,5 +1,5 @@
 import { CronJob } from "cron";
-import { SearchResponse, Refresh, GetResponse } from "elasticsearch";
+import { Refresh, GetResponse } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { ESClient } from "../../db";
 import { IResRepo } from "../res";
