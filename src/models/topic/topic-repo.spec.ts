@@ -5,7 +5,8 @@ import {
   TopicRepoMock,
   TopicRepo,
   ITopicRepo,
-  TopicNormal
+  TopicNormal,
+  AtError
 } from "../../";
 
 function run(repoGene: () => ITopicRepo, isReset: boolean) {
@@ -33,6 +34,14 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       await repo.insert(topicNormal.copy({ id: "topic2" }));
 
       expect(await repo.findOne("topic1")).toEqual(topicNormal);
+    });
+
+    it("存在しない時エラーになるか", async () => {
+      const repo = repoGene();
+
+      await repo.insert(topicNormal.copy({ id: "topic1" }));
+
+      await expect(repo.findOne("topic2")).rejects.toThrow(AtError);
     });
   });
 }
