@@ -10,7 +10,10 @@ import { History } from "../history";
 import { Res, ResFork, ResHistory, ResTopic } from "../res";
 import { User } from "../user";
 
-export type ITopicDB = ITopicNormalDB | ITopicOneDB | ITopicForkDB;
+export type ITopicDB = {
+  id: string,
+  body: ITopicNormalDB["body"] | ITopicOneDB["body"] | ITopicForkDB["body"]
+};
 
 export interface ITopicBaseDB<T extends TopicType, Body> {
   readonly id: string;

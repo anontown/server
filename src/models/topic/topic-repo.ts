@@ -103,7 +103,7 @@ export class TopicRepo implements ITopicRepo {
       },
     });
 
-    return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source }) as ITopicDB));
+    return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source })));
   }
 
   async findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
@@ -127,7 +127,7 @@ export class TopicRepo implements ITopicRepo {
       },
     });
 
-    return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source }) as ITopicDB));
+    return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source })));
   }
 
   async cronTopicCheck(now: Date): Promise<void> {

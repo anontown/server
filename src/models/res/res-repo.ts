@@ -23,7 +23,7 @@ export class ResRepo implements IResRepo {
     } catch {
       throw new AtNotFoundError("レスが存在しません");
     }
-    return (await this.aggregate([{ id: res._id, body: res._source } as IResDB]))[0];
+    return (await this.aggregate([{ id: res._id, body: res._source }]))[0];
   }
 
   async findIn(ids: string[]): Promise<Res[]> {
@@ -46,7 +46,7 @@ export class ResRepo implements IResRepo {
         reses.hits.hits.map(r => r._id));
     }
 
-    return this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
+    return this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
   }
 
   async find(topicID: string, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
@@ -76,7 +76,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    const result = await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
+    const result = await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
     if (type === "after") {
       result.reverse();
     }
@@ -97,7 +97,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
+    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
   }
 
   async findNotice(
@@ -137,7 +137,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    const result = await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
+    const result = await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
     if (type === "after") {
       result.reverse();
     }
@@ -163,7 +163,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
+    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
   }
 
   async findHash(hash: string): Promise<Res[]> {
@@ -180,7 +180,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
+    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
   }
 
   async findReply(resID: string): Promise<Res[]> {
@@ -202,7 +202,7 @@ export class ResRepo implements IResRepo {
       },
     });
 
-    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source } as IResDB)));
+    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
   }
 
   async insert(res: Res): Promise<void> {
