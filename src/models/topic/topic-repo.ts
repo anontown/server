@@ -56,6 +56,10 @@ export class TopicRepo implements ITopicRepo {
   }
 
   async findTags(limit: number): Promise<{ name: string, count: number }[]> {
+    if (limit === 0) {
+      return [];
+    }
+
     const data = await ESClient.search({
       index: "topics",
       size: 0,
