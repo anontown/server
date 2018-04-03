@@ -30,10 +30,13 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
     it("正常に取得出来るか", async () => {
       const repo = repoGene();
 
-      await repo.insert(topicNormal.copy({ id: "topic1" }));
-      await repo.insert(topicNormal.copy({ id: "topic2" }));
+      const topic1 = topicNormal.copy({ id: "topic1" });
+      const topic2 = topicNormal.copy({ id: "topic2" });
 
-      expect(await repo.findOne("topic1")).toEqual(topicNormal);
+      await repo.insert(topic1);
+      await repo.insert(topic2);
+
+      expect(await repo.findOne("topic1")).toEqual(topic1);
     });
 
     it("存在しない時エラーになるか", async () => {
