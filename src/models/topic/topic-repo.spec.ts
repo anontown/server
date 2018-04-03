@@ -84,6 +84,25 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       await expect(repo.findIn(["topic2", "topic1"])).rejects.toThrow(AtError);
     });
   });
+
+  describe("findTags", () => {
+    it("正常に検索出来るか", async () => {
+      const repo = repoGene();
+      await repo.insert(topicNormal.copy({ id: "topic1", tags: Im.List(["a"]) }));
+      await repo.insert(topicNormal.copy({ id: "topic2", tags: Im.List([""]) }));
+      await repo.insert(topicNormal.copy({ id: "topic3", tags: Im.List(["a", "b"]) }));
+      await repo.insert(topicNormal.copy({ id: "topic4", tags: Im.List(["b"]) }));
+      await repo.insert(topicNormal.copy({ id: "topic5", tags: Im.List(["b", "c"]) }));
+
+      expect(await repo.findTags(0)).toEqual([]);
+      expect(await repo.findTags(2)).toEqual([{ name: "b", count: 3 }, { name: "a", count: 2 }]);
+      expect(await repo.findTags(100)).toEqual([
+        { name: "b", count: 3 },
+        { name: "a", count: 2 },
+        { name: "c", count: 1 }
+      ]);
+    });
+  });
 }
 
 describe("TopicRepoMock", () => {
