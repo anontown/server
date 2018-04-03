@@ -99,11 +99,11 @@ export class TopicRepo implements ITopicRepo {
                   title: title,
                 },
               }] : [],
-              ...tags.length !== 0 ? [{
-                terms: {
-                  tags: tags,
+              ...tags.map(t => ({
+                term: {
+                  tags: t,
                 }
-              }] : [],
+              })),
               {
                 terms: {
                   type: ["normal", "one"],
