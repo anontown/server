@@ -96,11 +96,15 @@ export class TopicRepo implements ITopicRepo {
             filter: [
               {
                 match: {
-                  title: title
+                  title: title,
+                },
+              },
+              {
+                terms: {
+                  tags: tags,
                 }
               },
-              ...tags.map(t => ({ match: { tags: t } })),
-              ...activeOnly ? [{ match: { active: true } }] : [],
+              ...activeOnly ? [{ term: { active: true } }] : []
             ],
           },
           terms: {
