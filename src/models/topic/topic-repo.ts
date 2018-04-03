@@ -96,7 +96,10 @@ export class TopicRepo implements ITopicRepo {
             filter: [
               ...title.length !== 0 ? [{
                 match: {
-                  title: title,
+                  title: {
+                    query: title,
+                    operator: "and"
+                  },
                 },
               }] : [],
               ...tags.map(t => ({
