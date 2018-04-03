@@ -94,14 +94,15 @@ export class TopicRepo implements ITopicRepo {
         query: {
           bool: {
             filter: [
-              ...title.length !== 0 ? [{
+              {
                 match: {
                   title: {
                     query: title,
-                    operator: "and"
+                    operator: "and",
+                    zero_terms_query: "all"
                   },
                 },
-              }] : [],
+              },
               ...tags.map(t => ({
                 term: {
                   tags: t,
