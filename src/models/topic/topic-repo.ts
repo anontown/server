@@ -35,6 +35,7 @@ export class TopicRepo implements ITopicRepo {
   async findIn(ids: string[]): Promise<Topic[]> {
     const topics = await ESClient.search<ITopicDB["body"]>({
       index: "topics",
+      type: "doc",
       size: ids.length,
       body: {
         query: {
