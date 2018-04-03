@@ -104,11 +104,14 @@ export class TopicRepo implements ITopicRepo {
                   tags: tags,
                 }
               },
-              ...activeOnly ? [{ term: { active: true } }] : []
+              {
+                terms: {
+                  type: ["normal", "one"],
+                },
+              },
+              ...activeOnly ? [{ term: { active: true } }] : [],
+
             ],
-          },
-          terms: {
-            type: ["normal", "one"],
           },
         },
         sort: { ageUpdate: { order: "desc" } },
