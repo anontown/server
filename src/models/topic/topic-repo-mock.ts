@@ -30,7 +30,7 @@ export class TopicRepoMock implements ITopicRepo {
   async findIn(ids: string[]): Promise<Topic[]> {
     const topics = this.topics
       .filter(x => ids.includes(x.id))
-      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf());
+      .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf());
 
     if (topics.length !== ids.length) {
       throw new AtNotFoundPartError("トピックが存在しません",
