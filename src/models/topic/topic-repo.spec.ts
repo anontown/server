@@ -128,7 +128,6 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
 
   describe("find", () => {
     it("正常に検索出来るか", async () => {
-      //TODO:activeOnly
       const repo = repoGene();
 
       const topic1 = topicNormal.copy({
