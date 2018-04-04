@@ -70,7 +70,7 @@ export class UserController {
     },
   })
   async findID({ params, repo }: IHttpAPICallParams<{ sn: string }>): Promise<string> {
-    return (await repo.user.findID(params.sn)).toString();
+    return await repo.user.findID(params.sn);
   }
 
   @http({

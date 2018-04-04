@@ -1,5 +1,4 @@
 import { CronJob } from "cron";
-import { ObjectID } from "mongodb";
 import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { Logger } from "../../logger";
 import { IUserRepo } from "./iuser-repo";
@@ -18,14 +17,14 @@ export class UserRepoMock implements IUserRepo {
     return User.fromDB(user);
   }
 
-  async findID(sn: string): Promise<ObjectID> {
+  async findID(sn: string): Promise<string> {
     const user = this.users.find(x => x.sn === sn);
 
     if (user === undefined) {
       throw new AtNotFoundError("ユーザーが存在しません");
     }
 
-    return user._id;
+    return user._id.toHexString();
   }
 
   async insert(user: User): Promise<void> {

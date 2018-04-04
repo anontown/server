@@ -18,7 +18,7 @@ export class UserRepo implements IUserRepo {
     return User.fromDB(user);
   }
 
-  async findID(sn: string): Promise<ObjectID> {
+  async findID(sn: string): Promise<string> {
     const db = await DB;
     const user: IUserDB | null = await db.collection("users").findOne({ sn });
 
@@ -26,7 +26,7 @@ export class UserRepo implements IUserRepo {
       throw new AtNotFoundError("ユーザーが存在しません");
     }
 
-    return user._id;
+    return user._id.toHexString();
   }
 
   async insert(user: User): Promise<void> {
