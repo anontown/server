@@ -125,7 +125,7 @@ export class TopicRepo implements ITopicRepo {
     return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source })));
   }
 
-  async findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
+  async findFork(parentID: string, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
     const topics = await ESClient.search<ITopicForkDB["body"]>({
       index: "topics",
       size: limit,
@@ -136,7 +136,7 @@ export class TopicRepo implements ITopicRepo {
             filter: [
               {
                 match: {
-                  parent: parent.id
+                  parent: parentID
                 }
               },
               {

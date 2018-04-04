@@ -1,4 +1,4 @@
-import { Topic, TopicNormal } from "./topic";
+import { Topic } from "./topic";
 import { IResRepo } from "../res";
 
 export interface ITopicRepo {
@@ -17,7 +17,7 @@ export interface ITopicRepo {
     limit: number,
     activeOnly: boolean): Promise<Topic[]>;
 
-  findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]>;
+  findFork(parentID: string, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]>;
 
   cron(): void;
 

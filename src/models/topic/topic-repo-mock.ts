@@ -70,10 +70,10 @@ export class TopicRepoMock implements ITopicRepo {
       .slice(0, limit));
   }
 
-  async findFork(parent: TopicNormal, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
+  async findFork(parentID: string, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
     return this.aggregate(this.topics.filter<ITopicForkDB>
       ((x): x is ITopicForkDB => x.body.type === "fork")
-      .filter(x => x.body.parent === parent.id)
+      .filter(x => x.body.parent === parentID)
       .filter(x => activeOnly || x.body.active)
       .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf())
       .slice(skip)

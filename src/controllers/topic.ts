@@ -323,7 +323,7 @@ export class TopicController {
       throw new AtPrerequisiteError("親トピックは通常トピックのみ指定できます");
     }
 
-    const topic = await repo.topic.findFork(parent, params.skip, params.limit, params.activeOnly);
+    const topic = await repo.topic.findFork(parent.id, params.skip, params.limit, params.activeOnly);
     return topic.map(t => t.toAPI());
   }
 
