@@ -144,7 +144,7 @@ export class TopicRepo implements ITopicRepo {
                   type: "fork",
                 },
               },
-              ...activeOnly ? [{ match: { active: true } }] : [],
+              ...activeOnly ? [{ term: { active: true } }] : [],
             ],
           },
         },
