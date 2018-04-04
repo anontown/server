@@ -136,6 +136,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         tags: Im.List(["a"]),
         title: "x",
         ageUpdate: new Date(10),
+        active: false,
       });
 
       const topic2 = topicNormal.copy({
@@ -185,32 +186,31 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic3,
         topic4,
         topic2,
-        topic1,
       ]);
 
-      expect(await repo.find("", [], 1, 2, true)).toEqual([
+      expect(await repo.find("", [], 1, 2, false)).toEqual([
         topic3,
         topic4,
       ]);
 
-      expect(await repo.find("", ["a"], 0, 10, true)).toEqual([
+      expect(await repo.find("", ["a"], 0, 10, false)).toEqual([
         topic5,
         topic4,
         topic2,
         topic1,
       ]);
 
-      expect(await repo.find("", ["a", "b"], 0, 10, true)).toEqual([
+      expect(await repo.find("", ["a", "b"], 0, 10, false)).toEqual([
         topic2,
       ]);
 
-      expect(await repo.find("x", [], 0, 10, true)).toEqual([
+      expect(await repo.find("x", [], 0, 10, false)).toEqual([
         topic3,
         topic4,
         topic1,
       ]);
 
-      expect(await repo.find("y x", [], 0, 10, true)).toEqual([
+      expect(await repo.find("y x", [], 0, 10, false)).toEqual([
         topic3,
       ]);
     });
