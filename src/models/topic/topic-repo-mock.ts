@@ -64,7 +64,7 @@ export class TopicRepoMock implements ITopicRepo {
       ((x): x is ITopicNormalDB | ITopicOneDB => x.body.type === "normal" || x.body.type === "one")
       .filter(x => titles.every(t => x.body.title.includes(t)))
       .filter(x => tags.every(t => x.body.tags.includes(t)))
-      .filter(x => activeOnly || x.body.active)
+      .filter(x => !activeOnly || x.body.active)
       .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf())
       .slice(skip)
       .slice(0, limit));
@@ -74,7 +74,7 @@ export class TopicRepoMock implements ITopicRepo {
     return this.aggregate(this.topics.filter<ITopicForkDB>
       ((x): x is ITopicForkDB => x.body.type === "fork")
       .filter(x => x.body.parent === parentID)
-      .filter(x => activeOnly || x.body.active)
+      .filter(x => !activeOnly || x.body.active)
       .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf())
       .slice(skip)
       .slice(0, limit));
