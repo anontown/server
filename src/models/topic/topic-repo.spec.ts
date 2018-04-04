@@ -214,6 +214,77 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       ]);
     });
   });
+
+  describe("findFork", () => {
+    it("正常に検索出来るか", async () => {
+      const repo = repoGene();
+
+      const topic1 = topicNormal.copy({
+        id: "topic1",
+        ageUpdate: new Date(20),
+      });
+
+      const topic2 = topicFork.copy({
+        id: "topic2",
+        parent: "topic1",
+        ageUpdate: new Date(30),
+      });
+
+      const topic3 = topicNormal.copy({
+        id: "topic3",
+        ageUpdate: new Date(40),
+      });
+
+      const topic4 = topicFork.copy({
+        id: "topic4",
+        parent: "topic1",
+        ageUpdate: new Date(10),
+        active: false
+      });
+
+      const topic5 = topicFork.copy({
+        id: "topic5",
+        parent: "topic2",
+        ageUpdate: new Date(50),
+      });
+
+      const topic6 = topicFork.copy({
+        id: "topic6",
+        parent: "topic1",
+        ageUpdate: new Date(60),
+      });
+
+      await repo.insert(topic1);
+      await repo.insert(topic2);
+      await repo.insert(topic3);
+      await repo.insert(topic4);
+      await repo.insert(topic5);
+      await repo.insert(topic6);
+
+      expect(await repo.findFork("topic1", 0, 10, false)).toEqual([
+        topic6,
+        topic2,
+        topic4,
+      ]);
+
+      expect(await repo.findFork("topic1", 1, 10, false)).toEqual([
+        topic2,
+        topic4,
+      ]);
+
+      expect(await repo.findFork("topic1", 0, 2, false)).toEqual([
+        topic6,
+        topic2,
+      ]);
+
+      expect(await repo.findFork("topic3", 0, 10, false)).toEqual([]);
+
+      expect(await repo.findFork("topic1", 0, 10, true)).toEqual([
+        topic6,
+        topic2,
+      ]);
+    });
+  });
 }
 
 describe("TopicRepoMock", () => {
