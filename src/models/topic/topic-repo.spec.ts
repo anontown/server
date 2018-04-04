@@ -7,6 +7,8 @@ import {
   ITopicRepo,
   TopicNormal,
   AtError,
+  TopicOne,
+  TopicFork,
 } from "../../";
 
 function run(repoGene: () => ITopicRepo, isReset: boolean) {
@@ -19,6 +21,25 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
     0,
     new Date(10),
     true);
+
+  const topicOne = new TopicOne("topico",
+    "title",
+    Im.List(),
+    "body",
+    new Date(20),
+    new Date(0),
+    0,
+    new Date(10),
+    true);
+
+  const topicFork = new TopicFork("topicf",
+    "title",
+    new Date(20),
+    new Date(0),
+    0,
+    new Date(10),
+    true,
+    "topicn");
 
   beforeEach(async () => {
     if (isReset) {
@@ -54,8 +75,8 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
 
       const topic1 = topicNormal.copy({ id: "topic1", ageUpdate: new Date(50) });
       const topic2 = topicNormal.copy({ id: "topic2", ageUpdate: new Date(80) });
-      const topic3 = topicNormal.copy({ id: "topic3", ageUpdate: new Date(30) });
-      const topic4 = topicNormal.copy({ id: "topic4", ageUpdate: new Date(90) });
+      const topic3 = topicOne.copy({ id: "topic3", ageUpdate: new Date(30) });
+      const topic4 = topicFork.copy({ id: "topic4", ageUpdate: new Date(90) });
 
       await repo.insert(topic1);
       await repo.insert(topic2);
@@ -90,9 +111,10 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       const repo = repoGene();
       await repo.insert(topicNormal.copy({ id: "topic1", tags: Im.List(["a"]) }));
       await repo.insert(topicNormal.copy({ id: "topic2", tags: Im.List([]) }));
-      await repo.insert(topicNormal.copy({ id: "topic3", tags: Im.List(["a", "b"]) }));
+      await repo.insert(topicOne.copy({ id: "topic3", tags: Im.List(["a", "b"]) }));
       await repo.insert(topicNormal.copy({ id: "topic4", tags: Im.List(["b"]) }));
       await repo.insert(topicNormal.copy({ id: "topic5", tags: Im.List(["b", "c"]) }));
+      await repo.insert(topicFork.copy({ id: "topic6", parent: "topic1" }));
 
       expect(await repo.findTags(0)).toEqual([]);
       expect(await repo.findTags(2)).toEqual([{ name: "b", count: 3 }, { name: "a", count: 2 }]);
@@ -123,7 +145,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         ageUpdate: new Date(20),
       });
 
-      const topic3 = topicNormal.copy({
+      const topic3 = topicOne.copy({
         id: "topic3",
         tags: Im.List([]),
         title: "x y",
@@ -137,11 +159,17 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         ageUpdate: new Date(30),
       });
 
-      const topic5 = topicNormal.copy({
+      const topic5 = topicOne.copy({
         id: "topic5",
         tags: Im.List(["a"]),
         title: "",
         ageUpdate: new Date(50),
+      });
+
+      const topic6 = topicFork.copy({
+        id: "topic6",
+        parent: "topic1",
+        title: "x"
       });
 
       await repo.insert(topic1);
@@ -149,6 +177,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       await repo.insert(topic3);
       await repo.insert(topic4);
       await repo.insert(topic5);
+      await repo.insert(topic6);
 
 
       expect(await repo.find("", [], 0, 10, true)).toEqual([
