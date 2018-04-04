@@ -174,6 +174,7 @@ export class TopicRepo implements ITopicRepo {
           },
         },
       },
+      refresh: !!this.refresh
     });
   }
 
