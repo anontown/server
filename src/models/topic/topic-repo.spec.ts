@@ -316,7 +316,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       const topic5 = topicFork.copy({
         id: "topic5",
         parent: "topic2",
-        update: new Date(100000),
+        update: new Date(50000000),
       });
 
       await repo.insert(topic1);
