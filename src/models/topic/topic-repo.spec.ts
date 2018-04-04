@@ -285,6 +285,55 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       ]);
     });
   });
+
+  describe("cronTopicCheck", () => {
+    it("正常に更新出来るか", async () => {
+      const repo = repoGene();
+
+      const topic1 = topicNormal.copy({
+        id: "topic1",
+        update: new Date(20),
+      });
+
+      const topic2 = topicFork.copy({
+        id: "topic2",
+        parent: "topic1",
+        update: new Date(30),
+      });
+
+      const topic3 = topicOne.copy({
+        id: "topic3",
+        update: new Date(40),
+      });
+
+      const topic4 = topicFork.copy({
+        id: "topic4",
+        parent: "topic1",
+        update: new Date(10),
+        active: false
+      });
+
+      const topic5 = topicFork.copy({
+        id: "topic5",
+        parent: "topic2",
+        update: new Date(100000),
+      });
+
+      await repo.insert(topic1);
+      await repo.insert(topic2);
+      await repo.insert(topic3);
+      await repo.insert(topic4);
+      await repo.insert(topic5);
+
+      await repo.cronTopicCheck(new Date(10000));
+
+      expect(await repo.findOne(topic1.id)).toEqual(topic1);
+      expect(await repo.findOne(topic3.id)).toEqual(topic2.copy({ active: false }));
+      expect(await repo.findOne(topic4.id)).toEqual(topic2.copy({ active: false }));
+      expect(await repo.findOne(topic4.id)).toEqual(topic4);
+      expect(await repo.findOne(topic5.id)).toEqual(topic5);
+    });
+  });
 }
 
 describe("TopicRepoMock", () => {
