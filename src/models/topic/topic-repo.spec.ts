@@ -334,6 +334,46 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       expect(await repo.findOne(topic5.id)).toEqual(topic5);
     });
   });
+
+  describe("insert", () => {
+    it("正常に保存出来るか", async () => {
+      const repo = repoGene();
+
+      await repo.insert(topicNormal);
+      await repo.insert(topicOne);
+      await repo.insert(topicFork);
+
+      expect(await repo.findOne(topicNormal.id)).toEqual(topicNormal);
+      expect(await repo.findOne(topicOne.id)).toEqual(topicOne);
+      expect(await repo.findOne(topicFork.id)).toEqual(topicFork);
+    });
+
+    // TODO:ID被り
+  });
+
+  describe("update", () => {
+    it("正常に更新出来るか", async () => {
+      const repo = repoGene();
+
+      await repo.insert(topicNormal);
+      await repo.insert(topicOne);
+      await repo.insert(topicFork);
+
+      const t1 = topicNormal.copy({ title: "update1" });
+      const t2 = topicOne.copy({ title: "update2" });
+      const t3 = topicFork.copy({ title: "update3" });
+
+      await repo.update(t1);
+      await repo.update(t2);
+      await repo.update(t3);
+
+      expect(await repo.findOne(t1.id)).toEqual(t1);
+      expect(await repo.findOne(t2.id)).toEqual(t2);
+      expect(await repo.findOne(t3.id)).toEqual(t3);
+    });
+
+    // TODO:存在しないID
+  });
 }
 
 describe("TopicRepoMock", () => {
