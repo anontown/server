@@ -1,5 +1,5 @@
-import { Topic } from "./topic";
 import { IResRepo } from "../res";
+import { Topic } from "./topic";
 
 export interface ITopicRepo {
   resRepo: IResRepo;

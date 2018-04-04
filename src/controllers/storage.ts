@@ -1,9 +1,9 @@
+import { Storage } from "../index";
 import {
   controller,
   http,
   IHttpAPICallParams,
 } from "../server";
-import { Storage } from "../index";
 
 @controller
 export class StorageController {

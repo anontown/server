@@ -1,14 +1,14 @@
 import * as Im from "immutable";
 import {
-  dbReset,
-  ResRepoMock,
-  TopicRepoMock,
-  TopicRepo,
-  ITopicRepo,
-  TopicNormal,
   AtError,
-  TopicOne,
+  dbReset,
+  ITopicRepo,
+  ResRepoMock,
   TopicFork,
+  TopicNormal,
+  TopicOne,
+  TopicRepo,
+  TopicRepoMock,
 } from "../../";
 
 function run(repoGene: () => ITopicRepo, isReset: boolean) {
@@ -121,7 +121,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       expect(await repo.findTags(100)).toEqual([
         { name: "b", count: 3 },
         { name: "a", count: 2 },
-        { name: "c", count: 1 }
+        { name: "c", count: 1 },
       ]);
     });
   });
@@ -169,7 +169,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       const topic6 = topicFork.copy({
         id: "topic6",
         parent: "topic1",
-        title: "x"
+        title: "x",
       });
 
       await repo.insert(topic1);
@@ -178,7 +178,6 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       await repo.insert(topic4);
       await repo.insert(topic5);
       await repo.insert(topic6);
-
 
       expect(await repo.find("", [], 0, 10, true)).toEqual([
         topic5,
@@ -239,7 +238,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         id: "topic4",
         parent: "topic1",
         ageUpdate: new Date(10),
-        active: false
+        active: false,
       });
 
       const topic5 = topicFork.copy({
@@ -310,7 +309,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         id: "topic4",
         parent: "topic1",
         update: new Date(10),
-        active: false
+        active: false,
       });
 
       const topic5 = topicFork.copy({

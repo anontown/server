@@ -21,10 +21,10 @@ export interface IVote {
 
 export type ResType = "normal" | "history" | "topic" | "fork";
 
-export type IResDB = {
-  id: string,
-  body: IResNormalDB["body"] | IResHistoryDB["body"] | IResTopicDB["body"] | IResForkDB["body"]
-};
+export interface IResDB {
+  id: string;
+  body: IResNormalDB["body"] | IResHistoryDB["body"] | IResTopicDB["body"] | IResForkDB["body"];
+}
 
 export function fromDBToRes(db: IResNormalDB, replyCount: number): ResNormal;
 export function fromDBToRes(db: IResHistoryDB, replyCount: number): ResHistory;

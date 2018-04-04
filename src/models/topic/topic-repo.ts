@@ -1,5 +1,5 @@
 import { CronJob } from "cron";
-import { Refresh, GetResponse } from "elasticsearch";
+import { GetResponse, Refresh } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { ESClient } from "../../db";
 import { IResRepo } from "../res";
@@ -99,14 +99,14 @@ export class TopicRepo implements ITopicRepo {
                   title: {
                     query: title,
                     operator: "and",
-                    zero_terms_query: "all"
+                    zero_terms_query: "all",
                   },
                 },
               },
               ...tags.map(t => ({
                 term: {
                   tags: t,
-                }
+                },
               })),
               {
                 terms: {
@@ -136,8 +136,8 @@ export class TopicRepo implements ITopicRepo {
             filter: [
               {
                 match: {
-                  parent: parentID
-                }
+                  parent: parentID,
+                },
               },
               {
                 term: {
@@ -177,12 +177,12 @@ export class TopicRepo implements ITopicRepo {
                 terms: {
                   type: ["one", "fork"],
                 },
-              }
-            ]
-          }
+              },
+            ],
+          },
         },
       },
-      refresh: !!this.refresh
+      refresh: !!this.refresh,
     });
   }
 

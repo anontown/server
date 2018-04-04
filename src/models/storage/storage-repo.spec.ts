@@ -1,15 +1,14 @@
 import {
   AtError,
   dbReset,
-  Storage,
+  IAuthTokenGeneral,
+  IAuthTokenMaster,
+  IStorageRepo,
   ObjectIDGenerator,
+  Storage,
   StorageRepo,
   StorageRepoMock,
-  IStorageRepo,
-  IAuthTokenGeneral,
-  IAuthTokenMaster
 } from "../../";
-
 
 function run(repoGene: () => IStorageRepo, isReset: boolean) {
   beforeEach(async () => {
@@ -38,7 +37,7 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
         key: "tk",
         user: user1,
         type: "general",
-        client: client1
+        client: client1,
       };
 
       const authMaster: IAuthTokenMaster = {
@@ -51,43 +50,43 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       const storage1 = storage.copy({
         client: null,
         user: user1,
-        key: key1
+        key: key1,
       });
 
       const storage2 = storage.copy({
         client: null,
         user: user1,
-        key: key2
+        key: key2,
       });
 
       const storage3 = storage.copy({
         client: null,
         user: user2,
-        key: key1
+        key: key1,
       });
 
       const storage4 = storage.copy({
         client: client1,
         user: user1,
-        key: key1
+        key: key1,
       });
 
       const storage5 = storage.copy({
         client: client1,
         user: user1,
-        key: key2
+        key: key2,
       });
 
       const storage6 = storage.copy({
         client: client1,
         user: user2,
-        key: key1
+        key: key1,
       });
 
       const storage7 = storage.copy({
         client: client2,
         user: user1,
-        key: key1
+        key: key1,
       });
 
       await repo.save(storage1);
@@ -112,15 +111,15 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       const authGeneral: IAuthTokenGeneral = {
         id: ObjectIDGenerator(),
         key: "tk",
-        user: user,
+        user,
         type: "general",
-        client: client
+        client,
       };
 
       const authMaster: IAuthTokenMaster = {
         id: ObjectIDGenerator(),
         key: "tk",
-        user: user,
+        user,
         type: "master",
       };
 
@@ -149,9 +148,9 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       const authGeneral: IAuthTokenGeneral = {
         id: ObjectIDGenerator(),
         key: "tk",
-        user: user,
+        user,
         type: "general",
-        client: client
+        client,
       };
 
       expect(await repo.findOneKey(authGeneral, key)).toEqual(storage);
@@ -173,9 +172,9 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       const authGeneral: IAuthTokenGeneral = {
         id: ObjectIDGenerator(),
         key: "tk",
-        user: user,
+        user,
         type: "general",
-        client: client
+        client,
       };
 
       expect(await repo.findOneKey(authGeneral, key)).toEqual(storageUpdate);
@@ -197,9 +196,9 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       const authGeneral: IAuthTokenGeneral = {
         id: ObjectIDGenerator(),
         key: "tk",
-        user: user,
+        user,
         type: "general",
-        client: client
+        client,
       };
 
       await expect(repo.findOneKey(authGeneral, key)).rejects.toThrow(AtError);
@@ -223,9 +222,9 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
       const authGeneral: IAuthTokenGeneral = {
         id: ObjectIDGenerator(),
         key: "tk",
-        user: user,
+        user,
         type: "general",
-        client: client
+        client,
       };
 
       expect(await repo.list(authGeneral)).toEqual(["a", "b", "d"]);

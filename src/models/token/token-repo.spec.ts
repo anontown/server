@@ -1,15 +1,14 @@
+import * as Im from "immutable";
 import {
   AtError,
   dbReset,
   ITokenRepo,
   ObjectIDGenerator,
+  TokenGeneral,
   TokenMaster,
   TokenRepo,
   TokenRepoMock,
-  TokenGeneral,
 } from "../../";
-import * as Im from "immutable";
-
 
 function run(repoGene: () => ITokenRepo, isReset: boolean) {
   beforeEach(async () => {
@@ -164,7 +163,7 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
         id: ObjectIDGenerator(),
         key: "key",
         user: token.user,
-        type: "master"
+        type: "master",
       }, token.client);
 
       await expect(repo.findOne(token1.id)).rejects.toThrow(AtError);
@@ -193,7 +192,7 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
 
       await repo.delMasterToken({
         id: token1.user,
-        pass: "pass"
+        pass: "pass",
       });
 
       await expect(repo.findOne(token1.id)).rejects.toThrow(AtError);
