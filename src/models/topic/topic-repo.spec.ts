@@ -316,7 +316,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       const topic5 = topicFork.copy({
         id: "topic5",
         parent: "topic2",
-        update: new Date(50000000),
+        update: new Date(500000000),
       });
 
       await repo.insert(topic1);
@@ -325,7 +325,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       await repo.insert(topic4);
       await repo.insert(topic5);
 
-      await repo.cronTopicCheck(new Date(100000000));
+      await repo.cronTopicCheck(new Date(1000000000));
 
       expect(await repo.findOne(topic1.id)).toEqual(topic1);
       expect(await repo.findOne(topic2.id)).toEqual(topic2.copy({ active: false }));

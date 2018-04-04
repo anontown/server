@@ -169,7 +169,7 @@ export class TopicRepo implements ITopicRepo {
               {
                 range: {
                   update: {
-                    lt: new Date(now.valueOf() - 1000 * 60 * 60 * 24).toISOString(),
+                    lt: new Date(now.valueOf() - 1000 * 60 * 60 * 24 * 7).toISOString(),
                   },
                 },
               },
