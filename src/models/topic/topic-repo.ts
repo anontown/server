@@ -134,12 +134,18 @@ export class TopicRepo implements ITopicRepo {
         query: {
           bool: {
             filter: [
-              { match: { parent: parent.id } },
+              {
+                match: {
+                  parent: parent.id
+                }
+              },
+              {
+                term: {
+                  type: "fork",
+                },
+              },
               ...activeOnly ? [{ match: { active: true } }] : [],
             ],
-          },
-          term: {
-            type: "fork",
           },
         },
         sort: { ageUpdate: { order: "desc" } },
