@@ -328,8 +328,8 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       await repo.cronTopicCheck(new Date(10000));
 
       expect(await repo.findOne(topic1.id)).toEqual(topic1);
-      expect(await repo.findOne(topic3.id)).toEqual(topic2.copy({ active: false }));
-      expect(await repo.findOne(topic4.id)).toEqual(topic2.copy({ active: false }));
+      expect(await repo.findOne(topic2.id)).toEqual(topic2.copy({ active: false }));
+      expect(await repo.findOne(topic3.id)).toEqual(topic3.copy({ active: false }));
       expect(await repo.findOne(topic4.id)).toEqual(topic4);
       expect(await repo.findOne(topic5.id)).toEqual(topic5);
     });
