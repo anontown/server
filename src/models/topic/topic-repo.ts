@@ -164,14 +164,22 @@ export class TopicRepo implements ITopicRepo {
           inline: "ctx._source.active = false",
         },
         query: {
-          range: {
-            update: {
-              lt: new Date(now.valueOf() - 1000 * 60 * 60 * 24).toISOString(),
-            },
-          },
-          terms: {
-            type: ["one", "fork"],
-          },
+          bool: {
+            filter: [
+              {
+                range: {
+                  update: {
+                    lt: new Date(now.valueOf() - 1000 * 60 * 60 * 24).toISOString(),
+                  },
+                },
+              },
+              {
+                terms: {
+                  type: ["one", "fork"],
+                },
+              }
+            ]
+          }
         },
       },
       refresh: !!this.refresh
