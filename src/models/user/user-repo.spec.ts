@@ -51,6 +51,25 @@ function run(repoGene: () => IUserRepo, isReset: boolean) {
       await expect(repo.findOne(ObjectIDGenerator())).rejects.toThrow(AtError);
     });
   });
+
+  describe("findID", () => {
+    it("正常に取得出来るか", async () => {
+      const repo = repoGene();
+
+      await repo.insert(user);
+      await repo.insert(user.copy({ id: ObjectIDGenerator() }));
+
+      expect(await repo.findID(user.sn)).toEqual(user.id);
+    });
+
+    it("存在しない時エラーになるか", async () => {
+      const repo = repoGene();
+
+      await repo.insert(user);
+
+      await expect(repo.findID("sn2")).rejects.toThrow(AtError);
+    });
+  });
 }
 
 describe("UserRepoMock", () => {
