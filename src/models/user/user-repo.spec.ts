@@ -6,6 +6,7 @@ import {
   UserRepoMock,
   IUserRepo,
   User,
+  ResWaitCountKey,
 } from "../../";
 
 function run(repoGene: () => IUserRepo, isReset: boolean) {
@@ -142,6 +143,60 @@ function run(repoGene: () => IUserRepo, isReset: boolean) {
         expect(await repo.findOne(u.id)).toEqual(u.copy({ point: 0 }));
       }
     });
+  });
+
+  describe("cronCountReset", () => {
+    for (let t of ["m10", "m30", "h1", "h6", "h12", "d1"] as ResWaitCountKey[]) {
+      it("正常に更新出来るか:" + t, async () => {
+        const repo = repoGene();
+
+        const users = [
+          user.copy({
+            id: ObjectIDGenerator(), sn: "sn1", resWait: {
+              last: new Date(310),
+              m10: 0,
+              m30: 10,
+              h1: 20,
+              h6: 0,
+              h12: 30,
+              d1: 40,
+            }
+          }),
+          user.copy({
+            id: ObjectIDGenerator(), sn: "sn2", resWait: {
+              last: new Date(330),
+              m10: 10,
+              m30: 20,
+              h1: 0,
+              h6: 30,
+              h12: 40,
+              d1: 0,
+            }
+          }),
+          user.copy({
+            id: ObjectIDGenerator(), sn: "sn3", resWait: {
+              last: new Date(320),
+              m10: 20,
+              m30: 0,
+              h1: 10,
+              h6: 40,
+              h12: 0,
+              d1: 30,
+            }
+          }),
+        ];
+
+        for (let u of users) {
+          await repo.insert(u);
+        }
+
+        await repo.cronCountReset(t);
+
+        for (let u of users) {
+          expect(await repo.findOne(u.id)).toEqual(u.copy({ resWait: { ...u.resWait, [t]: 0 } }));
+        }
+      });
+    }
   });
 }
 
