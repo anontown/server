@@ -88,6 +88,39 @@ function run(repoGene: () => IUserRepo, isReset: boolean) {
       await expect(repo.insert(user.copy({ id: ObjectIDGenerator() }))).rejects.toThrow(AtError);
     });
   });
+
+  describe("update", () => {
+    it("正常に更新出来るか", async () => {
+      const repo = repoGene();
+
+      const user1 = user.copy({ id: ObjectIDGenerator(), sn: "sn1" });
+      const user2 = user.copy({ id: ObjectIDGenerator(), sn: "sn2" });
+      const user1update = user1.copy({ sn: "update" });
+
+      await repo.insert(user1);
+      await repo.insert(user2);
+
+      await repo.update(user1update);
+
+      expect(await repo.findOne(user1.id)).toEqual(user1update);
+      expect(await repo.findOne(user2.id)).toEqual(user2);
+    });
+
+    it("sn被りでエラーになるか", async () => {
+      const repo = repoGene();
+
+      const user1 = user.copy({ id: ObjectIDGenerator(), sn: "sn1" });
+      const user2 = user.copy({ id: ObjectIDGenerator(), sn: "sn2" });
+      const user1update = user1.copy({ sn: "sn2" });
+
+      await repo.insert(user1);
+      await repo.insert(user2);
+
+      await expect(repo.update(user1update)).rejects.toThrow(AtError);
+    });
+
+    // TODO:存在しないID
+  });
 }
 
 describe("UserRepoMock", () => {
