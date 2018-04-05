@@ -38,7 +38,7 @@ function run(repoGene: () => IUserRepo, isReset: boolean) {
       const repo = repoGene();
 
       await repo.insert(user);
-      await repo.insert(user.copy({ id: ObjectIDGenerator() }));
+      await repo.insert(user.copy({ id: ObjectIDGenerator(), sn: "sn2" }));
 
       expect(await repo.findOne(user.id)).toEqual(user);
     });
@@ -57,7 +57,7 @@ function run(repoGene: () => IUserRepo, isReset: boolean) {
       const repo = repoGene();
 
       await repo.insert(user);
-      await repo.insert(user.copy({ id: ObjectIDGenerator() }));
+      await repo.insert(user.copy({ id: ObjectIDGenerator(), sn: "sn2" }));
 
       expect(await repo.findID(user.sn)).toEqual(user.id);
     });
