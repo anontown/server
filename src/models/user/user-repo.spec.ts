@@ -70,6 +70,24 @@ function run(repoGene: () => IUserRepo, isReset: boolean) {
       await expect(repo.findID("sn2")).rejects.toThrow(AtError);
     });
   });
+
+  describe("insert", () => {
+    it("正常に保存出来るか", async () => {
+      const repo = repoGene();
+
+      await repo.insert(user);
+
+      expect(await repo.findOne(user.id)).toEqual(user);
+    });
+
+    it("スクリーンネーム被りでエラーになるか", async () => {
+      const repo = repoGene();
+
+      await repo.insert(user);
+
+      await expect(repo.insert(user.copy({ id: ObjectIDGenerator() }))).rejects.toThrow(AtError);
+    });
+  });
 }
 
 describe("UserRepoMock", () => {
