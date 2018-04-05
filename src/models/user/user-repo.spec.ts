@@ -121,6 +121,28 @@ function run(repoGene: () => IUserRepo, isReset: boolean) {
 
     // TODO:存在しないID
   });
+
+  describe("cronPointReset", () => {
+    it("正常に更新出来るか", async () => {
+      const repo = repoGene();
+
+      const users = [
+        user.copy({ id: ObjectIDGenerator(), sn: "sn1", point: 10 }),
+        user.copy({ id: ObjectIDGenerator(), sn: "sn2", point: 0 }),
+        user.copy({ id: ObjectIDGenerator(), sn: "sn3", point: 1 }),
+      ];
+
+      for (let u of users) {
+        await repo.insert(u);
+      }
+
+      await repo.cronPointReset();
+
+      for (let u of users) {
+        expect(await repo.findOne(u.id)).toEqual(u.copy({ point: 0 }));
+      }
+    });
+  });
 }
 
 describe("UserRepoMock", () => {
