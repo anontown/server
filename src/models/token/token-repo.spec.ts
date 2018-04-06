@@ -17,9 +17,18 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
     }
   });
 
+  const userID = ObjectIDGenerator();
+
   const tokenMaster = new TokenMaster(ObjectIDGenerator(),
     "key",
+    userID,
+    new Date(0));
+
+  const tokenGeneral = new TokenGeneral(ObjectIDGenerator(),
+    "key",
     ObjectIDGenerator(),
+    userID,
+    Im.List(),
     new Date(0));
 
 
@@ -28,9 +37,10 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
       const repo = repoGene();
 
       await repo.insert(tokenMaster);
-      await repo.insert(tokenMaster.copy({ id: ObjectIDGenerator() }));
+      await repo.insert(tokenGeneral);
 
       expect(await repo.findOne(tokenMaster.id)).toEqual(tokenMaster);
+      expect(await repo.findOne(tokenGeneral.id)).toEqual(tokenGeneral);
     });
 
     it("存在しない時エラーになるか", async () => {
@@ -51,9 +61,9 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
       const user3 = ObjectIDGenerator();
 
       const token1 = tokenMaster.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(50) });
-      const token2 = tokenMaster.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(80) });
+      const token2 = tokenGeneral.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(80) });
       const token3 = tokenMaster.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(30) });
-      const token4 = tokenMaster.copy({ id: ObjectIDGenerator(), user: user2, date: new Date(90) });
+      const token4 = tokenGeneral.copy({ id: ObjectIDGenerator(), user: user2, date: new Date(90) });
 
       await repo.insert(token1);
       await repo.insert(token2);
@@ -106,16 +116,21 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
       const repo = repoGene();
 
       const token1 = tokenMaster.copy({ id: ObjectIDGenerator(), key: "key1" });
-      const token2 = tokenMaster.copy({ id: ObjectIDGenerator(), key: "key2" });
+      const token2 = tokenGeneral.copy({ id: ObjectIDGenerator(), key: "key2" });
       const token1update = token1.copy({ key: "update" });
+      const token2update = token2.copy({ key: "update" });
 
       await repo.insert(token1);
       await repo.insert(token2);
 
       await repo.update(token1update);
 
-      expect(await repo.findOne(token1.id)).toEqual(token1update);
       expect(await repo.findOne(token2.id)).toEqual(token2);
+
+      await repo.update(token2update);
+
+      expect(await repo.findOne(token1.id)).toEqual(token1update);
+      expect(await repo.findOne(token2.id)).toEqual(token2update);
     });
 
     // TODO:存在しないID
@@ -125,34 +140,30 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
     it("正常に削除出来るか", async () => {
       const repo = repoGene();
 
-      const token = new TokenGeneral(ObjectIDGenerator(),
-        "key",
-        ObjectIDGenerator(),
-        ObjectIDGenerator(),
-        Im.List(),
-        new Date(0));
-
-      const token1 = token.copy({ id: ObjectIDGenerator() });
-      const token2 = token.copy({ id: ObjectIDGenerator() });
-      const token3 = token.copy({ id: ObjectIDGenerator(), client: ObjectIDGenerator() });
-      const token4 = token.copy({ id: ObjectIDGenerator(), user: ObjectIDGenerator() });
+      const token1 = tokenGeneral.copy({ id: ObjectIDGenerator() });
+      const token2 = tokenGeneral.copy({ id: ObjectIDGenerator() });
+      const token3 = tokenGeneral.copy({ id: ObjectIDGenerator(), client: ObjectIDGenerator() });
+      const token4 = tokenGeneral.copy({ id: ObjectIDGenerator(), user: ObjectIDGenerator() });
+      const token5 = tokenMaster.copy({ id: ObjectIDGenerator() });
 
       await repo.insert(token1);
       await repo.insert(token2);
       await repo.insert(token3);
       await repo.insert(token4);
+      await repo.insert(token5);
 
       await repo.delClientToken({
         id: ObjectIDGenerator(),
         key: "key",
-        user: token.user,
+        user: tokenGeneral.user,
         type: "master",
-      }, token.client);
+      }, tokenGeneral.client);
 
       await expect(repo.findOne(token1.id)).rejects.toThrow(AtError);
       await expect(repo.findOne(token2.id)).rejects.toThrow(AtError);
       expect(await repo.findOne(token3.id)).toEqual(token3);
       expect(await repo.findOne(token4.id)).toEqual(token4);
+      expect(await repo.findOne(token5.id)).toEqual(token5);
     });
   });
 
@@ -163,10 +174,12 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
       const token1 = tokenMaster.copy({ id: ObjectIDGenerator() });
       const token2 = tokenMaster.copy({ id: ObjectIDGenerator() });
       const token3 = tokenMaster.copy({ id: ObjectIDGenerator(), user: ObjectIDGenerator() });
+      const token4 = tokenGeneral.copy({ id: ObjectIDGenerator() });
 
       await repo.insert(token1);
       await repo.insert(token2);
       await repo.insert(token3);
+      await repo.insert(token4);
 
       await repo.delMasterToken({
         id: token1.user,
@@ -176,6 +189,7 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
       await expect(repo.findOne(token1.id)).rejects.toThrow(AtError);
       await expect(repo.findOne(token2.id)).rejects.toThrow(AtError);
       expect(await repo.findOne(token3.id)).toEqual(token3);
+      expect(await repo.findOne(token4.id)).toEqual(token4);
     });
   });
 }
