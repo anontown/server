@@ -529,26 +529,26 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
 
       await repo.insert(resNormal.copy({ id: "res0" }));
 
-      for (const i of range(1, 100)) {
+      for (const i of range(1, 25)) {
         await repo.insert(resNormal.copy({ id: "res" + i, reply: { user: "user", res: "res" + (i - 1) } }));
       }
 
-      for (let i = 100; i < 125; i++) {
+      for (let i = 25; i < 50; i++) {
         await repo.insert(resHistory.copy({ id: "res" + i, topic: "topic1" }));
       }
 
-      for (let i = 125; i < 150; i++) {
+      for (let i = 50; i < 75; i++) {
         await repo.insert(resTopic.copy({ id: "res" + i, topic: "topic1" }));
       }
 
-      for (let i = 150; i < 175; i++) {
+      for (let i = 75; i < 100; i++) {
         await repo.insert(resFork.copy({ id: "res" + i, topic: "topic1" }));
       }
 
       expect(await repo.replyCount([])).toEqual(new Map());
       expect(await repo.replyCount(["res1"])).toEqual(new Map([["res1", 1]]));
-      expect(await repo.replyCount(range(0, 100).map(x => "res" + x)))
-        .toEqual(new Map(range(0, 99).map<[string, number]>(x => ["res" + x, 1])));
+      expect(await repo.replyCount(range(0, 25).map(x => "res" + x)))
+        .toEqual(new Map(range(0, 24).map<[string, number]>(x => ["res" + x, 1])));
     });
   });
 }
