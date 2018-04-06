@@ -17,28 +17,26 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
     }
   });
 
+  const tokenMaster = new TokenMaster(ObjectIDGenerator(),
+    "key",
+    ObjectIDGenerator(),
+    new Date(0));
+
+
   describe("findOne", () => {
     it("正常に探せるか", async () => {
       const repo = repoGene();
 
-      const token = new TokenMaster(ObjectIDGenerator(),
-        "key",
-        ObjectIDGenerator(),
-        new Date(0));
+      await repo.insert(tokenMaster);
+      await repo.insert(tokenMaster.copy({ id: ObjectIDGenerator() }));
 
-      await repo.insert(token);
-      await repo.insert(token.copy({ id: ObjectIDGenerator() }));
-
-      expect(await repo.findOne(token.id)).toEqual(token);
+      expect(await repo.findOne(tokenMaster.id)).toEqual(tokenMaster);
     });
 
     it("存在しない時エラーになるか", async () => {
       const repo = repoGene();
 
-      await repo.insert(new TokenMaster(ObjectIDGenerator(),
-        "key",
-        ObjectIDGenerator(),
-        new Date(0)));
+      await repo.insert(tokenMaster);
 
       await expect(repo.findOne(ObjectIDGenerator())).rejects.toThrow(AtError);
     });
@@ -48,19 +46,14 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
     it("正常に探せるか", async () => {
       const repo = repoGene();
 
-      const token = new TokenMaster(ObjectIDGenerator(),
-        "key",
-        ObjectIDGenerator(),
-        new Date(0));
-
       const user1 = ObjectIDGenerator();
       const user2 = ObjectIDGenerator();
       const user3 = ObjectIDGenerator();
 
-      const token1 = token.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(50) });
-      const token2 = token.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(80) });
-      const token3 = token.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(30) });
-      const token4 = token.copy({ id: ObjectIDGenerator(), user: user2, date: new Date(90) });
+      const token1 = tokenMaster.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(50) });
+      const token2 = tokenMaster.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(80) });
+      const token3 = tokenMaster.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(30) });
+      const token4 = tokenMaster.copy({ id: ObjectIDGenerator(), user: user2, date: new Date(90) });
 
       await repo.insert(token1);
       await repo.insert(token2);
@@ -100,14 +93,9 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
     it("正常に保存出来るか", async () => {
       const repo = repoGene();
 
-      const token = new TokenMaster(ObjectIDGenerator(),
-        "key",
-        ObjectIDGenerator(),
-        new Date(0));
+      await repo.insert(tokenMaster);
 
-      await repo.insert(token);
-
-      expect(await repo.findOne(token.id)).toEqual(token);
+      expect(await repo.findOne(tokenMaster.id)).toEqual(tokenMaster);
     });
 
     // TODO:ID被り
@@ -117,13 +105,8 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
     it("正常に更新出来るか", async () => {
       const repo = repoGene();
 
-      const token = new TokenMaster(ObjectIDGenerator(),
-        "key",
-        ObjectIDGenerator(),
-        new Date(0));
-
-      const token1 = token.copy({ id: ObjectIDGenerator(), key: "key1" });
-      const token2 = token.copy({ id: ObjectIDGenerator(), key: "key2" });
+      const token1 = tokenMaster.copy({ id: ObjectIDGenerator(), key: "key1" });
+      const token2 = tokenMaster.copy({ id: ObjectIDGenerator(), key: "key2" });
       const token1update = token1.copy({ key: "update" });
 
       await repo.insert(token1);
@@ -177,14 +160,9 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
     it("正常に削除出来るか", async () => {
       const repo = repoGene();
 
-      const token = new TokenMaster(ObjectIDGenerator(),
-        "key",
-        ObjectIDGenerator(),
-        new Date(0));
-
-      const token1 = token.copy({ id: ObjectIDGenerator() });
-      const token2 = token.copy({ id: ObjectIDGenerator() });
-      const token3 = token.copy({ id: ObjectIDGenerator(), user: ObjectIDGenerator() });
+      const token1 = tokenMaster.copy({ id: ObjectIDGenerator() });
+      const token2 = tokenMaster.copy({ id: ObjectIDGenerator() });
+      const token3 = tokenMaster.copy({ id: ObjectIDGenerator(), user: ObjectIDGenerator() });
 
       await repo.insert(token1);
       await repo.insert(token2);
