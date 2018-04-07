@@ -416,7 +416,7 @@ updateFunc.push(async () => {
   });
 
   await ESClient.indices.create({
-    index: "reses",
+    index: "reses_1",
     body: {
       mappings: {
         doc: {
@@ -498,7 +498,7 @@ updateFunc.push(async () => {
   });
 
   await ESClient.indices.create({
-    index: "histories",
+    index: "histories_1",
     body: {
       mappings: {
         doc: {
@@ -532,7 +532,7 @@ updateFunc.push(async () => {
   });
 
   await ESClient.indices.create({
-    index: "msgs",
+    index: "msgs_1",
     body: {
       mappings: {
         doc: {
@@ -554,7 +554,7 @@ updateFunc.push(async () => {
   });
 
   await ESClient.indices.create({
-    index: "topics",
+    index: "topics_1",
     body: {
       mappings: {
         doc: {
@@ -598,6 +598,26 @@ updateFunc.push(async () => {
         },
       },
     },
+  });
+
+  await ESClient.indices.putAlias({
+    name: "reses",
+    index: "reses_1"
+  });
+
+  await ESClient.indices.putAlias({
+    name: "histories",
+    index: "histories_1"
+  });
+
+  await ESClient.indices.putAlias({
+    name: "msgs",
+    index: "msgs_1"
+  });
+
+  await ESClient.indices.putAlias({
+    name: "topics",
+    index: "topics_1"
   });
 });
 
