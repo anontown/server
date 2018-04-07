@@ -108,7 +108,7 @@ describe("TopicNormal", () => {
         auth,
         "title2",
         ["x"],
-        "body2",
+        "text2",
         new Date(1000))).toEqual({
           topic: topic.copy({
             update: new Date(1000),
