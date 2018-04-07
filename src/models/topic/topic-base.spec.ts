@@ -43,8 +43,8 @@ describe("TopicBase", () => {
 
   describe("checkData", () => {
     it("正常に動くか", () => {
-      TopicBase.checkData({ title: "title", tags: ["a", "b"], body: "body" });
-      TopicBase.checkData({ title: "title", tags: [], body: "body" });
+      TopicBase.checkData({ title: "title", tags: ["a", "b"], text: "text" });
+      TopicBase.checkData({ title: "title", tags: [], text: "text" });
     });
 
     it("タイトルが長すぎるとエラーになるか", () => {
@@ -100,7 +100,7 @@ describe("TopicBase", () => {
 
     it("本文が長すぎるとエラーになるか", () => {
       expect(() => {
-        TopicBase.checkData({ body: "x".repeat(10001) });
+        TopicBase.checkData({ text: "x".repeat(10001) });
       }).toThrow(AtError);
     });
   });
@@ -137,7 +137,7 @@ describe("TopicBase", () => {
 
   describe("resUpdate", () => {
     const resNormal = new ResNormal(null,
-      "body",
+      "text",
       null,
       "active",
       null,

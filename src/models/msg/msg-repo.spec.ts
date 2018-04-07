@@ -20,7 +20,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
 
       const msg = new Msg("msg",
         "user",
-        "body",
+        "text",
         new Date(0));
 
       await repo.insert(msg);
@@ -34,7 +34,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
 
       await repo.insert(new Msg("msg",
         "user",
-        "body",
+        "text",
         new Date(0)));
 
       await expect(repo.findOne("msg2")).rejects.toThrow(AtError);
@@ -47,7 +47,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
 
       const msg = new Msg("msg",
         "user",
-        "body",
+        "text",
         new Date(0));
 
       const msg1 = msg.copy({ id: "msg1", date: new Date(50) });
@@ -78,7 +78,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
 
       const msg = new Msg("msg",
         "user",
-        "body",
+        "text",
         new Date(0));
 
       await repo.insert(msg);
@@ -94,7 +94,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
 
       const msg = new Msg("msg",
         "user",
-        "body",
+        "text",
         new Date(0));
 
       const user1 = "user1";
@@ -190,7 +190,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
 
       const msg = new Msg("msg",
         "user",
-        "body",
+        "text",
         new Date(0));
 
       const msg1 = msg.copy({ id: "msg1", date: new Date(50), receiver: null });
@@ -224,7 +224,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
 
       const msg = new Msg("msg",
         "user",
-        "body",
+        "text",
         new Date(0));
 
       await repo.insert(msg);
@@ -241,12 +241,12 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
 
       const msg = new Msg("msg",
         "user",
-        "body",
+        "text",
         new Date(0));
 
       const msg1 = msg.copy({ id: "msg1" });
       const msg2 = msg.copy({ id: "msg2" });
-      const msg1update = msg1.copy({ body: "update" });
+      const msg1update = msg1.copy({ text: "update" });
 
       await repo.insert(msg1);
       await repo.insert(msg2);

@@ -8,7 +8,7 @@ export interface IMsgDB {
   readonly id: string;
   readonly body: {
     readonly receiver: string | null,
-    readonly body: string,
+    readonly text: string,
     readonly date: string,
   };
 }
@@ -16,26 +16,26 @@ export interface IMsgDB {
 export interface IMsgAPI {
   readonly id: string;
   readonly receiver: string | null;
-  readonly body: string;
+  readonly text: string;
   readonly date: string;
 }
 
 export class Msg extends Copyable<Msg> {
   static fromDB(m: IMsgDB): Msg {
-    return new Msg(m.id, m.body.receiver, m.body.body, new Date(m.body.date));
+    return new Msg(m.id, m.body.receiver, m.body.text, new Date(m.body.date));
   }
 
-  static create(objidGenerator: IGenerator<string>, receiver: User | null, body: string, now: Date): Msg {
+  static create(objidGenerator: IGenerator<string>, receiver: User | null, text: string, now: Date): Msg {
     return new Msg(objidGenerator(),
       receiver !== null ? receiver.id : null,
-      body,
+      text,
       now);
   }
 
   constructor(
     readonly id: string,
     readonly receiver: string | null,
-    readonly body: string,
+    readonly text: string,
     readonly date: Date) {
     super(Msg);
   }
@@ -45,7 +45,7 @@ export class Msg extends Copyable<Msg> {
       id: this.id,
       body: {
         receiver: this.receiver,
-        body: this.body,
+        text: this.text,
         date: this.date.toISOString(),
       },
     };
@@ -59,7 +59,7 @@ export class Msg extends Copyable<Msg> {
     return {
       id: this.id,
       receiver: this.receiver,
-      body: this.body,
+      text: this.text,
       date: this.date.toISOString(),
     };
   }

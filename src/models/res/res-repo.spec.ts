@@ -21,7 +21,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
   });
 
   const resNormal = new ResNormal("name",
-    "body",
+    "text",
     null,
     "active",
     null,
@@ -466,7 +466,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       const res3 = resFork.copy({ id: "res4" });
       const res4 = resHistory.copy({ id: "res5" });
 
-      const res1update = res1.copy({ body: "update" });
+      const res1update = res1.copy({ text: "update" });
       const res2update = res2.copy({ topic: "update" });
       const res3update = res3.copy({ fork: "update" });
       const res4update = res4.copy({ history: "update" });

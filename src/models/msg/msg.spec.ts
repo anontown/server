@@ -6,8 +6,8 @@ import {
 } from "../../";
 
 describe("Msg", () => {
-  const msg = new Msg("msg", "user", "body", new Date(0));
-  const receiverNullMsg = new Msg("msg", null, "body", new Date(0));
+  const msg = new Msg("msg", "user", "text", new Date(0));
+  const receiverNullMsg = new Msg("msg", null, "text", new Date(0));
   const auth: IAuthTokenMaster = {
     id: "token",
     key: "key",
@@ -21,7 +21,7 @@ describe("Msg", () => {
         id: "msg",
         body: {
           receiver: "user",
-          body: "body",
+          text: "text",
           date: new Date(0).toISOString(),
         },
       });
@@ -33,7 +33,7 @@ describe("Msg", () => {
       expect(msg.toAPI(auth)).toEqual({
         id: "msg",
         receiver: "user",
-        body: "body",
+        text: "text",
         date: new Date(0).toISOString(),
       });
     });
@@ -42,7 +42,7 @@ describe("Msg", () => {
       expect(receiverNullMsg.toAPI(auth)).toEqual({
         id: "msg",
         receiver: null,
-        body: "body",
+        text: "text",
         date: new Date(0).toISOString(),
       });
     });
@@ -60,7 +60,7 @@ describe("Msg", () => {
         id: "msg",
         body: {
           receiver: "user",
-          body: "body",
+          text: "text",
           date: new Date(0).toISOString(),
         },
       })).toEqual(msg);
@@ -69,7 +69,7 @@ describe("Msg", () => {
 
   describe("create", () => {
     it("receiverがnullの時正常に生成できるか", () => {
-      expect(Msg.create(() => "msg", null, "body", new Date(0))).toEqual(receiverNullMsg);
+      expect(Msg.create(() => "msg", null, "text", new Date(0))).toEqual(receiverNullMsg);
     });
 
     it("receiverがnullでない時正常に生成出来るか", () => {
@@ -91,7 +91,7 @@ describe("Msg", () => {
         new Date(20),
         0,
         new Date(250));
-      expect(Msg.create(() => "msg", user, "body", new Date(0))).toEqual(msg);
+      expect(Msg.create(() => "msg", user, "text", new Date(0))).toEqual(msg);
     });
   });
 });

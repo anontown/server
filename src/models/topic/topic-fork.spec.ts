@@ -46,7 +46,7 @@ describe("TopicFork", () => {
   const parent = new TopicNormal("parent",
     "title",
     Im.List(),
-    "body",
+    "text",
     new Date(100),
     new Date(0),
     5,

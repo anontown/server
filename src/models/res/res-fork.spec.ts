@@ -12,7 +12,7 @@ describe("ResFork", () => {
     "topic",
     "title",
     Im.List(),
-    "body",
+    "text",
     new Date(100),
     new Date(0),
     10,

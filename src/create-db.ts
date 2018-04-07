@@ -380,11 +380,7 @@ updateFunc.push((async () => {
 updateFunc.push(async () => {
   const db = await DB;
 
-  await db.collection("histories").update({}, { $rename: { text: "body" } }, { multi: true });
-  await db.collection("msgs").update({}, { $rename: { text: "body" } }, { multi: true });
-  await db.collection("profiles").update({}, { $rename: { text: "body" } }, { multi: true });
-  await db.collection("reses").update({}, { $rename: { text: "body" }, $unset: { "vote.lv": 1 } }, { multi: true });
-  await db.collection("topics").update({}, { $rename: { text: "body" } }, { multi: true });
+  await db.collection("reses").update({}, { $unset: { "vote.lv": 1 } }, { multi: true });
 
   await ESClient.putTemplate({
     id: "template",
@@ -459,7 +455,7 @@ updateFunc.push(async () => {
             name: {
               type: "text",
             },
-            body: {
+            text: {
               type: "text",
             },
             reply: {
@@ -513,7 +509,7 @@ updateFunc.push(async () => {
             tags: {
               type: "keyword",
             },
-            body: {
+            text: {
               type: "text",
             },
             date: {
@@ -541,7 +537,7 @@ updateFunc.push(async () => {
             receiver: {
               type: "keyword",
             },
-            body: {
+            text: {
               type: "text",
             },
             date: {
@@ -584,7 +580,7 @@ updateFunc.push(async () => {
             tags: {
               type: "keyword",
             },
-            body: {
+            text: {
               type: "text",
             },
 

@@ -9,7 +9,7 @@ export interface IProfileDB {
   readonly _id: ObjectID;
   readonly user: ObjectID;
   readonly name: string;
-  readonly body: string;
+  readonly text: string;
   readonly date: Date;
   readonly update: Date;
   readonly sn: string;
@@ -19,7 +19,7 @@ export interface IProfileAPI {
   readonly id: string;
   readonly user: string | null;
   readonly name: string;
-  readonly body: string;
+  readonly text: string;
   readonly date: string;
   readonly update: string;
   readonly sn: string;
@@ -27,14 +27,14 @@ export interface IProfileAPI {
 
 export class Profile extends Copyable<Profile> {
   static fromDB(p: IProfileDB): Profile {
-    return new Profile(p._id.toString(), p.user.toString(), p.name, p.body, p.date, p.update, p.sn);
+    return new Profile(p._id.toString(), p.user.toString(), p.name, p.text, p.date, p.update, p.sn);
   }
 
   static create(
     objidGenerator: IGenerator<string>,
     authToken: IAuthToken,
     name: string,
-    body: string,
+    text: string,
     sn: string,
     now: Date): Profile {
     paramsErrorMaker([
@@ -45,10 +45,10 @@ export class Profile extends Copyable<Profile> {
         message: Config.user.profile.name.msg,
       },
       {
-        field: "body",
-        val: body,
-        regex: Config.user.profile.body.regex,
-        message: Config.user.profile.body.msg,
+        field: "text",
+        val: text,
+        regex: Config.user.profile.text.regex,
+        message: Config.user.profile.text.msg,
       },
       {
         field: "sn",
@@ -61,7 +61,7 @@ export class Profile extends Copyable<Profile> {
     return new Profile(objidGenerator(),
       authToken.user,
       name,
-      body,
+      text,
       now,
       now,
       sn);
@@ -71,7 +71,7 @@ export class Profile extends Copyable<Profile> {
     readonly id: string,
     readonly user: string,
     readonly name: string,
-    readonly body: string,
+    readonly text: string,
     readonly date: Date,
     readonly update: Date,
     readonly sn: string) {
@@ -83,7 +83,7 @@ export class Profile extends Copyable<Profile> {
       _id: new ObjectID(this.id),
       user: new ObjectID(this.user),
       name: this.name,
-      body: this.body,
+      text: this.text,
       date: this.date,
       update: this.update,
       sn: this.sn,
@@ -95,14 +95,14 @@ export class Profile extends Copyable<Profile> {
       id: this.id,
       user: authToken !== null && authToken.user === this.user ? this.user : null,
       name: this.name,
-      body: this.body,
+      text: this.text,
       date: this.date.toISOString(),
       update: this.update.toISOString(),
       sn: this.sn,
     };
   }
 
-  changeData(authToken: IAuthToken, name: string, body: string, sn: string, now: Date) {
+  changeData(authToken: IAuthToken, name: string, text: string, sn: string, now: Date) {
     if (authToken.user !== this.user) {
       throw new AtRightError("人のプロフィール変更は出来ません");
     }
@@ -114,10 +114,10 @@ export class Profile extends Copyable<Profile> {
         message: Config.user.profile.name.msg,
       },
       {
-        field: "body",
-        val: body,
-        regex: Config.user.profile.body.regex,
-        message: Config.user.profile.body.msg,
+        field: "text",
+        val: text,
+        regex: Config.user.profile.text.regex,
+        message: Config.user.profile.text.msg,
       },
       {
         field: "sn",
@@ -129,7 +129,7 @@ export class Profile extends Copyable<Profile> {
 
     return this.copy({
       name,
-      body,
+      text,
       sn,
       update: now,
     });

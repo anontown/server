@@ -22,7 +22,7 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
         "topic",
         "title",
         Im.List(["x"]),
-        "body",
+        "text",
         new Date(0),
         "hash",
         "user");
@@ -40,7 +40,7 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
         "topic",
         "title",
         Im.List(["x"]),
-        "body",
+        "text",
         new Date(0),
         "hash",
         "user"));
@@ -57,7 +57,7 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
         "topic",
         "title",
         Im.List(["x"]),
-        "body",
+        "text",
         new Date(0),
         "hash",
         "user");
@@ -92,7 +92,7 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
         "topic",
         "title",
         Im.List(["x"]),
-        "body",
+        "text",
         new Date(0),
         "hash",
         "user");
@@ -112,7 +112,7 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
         "topic",
         "title",
         Im.List(["x"]),
-        "body",
+        "text",
         new Date(0),
         "hash",
         "user");
@@ -149,7 +149,7 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
         "topic",
         "title",
         Im.List(["x"]),
-        "body",
+        "text",
         new Date(0),
         "hash",
         "user");
@@ -170,14 +170,14 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
         "topic",
         "title",
         Im.List(["x"]),
-        "body",
+        "text",
         new Date(0),
         "hash",
         "user");
 
       const history1 = history.copy({ id: "history1" });
       const history2 = history.copy({ id: "history2" });
-      const history1update = history1.copy({ body: "update" });
+      const history1update = history1.copy({ text: "update" });
 
       await repo.insert(history1);
       await repo.insert(history2);

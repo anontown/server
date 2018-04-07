@@ -59,7 +59,7 @@ export interface IResBaseDB<T extends ResType, Body> {
 
 export type IResNormalDB = IResBaseDB<"normal", {
   readonly name: string | null,
-  readonly body: string,
+  readonly text: string,
   readonly reply: IReply | null,
   readonly deleteFlag: ResDeleteFlag,
   readonly profile: string | null,
@@ -95,7 +95,7 @@ export interface IResBaseAPI<T extends ResAPIType> {
 
 export interface IResNormalAPI extends IResBaseAPI<"normal"> {
   readonly name: string | null;
-  readonly body: string;
+  readonly text: string;
   readonly reply: string | null;
   readonly profile: string | null;
   readonly isReply: boolean | null;
@@ -217,7 +217,7 @@ export type Res = ResNormal | ResHistory | ResTopic | ResFork;
 export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", ResNormal> {
   static fromDB(r: IResNormalDB, replyCount: number): ResNormal {
     return new ResNormal(r.body.name,
-      r.body.body,
+      r.body.text,
       r.body.reply,
       r.body.deleteFlag,
       r.body.profile,
@@ -238,16 +238,16 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
     user: User,
     _authToken: IAuthToken,
     name: string | null,
-    body: string,
+    text: string,
     reply: Res | null,
     profile: Profile | null,
     age: boolean,
     now: Date) {
     const bodyCheck = {
-      field: "body",
-      val: body,
-      regex: Config.res.body.regex,
-      message: Config.res.body.msg,
+      field: "text",
+      val: text,
+      regex: Config.res.text.regex,
+      message: Config.res.text.msg,
     };
 
     paramsErrorMaker(name !== null ?
@@ -276,7 +276,7 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
     const newUser = user.changeLastRes(now);
 
     const result = new ResNormal(name,
-      body,
+      text,
       reply !== null ? { res: reply.id, user: reply.user } : null,
       "active",
       profile !== null ? profile.id : null,
@@ -303,7 +303,7 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
 
   constructor(
     readonly name: string | null,
-    readonly body: string,
+    readonly text: string,
     readonly reply: IReply | null,
     readonly deleteFlag: ResDeleteFlag,
     readonly profile: string | null,
@@ -322,7 +322,7 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
   toDB(): IResNormalDB {
     return this.toBaseDB({
       name: this.name,
-      body: this.body,
+      text: this.text,
       reply: this.reply,
       deleteFlag: this.deleteFlag,
       profile: this.profile,
@@ -335,7 +335,7 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
       return {
         ...this.toBaseAPI(authToken),
         name: this.name,
-        body: this.body,
+        text: this.text,
         reply: this.reply !== null ? this.reply.res : null,
         profile: this.profile !== null ? this.profile : null,
         isReply: authToken === null || this.reply === null ? null : authToken.user === this.reply.user,

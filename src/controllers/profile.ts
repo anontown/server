@@ -19,12 +19,12 @@ export class ProfileController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["name", "body", "sn"],
+      required: ["name", "text", "sn"],
       properties: {
         name: {
           type: "string",
         },
-        body: {
+        text: {
           type: "string",
         },
         sn: {
@@ -35,10 +35,10 @@ export class ProfileController {
   })
   async create({ params, auth, log, now, repo }: IHttpAPICallParams<{
     name: string,
-    body: string,
+    text: string,
     sn: string,
   }>): Promise<IProfileAPI> {
-    const profile = Profile.create(ObjectIDGenerator, auth.token, params.name, params.body, params.sn, now);
+    const profile = Profile.create(ObjectIDGenerator, auth.token, params.name, params.text, params.sn, now);
     await repo.profile.insert(profile);
     log("profiles", profile.id);
     return profile.toAPI(auth.token);
@@ -111,7 +111,7 @@ export class ProfileController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["id", "name", "body", "sn"],
+      required: ["id", "name", "text", "sn"],
       properties: {
         id: {
           type: "string",
@@ -119,7 +119,7 @@ export class ProfileController {
         name: {
           type: "string",
         },
-        body: {
+        text: {
           type: "string",
         },
         sn: {
@@ -131,11 +131,11 @@ export class ProfileController {
   async update({ params, auth, log, now, repo }: IHttpAPICallParams<{
     id: string,
     name: string,
-    body: string,
+    text: string,
     sn: string,
   }>): Promise<IProfileAPI> {
     const profile = await repo.profile.findOne(params.id);
-    const newProfile = profile.changeData(auth.token, params.name, params.body, params.sn, now);
+    const newProfile = profile.changeData(auth.token, params.name, params.text, params.sn, now);
     await repo.profile.update(newProfile);
     log("profiles", newProfile.id);
     return newProfile.toAPI(auth.token);

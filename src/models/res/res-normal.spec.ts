@@ -11,7 +11,7 @@ import {
 describe("ResNormal", () => {
   const resNormal = new ResNormal(
     "name",
-    "body",
+    "text",
     {
       res: "replyres",
       user: "replyuser",
@@ -32,7 +32,7 @@ describe("ResNormal", () => {
     "topic",
     "title",
     Im.List(),
-    "body",
+    "text",
     new Date(40),
     new Date(30),
     10,
@@ -70,7 +70,7 @@ describe("ResNormal", () => {
     "profile",
     "user",
     "name",
-    "body",
+    "text",
     new Date(94),
     new Date(95),
     "sn");
@@ -88,7 +88,7 @@ describe("ResNormal", () => {
           lv: 10,
           hash: "hash",
           name: "name",
-          body: "body",
+          text: "text",
           reply: {
             res: "replyres",
             user: "replyuser",
@@ -98,7 +98,7 @@ describe("ResNormal", () => {
           age: true,
         },
       }, 2)).toEqual(new ResNormal("name",
-        "body",
+        "text",
         {
           res: "replyres",
           user: "replyuser",
@@ -125,14 +125,14 @@ describe("ResNormal", () => {
         user,
         token,
         "name",
-        "body",
+        "text",
         null,
         null,
         true,
         new Date(60000));
 
       expect(res).toEqual(new ResNormal("name",
-        "body",
+        "text",
         null,
         "active",
         null,
@@ -172,14 +172,14 @@ describe("ResNormal", () => {
         user,
         token,
         null,
-        "body",
+        "text",
         resNormal.copy({ id: "res2", user: "res2" }),
         null,
         true,
         new Date(60000));
 
       expect(res).toEqual(new ResNormal(null,
-        "body",
+        "text",
         { res: "res2", user: "res2" },
         "active",
         null,
@@ -220,14 +220,14 @@ describe("ResNormal", () => {
         user,
         token,
         null,
-        "body",
+        "text",
         null,
         profile,
         true,
         date);
 
       expect(res).toEqual(new ResNormal(null,
-        "body",
+        "text",
         null,
         "active",
         "profile",
@@ -268,7 +268,7 @@ describe("ResNormal", () => {
           user,
           token,
           null,
-          "body",
+          "text",
           resNormal.copy({ id: "res2", user: "res2", topic: "topic2" }),
           null,
           true,
@@ -284,7 +284,7 @@ describe("ResNormal", () => {
           user,
           token,
           null,
-          "body",
+          "text",
           null,
           profile.copy({ user: "user2" }),
           true,
@@ -301,7 +301,7 @@ describe("ResNormal", () => {
             user,
             token,
             name,
-            "body",
+            "text",
             null,
             null,
             true,
@@ -312,7 +312,7 @@ describe("ResNormal", () => {
 
     for (const name of [null, "name"]) {
       it("bodyが不正な時エラーになるか。ただしname=" + name, () => {
-        for (const body of ["", "x".repeat(5001)]) {
+        for (const text of ["", "x".repeat(5001)]) {
           expect(() => {
             ResNormal.create(
               () => "res",
@@ -320,7 +320,7 @@ describe("ResNormal", () => {
               user,
               token,
               name,
-              body,
+              text,
               null,
               null,
               true,
@@ -345,7 +345,7 @@ describe("ResNormal", () => {
           lv: resNormal.lv,
           hash: resNormal.hash,
           name: resNormal.name,
-          body: resNormal.body,
+          text: resNormal.text,
           reply: resNormal.reply,
           deleteFlag: resNormal.deleteFlag,
           profile: resNormal.profile,
@@ -359,7 +359,7 @@ describe("ResNormal", () => {
         expect(api).toEqual({
           ...resNormal.toBaseAPI(null),
           name: resNormal.name,
-          body: resNormal.body,
+          text: resNormal.text,
           reply: "replyres",
           profile: resNormal.profile,
           isReply: null,

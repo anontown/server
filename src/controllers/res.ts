@@ -20,7 +20,7 @@ export class ResController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["topic", "name", "body", "reply", "profile", "age"],
+      required: ["topic", "name", "text", "reply", "profile", "age"],
       properties: {
         topic: {
           type: "string",
@@ -28,7 +28,7 @@ export class ResController {
         name: {
           type: ["string", "null"],
         },
-        body: {
+        text: {
           type: "string",
         },
         reply: {
@@ -46,7 +46,7 @@ export class ResController {
   async create({ params, auth, now, repo, log }: IHttpAPICallParams<{
     topic: string,
     name: string | null,
-    body: string,
+    text: string,
     reply: string | null,
     profile: string | null,
     age: boolean,
@@ -63,7 +63,7 @@ export class ResController {
       user,
       auth.token,
       params.name,
-      params.body,
+      params.text,
       reply,
       profile,
       params.age,

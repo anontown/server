@@ -28,7 +28,7 @@ describe("TopicSearchBase", () => {
       readonly id: string,
       readonly title: string,
       readonly tags: Im.List<string>,
-      readonly body: string,
+      readonly text: string,
       readonly update: Date,
       readonly date: Date,
       readonly resCount: number,
@@ -42,7 +42,7 @@ describe("TopicSearchBase", () => {
   const topic = new TopicSearchBaseTest("topic",
     "title",
     Im.List(),
-    "body",
+    "text",
     new Date(100),
     new Date(0),
     10,
@@ -53,7 +53,7 @@ describe("TopicSearchBase", () => {
     it("正常に変換出来るか", () => {
       expect(topic.toDB()).toEqual(topic.toBaseDB({
         tags: [],
-        body: "body",
+        text: "text",
       }));
     });
   });
@@ -63,7 +63,7 @@ describe("TopicSearchBase", () => {
       expect(topic.toAPI()).toEqual({
         ...topic.toBaseAPI(),
         tags: [],
-        body: "body",
+        text: "text",
       });
     });
   });

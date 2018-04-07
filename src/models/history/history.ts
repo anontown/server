@@ -10,7 +10,7 @@ export interface IHistoryDB {
     readonly topic: string,
     readonly title: string,
     readonly tags: string[],
-    readonly body: string,
+    readonly text: string,
     readonly date: string,
     readonly hash: string,
     readonly user: string,
@@ -22,7 +22,7 @@ export interface IHistoryAPI {
   readonly topic: string;
   readonly title: string;
   readonly tags: string[];
-  readonly body: string;
+  readonly text: string;
   readonly date: string;
   readonly hash: string;
 }
@@ -33,7 +33,7 @@ export class History extends Copyable<History> {
       h.body.topic,
       h.body.title,
       Im.List(h.body.tags),
-      h.body.body,
+      h.body.text,
       new Date(h.body.date),
       h.body.hash,
       h.body.user);
@@ -50,19 +50,19 @@ export class History extends Copyable<History> {
       topic.id,
       topic.title,
       Im.List(topic.tags),
-      topic.body,
+      topic.text,
       date, hash,
       user.id);
   }
 
   constructor(readonly id: string,
-              readonly topic: string,
-              readonly title: string,
-              readonly tags: Im.List<string>,
-              readonly body: string,
-              readonly date: Date,
-              readonly hash: string,
-              readonly user: string) {
+    readonly topic: string,
+    readonly title: string,
+    readonly tags: Im.List<string>,
+    readonly text: string,
+    readonly date: Date,
+    readonly hash: string,
+    readonly user: string) {
     super(History);
   }
 
@@ -73,7 +73,7 @@ export class History extends Copyable<History> {
         topic: this.topic,
         title: this.title,
         tags: this.tags.toArray(),
-        body: this.body,
+        text: this.text,
         date: this.date.toISOString(),
         hash: this.hash,
         user: this.user,
@@ -87,7 +87,7 @@ export class History extends Copyable<History> {
       topic: this.topic,
       title: this.title,
       tags: this.tags.toArray(),
-      body: this.body,
+      text: this.text,
       date: this.date.toISOString(),
       hash: this.hash,
     };

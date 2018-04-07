@@ -11,7 +11,7 @@ describe("ResTopic", () => {
     "topic",
     "title",
     Im.List(),
-    "body",
+    "text",
     new Date(150),
     new Date(100),
     10,

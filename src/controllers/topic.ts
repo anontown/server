@@ -53,7 +53,7 @@ export class TopicController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["title", "tags", "body"],
+      required: ["title", "tags", "text"],
       properties: {
         title: {
           type: "string",
@@ -64,7 +64,7 @@ export class TopicController {
             type: "string",
           },
         },
-        body: {
+        text: {
           type: "string",
         },
       },
@@ -73,13 +73,13 @@ export class TopicController {
   async createNormal({ params, auth, log, now, repo }: IHttpAPICallParams<{
     title: string,
     tags: string[],
-    body: string,
+    text: string,
   }>): Promise<ITopicAPI> {
     const user = await repo.user.findOne(auth.token.user);
     const create = TopicNormal.create(ObjectIDGenerator,
       params.title,
       params.tags,
-      params.body,
+      params.text,
       user,
       auth.token,
       now);
@@ -104,7 +104,7 @@ export class TopicController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["title", "tags", "body"],
+      required: ["title", "tags", "text"],
       properties: {
         title: {
           type: "string",
@@ -115,7 +115,7 @@ export class TopicController {
             type: "string",
           },
         },
-        body: {
+        text: {
           type: "string",
         },
       },
@@ -124,13 +124,13 @@ export class TopicController {
   async createOne({ params, auth, log, now, repo }: IHttpAPICallParams<{
     title: string,
     tags: string[],
-    body: string,
+    text: string,
   }>): Promise<ITopicAPI> {
     const user = await repo.user.findOne(auth.token.user);
     const create = TopicOne.create(ObjectIDGenerator,
       params.title,
       params.tags,
-      params.body,
+      params.text,
       user,
       auth.token,
       now);
@@ -356,7 +356,7 @@ export class TopicController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["id", "title", "tags", "body"],
+      required: ["id", "title", "tags", "text"],
       properties: {
         id: {
           type: "string",
@@ -370,7 +370,7 @@ export class TopicController {
             type: "string",
           },
         },
-        body: {
+        text: {
           type: "string",
         },
       },
@@ -380,7 +380,7 @@ export class TopicController {
     id: string,
     title: string,
     tags: string[],
-    body: string,
+    text: string,
   }>): Promise<ITopicAPI> {
     const [topic, user] = await Promise.all([
       repo.topic.findOne(params.id),
@@ -391,7 +391,7 @@ export class TopicController {
       throw new AtPrerequisiteError("通常トピック以外は編集出来ません");
     }
 
-    const val = topic.changeData(ObjectIDGenerator, user, auth.token, params.title, params.tags, params.body, now);
+    const val = topic.changeData(ObjectIDGenerator, user, auth.token, params.title, params.tags, params.text, now);
 
     await Promise.all([
       repo.res.insert(val.res),

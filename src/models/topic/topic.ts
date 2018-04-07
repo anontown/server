@@ -29,7 +29,7 @@ export interface ITopicBaseDB<T extends TopicType, Body> {
 
 export type ITopicSearchBaseDB<T extends TopicSearchType> = ITopicBaseDB<T, {
   readonly tags: string[],
-  readonly body: string,
+  readonly text: string,
 }>;
 
 export type ITopicNormalDB = ITopicSearchBaseDB<"normal">;
@@ -54,7 +54,7 @@ export interface ITopicBaseAPI<T extends TopicType> {
 
 export interface ITopicSearchBaseAPI<T extends TopicSearchType> extends ITopicBaseAPI<T> {
   readonly tags: string[];
-  readonly body: string;
+  readonly text: string;
 }
 
 export interface ITopicNormalAPI extends ITopicSearchBaseAPI<"normal"> {
@@ -73,7 +73,7 @@ export type TopicType = TopicSearchType | "fork";
 export type Topic = TopicNormal | TopicOne | TopicFork;
 
 export abstract class TopicBase<T extends TopicType, C extends TopicBase<T, C>> {
-  static checkData({ title, tags, body }: { title?: string, tags?: string[], body?: string }) {
+  static checkData({ title, tags, text }: { title?: string, tags?: string[], text?: string }) {
     const data: paramsErrorMakerData[] = [];
     if (title !== undefined) {
       data.push({
@@ -113,12 +113,12 @@ export abstract class TopicBase<T extends TopicType, C extends TopicBase<T, C>> 
         message: Config.topic.tags.msg,
       })));
     }
-    if (body !== undefined) {
+    if (text !== undefined) {
       data.push({
-        field: "body",
-        val: body,
-        regex: Config.topic.body.regex,
-        message: Config.topic.body.msg,
+        field: "text",
+        val: text,
+        regex: Config.topic.text.regex,
+        message: Config.topic.text.msg,
       });
     }
 
@@ -193,12 +193,12 @@ export abstract class TopicBase<T extends TopicType, C extends TopicBase<T, C>> 
 export abstract class TopicSearchBase<T extends TopicSearchType, C extends TopicSearchBase<T, C>>
   extends TopicBase<T, C> {
   abstract readonly tags: Im.List<string>;
-  abstract readonly body: string;
+  abstract readonly text: string;
 
   toDB(): ITopicSearchBaseDB<T> {
     return this.toBaseDB({
       tags: this.tags.toArray(),
-      body: this.body,
+      text: this.text,
     });
   }
 
@@ -206,7 +206,7 @@ export abstract class TopicSearchBase<T extends TopicSearchType, C extends Topic
     return {
       ...this.toBaseAPI(),
       tags: this.tags.toArray(),
-      body: this.body,
+      text: this.text,
     };
   }
 }
@@ -217,21 +217,21 @@ export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBas
     objidGenerator: IGenerator<string>,
     title: string,
     tags: string[],
-    body: string,
+    text: string,
     user: User,
     authToken: IAuthToken,
     now: Date) {
-    TopicBase.checkData({ title, tags, body });
+    TopicBase.checkData({ title, tags, text });
     const topic = new TopicNormal(objidGenerator(),
       title,
       Im.List(tags),
-      body,
+      text,
       now,
       now,
       1,
       now,
       true);
-    const cd = topic.changeData(objidGenerator, user, authToken, title, tags, body, now);
+    const cd = topic.changeData(objidGenerator, user, authToken, title, tags, text, now);
     const newUser = cd.user.changeLastTopic(now);
 
     return { topic: cd.topic, history: cd.history, res: cd.res, user: newUser };
@@ -241,7 +241,7 @@ export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBas
     return new TopicNormal(db.id,
       db.body.title,
       Im.List(db.body.tags),
-      db.body.body,
+      db.body.text,
       new Date(db.body.update),
       new Date(db.body.date),
       resCount,
@@ -262,7 +262,7 @@ export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBas
     readonly id: string,
     readonly title: string,
     readonly tags: Im.List<string>,
-    readonly body: string,
+    readonly text: string,
     readonly update: Date,
     readonly date: Date,
     readonly resCount: number,
@@ -277,12 +277,12 @@ export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBas
     authToken: IAuthToken,
     title: string,
     tags: string[],
-    body: string,
+    text: string,
     now: Date) {
     const newUser = user.usePoint(10);
-    TopicBase.checkData({ title, tags, body });
+    TopicBase.checkData({ title, tags, text });
 
-    const newTopic = this.copy({ title, tags: Im.List(tags), body });
+    const newTopic = this.copy({ title, tags: Im.List(tags), text });
 
     const history = History.create(objidGenerator, newTopic, now, newTopic.hash(now, newUser), newUser);
     const { res, topic: newNewTopic } = ResHistory.create(objidGenerator,
@@ -302,7 +302,7 @@ export class TopicOne extends Copyable<TopicOne> implements TopicSearchBase<"one
     return new TopicOne(db.id,
       db.body.title,
       Im.List(db.body.tags),
-      db.body.body,
+      db.body.text,
       new Date(db.body.update),
       new Date(db.body.date),
       resCount,
@@ -314,15 +314,15 @@ export class TopicOne extends Copyable<TopicOne> implements TopicSearchBase<"one
     objidGenerator: IGenerator<string>,
     title: string,
     tags: string[],
-    body: string,
+    text: string,
     user: User,
     authToken: IAuthToken,
     now: Date) {
-    TopicBase.checkData({ title, tags, body });
+    TopicBase.checkData({ title, tags, text });
     const topic = new TopicOne(objidGenerator(),
       title,
       Im.List(tags),
-      body,
+      text,
       now,
       now,
       1,
@@ -351,7 +351,7 @@ export class TopicOne extends Copyable<TopicOne> implements TopicSearchBase<"one
     readonly id: string,
     readonly title: string,
     readonly tags: Im.List<string>,
-    readonly body: string,
+    readonly text: string,
     readonly update: Date,
     readonly date: Date,
     readonly resCount: number,

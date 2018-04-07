@@ -10,7 +10,7 @@ describe("TopicOne", () => {
   const topic = new TopicOne("topic",
     "title",
     Im.List(),
-    "body",
+    "text",
     new Date(100),
     new Date(0),
     5,
@@ -54,7 +54,7 @@ describe("TopicOne", () => {
           ageUpdate: new Date(50).toISOString(),
           active: true,
           tags: [],
-          body: "body",
+          text: "text",
         },
       }, 5)).toEqual(topic);
     });
@@ -65,7 +65,7 @@ describe("TopicOne", () => {
       expect(TopicOne.create(() => "id",
         "title",
         [],
-        "body",
+        "text",
         user,
         auth,
         new Date(24 * 60 * 60 * 1000))).toEqual({
