@@ -44,23 +44,29 @@ export class ProfileRepo implements IProfileRepo {
 
   async insert(profile: Profile): Promise<void> {
     const db = await DB;
-    await db.collection("profiles").insert(profile.toDB()).catch((e: WriteError) => {
+    try {
+      await db.collection("profiles").insert(profile.toDB());
+    } catch (ex) {
+      let e: WriteError = ex;
       if (e.code === 11000) {
         throw new AtConflictError("スクリーンネームが使われています");
       } else {
         throw e;
       }
-    });
+    }
   }
 
   async update(profile: Profile): Promise<void> {
     const db = await DB;
-    await db.collection("profiles").update({ _id: new ObjectID(profile.id) }, profile.toDB()).catch((e: WriteError) => {
+    try {
+      await db.collection("profiles").update({ _id: new ObjectID(profile.id) }, profile.toDB())
+    } catch (ex) {
+      let e: WriteError = ex;
       if (e.code === 11000) {
         throw new AtConflictError("スクリーンネームが使われています");
       } else {
         throw e;
       }
-    });
+    }
   }
 }

@@ -31,24 +31,30 @@ export class UserRepo implements IUserRepo {
 
   async insert(user: User): Promise<void> {
     const db = await DB;
-    await db.collection("users").insert(user.toDB()).catch((e: WriteError) => {
+    try {
+      await db.collection("users").insert(user.toDB());
+    } catch (ex) {
+      let e: WriteError = ex;
       if (e.code === 11000) {
         throw new AtConflictError("スクリーンネームが使われています");
       } else {
         throw e;
       }
-    });
+    }
   }
 
   async update(user: User): Promise<void> {
     const db = await DB;
-    await db.collection("users").update({ _id: new ObjectID(user.id) }, user.toDB()).catch((e: WriteError) => {
+    try {
+      await db.collection("users").update({ _id: new ObjectID(user.id) }, user.toDB());
+    } catch (ex) {
+      let e: WriteError = ex;
       if (e.code === 11000) {
         throw new AtConflictError("スクリーンネームが使われています");
       } else {
         throw e;
       }
-    });
+    }
   }
 
   async cronPointReset(): Promise<void> {
