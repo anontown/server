@@ -1,5 +1,4 @@
 import { CronJob } from "cron";
-import { Refresh } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { ESClient } from "../../db";
 import { IResRepo } from "../res";
@@ -16,7 +15,7 @@ import {
 } from "./topic";
 
 export class TopicRepo implements ITopicRepo {
-  constructor(public resRepo: IResRepo, private refresh?: Refresh) { }
+  constructor(public resRepo: IResRepo, private refresh?: boolean) { }
 
   async findOne(id: string): Promise<Topic> {
     let topic;
@@ -182,7 +181,7 @@ export class TopicRepo implements ITopicRepo {
           },
         },
       },
-      refresh: !!this.refresh,
+      refresh: this.refresh,
     });
   }
 

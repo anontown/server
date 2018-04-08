@@ -1,4 +1,3 @@
-import { Refresh } from "elasticsearch";
 import { Subject } from "rxjs";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
@@ -10,7 +9,7 @@ import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
 export class ResRepo implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
 
-  constructor(private refresh?: Refresh) { }
+  constructor(private refresh?: boolean) { }
 
   async findOne(id: string): Promise<Res> {
     let res;

@@ -1,4 +1,3 @@
-import { Refresh } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
@@ -6,7 +5,7 @@ import { History, IHistoryDB } from "./history";
 import { IHistoryRepo } from "./ihistory-repo";
 
 export class HistoryRepo implements IHistoryRepo {
-  constructor(private refresh?: Refresh) { }
+  constructor(private refresh?: boolean) { }
 
   async insert(history: History): Promise<void> {
     const hDB = history.toDB();
