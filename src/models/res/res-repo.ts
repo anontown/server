@@ -1,4 +1,4 @@
-import { GetResponse, Refresh } from "elasticsearch";
+import { Refresh } from "elasticsearch";
 import { Subject } from "rxjs";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
@@ -13,7 +13,7 @@ export class ResRepo implements IResRepo {
   constructor(private refresh?: Refresh) { }
 
   async findOne(id: string): Promise<Res> {
-    let res: GetResponse<IResDB["body"]>;
+    let res;
     try {
       res = await ESClient.get<IResDB["body"]>({
         index: "reses",

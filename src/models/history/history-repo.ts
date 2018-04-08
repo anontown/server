@@ -1,4 +1,4 @@
-import { GetResponse, Refresh } from "elasticsearch";
+import { Refresh } from "elasticsearch";
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
@@ -31,7 +31,7 @@ export class HistoryRepo implements IHistoryRepo {
   }
 
   async findOne(id: string): Promise<History> {
-    let history: GetResponse<IHistoryDB["body"]>;
+    let history;
     try {
       history = await ESClient.get<IHistoryDB["body"]>({
         index: "histories",
