@@ -3,7 +3,7 @@ version: '2'
 services:
   mongo:
     restart: always
-    image: "mongo:3.0.15"
+    image: "mongo:3.6.3"
     volumes:
       - ./data/db:/data/db
 #  mongo-express:
