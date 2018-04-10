@@ -615,6 +615,56 @@ updateFunc.push(async () => {
     name: "topics",
     index: "topics_1"
   });
+
+  function mongo2ESBody(doc: any) {
+    for (let key of Object.keys(doc)) {
+      if (doc[key] instanceof ObjectID) {
+        doc[key] = doc[key].toHexString();
+      }
+
+      if (doc[key] instanceof Date) {
+        doc[key] = doc[key].toISOString();
+      }
+
+      if (Array.isArray(doc[key])) {
+        doc[key].map((x: any) => mongo2ESBody(x))
+      }
+
+      if (typeof doc[key] === "object") {
+        mongo2ESBody(doc[key]);
+      }
+    }
+  }
+
+  function mongo2ES(doc: any) {
+    const id = doc._id.toHexString();
+    delete doc._id;
+    mongo2ESBody(doc);
+    return {
+      id,
+      body: doc
+    };
+  }
+
+  async function mongo2ESBulk(name: string) {
+    await ESClient.bulk({
+      body: Array.prototype.concat.apply([], (await db.collection(name)
+        .find()
+        .toArray())
+        .map(doc => {
+          const { id, body } = mongo2ES(doc);
+          return [
+            { index: { _index: name, _type: 'doc', _id: id } },
+            body
+          ];
+        }))
+    });
+  }
+
+  await mongo2ESBulk("reses");
+  await mongo2ESBulk("histories");
+  await mongo2ESBulk("msgs");
+  await mongo2ESBulk("topics");
 });
 
 /*
