@@ -662,6 +662,8 @@ updateFunc.push(async () => {
         body
       });
     }
+
+    await db.collection(name).drop();
   }
 
   await mongo2ESBulk("reses");
