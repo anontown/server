@@ -616,33 +616,29 @@ updateFunc.push(async () => {
     index: "topics_1"
   });
 
-  function mongo2ESBody(doc: any) {
-    for (let key of Object.keys(doc)) {
-      if (doc[key] instanceof ObjectID) {
-        doc[key] = doc[key].toHexString();
+  function mongo2ESBody(doc: any): any {
+    if (doc instanceof ObjectID) {
+      return doc.toHexString();
+    } else if (doc instanceof Date) {
+      return doc.toISOString();
+    } else if (Array.isArray(doc)) {
+      return doc.map((x: any) => mongo2ESBody(x))
+    } else if (typeof doc === "object") {
+      for (let key of Object.keys(doc)) {
+        doc[key] = mongo2ESBody(doc[key]);
       }
-
-      if (doc[key] instanceof Date) {
-        doc[key] = doc[key].toISOString();
-      }
-
-      if (Array.isArray(doc[key])) {
-        doc[key].map((x: any) => mongo2ESBody(x))
-      }
-
-      if (typeof doc[key] === "object") {
-        mongo2ESBody(doc[key]);
-      }
+      return doc;
+    } else {
+      return doc;
     }
   }
 
   function mongo2ES(doc: any) {
     const id = doc._id.toHexString();
     delete doc._id;
-    mongo2ESBody(doc);
     return {
       id,
-      body: doc
+      body: mongo2ESBody(doc)
     };
   }
 
