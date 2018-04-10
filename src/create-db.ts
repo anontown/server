@@ -622,7 +622,9 @@ updateFunc.push(async () => {
     } else if (doc instanceof Date) {
       return doc.toISOString();
     } else if (Array.isArray(doc)) {
-      return doc.map((x: any) => mongo2ESBody(x))
+      return doc.map((x: any) => mongo2ESBody(x));
+    } else if (doc === null) {
+      return null;
     } else if (typeof doc === "object") {
       for (let key of Object.keys(doc)) {
         doc[key] = mongo2ESBody(doc[key]);
