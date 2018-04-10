@@ -647,18 +647,21 @@ updateFunc.push(async () => {
   }
 
   async function mongo2ESBulk(name: string) {
-    await ESClient.bulk({
-      body: Array.prototype.concat.apply([], (await db.collection(name)
-        .find()
-        .toArray())
-        .map(doc => {
-          const { id, body } = mongo2ES(doc);
-          return [
-            { index: { _index: name, _type: 'doc', _id: id } },
-            body
-          ];
-        }))
-    });
+    const body = Array.prototype.concat.apply([], (await db.collection(name)
+      .find()
+      .toArray())
+      .map(doc => {
+        const { id, body } = mongo2ES(doc);
+        return [
+          { index: { _index: name, _type: 'doc', _id: id } },
+          body
+        ];
+      }));
+    if (body.length !== 0) {
+      await ESClient.bulk({
+        body
+      });
+    }
   }
 
   await mongo2ESBulk("reses");
