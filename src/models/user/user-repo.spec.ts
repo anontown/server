@@ -1,12 +1,12 @@
 import {
   AtError,
   dbReset,
+  IUserRepo,
   ObjectIDGenerator,
+  ResWaitCountKey,
+  User,
   UserRepo,
   UserRepoMock,
-  IUserRepo,
-  User,
-  ResWaitCountKey,
 } from "../../";
 
 function run(repoGene: () => IUserRepo, isReset: boolean) {
@@ -133,20 +133,20 @@ function run(repoGene: () => IUserRepo, isReset: boolean) {
         user.copy({ id: ObjectIDGenerator(), sn: "sn3", point: 1 }),
       ];
 
-      for (let u of users) {
+      for (const u of users) {
         await repo.insert(u);
       }
 
       await repo.cronPointReset();
 
-      for (let u of users) {
+      for (const u of users) {
         expect(await repo.findOne(u.id)).toEqual(u.copy({ point: 0 }));
       }
     });
   });
 
   describe("cronCountReset", () => {
-    for (let t of ["m10", "m30", "h1", "h6", "h12", "d1"] as ResWaitCountKey[]) {
+    for (const t of ["m10", "m30", "h1", "h6", "h12", "d1"] as ResWaitCountKey[]) {
       it("正常に更新出来るか:" + t, async () => {
         const repo = repoGene();
 
@@ -160,7 +160,7 @@ function run(repoGene: () => IUserRepo, isReset: boolean) {
               h6: 0,
               h12: 30,
               d1: 40,
-            }
+            },
           }),
           user.copy({
             id: ObjectIDGenerator(), sn: "sn2", resWait: {
@@ -171,7 +171,7 @@ function run(repoGene: () => IUserRepo, isReset: boolean) {
               h6: 30,
               h12: 40,
               d1: 0,
-            }
+            },
           }),
           user.copy({
             id: ObjectIDGenerator(), sn: "sn3", resWait: {
@@ -182,17 +182,17 @@ function run(repoGene: () => IUserRepo, isReset: boolean) {
               h6: 40,
               h12: 0,
               d1: 30,
-            }
+            },
           }),
         ];
 
-        for (let u of users) {
+        for (const u of users) {
           await repo.insert(u);
         }
 
         await repo.cronCountReset(t);
 
-        for (let u of users) {
+        for (const u of users) {
           expect(await repo.findOne(u.id)).toEqual(u.copy({ resWait: { ...u.resWait, [t]: 0 } }));
         }
       });

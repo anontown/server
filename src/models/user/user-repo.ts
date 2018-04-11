@@ -34,7 +34,7 @@ export class UserRepo implements IUserRepo {
     try {
       await db.collection("users").insert(user.toDB());
     } catch (ex) {
-      let e: WriteError = ex;
+      const e: WriteError = ex;
       if (e.code === 11000) {
         throw new AtConflictError("スクリーンネームが使われています");
       } else {
@@ -48,7 +48,7 @@ export class UserRepo implements IUserRepo {
     try {
       await db.collection("users").update({ _id: new ObjectID(user.id) }, user.toDB());
     } catch (ex) {
-      let e: WriteError = ex;
+      const e: WriteError = ex;
       if (e.code === 11000) {
         throw new AtConflictError("スクリーンネームが使われています");
       } else {

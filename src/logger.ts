@@ -27,11 +27,11 @@ log4js.configure({
             filename: "logs/app.log",
             pattern: "-yyyy-MM-dd",
         },
-        ...process.env["AT_MODE"] === "TEST"
+        ...process.env.AT_MODE === "TEST"
             ? []
             : [{
                 type: "console",
-            }]
+            }],
 
     ],
 });

@@ -31,7 +31,6 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
     Im.List(),
     new Date(0));
 
-
   describe("findOne", () => {
     it("正常に探せるか", async () => {
       const repo = repoGene();

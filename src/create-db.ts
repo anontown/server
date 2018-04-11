@@ -599,22 +599,22 @@ updateFunc.push(async () => {
 
   await ESClient.indices.putAlias({
     name: "reses",
-    index: "reses_1"
+    index: "reses_1",
   });
 
   await ESClient.indices.putAlias({
     name: "histories",
-    index: "histories_1"
+    index: "histories_1",
   });
 
   await ESClient.indices.putAlias({
     name: "msgs",
-    index: "msgs_1"
+    index: "msgs_1",
   });
 
   await ESClient.indices.putAlias({
     name: "topics",
-    index: "topics_1"
+    index: "topics_1",
   });
 
   function mongo2ESBody(doc: any): any {
@@ -627,7 +627,7 @@ updateFunc.push(async () => {
     } else if (doc === null) {
       return null;
     } else if (typeof doc === "object") {
-      for (let key of Object.keys(doc)) {
+      for (const key of Object.keys(doc)) {
         doc[key] = mongo2ESBody(doc[key]);
       }
       return doc;
@@ -641,7 +641,7 @@ updateFunc.push(async () => {
     delete doc._id;
     return {
       id,
-      body: mongo2ESBody(doc)
+      body: mongo2ESBody(doc),
     };
   }
 
@@ -652,13 +652,13 @@ updateFunc.push(async () => {
       .map(doc => {
         const { id, body } = mongo2ES(doc);
         return [
-          { index: { _index: name, _type: 'doc', _id: id } },
-          body
+          { index: { _index: name, _type: "doc", _id: id } },
+          body,
         ];
       }));
     if (body.length !== 0) {
       await ESClient.bulk({
-        body
+        body,
       });
     }
 

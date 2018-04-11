@@ -247,7 +247,7 @@ export class ResRepo implements IResRepo {
           res_count: {
             terms: {
               field: "topic",
-              size: topicIDs.length
+              size: topicIDs.length,
             },
           },
         },

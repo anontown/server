@@ -5,12 +5,12 @@ import {
   dbReset,
   IAuthTokenMaster,
   IResRepo,
+  ResFork,
+  ResHistory,
   ResNormal,
   ResRepo,
   ResRepoMock,
-  ResHistory,
   ResTopic,
-  ResFork,
 } from "../../";
 
 function run(repoGene: () => IResRepo, isReset: boolean) {
@@ -64,8 +64,6 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
     5,
     "hash",
     0);
-
-
 
   describe("findOne", () => {
     it("正常に探せるか", async () => {
@@ -260,7 +258,6 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       const res11 = resHistory.copy({ id: "res11", date: new Date(40) });
       const res12 = resFork.copy({ id: "res12", date: new Date(70) });
 
-
       await repo.insert(res1);
       await repo.insert(res2);
       await repo.insert(res3);
@@ -336,8 +333,18 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
 
       const res1 = resNormal.copy({ id: "res1", date: new Date(50), reply: null, user: user2 });
       const res2 = resNormal.copy({ id: "res2", date: new Date(80), reply: { res: "res1", user: user2 } });
-      const res3 = resNormal.copy({ id: "res3", date: new Date(30), reply: { user: "user1", res: "res1" }, user: user2 });
-      const res4 = resNormal.copy({ id: "res4", date: new Date(90), reply: { user: "user1", res: "res1" }, user: user2 });
+      const res3 = resNormal.copy({
+        id: "res3",
+        date: new Date(30),
+        reply: { user: "user1", res: "res1" },
+        user: user2,
+      });
+      const res4 = resNormal.copy({
+        id: "res4",
+        date: new Date(90),
+        reply: { user: "user1", res: "res1" },
+        user: user2,
+      });
       const res5 = resTopic.copy({ id: "res5", date: new Date(60) });
       const res6 = resHistory.copy({ id: "res6", date: new Date(40) });
       const res7 = resFork.copy({ id: "res7", date: new Date(70) });
