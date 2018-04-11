@@ -51,7 +51,7 @@ export interface IResBaseDB<T extends ResType, Body> {
     readonly topic: string,
     readonly date: string,
     readonly user: string,
-    readonly vote: IVote[],
+    readonly votes: IVote[],
     readonly lv: number,
     readonly hash: string,
   } & Body;
@@ -128,7 +128,7 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
   abstract readonly topic: string;
   abstract readonly date: Date;
   abstract readonly user: string;
-  abstract readonly vote: Im.List<IVote>;
+  abstract readonly votes: Im.List<IVote>;
   abstract readonly lv: number;
   abstract readonly hash: string;
   abstract readonly type: T;
@@ -141,7 +141,7 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
     if (user.id === this.user) {
       throw new AtRightError("自分に投票は出来ません");
     }
-    if (this.vote.find(x => x.user === user.id) !== undefined) {
+    if (this.votes.find(x => x.user === user.id) !== undefined) {
       throw new AtPrerequisiteError("既に投票しています");
     }
     const valueAbs = Math.floor(user.lv / 100) + 1;
@@ -149,21 +149,21 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
     const newResUser = resUser.changeLv(resUser.lv + value);
     return {
       res: this.copy({
-        vote: this.vote.push({ user: user.id, value }),
+        votes: this.votes.push({ user: user.id, value }),
       }),
       resUser: newResUser,
     };
   }
 
   cv(resUser: User, user: User, _authToken: IAuthToken): { res: C, resUser: User } {
-    const vote = this.vote.find(x => x.user === user.id);
+    const vote = this.votes.find(x => x.user === user.id);
     if (vote === undefined) {
       throw new AtPrerequisiteError("投票していません");
     }
     const newResUser = resUser.changeLv(resUser.lv - vote.value);
     return {
       res: this.copy({
-        vote: this.vote.remove(this.vote.indexOf(vote)),
+        votes: this.votes.remove(this.votes.indexOf(vote)),
       }),
       resUser: newResUser,
     };
@@ -177,7 +177,7 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
         topic: this.topic,
         date: this.date.toISOString(),
         user: this.user,
-        vote: this.vote.toArray(),
+        votes: this.votes.toArray(),
         lv: this.lv,
         hash: this.hash,
       }),
@@ -189,7 +189,7 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
     if (authToken === null) {
       voteFlag = null;
     } else {
-      const vote = this.vote.find(v => authToken.user === v.user);
+      const vote = this.votes.find(v => authToken.user === v.user);
       if (vote === undefined) {
         voteFlag = "not";
       } else {
@@ -202,8 +202,8 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
       topic: this.topic,
       date: this.date,
       user: (authToken !== null && authToken.user === this.user ? this.user : null),
-      uv: this.vote.filter(x => x.value > 0).size,
-      dv: this.vote.filter(x => x.value < 0).size,
+      uv: this.votes.filter(x => x.value > 0).size,
+      dv: this.votes.filter(x => x.value < 0).size,
       hash: this.hash,
       replyCount: this.replyCount,
       voteFlag,
@@ -226,7 +226,7 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
       r.body.topic,
       new Date(r.body.date),
       r.body.user,
-      Im.List(r.body.vote),
+      Im.List(r.body.votes),
       r.body.lv,
       r.body.hash,
       replyCount);
@@ -312,7 +312,7 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
     readonly topic: string,
     readonly date: Date,
     readonly user: string,
-    readonly vote: Im.List<IVote>,
+    readonly votes: Im.List<IVote>,
     readonly lv: number,
     readonly hash: string,
     readonly replyCount: number) {
@@ -376,7 +376,7 @@ export class ResHistory extends Copyable<ResHistory> implements ResBase<"history
       r.body.topic,
       new Date(r.body.date),
       r.body.user,
-      Im.List(r.body.vote),
+      Im.List(r.body.votes),
       r.body.lv,
       r.body.hash,
       replyCount);
@@ -416,7 +416,7 @@ export class ResHistory extends Copyable<ResHistory> implements ResBase<"history
     readonly topic: string,
     readonly date: Date,
     readonly user: string,
-    readonly vote: Im.List<IVote>,
+    readonly votes: Im.List<IVote>,
     readonly lv: number,
     readonly hash: string,
     readonly replyCount: number) {
@@ -442,7 +442,7 @@ export class ResTopic extends Copyable<ResTopic> implements ResBase<"topic", Res
       r.body.topic,
       new Date(r.body.date),
       r.body.user,
-      Im.List(r.body.vote),
+      Im.List(r.body.votes),
       r.body.lv,
       r.body.hash,
       replyCount);
@@ -480,7 +480,7 @@ export class ResTopic extends Copyable<ResTopic> implements ResBase<"topic", Res
     readonly topic: string,
     readonly date: Date,
     readonly user: string,
-    readonly vote: Im.List<IVote>,
+    readonly votes: Im.List<IVote>,
     readonly lv: number,
     readonly hash: string,
     readonly replyCount: number) {
@@ -504,7 +504,7 @@ export class ResFork extends Copyable<ResFork> implements ResBase<"fork", ResFor
       r.body.topic,
       new Date(r.body.date),
       r.body.user,
-      Im.List(r.body.vote),
+      Im.List(r.body.votes),
       r.body.lv,
       r.body.hash,
       replyCount);
@@ -544,7 +544,7 @@ export class ResFork extends Copyable<ResFork> implements ResBase<"fork", ResFor
     readonly topic: string,
     readonly date: Date,
     readonly user: string,
-    readonly vote: Im.List<IVote>,
+    readonly votes: Im.List<IVote>,
     readonly lv: number,
     readonly hash: string,
     readonly replyCount: number) {

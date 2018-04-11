@@ -25,7 +25,7 @@ describe("ResBase", () => {
       readonly topic: string,
       readonly date: Date,
       readonly user: string,
-      readonly vote: Im.List<IVote>,
+      readonly votes: Im.List<IVote>,
       readonly lv: number,
       readonly hash: string,
       readonly replyCount: number) {
@@ -77,7 +77,7 @@ describe("ResBase", () => {
         "uv",
         { ...token, user: "voteuser" });
 
-      expect(newRes).toEqual(res.copy({ vote: Im.List([{ user: voteUser.id, value: 2 }]) }));
+      expect(newRes).toEqual(res.copy({ votes: Im.List([{ user: voteUser.id, value: 2 }]) }));
       expect(newResUser).toEqual(user.copy({ lv: 3 }));
 
       const voteUser2 = voteUser.copy({ id: "voteuser2", lv: 50 });
@@ -87,7 +87,7 @@ describe("ResBase", () => {
         { ...token, user: "voteuser2" });
 
       expect(newNewRes).toEqual(newRes.copy({
-        vote: Im.List([
+        votes: Im.List([
           { user: voteUser.id, value: 2 },
           { user: voteUser2.id, value: -1 }]),
       }));
@@ -104,7 +104,7 @@ describe("ResBase", () => {
     });
 
     it("重複投票でエラーになるか", () => {
-      const votedRes = res.copy({ vote: Im.List([{ user: "voteuser", value: 2 }]) });
+      const votedRes = res.copy({ votes: Im.List([{ user: "voteuser", value: 2 }]) });
       const voteUser = user.copy({ id: "voteuser" });
 
       expect(() => {
@@ -115,18 +115,18 @@ describe("ResBase", () => {
 
   describe("#cv", () => {
     it("正常にcv出来るか", () => {
-      const votedRes = res.copy({ vote: Im.List([{ user: "voteuser", value: 2 }]) });
+      const votedRes = res.copy({ votes: Im.List([{ user: "voteuser", value: 2 }]) });
       const resUser = user.copy({ lv: 5 });
       const voteUser = user.copy({ id: "voteuser" });
       const { res: newRes, resUser: newResUser }
         = votedRes.cv(resUser, voteUser, { ...token, user: "voteuser" });
 
-      expect(newRes).toEqual(res.copy({ vote: Im.List() }));
+      expect(newRes).toEqual(res.copy({ votes: Im.List() }));
       expect(newResUser).toEqual(resUser.copy({ lv: 3 }));
     });
 
     it("投票していない時エラーになるか", () => {
-      const votedRes = res.copy({ vote: Im.List([{ user: "voteuser", value: 2 }]) });
+      const votedRes = res.copy({ votes: Im.List([{ user: "voteuser", value: 2 }]) });
       const resUser = user.copy({ lv: 5 });
       const voteUser = user.copy({ id: "voteuser2" });
       expect(() => {
@@ -145,7 +145,7 @@ describe("ResBase", () => {
           topic: res.topic,
           date: res.date.toISOString(),
           user: res.user,
-          vote: res.vote.toArray(),
+          votes: res.votes.toArray(),
           lv: res.lv,
           hash: res.hash,
         },
@@ -188,7 +188,7 @@ describe("ResBase", () => {
 
     it("tokenが投稿ユーザーでない時", () => {
       const api = res.copy({
-        vote: Im.List([{ user: "user2", value: -2 }]),
+        votes: Im.List([{ user: "user2", value: -2 }]),
       }).toBaseAPI({ ...token, user: "user1" });
       expect(api).toEqual({
         id: res.id,
@@ -206,7 +206,7 @@ describe("ResBase", () => {
 
     it("uvした時", () => {
       const api = res.copy({
-        vote: Im.List([{ user: "user2", value: -2 }, { user: "user1", value: 5 }]),
+        votes: Im.List([{ user: "user2", value: -2 }, { user: "user1", value: 5 }]),
       })
         .toBaseAPI({ ...token, user: "user1" });
 
@@ -226,7 +226,7 @@ describe("ResBase", () => {
 
     it("dvした時", () => {
       const api = res.copy({
-        vote: Im.List([{ user: "user1", value: -1 }, { user: "user2", value: 1 }]),
+        votes: Im.List([{ user: "user1", value: -1 }, { user: "user2", value: 1 }]),
       })
         .toBaseAPI({ ...token, user: "user1" });
 

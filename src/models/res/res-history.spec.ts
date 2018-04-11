@@ -67,7 +67,7 @@ describe("ResHistory", () => {
           topic: "topic",
           date: new Date(1000).toISOString(),
           user: "user",
-          vote: [],
+          votes: [],
           lv: 5,
           hash: "hash",
           history: "history",

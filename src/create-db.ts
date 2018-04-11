@@ -381,6 +381,7 @@ updateFunc.push(async () => {
   const db = await DB;
 
   await db.collection("reses").update({}, { $unset: { "vote.lv": 1 } }, { multi: true });
+  await db.collection("reses").update({}, { $rename: { vote: "votes" } }, { multi: true });
 
   await ESClient.putTemplate({
     id: "template",
@@ -431,7 +432,7 @@ updateFunc.push(async () => {
             user: {
               type: "keyword",
             },
-            vote: {
+            votes: {
               type: "nested",
               properties: {
                 user: {

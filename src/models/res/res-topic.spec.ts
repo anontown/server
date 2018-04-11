@@ -63,7 +63,7 @@ describe("ResTopic", () => {
           topic: "topic",
           date: new Date(100).toISOString(),
           user: "user",
-          vote: [],
+          votes: [],
           lv: 5,
           hash: "hash",
         },
