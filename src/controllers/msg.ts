@@ -76,7 +76,7 @@ export class MsgController {
           format: "date-time",
         },
         limit: {
-          type: "number",
+          type: "integer",
         },
       },
     },
@@ -103,7 +103,7 @@ export class MsgController {
       required: ["limit"],
       properties: {
         limit: {
-          type: "number",
+          type: "integer",
         },
       },
     },

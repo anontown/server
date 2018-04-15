@@ -264,10 +264,10 @@ export class TopicController {
           },
         },
         skip: {
-          type: "number",
+          type: "integer",
         },
         limit: {
-          type: "number",
+          type: "integer",
         },
         activeOnly: {
           type: "boolean",
@@ -301,10 +301,10 @@ export class TopicController {
           type: "string",
         },
         skip: {
-          type: "number",
+          type: "integer",
         },
         limit: {
-          type: "number",
+          type: "integer",
         },
         activeOnly: {
           type: "boolean",
@@ -338,7 +338,7 @@ export class TopicController {
       required: ["limit"],
       properties: {
         limit: {
-          type: "number",
+          type: "integer",
         },
       },
     },

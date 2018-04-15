@@ -149,7 +149,7 @@ export class ResController {
           format: "date-time",
         },
         limit: {
-          type: "number",
+          type: "integer",
         },
       },
     },
@@ -180,7 +180,7 @@ export class ResController {
           type: "string",
         },
         limit: {
-          type: "number",
+          type: "integer",
         },
       },
     },
@@ -257,7 +257,7 @@ export class ResController {
           format: "date-time",
         },
         limit: {
-          type: "number",
+          type: "integer",
         },
       },
     },
@@ -284,7 +284,7 @@ export class ResController {
       required: ["limit"],
       properties: {
         limit: {
-          type: "number",
+          type: "integer",
         },
       },
     },
