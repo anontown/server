@@ -211,8 +211,9 @@ export class ResRepo implements IResRepo {
       type: "doc",
       id: rDB.id,
       body: rDB.body,
-      refresh: this.refresh,
+      refresh: true,
     });
+    //TODO:refresh:trueじゃなくても動くようにしたいけどとりあえず
 
     const resCount = (await this.resCount([res.topic])).get(res.topic) || 0;
     this.insertEvent.next({ res, count: resCount });
