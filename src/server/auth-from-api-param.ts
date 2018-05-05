@@ -56,12 +56,12 @@ export async function user(
 }
 
 export async function recaptcha(apiParamRecaptcha: string | null, isRecaptcha: boolean) {
-  if (apiParamRecaptcha === null && isRecaptcha) {
-    throw new AtAuthError("キャプチャ認証が必要です");
-  }
-
   if (!isRecaptcha) {
     return;
+  }
+
+  if (apiParamRecaptcha === null) {
+    throw new AtAuthError("キャプチャ認証が必要です");
   }
 
   const result = await new Promise<string>((resolve, reject) => {
