@@ -239,7 +239,7 @@ export class AppServer {
     jsonSchemaCheck(parameter.json, {
       type: "object",
       additionalProperties: false,
-      required: ["authUser", "authToken", "params"],
+      required: ["authUser", "authToken", "params", "recaptcha"],
       properties: {
         authUser: schemas.authUser,
         recaptcha: schemas.recaptcha,
