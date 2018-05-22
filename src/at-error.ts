@@ -33,7 +33,7 @@ export class AtServerError extends AtError {
 
 export class AtParamTypeError extends AtError {
     constructor(data: IJSONSchemaValidationError[]) {
-        super(StatusCode.MisdirectedRequest, "param_type", [
+        super(StatusCode.ClientError, "param_type", [
             { message: "パラメーターの型が不正です", data },
         ]);
     }
@@ -41,7 +41,7 @@ export class AtParamTypeError extends AtError {
 
 export class AtCaptchaError extends AtError {
     constructor() {
-        super(StatusCode.Forbidden, "captcha", [
+        super(StatusCode.ClientError, "captcha", [
             { message: "キャプチャ認証に失敗", data: null },
         ]);
     }
@@ -54,7 +54,7 @@ export interface IParamErrorData {
 
 export class AtParamsError extends AtError {
     constructor(data: IParamErrorData[]) {
-        super(StatusCode.MisdirectedRequest,
+        super(StatusCode.ClientError,
             "params",
             data.map(x => ({ message: x.message, data: { field: x.field } })));
     }
@@ -88,7 +88,7 @@ export function paramsErrorMaker(fs: paramsErrorMakerData[]) {
 
 export class AtRightError extends AtError {
     constructor(message: string) {
-        super(StatusCode.Forbidden,
+        super(StatusCode.ClientError,
             "right",
             [{ message, data: null }]);
     }
@@ -96,7 +96,7 @@ export class AtRightError extends AtError {
 
 export class AtConflictError extends AtError {
     constructor(message: string) {
-        super(StatusCode.Forbidden,
+        super(StatusCode.ClientError,
             "conflict",
             [{ message, data: null }]);
     }
@@ -107,7 +107,7 @@ export class AtConflictError extends AtError {
  */
 export class AtPrerequisiteError extends AtError {
     constructor(message: string) {
-        super(StatusCode.Forbidden,
+        super(StatusCode.ClientError,
             "prerequisite",
             [{ message, data: null }]);
     }
@@ -118,7 +118,7 @@ export class AtPrerequisiteError extends AtError {
  */
 export class AtTokenAuthError extends AtError {
     constructor() {
-        super(StatusCode.Unauthorized,
+        super(StatusCode.ClientError,
             "token_auth",
             [{ message: "認証に失敗しました", data: null }]);
     }
@@ -126,7 +126,7 @@ export class AtTokenAuthError extends AtError {
 
 export class AtAuthError extends AtError {
     constructor(message: string) {
-        super(StatusCode.Unauthorized,
+        super(StatusCode.ClientError,
             "auth",
             [{ message, data: null }]);
     }
@@ -134,7 +134,7 @@ export class AtAuthError extends AtError {
 
 export class AtUserAuthError extends AtError {
     constructor() {
-        super(StatusCode.Unauthorized,
+        super(StatusCode.ClientError,
             "user_auth",
             [{ message: "認証に失敗しました", data: null }]);
     }
@@ -142,7 +142,7 @@ export class AtUserAuthError extends AtError {
 
 export class AtNotFoundError extends AtError {
     constructor(message: string) {
-        super(StatusCode.NotFound,
+        super(StatusCode.ClientError,
             "not_found",
             [{ message, data: null }]);
     }
@@ -150,7 +150,7 @@ export class AtNotFoundError extends AtError {
 
 export class AtNotFoundPartError extends AtError {
     constructor(message: string, foundIds: string[]) {
-        super(StatusCode.NotFound,
+        super(StatusCode.ClientError,
             "not_found_part",
             [{ message, data: { foundIds } }]);
     }
@@ -158,29 +158,9 @@ export class AtNotFoundPartError extends AtError {
 
 export enum StatusCode {
     /**
-     * 認証が必要
+     * リクエストが不正
      */
-    Unauthorized = 401,
-
-    /**
-     * 拒否
-     */
-    Forbidden = 402,
-
-    /**
-     * 見つからない
-     */
-    NotFound = 404,
-
-    /**
-     * 競合
-     */
-    Conflict = 409,
-
-    /**
-     * パラメーターが不正
-     */
-    MisdirectedRequest = 421,
+    ClientError = 400,
 
     /**
      * サーバー内部エラー
