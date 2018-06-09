@@ -31,8 +31,7 @@ export class MsgRepoMock implements IMsgRepo {
 
   async find(
     authToken: IAuthToken,
-    type: "before" | "after",
-    equal: boolean,
+    type: "gt" | "gte" | "lt" | "lte",
     date: Date,
     limit: number): Promise<Msg[]> {
     const msgs = this.msgs
@@ -40,19 +39,26 @@ export class MsgRepoMock implements IMsgRepo {
       .filter(x => {
         const dateV = date.valueOf();
         const xDateV = new Date(x.body.date).valueOf();
-        return type === "after"
-          ? (equal ? dateV <= xDateV : dateV < xDateV)
-          : (equal ? xDateV <= dateV : xDateV < dateV);
+        switch (type) {
+          case "gte":
+            return dateV <= xDateV;
+          case "gt":
+            return dateV < xDateV;
+          case "lte":
+            return dateV >= xDateV;
+          case "lt":
+            return dateV > xDateV;
+        }
       })
       .sort((a, b) => {
         const av = new Date(a.body.date).valueOf();
         const bv = new Date(b.body.date).valueOf();
-        return type === "after" ? av - bv : bv - av;
+        return type === "gt" || type === "gte" ? av - bv : bv - av;
       })
       .slice(0, limit);
 
     const result = msgs.map(x => Msg.fromDB(x));
-    if (type === "after") {
+    if (type === "gt" || type === "gte") {
       result.reverse();
     }
     return result;

@@ -5,8 +5,7 @@ export interface IMsgRepo {
   findIn(ids: string[]): Promise<Msg[]>;
   find(
     authToken: IAuthToken,
-    type: "before" | "after",
-    equal: boolean,
+    type: "gt" | "gte" | "lt" | "lte",
     date: Date,
     limit: number): Promise<Msg[]>;
   findNew(authToken: IAuthToken, limit: number): Promise<Msg[]>;

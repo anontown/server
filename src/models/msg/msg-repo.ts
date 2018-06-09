@@ -47,8 +47,7 @@ export class MsgRepo implements IMsgRepo {
 
   async find(
     authToken: IAuthToken,
-    type: "before" | "after",
-    equal: boolean,
+    type: "gt" | "gte" | "lt" | "lte",
     date: Date,
     limit: number): Promise<Msg[]> {
     const msgs = await ESClient.search<IMsgDB["body"]>({
@@ -61,7 +60,7 @@ export class MsgRepo implements IMsgRepo {
               {
                 range: {
                   date: {
-                    [type === "after" ? (equal ? "gte" : "gt") : (equal ? "lte" : "lt")]: date.toISOString(),
+                    [type]: date.toISOString(),
                   },
                 },
               },
@@ -84,12 +83,12 @@ export class MsgRepo implements IMsgRepo {
             ],
           },
         },
-        sort: { date: { order: type === "after" ? "asc" : "desc" } },
+        sort: { date: { order: type === "gt" || type === "gte" ? "asc" : "desc" } },
       },
     });
 
     const result = msgs.hits.hits.map(m => Msg.fromDB({ id: m._id, body: m._source }));
-    if (type === "after") {
+    if (type === "gt" || type === "gte") {
       result.reverse();
     }
     return result;

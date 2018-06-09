@@ -62,14 +62,11 @@ export class MsgController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["type", "equal", "date", "limit"],
+      required: ["type", "date", "limit"],
       properties: {
         type: {
           type: "string",
-          enum: ["before", "after"],
-        },
-        equal: {
-          type: "boolean",
+          enum: ["gt", "gte", "lt", "lte"],
         },
         date: {
           type: "string",
@@ -82,13 +79,13 @@ export class MsgController {
     },
   })
   async find({ params, auth, repo }: IHttpAPICallParams<{
-    type: "before" | "after",
+    type: "gt" | "gte" | "lt" | "lte",
     equal: boolean,
     date: string,
     limit: number,
   }>): Promise<IMsgAPI[]> {
     const msgs = await repo.msg
-      .find(auth.token, params.type, params.equal, new Date(params.date), params.limit);
+      .find(auth.token, params.type, new Date(params.date), params.limit);
     return msgs.map(m => m.toAPI(auth.token));
   }
 
