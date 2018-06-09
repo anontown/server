@@ -9,14 +9,13 @@ export interface IResRepo {
 
   findIn(ids: string[]): Promise<Res[]>;
 
-  find(topic: string, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]>;
+  find(topic: string, type: "gt" | "gte" | "lt" | "lte", date: Date, limit: number): Promise<Res[]>;
 
   findNew(topicID: string, limit: number): Promise<Res[]>;
 
   findNotice(
     authToken: IAuthToken,
-    type: "before" | "after",
-    equal: boolean,
+    type: "gt" | "gte" | "lt" | "lte",
     date: Date,
     limit: number): Promise<Res[]>;
 

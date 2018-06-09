@@ -155,7 +155,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       await repo.insert(res8);
       await repo.insert(res9);
 
-      expect(await repo.find("topic", "after", true, new Date(0), 100)).toEqual([
+      expect(await repo.find("topic", "gte", new Date(0), 100)).toEqual([
         res4,
         res9,
         res7,
@@ -166,37 +166,37 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         res6,
       ]);
 
-      expect(await repo.find("topic", "after", true, new Date(70), 100)).toEqual([
+      expect(await repo.find("topic", "gte", new Date(70), 100)).toEqual([
         res4,
         res9,
       ]);
 
-      expect(await repo.find("topic", "after", true, new Date(70), 1)).toEqual([
+      expect(await repo.find("topic", "gte", new Date(70), 1)).toEqual([
         res9,
       ]);
 
-      expect(await repo.find("topic", "after", false, new Date(70), 100)).toEqual([
+      expect(await repo.find("topic", "gt", new Date(70), 100)).toEqual([
         res4,
       ]);
 
-      expect(await repo.find("topic", "before", true, new Date(30), 100)).toEqual([
+      expect(await repo.find("topic", "lte", new Date(30), 100)).toEqual([
         res3,
         res5,
         res6,
       ]);
 
-      expect(await repo.find("topic", "before", true, new Date(30), 2)).toEqual([
+      expect(await repo.find("topic", "lte", new Date(30), 2)).toEqual([
         res3,
         res5,
       ]);
 
-      expect(await repo.find("topic", "before", false, new Date(30), 100)).toEqual([
+      expect(await repo.find("topic", "lt", new Date(30), 100)).toEqual([
         res5,
         res6,
       ]);
 
-      expect(await repo.find("topic", "after", false, new Date(90), 100)).toEqual([]);
-      expect(await repo.find("topic", "before", false, new Date(30), 0)).toEqual([]);
+      expect(await repo.find("topic", "gt", new Date(90), 100)).toEqual([]);
+      expect(await repo.find("topic", "lt", new Date(30), 0)).toEqual([]);
     });
   });
 
@@ -271,7 +271,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       await repo.insert(res11);
       await repo.insert(res12);
 
-      expect(await repo.findNotice(token, "after", true, new Date(0), 100)).toEqual([
+      expect(await repo.findNotice(token, "gte", new Date(0), 100)).toEqual([
         res4,
         res9,
         res7,
@@ -281,37 +281,37 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         res6,
       ]);
 
-      expect(await repo.findNotice(token, "after", true, new Date(70), 100)).toEqual([
+      expect(await repo.findNotice(token, "gte", new Date(70), 100)).toEqual([
         res4,
         res9,
       ]);
 
-      expect(await repo.findNotice(token, "after", true, new Date(70), 1)).toEqual([
+      expect(await repo.findNotice(token, "gte", new Date(70), 1)).toEqual([
         res9,
       ]);
 
-      expect(await repo.findNotice(token, "after", false, new Date(70), 100)).toEqual([
+      expect(await repo.findNotice(token, "gt", new Date(70), 100)).toEqual([
         res4,
       ]);
 
-      expect(await repo.findNotice(token, "before", true, new Date(30), 100)).toEqual([
+      expect(await repo.findNotice(token, "lte", new Date(30), 100)).toEqual([
         res3,
         res5,
         res6,
       ]);
 
-      expect(await repo.findNotice(token, "before", true, new Date(30), 2)).toEqual([
+      expect(await repo.findNotice(token, "lte", new Date(30), 2)).toEqual([
         res3,
         res5,
       ]);
 
-      expect(await repo.findNotice(token, "before", false, new Date(30), 100)).toEqual([
+      expect(await repo.findNotice(token, "lt", new Date(30), 100)).toEqual([
         res5,
         res6,
       ]);
 
-      expect(await repo.findNotice(token, "after", false, new Date(90), 100)).toEqual([]);
-      expect(await repo.findNotice(token, "before", false, new Date(30), 0)).toEqual([]);
+      expect(await repo.findNotice(token, "gt", new Date(90), 100)).toEqual([]);
+      expect(await repo.findNotice(token, "lt", new Date(30), 0)).toEqual([]);
     });
   });
 

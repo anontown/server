@@ -48,7 +48,7 @@ export class ResRepo implements IResRepo {
     return this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
   }
 
-  async find(topicID: string, type: "before" | "after", equal: boolean, date: Date, limit: number): Promise<Res[]> {
+  async find(topicID: string, type: "gt" | "gte" | "lt" | "lte", date: Date, limit: number): Promise<Res[]> {
     const reses = await ESClient.search<IResDB["body"]>({
       index: "reses",
       size: limit,
@@ -59,7 +59,7 @@ export class ResRepo implements IResRepo {
               {
                 range: {
                   date: {
-                    [type === "after" ? (equal ? "gte" : "gt") : (equal ? "lte" : "lt")]: date.toISOString(),
+                    [type]: date.toISOString(),
                   },
                 },
               },
@@ -71,12 +71,12 @@ export class ResRepo implements IResRepo {
             ],
           },
         },
-        sort: { date: { order: type === "after" ? "asc" : "desc" } },
+        sort: { date: { order: type === "gt" || type === "gte" ? "asc" : "desc" } },
       },
     });
 
     const result = await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
-    if (type === "after") {
+    if (type === "gt" || type === "gte") {
       result.reverse();
     }
     return result;
@@ -101,8 +101,7 @@ export class ResRepo implements IResRepo {
 
   async findNotice(
     authToken: IAuthToken,
-    type: "before" | "after",
-    equal: boolean,
+    type: "gt" | "gte" | "lt" | "lte",
     date: Date,
     limit: number): Promise<Res[]> {
     const reses = await ESClient.search<IResDB["body"]>({
@@ -115,7 +114,7 @@ export class ResRepo implements IResRepo {
               {
                 range: {
                   date: {
-                    [type === "after" ? (equal ? "gte" : "gt") : (equal ? "lte" : "lt")]: date.toISOString(),
+                    [type]: date.toISOString(),
                   },
                 },
               },
@@ -132,12 +131,12 @@ export class ResRepo implements IResRepo {
             ],
           },
         },
-        sort: { date: { order: type === "after" ? "asc" : "desc" } },
+        sort: { date: { order: type === "gt" || type === "gte" ? "asc" : "desc" } },
       },
     });
 
     const result = await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
-    if (type === "after") {
+    if (type === "gt" || type === "gte") {
       result.reverse();
     }
     return result;
@@ -213,7 +212,7 @@ export class ResRepo implements IResRepo {
       body: rDB.body,
       refresh: true,
     });
-    //TODO:refresh:trueじゃなくても動くようにしたいけどとりあえず
+    // TODO:refresh:trueじゃなくても動くようにしたいけどとりあえず
 
     const resCount = (await this.resCount([res.topic])).get(res.topic) || 0;
     this.insertEvent.next({ res, count: resCount });

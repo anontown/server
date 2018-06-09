@@ -132,17 +132,14 @@ export class ResController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["topic", "type", "equal", "date", "limit"],
+      required: ["topic", "type", "date", "limit"],
       properties: {
         topic: {
           type: "string",
         },
         type: {
           type: "string",
-          enum: ["before", "after"],
-        },
-        equal: {
-          type: "boolean",
+          enum: ["gt", "gte", "lt", "lte"],
         },
         date: {
           type: "string",
@@ -156,13 +153,12 @@ export class ResController {
   })
   async find({ params, auth, repo }: IHttpAPICallParams<{
     topic: string,
-    type: "before" | "after",
-    equal: boolean,
+    type: "gt" | "gte" | "lt" | "lte",
     date: string,
     limit: number,
   }>): Promise<IResAPI[]> {
     const topic = await repo.topic.findOne(params.topic);
-    const reses = await repo.res.find(topic.id, params.type, params.equal, new Date(params.date), params.limit);
+    const reses = await repo.res.find(topic.id, params.type, new Date(params.date), params.limit);
     return reses.map(r => r.toAPI(auth.tokenOrNull));
   }
 
@@ -243,14 +239,11 @@ export class ResController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["type", "equal", "date", "limit"],
+      required: ["type", "date", "limit"],
       properties: {
         type: {
           type: "string",
-          enum: ["before", "after"],
-        },
-        equal: {
-          type: "boolean",
+          enum: ["gt", "gte", "lt", "lte"],
         },
         date: {
           type: "string",
@@ -263,13 +256,12 @@ export class ResController {
     },
   })
   async findNotice({ params, auth, repo }: IHttpAPICallParams<{
-    type: "before" | "after",
-    equal: boolean,
+    type: "gt" | "gte" | "lt" | "lte",
     date: string,
     limit: number,
   }>): Promise<IResAPI[]> {
     const res = await repo.res
-      .findNotice(auth.token, params.type, params.equal, new Date(params.date), params.limit);
+      .findNotice(auth.token, params.type, new Date(params.date), params.limit);
     return res.map(x => x.toAPI(auth.token));
   }
 
