@@ -64,15 +64,6 @@ export class MsgRepoMock implements IMsgRepo {
     return result;
   }
 
-  async findNew(authToken: IAuthToken, limit: number): Promise<Msg[]> {
-    const msgs = this.msgs
-      .filter(x => x.body.receiver === null || x.body.receiver === authToken.user)
-      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
-      .slice(0, limit);
-
-    return msgs.map(x => Msg.fromDB(x));
-  }
-
   async insert(msg: Msg): Promise<void> {
     this.msgs.push(msg.toDB());
   }

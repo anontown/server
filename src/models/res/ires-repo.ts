@@ -11,15 +11,11 @@ export interface IResRepo {
 
   find(topic: string, type: "gt" | "gte" | "lt" | "lte", date: Date, limit: number): Promise<Res[]>;
 
-  findNew(topicID: string, limit: number): Promise<Res[]>;
-
   findNotice(
     authToken: IAuthToken,
     type: "gt" | "gte" | "lt" | "lte",
     date: Date,
     limit: number): Promise<Res[]>;
-
-  findNoticeNew(authToken: IAuthToken, limit: number): Promise<Res[]>;
 
   findHash(hash: string): Promise<Res[]>;
 

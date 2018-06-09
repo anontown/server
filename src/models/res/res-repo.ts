@@ -82,23 +82,6 @@ export class ResRepo implements IResRepo {
     return result;
   }
 
-  async findNew(topicID: string, limit: number): Promise<Res[]> {
-    const reses = await ESClient.search<IResDB["body"]>({
-      index: "reses",
-      size: limit,
-      body: {
-        query: {
-          term: {
-            topic: topicID,
-          },
-        },
-        sort: { date: { order: "desc" } },
-      },
-    });
-
-    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
-  }
-
   async findNotice(
     authToken: IAuthToken,
     type: "gt" | "gte" | "lt" | "lte",
@@ -140,28 +123,6 @@ export class ResRepo implements IResRepo {
       result.reverse();
     }
     return result;
-  }
-
-  async findNoticeNew(authToken: IAuthToken, limit: number): Promise<Res[]> {
-    const reses = await ESClient.search<IResDB["body"]>({
-      index: "reses",
-      size: limit,
-      body: {
-        query: {
-          nested: {
-            path: "reply",
-            query: {
-              term: {
-                "reply.user": authToken.user,
-              },
-            },
-          },
-        },
-        sort: { date: { order: "desc" } },
-      },
-    });
-
-    return await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
   }
 
   async findHash(hash: string): Promise<Res[]> {

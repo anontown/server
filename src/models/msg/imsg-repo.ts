@@ -8,7 +8,6 @@ export interface IMsgRepo {
     type: "gt" | "gte" | "lt" | "lte",
     date: Date,
     limit: number): Promise<Msg[]>;
-  findNew(authToken: IAuthToken, limit: number): Promise<Msg[]>;
   insert(msg: Msg): Promise<void>;
   update(msg: Msg): Promise<void>;
 }

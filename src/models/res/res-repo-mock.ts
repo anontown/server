@@ -63,15 +63,6 @@ export class ResRepoMock implements IResRepo {
     return result;
   }
 
-  async findNew(topicID: string, limit: number): Promise<Res[]> {
-    const reses = this.reses
-      .filter(x => x.body.topic === topicID)
-      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
-      .slice(0, limit);
-
-    return await this.aggregate(reses);
-  }
-
   async findNotice(
     authToken: IAuthToken,
     type: "gt" | "gte" | "lt" | "lte",
@@ -105,15 +96,6 @@ export class ResRepoMock implements IResRepo {
       result.reverse();
     }
     return result;
-  }
-
-  async findNoticeNew(authToken: IAuthToken, limit: number): Promise<Res[]> {
-    const reses = this.reses
-      .filter(x => x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === authToken.user)
-      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
-      .slice(0, limit);
-
-    return await this.aggregate(reses);
   }
 
   async findHash(hash: string): Promise<Res[]> {

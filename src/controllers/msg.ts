@@ -88,25 +88,4 @@ export class MsgController {
       .find(auth.token, params.type, new Date(params.date), params.limit);
     return msgs.map(m => m.toAPI(auth.token));
   }
-
-  @http({
-    url: "/msg/find/new",
-
-    isAuthUser: false,
-    isAuthToken: "all",
-    schema: {
-      type: "object",
-      additionalProperties: false,
-      required: ["limit"],
-      properties: {
-        limit: {
-          type: "integer",
-        },
-      },
-    },
-  })
-  async findNew({ params, auth, repo }: IHttpAPICallParams<{ limit: number }>): Promise<IMsgAPI[]> {
-    const msgs = await repo.msg.findNew(auth.token, params.limit);
-    return msgs.map(m => m.toAPI(auth.token));
-  }
 }

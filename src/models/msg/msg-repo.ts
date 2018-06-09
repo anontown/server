@@ -94,34 +94,6 @@ export class MsgRepo implements IMsgRepo {
     return result;
   }
 
-  async findNew(authToken: IAuthToken, limit: number): Promise<Msg[]> {
-    const msgs = await ESClient.search<IMsgDB["body"]>({
-      index: "msgs",
-      size: limit,
-      body: {
-        query: {
-          bool: {
-            should: [
-              {
-                bool: {
-                  must_not: {
-                    exists: {
-                      field: "receiver",
-                    },
-                  },
-                },
-              },
-              { term: { receiver: authToken.user } },
-            ],
-          },
-        },
-        sort: { date: { order: "desc" } },
-      },
-    });
-
-    return msgs.hits.hits.map(m => Msg.fromDB({ id: m._id, body: m._source }));
-  }
-
   async insert(msg: Msg): Promise<void> {
     const mDB = msg.toDB();
     await ESClient.create({

@@ -163,31 +163,6 @@ export class ResController {
   }
 
   @http({
-    url: "/res/find/new",
-
-    isAuthUser: false,
-    isAuthToken: "no",
-    schema: {
-      type: "object",
-      additionalProperties: false,
-      required: ["topic", "limit"],
-      properties: {
-        topic: {
-          type: "string",
-        },
-        limit: {
-          type: "integer",
-        },
-      },
-    },
-  })
-  async findNew({ params, auth, repo }: IHttpAPICallParams<{ topic: string, limit: number }>): Promise<IResAPI[]> {
-    const topic = await repo.topic.findOne(params.topic);
-    const reses = await repo.res.findNew(topic.id, params.limit);
-    return reses.map(r => r.toAPI(auth.tokenOrNull));
-  }
-
-  @http({
     url: "/res/find/hash",
 
     isAuthUser: false,
@@ -262,27 +237,6 @@ export class ResController {
   }>): Promise<IResAPI[]> {
     const res = await repo.res
       .findNotice(auth.token, params.type, new Date(params.date), params.limit);
-    return res.map(x => x.toAPI(auth.token));
-  }
-
-  @http({
-    url: "/res/find/notice/new",
-
-    isAuthUser: false,
-    isAuthToken: "all",
-    schema: {
-      type: "object",
-      additionalProperties: false,
-      required: ["limit"],
-      properties: {
-        limit: {
-          type: "integer",
-        },
-      },
-    },
-  })
-  async findNoticeNew({ params, auth, repo }: IHttpAPICallParams<{ limit: number }>): Promise<IResAPI[]> {
-    const res = await repo.res.findNoticeNew(auth.token, params.limit);
     return res.map(x => x.toAPI(auth.token));
   }
 

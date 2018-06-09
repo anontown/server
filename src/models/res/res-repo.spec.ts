@@ -200,37 +200,6 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
     });
   });
 
-  describe("findNew", () => {
-    it("正常に検索出来るか", async () => {
-      const repo = repoGene();
-
-      expect(await repo.findNew("topic", 100)).toEqual([]);
-
-      const res1 = resNormal.copy({ id: "res1", date: new Date(50) });
-      const res2 = resHistory.copy({ id: "res2", date: new Date(80), topic: "topic2" });
-      const res3 = resTopic.copy({ id: "res3", date: new Date(30) });
-      const res4 = resFork.copy({ id: "res4", date: new Date(90) });
-
-      await repo.insert(res1);
-      await repo.insert(res2);
-      await repo.insert(res3);
-      await repo.insert(res4);
-
-      expect(await repo.findNew("topic", 100)).toEqual([
-        res4,
-        res1,
-        res3,
-      ]);
-
-      expect(await repo.findNew("topic", 2)).toEqual([
-        res4,
-        res1,
-      ]);
-
-      expect(await repo.findNew("topic", 0)).toEqual([]);
-    });
-  });
-
   describe("findNotice", () => {
     it("正常に検索出来るか", async () => {
       const repo = repoGene();
@@ -312,61 +281,6 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
 
       expect(await repo.findNotice(token, "gt", new Date(90), 100)).toEqual([]);
       expect(await repo.findNotice(token, "lt", new Date(30), 0)).toEqual([]);
-    });
-  });
-
-  describe("findNoticeNew", () => {
-    it("正常に検索出来るか", async () => {
-      const repo = repoGene();
-
-      const user1 = "user1";
-      const user2 = "user2";
-
-      const token: IAuthTokenMaster = {
-        id: "token",
-        key: "key",
-        user: user1,
-        type: "master",
-      };
-
-      expect(await repo.findNoticeNew(token, 100)).toEqual([]);
-
-      const res1 = resNormal.copy({ id: "res1", date: new Date(50), reply: null, user: user2 });
-      const res2 = resNormal.copy({ id: "res2", date: new Date(80), reply: { res: "res1", user: user2 } });
-      const res3 = resNormal.copy({
-        id: "res3",
-        date: new Date(30),
-        reply: { user: "user1", res: "res1" },
-        user: user2,
-      });
-      const res4 = resNormal.copy({
-        id: "res4",
-        date: new Date(90),
-        reply: { user: "user1", res: "res1" },
-        user: user2,
-      });
-      const res5 = resTopic.copy({ id: "res5", date: new Date(60) });
-      const res6 = resHistory.copy({ id: "res6", date: new Date(40) });
-      const res7 = resFork.copy({ id: "res7", date: new Date(70) });
-
-      await repo.insert(res1);
-      await repo.insert(res2);
-      await repo.insert(res3);
-      await repo.insert(res4);
-      await repo.insert(res5);
-      await repo.insert(res6);
-      await repo.insert(res7);
-
-      expect(await repo.findNoticeNew(token, 100)).toEqual([
-        res4,
-        res3,
-      ]);
-
-      expect(await repo.findNoticeNew(token, 1)).toEqual([
-        res4,
-      ]);
-
-      expect(await repo.findNoticeNew(token, 0)).toEqual([]);
     });
   });
 
