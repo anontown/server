@@ -1,10 +1,9 @@
 import { Subject } from "rxjs";
 import { AtNotFoundError, AtNotFoundPartError, AtAuthError } from "../../at-error";
 import { IAuthToken } from "../../auth";
-import { Config } from "../../config";
 import { ESClient } from "../../db";
 import { IResRepo, IResFindQuery } from "./ires-repo";
-import { fromDBToRes, IResDB, IResNormalDB, Res } from "./res";
+import { fromDBToRes, IResDB, Res } from "./res";
 
 export class ResRepo implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
