@@ -135,13 +135,20 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
     it("正常に検索出来るか", async () => {
       const repo = repoGene();
 
+      const token: IAuthTokenMaster = {
+        id: "token",
+        key: "key",
+        user: "user",
+        type: "master",
+      };
+
       const res1 = resNormal.copy({ id: "res1", date: new Date(50) });
       const res2 = resTopic.copy({ id: "res2", date: new Date(80), topic: "topic2" });
       const res3 = resFork.copy({ id: "res3", date: new Date(30) });
-      const res4 = resHistory.copy({ id: "res4", date: new Date(90) });
+      const res4 = resHistory.copy({ id: "res4", date: new Date(90), hash: "hash2" });
       const res5 = resNormal.copy({ id: "res5", date: new Date(20) });
       const res6 = resTopic.copy({ id: "res6", date: new Date(10) });
-      const res7 = resNormal.copy({ id: "res7", date: new Date(60) });
+      const res7 = resNormal.copy({ id: "res7", date: new Date(60), reply: { user: "user", res: "res6" } });
       const res8 = resHistory.copy({ id: "res8", date: new Date(40) });
       const res9 = resFork.copy({ id: "res9", date: new Date(70) });
 
@@ -155,7 +162,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       await repo.insert(res8);
       await repo.insert(res9);
 
-      expect(await repo.find("topic", "gte", new Date(0), 100)).toEqual([
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "gte", new Date(0), 100)).toEqual([
         res4,
         res9,
         res7,
@@ -166,203 +173,46 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         res6,
       ]);
 
-      expect(await repo.find("topic", "gte", new Date(70), 100)).toEqual([
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "gte", new Date(70), 100)).toEqual([
         res4,
         res9,
       ]);
 
-      expect(await repo.find("topic", "gte", new Date(70), 1)).toEqual([
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "gte", new Date(70), 1)).toEqual([
         res9,
       ]);
 
-      expect(await repo.find("topic", "gt", new Date(70), 100)).toEqual([
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "gt", new Date(70), 100)).toEqual([
         res4,
       ]);
 
-      expect(await repo.find("topic", "lte", new Date(30), 100)).toEqual([
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "lte", new Date(30), 100)).toEqual([
         res3,
         res5,
         res6,
       ]);
 
-      expect(await repo.find("topic", "lte", new Date(30), 2)).toEqual([
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "lte", new Date(30), 2)).toEqual([
         res3,
         res5,
       ]);
 
-      expect(await repo.find("topic", "lt", new Date(30), 100)).toEqual([
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "lt", new Date(30), 100)).toEqual([
         res5,
         res6,
       ]);
 
-      expect(await repo.find("topic", "gt", new Date(90), 100)).toEqual([]);
-      expect(await repo.find("topic", "lt", new Date(30), 0)).toEqual([]);
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "gt", new Date(90), 100)).toEqual([]);
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "lt", new Date(30), 0)).toEqual([]);
+
+      expect(await repo.find({ topic: null, notice: true, reply: null, hash: null }, token, "gte", new Date(0), 1)).toEqual([res7]);
+      expect(await repo.find({ topic: null, notice: false, reply: "res6", hash: null }, null, "gte", new Date(0), 1)).toEqual([res7]);
+      expect(await repo.find({ topic: null, notice: false, reply: null, hash: "hash2" }, null, "gte", new Date(0), 1)).toEqual([res4]);
     });
-  });
 
-  describe("findNotice", () => {
-    it("正常に検索出来るか", async () => {
+    describe("通知フィルタでトークンがないとエラーになるか", async () => {
       const repo = repoGene();
-
-      const user1 = "user1";
-      const user2 = "user2";
-
-      const token: IAuthTokenMaster = {
-        id: "token",
-        key: "key",
-        user: user1,
-        type: "master",
-      };
-
-      const res1 = resNormal.copy({ id: "res1", date: new Date(50), reply: null, user: user2 });
-      const res2 = resNormal.copy({ id: "res2", date: new Date(80), reply: { res: "res1", user: user2 } });
-      const res3 = resNormal.copy({ id: "res3", date: new Date(30), reply: { res: "res2", user: user1 } });
-      const res4 = resNormal.copy({ id: "res4", date: new Date(90), reply: { res: "res2", user: user1 } });
-      const res5 = resNormal.copy({ id: "res5", date: new Date(20), reply: { res: "res2", user: user1 } });
-      const res6 = resNormal.copy({ id: "res6", date: new Date(10), reply: { res: "res2", user: user1 } });
-      const res7 = resNormal.copy({ id: "res7", date: new Date(60), reply: { res: "res2", user: user1 } });
-      const res8 = resNormal.copy({ id: "res8", date: new Date(40), reply: { res: "res2", user: user1 } });
-      const res9 = resNormal.copy({ id: "res9", date: new Date(70), reply: { res: "res2", user: user1 } });
-      const res10 = resTopic.copy({ id: "res10", date: new Date(60) });
-      const res11 = resHistory.copy({ id: "res11", date: new Date(40) });
-      const res12 = resFork.copy({ id: "res12", date: new Date(70) });
-
-      await repo.insert(res1);
-      await repo.insert(res2);
-      await repo.insert(res3);
-      await repo.insert(res4);
-      await repo.insert(res5);
-      await repo.insert(res6);
-      await repo.insert(res7);
-      await repo.insert(res8);
-      await repo.insert(res9);
-      await repo.insert(res10);
-      await repo.insert(res11);
-      await repo.insert(res12);
-
-      expect(await repo.findNotice(token, "gte", new Date(0), 100)).toEqual([
-        res4,
-        res9,
-        res7,
-        res8,
-        res3,
-        res5,
-        res6,
-      ]);
-
-      expect(await repo.findNotice(token, "gte", new Date(70), 100)).toEqual([
-        res4,
-        res9,
-      ]);
-
-      expect(await repo.findNotice(token, "gte", new Date(70), 1)).toEqual([
-        res9,
-      ]);
-
-      expect(await repo.findNotice(token, "gt", new Date(70), 100)).toEqual([
-        res4,
-      ]);
-
-      expect(await repo.findNotice(token, "lte", new Date(30), 100)).toEqual([
-        res3,
-        res5,
-        res6,
-      ]);
-
-      expect(await repo.findNotice(token, "lte", new Date(30), 2)).toEqual([
-        res3,
-        res5,
-      ]);
-
-      expect(await repo.findNotice(token, "lt", new Date(30), 100)).toEqual([
-        res5,
-        res6,
-      ]);
-
-      expect(await repo.findNotice(token, "gt", new Date(90), 100)).toEqual([]);
-      expect(await repo.findNotice(token, "lt", new Date(30), 0)).toEqual([]);
-    });
-  });
-
-  describe("findHash", () => {
-    it("正常に検索出来るか", async () => {
-      const repo = repoGene();
-
-      const res1 = resNormal.copy({ id: "res1", date: new Date(50), hash: "hash2" });
-      const res2 = resFork.copy({ id: "res2", date: new Date(80), hash: "hash1" });
-      const res3 = resTopic.copy({ id: "res3", date: new Date(30) });
-      const res4 = resHistory.copy({ id: "res4", date: new Date(90) });
-      const res5 = resNormal.copy({ id: "res5", date: new Date(20) });
-      const res6 = resFork.copy({ id: "res6", date: new Date(10) });
-      const res7 = resTopic.copy({ id: "res7", date: new Date(60) });
-      const res8 = resHistory.copy({ id: "res8", date: new Date(40) });
-      const res9 = resNormal.copy({ id: "res9", date: new Date(70) });
-
-      await repo.insert(res1);
-      await repo.insert(res2);
-      await repo.insert(res3);
-      await repo.insert(res4);
-      await repo.insert(res5);
-      await repo.insert(res6);
-      await repo.insert(res7);
-      await repo.insert(res8);
-      await repo.insert(res9);
-
-      expect(await repo.findHash("aaa")).toEqual([]);
-      expect(await repo.findHash("hash1")).toEqual([res2]);
-      expect(await repo.findHash("hash")).toEqual([
-        res4,
-        res9,
-        res7,
-        res8,
-        res3,
-        res5,
-        res6,
-      ]);
-    });
-  });
-
-  describe("findReply", () => {
-    it("正常に検索出来るか", async () => {
-      const repo = repoGene();
-
-      const res1 = resNormal.copy({ id: "res1", date: new Date(50), reply: null });
-      const res2 = resNormal.copy({ id: "res2", date: new Date(80), reply: { res: "res1", user: "user" } });
-      const res3 = resNormal.copy({ id: "res3", date: new Date(30), reply: { res: "res2", user: "user" } });
-      const res4 = resNormal.copy({ id: "res4", date: new Date(90), reply: { res: "res2", user: "user" } });
-      const res5 = resNormal.copy({ id: "res5", date: new Date(20), reply: { res: "res2", user: "user" } });
-      const res6 = resNormal.copy({ id: "res6", date: new Date(10), reply: { res: "res2", user: "user" } });
-      const res7 = resNormal.copy({ id: "res7", date: new Date(60), reply: { res: "res2", user: "user" } });
-      const res8 = resNormal.copy({ id: "res8", date: new Date(40), reply: { res: "res2", user: "user" } });
-      const res9 = resNormal.copy({ id: "res9", date: new Date(70), reply: { res: "res2", user: "user" } });
-      const res10 = resTopic.copy({ id: "res10", date: new Date(60) });
-      const res11 = resHistory.copy({ id: "res11", date: new Date(40) });
-      const res12 = resFork.copy({ id: "res12", date: new Date(70) });
-
-      await repo.insert(res1);
-      await repo.insert(res2);
-      await repo.insert(res3);
-      await repo.insert(res4);
-      await repo.insert(res5);
-      await repo.insert(res6);
-      await repo.insert(res7);
-      await repo.insert(res8);
-      await repo.insert(res9);
-      await repo.insert(res10);
-      await repo.insert(res11);
-      await repo.insert(res12);
-
-      expect(await repo.findReply("res3")).toEqual([]);
-      expect(await repo.findReply("res1")).toEqual([res2.copy({ replyCount: 7 })]);
-      expect(await repo.findReply("res2")).toEqual([
-        res4,
-        res9,
-        res7,
-        res8,
-        res3,
-        res5,
-        res6,
-      ]);
+      await expect(repo.find({ topic: null, notice: true, reply: null, hash: null }, null, "gte", new Date(0), 1)).rejects.toThrow(AtError);
     });
   });
 
