@@ -3,6 +3,7 @@ import { ObjectIDGenerator } from "../generator";
 import {
   IResAPI,
   ResNormal,
+  IResFindQuery,
 } from "../models";
 import {
   controller,
@@ -132,10 +133,26 @@ export class ResController {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["topic", "type", "date", "limit"],
+      required: ["query", "type", "date", "limit"],
       properties: {
-        topic: {
-          type: "string",
+        query: {
+          type: "object",
+          additionalProperties: false,
+          required: ["topic", "notice", "hash", "reply"],
+          properties: {
+            topic: {
+              type: ["string", "null"]
+            },
+            notice: {
+              type: "boolean"
+            },
+            hash: {
+              type: ["string", "null"]
+            },
+            reply: {
+              type: ["string", "null"]
+            }
+          }
         },
         type: {
           type: "string",
@@ -152,92 +169,13 @@ export class ResController {
     },
   })
   async find({ params, auth, repo }: IHttpAPICallParams<{
-    topic: string,
+    query: IResFindQuery,
     type: "gt" | "gte" | "lt" | "lte",
     date: string,
     limit: number,
   }>): Promise<IResAPI[]> {
-    const topic = await repo.topic.findOne(params.topic);
-    const reses = await repo.res.find(topic.id, params.type, new Date(params.date), params.limit);
+    const reses = await repo.res.find(params.query, auth.tokenOrNull, params.type, new Date(params.date), params.limit);
     return reses.map(r => r.toAPI(auth.tokenOrNull));
-  }
-
-  @http({
-    url: "/res/find/hash",
-
-    isAuthUser: false,
-    isAuthToken: "no",
-    schema: {
-      type: "object",
-      additionalProperties: false,
-      required: ["hash"],
-      properties: {
-        hash: {
-          type: "string",
-        },
-      },
-    },
-  })
-  async findHash({ params, auth, repo }: IHttpAPICallParams<{ hash: string }>): Promise<IResAPI[]> {
-    const reses = await repo.res.findHash(params.hash);
-    return reses.map(r => r.toAPI(auth.tokenOrNull));
-  }
-
-  @http({
-    url: "/res/find/reply",
-
-    isAuthUser: false,
-    isAuthToken: "no",
-    schema: {
-      type: "object",
-      additionalProperties: false,
-      required: ["reply"],
-      properties: {
-        reply: {
-          type: "string",
-        },
-      },
-    },
-  })
-  async findReply({ params, auth, repo }: IHttpAPICallParams<{ reply: string }>): Promise<IResAPI[]> {
-    const res = await repo.res.findOne(params.reply);
-
-    const reses = await repo.res.findReply(res.id);
-    return reses.map(r => r.toAPI(auth.tokenOrNull));
-  }
-
-  @http({
-    url: "/res/find/notice",
-
-    isAuthUser: false,
-    isAuthToken: "all",
-    schema: {
-      type: "object",
-      additionalProperties: false,
-      required: ["type", "date", "limit"],
-      properties: {
-        type: {
-          type: "string",
-          enum: ["gt", "gte", "lt", "lte"],
-        },
-        date: {
-          type: "string",
-          format: "date-time",
-        },
-        limit: {
-          type: "integer",
-        },
-      },
-    },
-  })
-  async findNotice({ params, auth, repo }: IHttpAPICallParams<{
-    type: "gt" | "gte" | "lt" | "lte",
-    date: string,
-    limit: number,
-  }>): Promise<IResAPI[]> {
-    const res = await repo.res
-      .findNotice(auth.token, params.type, new Date(params.date), params.limit);
-    return res.map(x => x.toAPI(auth.token));
   }
 
   @http({
