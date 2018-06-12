@@ -3,11 +3,11 @@ import { IAuthToken } from "../../auth";
 import { Res } from "./res";
 
 export interface IResFindQuery {
-  topic: string | null,
-  notice: boolean,
-  hash: string | null,
-  reply: string | null
-};
+  topic: string | null;
+  notice: boolean;
+  hash: string | null;
+  reply: string | null;
+}
 
 export interface IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }>;

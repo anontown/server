@@ -1,8 +1,8 @@
 import { Subject } from "rxjs";
-import { AtNotFoundError, AtNotFoundPartError, AtAuthError } from "../../at-error";
+import { AtAuthError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
-import { IResRepo, IResFindQuery } from "./ires-repo";
+import { IResFindQuery, IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
 
 export class ResRepo implements IResRepo {
@@ -115,7 +115,7 @@ export class ResRepo implements IResRepo {
       body: {
         query: {
           bool: {
-            filter: filter,
+            filter,
           },
         },
         sort: { date: { order: type === "gt" || type === "gte" ? "asc" : "desc" } },

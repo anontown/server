@@ -2,8 +2,8 @@ import { AtPrerequisiteError } from "../at-error";
 import { ObjectIDGenerator } from "../generator";
 import {
   IResAPI,
-  ResNormal,
   IResFindQuery,
+  ResNormal,
 } from "../models";
 import {
   controller,
@@ -141,18 +141,18 @@ export class ResController {
           required: ["topic", "notice", "hash", "reply"],
           properties: {
             topic: {
-              type: ["string", "null"]
+              type: ["string", "null"],
             },
             notice: {
-              type: "boolean"
+              type: "boolean",
             },
             hash: {
-              type: ["string", "null"]
+              type: ["string", "null"],
             },
             reply: {
-              type: ["string", "null"]
-            }
-          }
+              type: ["string", "null"],
+            },
+          },
         },
         type: {
           type: "string",

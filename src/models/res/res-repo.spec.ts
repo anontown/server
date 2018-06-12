@@ -162,57 +162,70 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       await repo.insert(res8);
       await repo.insert(res9);
 
-      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "gte", new Date(0), 100)).toEqual([
-        res4,
-        res9,
-        res7,
-        res1,
-        res8,
-        res3,
-        res5,
-        res6,
-      ]);
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null },
+        null, "gte", new Date(0), 100)).toEqual([
+          res4,
+          res9,
+          res7,
+          res1,
+          res8,
+          res3,
+          res5,
+          res6,
+        ]);
 
-      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "gte", new Date(70), 100)).toEqual([
-        res4,
-        res9,
-      ]);
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null },
+        null, "gte", new Date(70), 100)).toEqual([
+          res4,
+          res9,
+        ]);
 
-      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "gte", new Date(70), 1)).toEqual([
-        res9,
-      ]);
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null },
+        null, "gte", new Date(70), 1)).toEqual([
+          res9,
+        ]);
 
-      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "gt", new Date(70), 100)).toEqual([
-        res4,
-      ]);
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null },
+        null, "gt", new Date(70), 100)).toEqual([
+          res4,
+        ]);
 
-      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "lte", new Date(30), 100)).toEqual([
-        res3,
-        res5,
-        res6,
-      ]);
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null },
+        null, "lte", new Date(30), 100)).toEqual([
+          res3,
+          res5,
+          res6,
+        ]);
 
-      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "lte", new Date(30), 2)).toEqual([
-        res3,
-        res5,
-      ]);
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null },
+        null, "lte", new Date(30), 2)).toEqual([
+          res3,
+          res5,
+        ]);
 
-      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "lt", new Date(30), 100)).toEqual([
-        res5,
-        res6,
-      ]);
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null },
+        null, "lt", new Date(30), 100)).toEqual([
+          res5,
+          res6,
+        ]);
 
-      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "gt", new Date(90), 100)).toEqual([]);
-      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null }, null, "lt", new Date(30), 0)).toEqual([]);
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null },
+        null, "gt", new Date(90), 100)).toEqual([]);
+      expect(await repo.find({ topic: "topic", notice: false, reply: null, hash: null },
+        null, "lt", new Date(30), 0)).toEqual([]);
 
-      expect(await repo.find({ topic: null, notice: true, reply: null, hash: null }, token, "gte", new Date(0), 1)).toEqual([res7]);
-      expect(await repo.find({ topic: null, notice: false, reply: "res6", hash: null }, null, "gte", new Date(0), 1)).toEqual([res7]);
-      expect(await repo.find({ topic: null, notice: false, reply: null, hash: "hash2" }, null, "gte", new Date(0), 1)).toEqual([res4]);
+      expect(await repo.find({ topic: null, notice: true, reply: null, hash: null },
+        token, "gte", new Date(0), 1)).toEqual([res7]);
+      expect(await repo.find({ topic: null, notice: false, reply: "res6", hash: null },
+        null, "gte", new Date(0), 1)).toEqual([res7]);
+      expect(await repo.find({ topic: null, notice: false, reply: null, hash: "hash2" },
+        null, "gte", new Date(0), 1)).toEqual([res4]);
     });
 
     describe("通知フィルタでトークンがないとエラーになるか", async () => {
       const repo = repoGene();
-      await expect(repo.find({ topic: null, notice: true, reply: null, hash: null }, null, "gte", new Date(0), 1)).rejects.toThrow(AtError);
+      await expect(repo.find({ topic: null, notice: true, reply: null, hash: null },
+        null, "gte", new Date(0), 1)).rejects.toThrow(AtError);
     });
   });
 

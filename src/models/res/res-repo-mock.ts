@@ -1,7 +1,7 @@
 import { Subject } from "rxjs";
-import { AtNotFoundError, AtNotFoundPartError, AtAuthError } from "../../at-error";
+import { AtAuthError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
-import { IResRepo, IResFindQuery } from "./ires-repo";
+import { IResFindQuery, IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
 
 export class ResRepoMock implements IResRepo {
