@@ -1,8 +1,7 @@
 import { Subject } from "rxjs";
-import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { AtNotFoundError, AtNotFoundPartError, AtAuthError } from "../../at-error";
 import { IAuthToken } from "../../auth";
-import { Config } from "../../config";
-import { IResRepo } from "./ires-repo";
+import { IResRepo, IResFindQuery } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
 
 export class ResRepoMock implements IResRepo {
@@ -32,44 +31,28 @@ export class ResRepoMock implements IResRepo {
     return this.aggregate(reses);
   }
 
-  async find(topicID: string, type: "gt" | "gte" | "lt" | "lte", date: Date, limit: number): Promise<Res[]> {
-    const reses = this.reses
-      .filter(x => x.body.topic === topicID)
-      .filter(x => {
-        const dateV = date.valueOf();
-        const xDateV = new Date(x.body.date).valueOf();
-        switch (type) {
-          case "gte":
-            return dateV <= xDateV;
-          case "gt":
-            return dateV < xDateV;
-          case "lte":
-            return dateV >= xDateV;
-          case "lt":
-            return dateV > xDateV;
-        }
-      })
-      .sort((a, b) => {
-        const av = new Date(a.body.date).valueOf();
-        const bv = new Date(b.body.date).valueOf();
-        return type === "gt" || type === "gte" ? av - bv : bv - av;
-      })
-      .slice(0, limit);
-
-    const result = await this.aggregate(reses);
-    if (type === "gt" || type === "gte") {
-      result.reverse();
-    }
-    return result;
-  }
-
-  async findNotice(
-    authToken: IAuthToken,
+  async find(
+    query: IResFindQuery,
+    authToken: IAuthToken | null,
     type: "gt" | "gte" | "lt" | "lte",
     date: Date,
     limit: number): Promise<Res[]> {
     const reses = this.reses
-      .filter(x => x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === authToken.user)
+      .filter(x => query.topic === null || x.body.topic === query.topic)
+      .filter(x => {
+        if (query.notice) {
+          if (authToken !== null) {
+            return x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === authToken.user;
+          } else {
+            throw new AtAuthError("認証が必要です");
+          }
+        } else {
+          return true;
+        }
+      })
+      .filter(x => query.hash === null || x.body.hash === query.hash)
+      .filter(x => query.reply === null ||
+        x.body.type === "normal" && x.body.reply !== null && x.body.reply.res === query.reply)
       .filter(x => {
         const dateV = date.valueOf();
         const xDateV = new Date(x.body.date).valueOf();
@@ -96,24 +79,6 @@ export class ResRepoMock implements IResRepo {
       result.reverse();
     }
     return result;
-  }
-
-  async findHash(hash: string): Promise<Res[]> {
-    const reses = this.reses
-      .filter(x => x.body.hash === hash)
-      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
-      .slice(0, Config.api.limit);
-
-    return await this.aggregate(reses);
-  }
-
-  async findReply(resID: string): Promise<Res[]> {
-    const reses = this.reses
-      .filter(x => x.body.type === "normal" && x.body.reply !== null && x.body.reply.res === resID)
-      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf())
-      .slice(0, Config.api.limit);
-
-    return await this.aggregate(reses);
   }
 
   async insert(res: Res): Promise<void> {

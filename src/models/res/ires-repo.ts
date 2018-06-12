@@ -2,6 +2,13 @@ import { Subject } from "rxjs";
 import { IAuthToken } from "../../auth";
 import { Res } from "./res";
 
+export interface IResFindQuery {
+  topic: string | null,
+  notice: boolean,
+  hash: string | null,
+  reply: string | null
+};
+
 export interface IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }>;
 
@@ -9,17 +16,12 @@ export interface IResRepo {
 
   findIn(ids: string[]): Promise<Res[]>;
 
-  find(topic: string, type: "gt" | "gte" | "lt" | "lte", date: Date, limit: number): Promise<Res[]>;
-
-  findNotice(
-    authToken: IAuthToken,
+  find(
+    query: IResFindQuery,
+    authToken: IAuthToken | null,
     type: "gt" | "gte" | "lt" | "lte",
     date: Date,
     limit: number): Promise<Res[]>;
-
-  findHash(hash: string): Promise<Res[]>;
-
-  findReply(resID: string): Promise<Res[]>;
 
   insert(res: Res): Promise<void>;
 
