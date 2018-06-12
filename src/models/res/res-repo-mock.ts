@@ -37,15 +37,21 @@ export class ResRepoMock implements IResRepo {
     type: "gt" | "gte" | "lt" | "lte",
     date: Date,
     limit: number): Promise<Res[]> {
+    let notice: string | null;
+    if (query.notice) {
+      if (authToken !== null) {
+        notice = authToken.user;
+      } else {
+        throw new AtAuthError("認証が必要です");
+      }
+    } else {
+      notice = null;
+    }
     const reses = this.reses
       .filter(x => query.topic === null || x.body.topic === query.topic)
       .filter(x => {
-        if (query.notice) {
-          if (authToken !== null) {
-            return x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === authToken.user;
-          } else {
-            throw new AtAuthError("認証が必要です");
-          }
+        if (notice !== null) {
+          return x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === notice;
         } else {
           return true;
         }
