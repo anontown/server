@@ -222,7 +222,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         null, "gte", new Date(0), 1)).toEqual([res4]);
     });
 
-    describe("通知フィルタでトークンがないとエラーになるか", async () => {
+    it("通知フィルタでトークンがないとエラーになるか", async () => {
       const repo = repoGene();
       await expect(repo.find({ topic: null, notice: true, reply: null, hash: null },
         null, "gte", new Date(0), 1)).rejects.toThrow(AtError);
