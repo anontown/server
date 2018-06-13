@@ -3,13 +3,13 @@ import { IAuthToken } from "../../auth";
 import { Res } from "./res";
 
 export interface IResFindQuery {
-  topic: string | null;
-  notice: boolean;
-  hash: string | null;
-  reply: string | null;
-  profile: string | null;
-  self: boolean;
-  text: string | null;
+  topic?: string;
+  notice?: boolean;
+  hash?: string;
+  reply?: string;
+  profile?: string;
+  self?: boolean;
+  text?: string;
 }
 
 export interface IResRepo {

@@ -58,19 +58,19 @@ export class ResRepoMock implements IResRepo {
     } else {
       self = null;
     }
-    const texts = query.text !== null
+    const texts = query.text !== undefined
       ? query.text
         .split(/\s/)
         .filter(x => x.length !== 0)
       : null;
 
     const reses = this.reses
-      .filter(x => query.topic === null || x.body.topic === query.topic)
+      .filter(x => query.topic === undefined || x.body.topic === query.topic)
       .filter(x => notice === null || x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === notice)
-      .filter(x => query.hash === null || x.body.hash === query.hash)
-      .filter(x => query.reply === null ||
+      .filter(x => query.hash === undefined || x.body.hash === query.hash)
+      .filter(x => query.reply === undefined ||
         x.body.type === "normal" && x.body.reply !== null && x.body.reply.res === query.reply)
-      .filter(x => query.profile === null ||
+      .filter(x => query.profile === undefined ||
         x.body.type === "normal" && x.body.profile !== null && x.body.profile === query.profile)
       .filter(x => self === null || x.body.user === self)
       .filter(x => texts === null || texts.every(t => x.body.type === "normal" && x.body.text.includes(t)))

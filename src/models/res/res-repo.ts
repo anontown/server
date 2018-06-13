@@ -63,7 +63,7 @@ export class ResRepo implements IResRepo {
       },
     ];
 
-    if (query.topic !== null) {
+    if (query.topic !== undefined) {
       filter.push({
         term: {
           topic: query.topic,
@@ -88,7 +88,7 @@ export class ResRepo implements IResRepo {
       }
     }
 
-    if (query.hash !== null) {
+    if (query.hash !== undefined) {
       filter.push({
         term: {
           hash: query.hash,
@@ -96,7 +96,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.reply !== null) {
+    if (query.reply !== undefined) {
       filter.push({
         nested: {
           path: "reply",
@@ -109,7 +109,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.profile !== null) {
+    if (query.profile !== undefined) {
       filter.push({
         term: {
           profile: query.profile,
@@ -129,7 +129,7 @@ export class ResRepo implements IResRepo {
       }
     }
 
-    if (query.text !== null) {
+    if (query.text !== undefined) {
       filter.push({
         match: {
           text: {
