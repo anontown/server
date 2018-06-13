@@ -144,11 +144,14 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
 
       const res1 = resNormal.copy({ id: "res1", date: new Date(50) });
       const res2 = resTopic.copy({ id: "res2", date: new Date(80), topic: "topic2" });
-      const res3 = resFork.copy({ id: "res3", date: new Date(30) });
+      const res3 = resFork.copy({ id: "res3", date: new Date(30), user: "user2" });
       const res4 = resHistory.copy({ id: "res4", date: new Date(90), hash: "hash2" });
-      const res5 = resNormal.copy({ id: "res5", date: new Date(20) });
+      const res5 = resNormal.copy({ id: "res5", date: new Date(20), profile: "p1" });
       const res6 = resTopic.copy({ id: "res6", date: new Date(10), replyCount: 1 });
-      const res7 = resNormal.copy({ id: "res7", date: new Date(60), reply: { user: "user", res: "res6" } });
+      const res7 = resNormal.copy({
+        id: "res7", date: new Date(60), text: "abc"
+        , reply: { user: "user", res: "res6" }
+      });
       const res8 = resHistory.copy({ id: "res8", date: new Date(40) });
       const res9 = resFork.copy({ id: "res9", date: new Date(70) });
 
@@ -220,11 +223,23 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         null, "gte", new Date(0), 10)).toEqual([res7]);
       expect(await repo.find({ hash: "hash2" },
         null, "gte", new Date(0), 10)).toEqual([res4]);
+      expect(await repo.find({ profile: "p1" },
+        null, "gte", new Date(0), 10)).toEqual([res5]);
+      expect(await repo.find({ self: true },
+        { ...token, user: "user2" }, "gte", new Date(0), 10)).toEqual([res3]);
+      expect(await repo.find({ text: "abc" },
+        null, "gte", new Date(0), 10)).toEqual([res7]);
     });
 
     it("通知フィルタでトークンがないとエラーになるか", async () => {
       const repo = repoGene();
       await expect(repo.find({ notice: true },
+        null, "gte", new Date(0), 10)).rejects.toThrow(AtError);
+    });
+
+    it("selfフィルタでトークンがないとエラーになるか", async () => {
+      const repo = repoGene();
+      await expect(repo.find({ self: true },
         null, "gte", new Date(0), 10)).rejects.toThrow(AtError);
     });
   });
