@@ -215,17 +215,17 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         null, "lt", new Date(30), 0)).toEqual([]);
 
       expect(await repo.find({ notice: true },
-        token, "gte", new Date(0), 1)).toEqual([res7]);
+        token, "gte", new Date(0), 10)).toEqual([res7]);
       expect(await repo.find({ reply: "res6" },
-        null, "gte", new Date(0), 1)).toEqual([res7]);
+        null, "gte", new Date(0), 10)).toEqual([res7]);
       expect(await repo.find({ hash: "hash2" },
-        null, "gte", new Date(0), 1)).toEqual([res4]);
+        null, "gte", new Date(0), 10)).toEqual([res4]);
     });
 
     it("通知フィルタでトークンがないとエラーになるか", async () => {
       const repo = repoGene();
       await expect(repo.find({ notice: true },
-        null, "gte", new Date(0), 1)).rejects.toThrow(AtError);
+        null, "gte", new Date(0), 10)).rejects.toThrow(AtError);
     });
   });
 
