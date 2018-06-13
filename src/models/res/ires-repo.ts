@@ -7,6 +7,9 @@ export interface IResFindQuery {
   notice: boolean;
   hash: string | null;
   reply: string | null;
+  profile: string | null;
+  self: boolean;
+  text: string | null;
 }
 
 export interface IResRepo {

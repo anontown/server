@@ -47,18 +47,33 @@ export class ResRepoMock implements IResRepo {
     } else {
       notice = null;
     }
+
+    let self: string | null;
+    if (query.self) {
+      if (authToken !== null) {
+        self = authToken.user;
+      } else {
+        throw new AtAuthError("認証が必要です");
+      }
+    } else {
+      self = null;
+    }
+    const texts = query.text !== null
+      ? query.text
+        .split(/\s/)
+        .filter(x => x.length !== 0)
+      : null;
+
     const reses = this.reses
       .filter(x => query.topic === null || x.body.topic === query.topic)
-      .filter(x => {
-        if (notice !== null) {
-          return x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === notice;
-        } else {
-          return true;
-        }
-      })
+      .filter(x => notice === null || x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === notice)
       .filter(x => query.hash === null || x.body.hash === query.hash)
       .filter(x => query.reply === null ||
         x.body.type === "normal" && x.body.reply !== null && x.body.reply.res === query.reply)
+      .filter(x => query.profile === null ||
+        x.body.type === "normal" && x.body.profile !== null && x.body.profile === query.profile)
+      .filter(x => self === null || x.body.user === self)
+      .filter(x => texts === null || texts.every(t => x.body.type === "normal" && x.body.text.includes(t)))
       .filter(x => {
         const dateV = date.valueOf();
         const xDateV = new Date(x.body.date).valueOf();

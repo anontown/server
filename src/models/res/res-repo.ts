@@ -109,6 +109,38 @@ export class ResRepo implements IResRepo {
       });
     }
 
+    if (query.profile !== null) {
+      filter.push({
+        term: {
+          profile: query.profile,
+        },
+      });
+    }
+
+    if (query.self) {
+      if (authToken !== null) {
+        filter.push({
+          term: {
+            user: authToken.user,
+          },
+        });
+      } else {
+        throw new AtAuthError("認証が必要です");
+      }
+    }
+
+    if (query.text !== null) {
+      filter.push({
+        match: {
+          text: {
+            query: query.text,
+            operator: "and",
+            zero_terms_query: "all",
+          },
+        },
+      });
+    }
+
     const reses = await ESClient.search<IResDB["body"]>({
       index: "reses",
       size: limit,

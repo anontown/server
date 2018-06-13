@@ -138,7 +138,7 @@ export class ResController {
         query: {
           type: "object",
           additionalProperties: false,
-          required: ["topic", "notice", "hash", "reply"],
+          required: ["topic", "notice", "hash", "reply", "profile", "self", "text"],
           properties: {
             topic: {
               type: ["string", "null"],
@@ -150,6 +150,15 @@ export class ResController {
               type: ["string", "null"],
             },
             reply: {
+              type: ["string", "null"],
+            },
+            profile: {
+              type: ["string", "null"],
+            },
+            self: {
+              type: "boolean",
+            },
+            text: {
               type: ["string", "null"],
             },
           },
