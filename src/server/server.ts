@@ -5,11 +5,12 @@ import { buildSchema } from "graphql";
 import * as fs from "fs";
 import { Config } from "../config";
 
-const myGraphQLSchema = buildSchema(fs.readFileSync("app.graphql", "utf8"));
-
 const app = express();
 
-app.use("/graphql", bodyParser.json(), graphqlExpress({ schema: myGraphQLSchema }));
+app.use(bodyParser.json());
+app.use("/graphql", graphqlExpress({
+  schema: buildSchema(fs.readFileSync("app.graphql", "utf8"))
+}));
 app.get("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
 
 app.listen(Config.server.port);
