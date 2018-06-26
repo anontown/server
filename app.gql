@@ -33,3 +33,21 @@ type Profile{
   update: String!
   sn: String!
 }
+
+enum VoteFlag{
+  uv
+  dv
+  not
+}
+
+interface ResBase{
+  id: String!
+  topic: String!
+  date: String!
+  user: String
+  uv: Int!
+  dv: Int!
+  hash: String!
+  replyCount: Int!
+  voteFlag: VoteFlag
+}
