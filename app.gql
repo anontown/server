@@ -23,3 +23,13 @@ type Msg{
   text: String!
   date: String!
 }
+
+type Profile{
+  id: String!
+  user: String
+  name: String!
+  text: String!
+  date: String!
+  update: String!
+  sn: String!
+}
