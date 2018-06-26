@@ -1,15 +1,15 @@
 type Client{
-  id: String!
+  id: ID!
   name: String!
   url: String!
-  user: String
+  user: ID
   date: String!
   update: String!
 }
 
 type History{
-  id: String!
-  topic: String!
+  id: ID!
+  topic: ID!
   title: String!
   tags: [String!]!
   text: String!
@@ -18,15 +18,15 @@ type History{
 }
 
 type Msg{
-  id: String!
-  receiver: String
+  id: ID!
+  receiver: ID
   text: String!
   date: String!
 }
 
 type Profile{
-  id: String!
-  user: String
+  id: ID!
+  user: ID
   name: String!
   text: String!
   date: String!
@@ -41,10 +41,10 @@ enum VoteFlag{
 }
 
 interface ResBase{
-  id: String!
-  topic: String!
+  id: ID!
+  topic: ID!
   date: String!
-  user: String
+  user: ID
   uv: Int!
   dv: Int!
   hash: String!
