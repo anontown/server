@@ -218,3 +218,8 @@ type TopicFork implements TopicSearchBase{
 }
 
 union Topic=TopicNormal|TopicOne|TopicFork
+
+type User{
+  id:ID!
+  sn:String!
+}
