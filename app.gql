@@ -130,3 +130,33 @@ type ResDelete implements ResBase{
 }
 
 union Res=ResNormal|ResHistory|ResTopic|ResFork|ResDelete
+
+type TokenReq{
+  token: ID!
+  key: String!
+}
+
+interface TokenBase{
+  id: ID!
+  key: String!
+  user: ID!
+  date: String!
+}
+
+type TokenMaster implements TokenBase{
+  id: ID!
+  key: String!
+  user: ID!
+  date: String!
+}
+
+type TokenGeneral implements TokenBase{
+  id: ID!
+  key: String!
+  user: ID!
+  date: String!
+
+  client:ID!
+}
+
+type Token=TokenMaster|TokenGeneral
