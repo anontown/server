@@ -40,6 +40,11 @@ enum VoteFlag{
   not
 }
 
+enum ResDeleteFlag{
+  self
+  freeze
+}
+
 interface ResBase{
   id: ID!
   topic: ID!
@@ -51,3 +56,77 @@ interface ResBase{
   replyCount: Int!
   voteFlag: VoteFlag
 }
+
+type ResNormal implements ResBase{
+  id: ID!
+  topic: ID!
+  date: String!
+  user: ID
+  uv: Int!
+  dv: Int!
+  hash: String!
+  replyCount: Int!
+  voteFlag: VoteFlag
+
+  name: String
+  text: String!
+  reply: ID
+  profile: ID
+  isReply: Boolean
+}
+
+type ResHistory implements ResBase{
+  id: ID!
+  topic: ID!
+  date: String!
+  user: ID
+  uv: Int!
+  dv: Int!
+  hash: String!
+  replyCount: Int!
+  voteFlag: VoteFlag
+
+  history: ID!
+}
+
+type ResTopic implements ResBase{
+  id: ID!
+  topic: ID!
+  date: String!
+  user: ID
+  uv: Int!
+  dv: Int!
+  hash: String!
+  replyCount: Int!
+  voteFlag: VoteFlag
+}
+
+type ResFork implements ResBase{
+  id: ID!
+  topic: ID!
+  date: String!
+  user: ID
+  uv: Int!
+  dv: Int!
+  hash: String!
+  replyCount: Int!
+  voteFlag: VoteFlag
+
+  fork: ID!
+}
+
+type ResDelete implements ResBase{
+  id: ID!
+  topic: ID!
+  date: String!
+  user: ID
+  uv: Int!
+  dv: Int!
+  hash: String!
+  replyCount: Int!
+  voteFlag: VoteFlag
+
+  flag: ResDeleteFlag!
+}
+
+union Res=ResNormal|ResHistory|ResTopic|ResFork|ResDelete
