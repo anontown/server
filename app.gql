@@ -159,4 +159,4 @@ type TokenGeneral implements TokenBase{
   client:ID!
 }
 
-type Token=TokenMaster|TokenGeneral
+union Token=TokenMaster|TokenGeneral
