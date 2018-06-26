@@ -1,0 +1,8 @@
+type Client{
+  id: String!
+  name: String!
+  url: String!
+  user: String
+  date: String!
+  update: String!
+}
