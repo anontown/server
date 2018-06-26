@@ -160,3 +160,61 @@ type TokenGeneral implements TokenBase{
 }
 
 union Token=TokenMaster|TokenGeneral
+
+interface TopicBase{
+  id: ID!
+  title: String!
+  update: String!
+  date: String!
+  resCount: Int!
+  active: Boolean!
+}
+
+interface TopicSearchBase implements TopicBase{
+  id: ID!
+  title: String!
+  update: String!
+  date: String!
+  resCount: Int!
+  active: Boolean!
+
+  tags: [String!]!
+  text:String!
+}
+
+type TopicNormal implements TopicSearchBase{
+  id: ID!
+  title: String!
+  update: String!
+  date: String!
+  resCount: Int!
+  active: Boolean!
+
+  tags: [String!]!
+  text:String!
+}
+
+type TopicOne implements TopicSearchBase{
+  id: ID!
+  title: String!
+  update: String!
+  date: String!
+  resCount: Int!
+  active: Boolean!
+
+  tags: [String!]!
+  text:String!
+}
+
+type TopicFork implements TopicSearchBase{
+  id: ID!
+  title: String!
+  update: String!
+  date: String!
+  resCount: Int!
+  active: Boolean!
+
+  parent:ID!
+}
+
+union Topic=TopicNormal|TopicOne|TopicFork
