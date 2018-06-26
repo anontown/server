@@ -7,7 +7,7 @@ import { Config } from "../config";
 import * as http from "http";
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 
-const schema = buildSchema(fs.readFileSync("app.graphql", "utf8"));
+const schema = buildSchema(fs.readFileSync("app.gql", "utf8"));
 
 const app = express();
 
