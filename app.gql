@@ -16,3 +16,10 @@ type History{
   date: String!
   hash: String!
 }
+
+type Msg{
+  id: String!
+  receiver: String
+  text: String!
+  date: String!
+}
