@@ -223,3 +223,10 @@ type User{
   id:ID!
   sn:String!
 }
+
+type Query{
+
+}
+
+type Mutation {
+}
