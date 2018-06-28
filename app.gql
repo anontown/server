@@ -237,9 +237,9 @@ type User{
 }
 
 type Query{
-  clients(id:[ID!],self:Boolean,limit:Int!):[Client!]!
-  histories(id:[ID!],topic:[ID!],limit:Int!):[History!]!
-  msgs(id:[ID!],date:Date,limit:Int!)
+  clients(id:[ID!],self:Boolean,date:Date,limit:Int!):[Client!]!
+  histories(id:[ID!],topic:[ID!],date:Date,limit:Int!):[History!]!
+  msgs(id:[ID!],date:Date,limit:Int!):[Msg!]!
 }
 
 type Mutation {
