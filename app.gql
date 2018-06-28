@@ -219,14 +219,27 @@ type TopicFork implements TopicSearchBase{
 
 union Topic=TopicNormal|TopicOne|TopicFork
 
+input Date{
+  date:Srting!
+  type:DateType!
+}
+
+enum DateType{
+  gt
+  gte
+  lt
+  lte
+}
+
 type User{
   id:ID!
   sn:String!
 }
 
 type Query{
-  clients(id:[ID!],self:Boolean):[Client!]!
-  histories(id:[ID!],topic:[ID!]):[History!]!
+  clients(id:[ID!],self:Boolean,limit:Int!):[Client!]!
+  histories(id:[ID!],topic:[ID!],limit:Int!):[History!]!
+  msgs(id:[ID!],date:Date,limit:Int!)
 }
 
 type Mutation {
