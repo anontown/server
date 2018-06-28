@@ -226,6 +226,7 @@ type User{
 
 type Query{
   clients(id:[ID!],self:Boolean):[Client!]!
+  histories(id:[ID!],topic:[ID!]):[History!]!
 }
 
 type Mutation {
