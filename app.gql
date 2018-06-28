@@ -258,8 +258,8 @@ type Query{
     date:Date,
     limit:Int=100):[Res!]!
   storages(key:[String!]):[Storage!]!
-
-}storages
+  
+}
 
 enum VoteType{
   uv
