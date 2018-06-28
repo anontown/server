@@ -225,7 +225,7 @@ type Storage{
 }
 
 input Date{
-  date:Srting!
+  date:String!
   type:DateType!
 }
 
@@ -239,6 +239,11 @@ enum DateType{
 type User{
   id:ID!
   sn:String!
+}
+
+type Tags{
+  name:String!
+  count:Int!
 }
 
 type Query{
@@ -259,6 +264,8 @@ type Query{
     limit:Int=100):[Res!]!
   storages(key:[String!]):[Storage!]!
   tokens(id:[ID!]):[Token!]!
+  topics(id:[ID!],title:String,tags:[String!],date:Date,limit:Int=100,activeOnly:Boolean,parent:ID):[Topic!]!
+  topicTags(limit:Int=100):[Tags!]!
 }
 
 enum VoteType{
@@ -282,9 +289,14 @@ type Mutation {
   createTokenMaster():TokenMaster!
   createTokenReq():TokenReq!
   authTokenReq(id:ID!,key:String!):TokenGeneral!
+  createTopicNormal(title:String!,tags:[String!]!,text:String!):TopicNormal!
+  createTopicOne(title:String!,tags:[String!]!,text:String!):TopicOne!
+  createTopicFork(title:String!,parent:ID!):TopicFork!
+  updateTopic(id:ID!,title:String!,tags:[String!],text:String!):TopicNormal!
 }
 
 type Subscription {
+  newRes(topic:ID!):Res!
 }
 
 schema {
