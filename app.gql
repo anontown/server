@@ -283,3 +283,12 @@ type Mutation {
   createTokenReq():TokenReq!
   authTokenReq(id:ID!,key:String!):TokenGeneral!
 }
+
+type Subscription {
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
