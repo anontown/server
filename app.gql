@@ -219,6 +219,11 @@ type TopicFork implements TopicSearchBase{
 
 union Topic=TopicNormal|TopicOne|TopicFork
 
+type Storage{
+  key:String!
+  value:String!
+}
+
 input Date{
   date:Srting!
   type:DateType!
@@ -252,7 +257,9 @@ type Query{
     text:String,
     date:Date,
     limit:Int=100):[Res!]!
-}
+  storages(key:[String!]):[Storage!]!
+
+}storages
 
 enum VoteType{
   uv
@@ -268,4 +275,6 @@ type Mutation {
   createRes(topic:String!,name:String,text:String!,reply:String,profile:String,age:Boolean!):Res!
   voteRes(res:ID!,type:VoteType!):Res!
   delRes(res:ID!):Res!
+  setStorage(key:String!,value:String!):Boolean
+  delStorage(key:String!):Boolean
 }
