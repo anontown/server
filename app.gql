@@ -241,6 +241,17 @@ type Query{
   histories(id:[ID!],topic:[ID!],date:Date,limit:Int=100):[History!]!
   msgs(id:[ID!],date:Date,limit:Int=100):[Msg!]!
   profiles(id:[ID!],self:Boolean,limit:Int=100):[Profile!]!
+  reses(
+    id:[ID!],
+    topic:ID,
+    notice:Boolean,
+    hash:String,
+    reply:String,
+    profile:String,
+    self:Boolean,
+    text:String,
+    date:Date,
+    limit:Int=100):[Res!]!
 }
 
 type Mutation {
