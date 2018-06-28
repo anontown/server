@@ -245,5 +245,5 @@ type Query{
 type Mutation {
   createClient(name:String!,url:String!):Client!
   updateClient(id:ID!,name:String!,url:String!):Client!
-
+  createProfile(name:String!,text:String!,sn:String!):Profile!
 }
