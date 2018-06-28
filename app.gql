@@ -266,6 +266,8 @@ type Query{
   tokens(id:[ID!]):[Token!]!
   topics(id:[ID!],title:String,tags:[String!],date:Date,limit:Int=100,activeOnly:Boolean,parent:ID):[Topic!]!
   topicTags(limit:Int=100):[Tags!]!
+  userID(sn:String!):ID!
+  userSN(id:ID!):String!
 }
 
 enum VoteType{
@@ -293,6 +295,8 @@ type Mutation {
   createTopicOne(title:String!,tags:[String!]!,text:String!):TopicOne!
   createTopicFork(title:String!,parent:ID!):TopicFork!
   updateTopic(id:ID!,title:String!,tags:[String!],text:String!):TopicNormal!
+  createUser(sn:String!,pass:String!):User!
+  updateUser(sn:String!,pass:String!):User!
 }
 
 type Subscription {
