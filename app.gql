@@ -258,7 +258,7 @@ type Query{
     date:Date,
     limit:Int=100):[Res!]!
   storages(key:[String!]):[Storage!]!
-  
+  tokens(id:[ID!]):[Token!]!
 }
 
 enum VoteType{
@@ -277,4 +277,9 @@ type Mutation {
   delRes(res:ID!):Res!
   setStorage(key:String!,value:String!):Boolean
   delStorage(key:String!):Boolean
+  delTokenClient(client:ID!):Boolean
+  createTokenGeneral(client:ID!):TokenGeneral!
+  createTokenMaster():TokenMaster!
+  createTokenReq():TokenReq!
+  authTokenReq(id:ID!,key:String!):TokenGeneral!
 }
