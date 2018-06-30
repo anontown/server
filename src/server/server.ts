@@ -7,10 +7,21 @@ import { Config } from "../config";
 import * as http from "http";
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { makeExecutableSchema } from "graphql-tools";
+import { PubSub } from "graphql-subscriptions";
 
 const schema = makeExecutableSchema({
   typeDefs: fs.readFileSync("app.gql", "utf8"),
-  resolvers: {}
+  resolvers: {
+    Query: {
+
+    },
+    Mutation: {
+
+    },
+    Subscription: {
+
+    }
+  }
 });
 
 const app = express();
@@ -20,11 +31,18 @@ app.use(bodyParser.json());
 
 const server = http.createServer(app as any);
 
-new SubscriptionServer({ schema, execute, subscribe }, { server, path: "subscriptions" });
+
+export const pubsub = new PubSub();
 
 app.use("/graphql", graphqlExpress({
   schema,
 }));
 app.get("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
 
-server.listen(Config.server.port);
+server.listen(Config.server.port, () => {
+  new SubscriptionServer({
+    schema,
+    execute,
+    subscribe
+  }, { server, path: "subscriptions" })
+});
