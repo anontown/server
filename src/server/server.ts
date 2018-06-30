@@ -9,7 +9,9 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { makeExecutableSchema } from "graphql-tools";
 import { PubSub } from "graphql-subscriptions";
 
-const schema = makeExecutableSchema({
+type Context = {};
+
+const schema = makeExecutableSchema<Context>({
   typeDefs: fs.readFileSync("app.gql", "utf8"),
   resolvers: {
     Query: {
@@ -34,8 +36,11 @@ const server = http.createServer(app as any);
 
 export const pubsub = new PubSub();
 
-app.use("/graphql", graphqlExpress({
-  schema,
+app.use("/graphql", graphqlExpress(async _req => {
+  return {
+    schema,
+    context: {}
+  };
 }));
 app.get("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
 
