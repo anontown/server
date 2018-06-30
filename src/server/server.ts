@@ -48,6 +48,9 @@ server.listen(Config.server.port, () => {
   new SubscriptionServer({
     schema,
     execute,
-    subscribe
+    subscribe,
+    onConnect: async () => {
+
+    }
   }, { server, path: "subscriptions" })
 });
