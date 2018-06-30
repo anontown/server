@@ -1,13 +1,17 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-import { buildSchema, execute, subscribe } from "graphql";
+import { execute, subscribe } from "graphql";
 import * as fs from "fs";
 import { Config } from "../config";
 import * as http from "http";
 import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { makeExecutableSchema } from "graphql-tools";
 
-const schema = buildSchema(fs.readFileSync("app.gql", "utf8"));
+const schema = makeExecutableSchema({
+  typeDefs: fs.readFileSync("app.gql", "utf8"),
+  resolvers: {}
+});
 
 const app = express();
 
