@@ -1,8 +1,16 @@
 import { IAuthToken, IAuthTokenMaster, IAuthUser } from "../auth";
+import { AtAuthError } from "../at-error";
 
 export class AuthContainer {
   constructor(private _token: IAuthToken | null,
-              private _user: IAuthUser | null) {
+    private _user: IAuthUser | null,
+    private _recaptcha: boolean) {
+  }
+
+  recaptcha() {
+    if (!this.recaptcha) {
+      throw new AtAuthError("キャプチャ認証が必要です");
+    }
   }
 
   get token(): IAuthToken {

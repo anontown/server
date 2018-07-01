@@ -262,7 +262,7 @@ export class AppServer {
 
     return {
       params,
-      auth: new AuthContainer(authTokenObj, authUserObj),
+      auth: new AuthContainer(authTokenObj, authUserObj, recaptcha !== null),
     };
   }
 }
