@@ -7,9 +7,7 @@ import { Config } from "../config";
 import * as http from "http";
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { makeExecutableSchema } from "graphql-tools";
-import { PubSub } from "graphql-subscriptions";
-
-type Context = {};
+import { Context } from "./context";
 
 const schema = makeExecutableSchema<Context>({
   typeDefs: fs.readFileSync("app.gql", "utf8"),
@@ -33,13 +31,10 @@ app.use(bodyParser.json());
 
 const server = http.createServer(app as any);
 
-
-export const pubsub = new PubSub();
-
-app.use("/graphql", graphqlExpress(async _req => {
+app.use("/graphql", graphqlExpress(async (_req, _res) => {
   return {
     schema,
-    context: {}
+    context: {},
   };
 }));
 app.get("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
@@ -52,5 +47,7 @@ server.listen(Config.server.port, () => {
     onConnect: async () => {
 
     }
-  }, { server, path: "subscriptions" })
+  }, {
+      server, path: "subscriptions"
+    })
 });
