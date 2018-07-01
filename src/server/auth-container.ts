@@ -8,7 +8,7 @@ export class AuthContainer {
   }
 
   recaptcha() {
-    if (!this.recaptcha) {
+    if (!this._recaptcha) {
       throw new AtAuthError("キャプチャ認証が必要です");
     }
   }
