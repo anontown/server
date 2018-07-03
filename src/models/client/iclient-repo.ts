@@ -7,4 +7,8 @@ export interface IClientRepo {
   findAll(authToken: IAuthTokenMaster): Promise<Client[]>;
   insert(client: Client): Promise<void>;
   update(client: Client): Promise<void>;
+  find(authToken: IAuthTokenMaster | null, query: {
+    id: string[] | null,
+    self: boolean | null,
+  }): Promise<Client[]>;
 }

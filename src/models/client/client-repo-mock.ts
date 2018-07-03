@@ -1,4 +1,4 @@
-import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { AtNotFoundError, AtNotFoundPartError, AtAuthError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { Client, IClientDB } from "./client";
 import { IClientRepo } from "./iclient-repo";
@@ -42,5 +42,21 @@ export class ClientRepoMock implements IClientRepo {
 
   async update(client: Client): Promise<void> {
     this.clients[this.clients.findIndex(c => c._id.toHexString() === client.id)] = client.toDB();
+  }
+
+  async find(authToken: IAuthTokenMaster | null, query: {
+    id: string[] | null,
+    self: boolean | null,
+  }): Promise<Client[]> {
+    if (query.self && authToken === null) {
+      throw new AtAuthError("認証が必要です");
+    }
+
+    const clients = this.clients
+      .filter(c => !query.self || authToken === null || c.user.toHexString() === authToken.user)
+      .filter(x => query.id === null || query.id.includes(x._id.toHexString()))
+      .sort((a, b) => b.date.valueOf() - a.date.valueOf());
+
+    return clients.map(c => Client.fromDB(c));
   }
 }

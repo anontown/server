@@ -1,9 +1,10 @@
 import { ObjectID } from "mongodb";
-import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { AtNotFoundError, AtNotFoundPartError, AtAuthError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { DB } from "../../db";
 import { Client, IClientDB } from "./client";
 import { IClientRepo } from "./iclient-repo";
+import { DateType } from "../../server";
 
 export class ClientRepo implements IClientRepo {
   async findOne(id: string): Promise<Client> {
@@ -36,6 +37,28 @@ export class ClientRepo implements IClientRepo {
     const db = await DB;
     const clients: IClientDB[] = await db.collection("clients")
       .find({ user: new ObjectID(authToken.user) })
+      .sort({ date: -1 })
+      .toArray();
+    return clients.map(c => Client.fromDB(c));
+  }
+
+  async find(authToken: IAuthTokenMaster | null, query: {
+    id: string[] | null,
+    self: boolean | null,
+  }): Promise<Client[]> {
+    if (query.self && authToken === null) {
+      throw new AtAuthError("認証が必要です");
+    }
+    const db = await DB;
+    const q: any = {};
+    if (query.self && authToken !== null) {
+      q["user"] = new ObjectID(authToken.user);
+    }
+    if (query.id !== null) {
+      q["_id"] = { $in: query.id.map(id => new ObjectID(id)) };
+    }
+    const clients: IClientDB[] = await db.collection("clients")
+      .find(q)
       .sort({ date: -1 })
       .toArray();
     return clients.map(c => Client.fromDB(c));

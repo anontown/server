@@ -247,7 +247,7 @@ type Tags{
 }
 
 type Query{
-  clients(id:[ID!],self:Boolean,date:Date,limit:Int=100):[Client!]!
+  clients(id:[ID!],self:Boolean):[Client!]!
   histories(id:[ID!],topic:[ID!],date:Date,limit:Int=100):[History!]!
   msgs(id:[ID!],date:Date,limit:Int=100):[Msg!]!
   profiles(id:[ID!],self:Boolean,limit:Int=100):[Profile!]!
