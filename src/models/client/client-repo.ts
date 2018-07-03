@@ -4,7 +4,6 @@ import { IAuthTokenMaster } from "../../auth";
 import { DB } from "../../db";
 import { Client, IClientDB } from "./client";
 import { IClientRepo } from "./iclient-repo";
-import { DateType } from "../../server";
 
 export class ClientRepo implements IClientRepo {
   async findOne(id: string): Promise<Client> {
