@@ -8,6 +8,25 @@ import {
   http,
   IHttpAPICallParams,
 } from "../server";
+import { Context, DateType } from "../server";
+
+export const clientResolver = {
+  Query: {
+    clients: async (_obj: any,
+      args: {
+        id: string[] | null,
+        self: boolean | null,
+        date: DateType | null,
+        limit: number
+      }, context: Context,
+      _info: any) => {
+
+    }
+  },
+  Mutation: {
+
+  },
+};
 
 @controller
 export class ClientController {
