@@ -16,11 +16,13 @@ export const clientResolver = {
       args: {
         id: string[] | null,
         self: boolean | null,
-        date: DateType | null,
-        limit: number
       }, context: Context,
       _info: any) => {
-
+      const clients = await context.repo.client.find(context.auth.TokenMasterOrNull, {
+        id: args.id,
+        self: args.self
+      });
+      return clients.map(c => c.toAPI(context.auth.TokenMasterOrNull));
     }
   },
   Mutation: {
