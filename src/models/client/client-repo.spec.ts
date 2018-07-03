@@ -150,6 +150,86 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
     });
   });
 
+  describe("find", () => {
+    it("正常に検索出来るか", async () => {
+      const repo = repoGene();
+
+      const client = new Client(ObjectIDGenerator(),
+        "name",
+        "https://hoge.com",
+        ObjectIDGenerator(),
+        new Date(0),
+        new Date(100));
+
+      const user1 = ObjectIDGenerator();
+      const user2 = ObjectIDGenerator();
+
+      const client1 = client.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(50) });
+      const client2 = client.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(80) });
+      const client3 = client.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(30) });
+      const client4 = client.copy({ id: ObjectIDGenerator(), user: user2, date: new Date(90) });
+
+      await repo.insert(client1);
+      await repo.insert(client2);
+      await repo.insert(client3);
+      await repo.insert(client4);
+
+      expect(await repo.find(null, {
+        id: null,
+        self: null,
+      })).toEqual([
+        client4,
+        client2,
+        client1,
+        client3,
+      ]);
+
+      expect(await repo.find({
+        id: ObjectIDGenerator(),
+        key: "key",
+        user: user1,
+        type: "master",
+      }, {
+          id: null,
+          self: null,
+        })).toEqual([
+          client4,
+          client2,
+          client1,
+          client3,
+        ]);
+
+      expect(await repo.find(null, {
+        id: [],
+        self: null,
+      })).toEqual([]);
+
+      expect(await repo.find(null, {
+        id: [client1.id],
+        self: null,
+      })).toEqual([client1]);
+
+      expect(await repo.find({
+        id: ObjectIDGenerator(),
+        key: "key",
+        user: user1,
+        type: "master",
+      }, {
+          id: null,
+          self: true,
+        })).toEqual([
+          client2,
+          client1,
+          client3,
+        ]);
+    });
+
+    describe("トークンがnullでselfがtrueの時エラーになるか", async () => {
+      const repo = repoGene();
+      await expect(repo.find(null, { id: null, self: true })).rejects.toThrow(AtError);
+    });
+  });
+
   describe("insert", () => {
     it("正常に保存出来るか", async () => {
       const repo = repoGene();
