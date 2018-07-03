@@ -36,6 +36,19 @@ export const clientResolver = {
       await context.repo.client.insert(client);
       context.log("clients", client.id);
       return client.toAPI(context.auth.tokenMaster);
+    },
+    updateClient: async (_obj: any,
+      args: {
+        id: string,
+        name: string,
+        url: string
+      }, context: Context,
+      _info: any) => {
+      const client = await context.repo.client.findOne(args.id);
+      const newClient = client.changeData(context.auth.tokenMaster, args.name, args.url, context.now);
+      await context.repo.client.update(newClient);
+      context.log("clients", newClient.id);
+      return newClient.toAPI(context.auth.tokenMaster);
     }
   },
 };
