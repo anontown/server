@@ -26,7 +26,17 @@ export const clientResolver = {
     }
   },
   Mutation: {
-
+    createClient: async (_obj: any,
+      args: {
+        name: string,
+        url: string
+      }, context: Context,
+      _info: any) => {
+      const client = Client.create(ObjectIDGenerator, context.auth.tokenMaster, args.name, args.url, context.now);
+      await context.repo.client.insert(client);
+      context.log("clients", client.id);
+      return client.toAPI(context.auth.tokenMaster);
+    }
   },
 };
 
