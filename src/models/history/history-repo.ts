@@ -83,4 +83,22 @@ export class HistoryRepo implements IHistoryRepo {
 
     return histories.hits.hits.map(h => History.fromDB({ id: h._id, body: h._source }));
   }
+
+  async find(query: { id: string | null, topic: string[] | null }): Promise<History[]> {
+    const histories = await ESClient.search<IHistoryDB["body"]>({
+      index: "histories",
+      size: Config.api.limit,
+      body: {
+        query: {
+          term: {
+            _id: query.id !== null ? query.id : undefined,
+            topic: query.topic !== null ? query.topic : undefined,
+          },
+        },
+        sort: { date: { order: "desc" } },
+      },
+    });
+
+    return histories.hits.hits.map(h => History.fromDB({ id: h._id, body: h._source }));
+  }
 }
