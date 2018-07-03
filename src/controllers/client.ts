@@ -8,7 +8,7 @@ import {
   http,
   IHttpAPICallParams,
 } from "../server";
-import { Context, DateType } from "../server";
+import { Context } from "../server";
 
 export const clientResolver = {
   Query: {
