@@ -5,7 +5,25 @@ import {
   controller,
   http,
   IHttpAPICallParams,
+  Context,
 } from "../server";
+
+export const historyResolver = {
+  Query: {
+    histories: async (_obj: any,
+      args: {
+        id: string[] | null,
+        topic: string[] | null,
+      }, context: Context,
+      _info: any) => {
+      const histories = await context.repo.history.find({
+        id: args.id,
+        topic: args.topic
+      });
+      return histories.map(x => x.toAPI());
+    }
+  }
+};
 
 @controller
 export class HistoryController {
