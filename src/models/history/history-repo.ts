@@ -85,14 +85,30 @@ export class HistoryRepo implements IHistoryRepo {
   }
 
   async find(query: { id: string[] | null, topic: string[] | null }): Promise<History[]> {
+    const filter: any[] = [];
+    if (query.id !== null) {
+      filter.push({
+        terms: {
+          _id: query.id,
+        }
+      });
+    }
+
+    if (query.topic !== null) {
+      filter.push({
+        terms: {
+          topic: query.topic,
+        }
+      });
+    }
+
     const histories = await ESClient.search<IHistoryDB["body"]>({
       index: "histories",
       size: Config.api.limit,
       body: {
         query: {
-          terms: {
-            _id: query.id !== null ? query.id : undefined,
-            topic: query.topic !== null ? query.topic : undefined,
+          bool: {
+            filter: filter
           },
         },
         sort: { date: { order: "desc" } },
