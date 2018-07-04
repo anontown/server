@@ -44,7 +44,7 @@ export class HistoryRepoMock implements IHistoryRepo {
     return histories.map(h => History.fromDB(h));
   }
 
-  async find(query: { id: string | null, topic: string[] | null }): Promise<History[]> {
+  async find(query: { id: string[] | null, topic: string[] | null }): Promise<History[]> {
     const histories = this.histories
       .filter(x => query.id === null || query.id.includes(x.id))
       .filter(x => query.topic === null || query.topic.includes(x.body.topic))
