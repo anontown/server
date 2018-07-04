@@ -1,6 +1,6 @@
 import { IAuthToken } from "../../auth";
-import { Msg } from "./msg";
 import { DateType } from "../../server";
+import { Msg } from "./msg";
 export interface IMsgRepo {
   findOne(id: string): Promise<Msg>;
   findIn(ids: string[]): Promise<Msg[]>;
@@ -15,7 +15,7 @@ export interface IMsgRepo {
     authToken: IAuthToken,
     query: {
       date: DateType | null,
-      id: string[] | null
+      id: string[] | null,
     },
     limit: number): Promise<Msg[]>;
 }

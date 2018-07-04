@@ -1,8 +1,8 @@
+import * as express from "express";
+import { AtAuthError } from "../at-error";
+import { Logger } from "../logger";
 import { IRepo, Repo } from "../models";
 import { AuthContainer } from "./auth-container";
-import * as express from "express";
-import { Logger } from "../logger";
-import { AtAuthError } from "../at-error";
 import * as authFromApiParam from "./auth-from-api-param";
 
 export interface Context {
@@ -57,9 +57,9 @@ export async function createContext(req: express.Request): Promise<Context> {
 
   return {
     auth: new AuthContainer(token, user, recaptcha),
-    ip: ip,
+    ip,
     now: new Date(),
-    repo: repo,
+    repo,
     log: (name, id) => Logger.app.info(ip, name, id),
   };
 }

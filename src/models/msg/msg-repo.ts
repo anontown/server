@@ -1,9 +1,9 @@
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
+import { DateType } from "../../server/index";
 import { IMsgRepo } from "./imsg-repo";
 import { IMsgDB, Msg } from "./msg";
-import { DateType } from "../../server/index";
 
 export class MsgRepo implements IMsgRepo {
   constructor(private refresh?: boolean) { }
@@ -99,7 +99,7 @@ export class MsgRepo implements IMsgRepo {
     authToken: IAuthToken,
     query: {
       date: DateType | null,
-      id: string[] | null
+      id: string[] | null,
     },
     limit: number): Promise<Msg[]> {
     const filter: any[] = [{
@@ -131,7 +131,7 @@ export class MsgRepo implements IMsgRepo {
       filter.push({
         terms: {
           _id: query.id,
-        }
+        },
       });
     }
     const msgs = await ESClient.search<IMsgDB["body"]>({
@@ -140,10 +140,16 @@ export class MsgRepo implements IMsgRepo {
       body: {
         query: {
           bool: {
-            filter: filter,
+            filter,
           },
         },
-        sort: { date: { order: query.date !== null && (query.date.type === "gt" || query.date.type === "gte") ? "asc" : "desc" } },
+        sort: {
+          date: {
+            order: query.date !== null && (query.date.type === "gt" || query.date.type === "gte")
+              ? "asc"
+              : "desc",
+          },
+        },
       },
     });
 

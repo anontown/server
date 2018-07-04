@@ -2,27 +2,27 @@ import {
   IHistoryAPI,
 } from "../models";
 import {
+  Context,
   controller,
   http,
   IHttpAPICallParams,
-  Context,
 } from "../server";
 
 export const historyResolver = {
   Query: {
     histories: async (_obj: any,
-      args: {
+                      args: {
         id: string[] | null,
         topic: string[] | null,
-      }, context: Context,
-      _info: any) => {
+      },              context: Context,
+                      _info: any) => {
       const histories = await context.repo.history.find({
         id: args.id,
-        topic: args.topic
+        topic: args.topic,
       });
       return histories.map(x => x.toAPI());
-    }
-  }
+    },
+  },
 };
 
 @controller

@@ -1,4 +1,4 @@
-import { AtNotFoundError, AtNotFoundPartError, AtAuthError } from "../../at-error";
+import { AtAuthError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { Client, IClientDB } from "./client";
 import { IClientRepo } from "./iclient-repo";

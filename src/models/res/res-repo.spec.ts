@@ -150,7 +150,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       const res6 = resTopic.copy({ id: "res6", date: new Date(10), replyCount: 1 });
       const res7 = resNormal.copy({
         id: "res7", date: new Date(60), text: "abc"
-        , reply: { user: "user", res: "res6" }
+        , reply: { user: "user", res: "res6" },
       });
       const res8 = resHistory.copy({ id: "res8", date: new Date(40) });
       const res9 = resFork.copy({ id: "res9", date: new Date(70) });

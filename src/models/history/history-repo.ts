@@ -90,7 +90,7 @@ export class HistoryRepo implements IHistoryRepo {
       filter.push({
         terms: {
           _id: query.id,
-        }
+        },
       });
     }
 
@@ -98,7 +98,7 @@ export class HistoryRepo implements IHistoryRepo {
       filter.push({
         terms: {
           topic: query.topic,
-        }
+        },
       });
     }
 
@@ -108,7 +108,7 @@ export class HistoryRepo implements IHistoryRepo {
       body: {
         query: {
           bool: {
-            filter: filter
+            filter,
           },
         },
         sort: { date: { order: "desc" } },

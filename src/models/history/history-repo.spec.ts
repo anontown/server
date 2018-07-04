@@ -196,11 +196,11 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
       expect(await repo.find({ topic: null, id: ["history2", "a"] })).toEqual([history2]);
       expect(await repo.find({ topic: null, id: ["history2", "history4"] })).toEqual([
         history4,
-        history2
+        history2,
       ]);
 
       expect(await repo.find({ topic: ["topic1"], id: ["history2", "history4"] })).toEqual([
-        history2
+        history2,
       ]);
     });
   });

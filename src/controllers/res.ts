@@ -146,7 +146,7 @@ export class ResController {
               type: "boolean",
             },
             hash: {
-              type:"string",
+              type: "string",
             },
             reply: {
               type: ["string"],

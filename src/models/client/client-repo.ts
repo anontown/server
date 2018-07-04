@@ -1,5 +1,5 @@
 import { ObjectID } from "mongodb";
-import { AtNotFoundError, AtNotFoundPartError, AtAuthError } from "../../at-error";
+import { AtAuthError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { DB } from "../../db";
 import { Client, IClientDB } from "./client";
@@ -51,10 +51,10 @@ export class ClientRepo implements IClientRepo {
     const db = await DB;
     const q: any = {};
     if (query.self && authToken !== null) {
-      q["user"] = new ObjectID(authToken.user);
+      q.user = new ObjectID(authToken.user);
     }
     if (query.id !== null) {
-      q["_id"] = { $in: query.id.map(id => new ObjectID(id)) };
+      q._id = { $in: query.id.map(id => new ObjectID(id)) };
     }
     const clients: IClientDB[] = await db.collection("clients")
       .find(q)

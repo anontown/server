@@ -1,8 +1,8 @@
 import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
+import { DateType } from "../../server/index";
 import { IMsgRepo } from "./imsg-repo";
 import { IMsgDB, Msg } from "./msg";
-import { DateType } from "../../server/index";
 
 export class MsgRepoMock implements IMsgRepo {
   private msgs: IMsgDB[] = [];
@@ -34,7 +34,7 @@ export class MsgRepoMock implements IMsgRepo {
     authToken: IAuthToken,
     query: {
       date: DateType | null,
-      id: string[] | null
+      id: string[] | null,
     },
     limit: number): Promise<Msg[]> {
     const msgs = this.msgs

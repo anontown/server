@@ -1,12 +1,12 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-import { execute, subscribe } from "graphql";
+import { graphiqlExpress, graphqlExpress } from "apollo-server-express";
+import bodyParser from "body-parser";
+import express from "express";
 import * as fs from "fs";
-import { Config } from "../config";
-import * as http from "http";
-import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { execute, subscribe } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
+import * as http from "http";
+import { SubscriptionServer } from "subscriptions-transport-ws";
+import { Config } from "../config";
 import { Context } from "./context";
 
 const schema = makeExecutableSchema<Context>({
@@ -20,8 +20,8 @@ const schema = makeExecutableSchema<Context>({
     },
     Subscription: {
 
-    }
-  }
+    },
+  },
 });
 
 const app = express();
@@ -40,14 +40,14 @@ app.use("/graphql", graphqlExpress(async (_req, _res) => {
 app.get("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
 
 server.listen(Config.server.port, () => {
-  new SubscriptionServer({
+  SubscriptionServer.create({
     schema,
     execute,
     subscribe,
     onConnect: async () => {
-
-    }
+      /* tslint:disable:no-empty */
+    },
   }, {
-      server, path: "subscriptions"
-    })
+      server, path: "subscriptions",
+    });
 });

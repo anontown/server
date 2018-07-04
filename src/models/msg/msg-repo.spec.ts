@@ -213,12 +213,12 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
 
       expect(await repo.find2(token, {
         date: null,
-        id: []
+        id: [],
       }, 100)).toEqual([]);
 
       expect(await repo.find2(token, {
         date: null,
-        id: ["msg1", "msg2", "msg3"]
+        id: ["msg1", "msg2", "msg3"],
       }, 100)).toEqual([
         msg1,
         msg3,
@@ -226,7 +226,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
 
       expect(await repo.find2(token, {
         date: null,
-        id: null
+        id: null,
       }, 100)).toEqual([
         msg4,
         msg9,
@@ -241,9 +241,9 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.find2(token, {
         date: {
           type: "gte",
-          date: new Date(70)
+          date: new Date(70),
         },
-        id: ["msg9", "msg1"]
+        id: ["msg9", "msg1"],
       }, 100)).toEqual([
         msg9,
       ]);
@@ -251,9 +251,9 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.find2(token, {
         date: {
           type: "gte",
-          date: new Date(0)
+          date: new Date(0),
         },
-        id: null
+        id: null,
       }, 100)).toEqual([
         msg4,
         msg9,
@@ -268,9 +268,9 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.find2(token, {
         date: {
           type: "gte",
-          date: new Date(70)
+          date: new Date(70),
         },
-        id: null
+        id: null,
       }, 100)).toEqual([
         msg4,
         msg9,
@@ -279,9 +279,9 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.find2(token, {
         date: {
           type: "gte",
-          date: new Date(70)
+          date: new Date(70),
         },
-        id: null
+        id: null,
       }, 1)).toEqual([
         msg9,
       ]);
@@ -289,9 +289,9 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.find2(token, {
         date: {
           type: "gt",
-          date: new Date(70)
+          date: new Date(70),
         },
-        id: null
+        id: null,
       }, 100)).toEqual([
         msg4,
       ]);
@@ -299,9 +299,9 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.find2(token, {
         date: {
           type: "lte",
-          date: new Date(30)
+          date: new Date(30),
         },
-        id: null
+        id: null,
       }, 100)).toEqual([
         msg3,
         msg5,
@@ -311,9 +311,9 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.find2(token, {
         date: {
           type: "lte",
-          date: new Date(30)
+          date: new Date(30),
         },
-        id: null
+        id: null,
       }, 2)).toEqual([
         msg3,
         msg5,
@@ -322,9 +322,9 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.find2(token, {
         date: {
           type: "lt",
-          date: new Date(30)
+          date: new Date(30),
         },
-        id: null
+        id: null,
       }, 100)).toEqual([
         msg5,
         msg6,
@@ -333,16 +333,16 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       expect(await repo.find2(token, {
         date: {
           type: "gt",
-          date: new Date(90)
+          date: new Date(90),
         },
-        id: null
+        id: null,
       }, 100)).toEqual([]);
       expect(await repo.find2(token, {
         date: {
           type: "lt",
-          date: new Date(30)
+          date: new Date(30),
         },
-        id: null
+        id: null,
       }, 0)).toEqual([]);
     });
   });
