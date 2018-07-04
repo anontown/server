@@ -220,7 +220,6 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         date: null,
         id: ["msg1", "msg2", "msg3"]
       }, 100)).toEqual([
-        msg2,
         msg1,
         msg3,
       ]);
