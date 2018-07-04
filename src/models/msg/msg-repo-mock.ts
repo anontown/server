@@ -2,6 +2,7 @@ import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { IMsgRepo } from "./imsg-repo";
 import { IMsgDB, Msg } from "./msg";
+import { DateType } from "../../server/index";
 
 export class MsgRepoMock implements IMsgRepo {
   private msgs: IMsgDB[] = [];
@@ -27,6 +28,47 @@ export class MsgRepoMock implements IMsgRepo {
     }
 
     return msgs.map(x => Msg.fromDB(x));
+  }
+
+  async find2(
+    authToken: IAuthToken,
+    query: {
+      date: DateType | null,
+      id: string[] | null
+    },
+    limit: number): Promise<Msg[]> {
+    const msgs = this.msgs
+      .filter(x => x.body.receiver === null || x.body.receiver === authToken.user)
+      .filter(x => query.id === null || query.id.includes(x.id))
+      .filter(x => {
+        if (query.date === null) {
+          return true;
+        }
+        const dateV = new Date(query.date.date).valueOf();
+        const xDateV = new Date(x.body.date).valueOf();
+        switch (query.date.type) {
+          case "gte":
+            return dateV <= xDateV;
+          case "gt":
+            return dateV < xDateV;
+          case "lte":
+            return dateV >= xDateV;
+          case "lt":
+            return dateV > xDateV;
+        }
+      })
+      .sort((a, b) => {
+        const av = new Date(a.body.date).valueOf();
+        const bv = new Date(b.body.date).valueOf();
+        return query.date !== null && (query.date.type === "gt" || query.date.type === "gte") ? av - bv : bv - av;
+      })
+      .slice(0, limit);
+
+    const result = msgs.map(x => Msg.fromDB(x));
+    if (query.date !== null && (query.date.type === "gt" || query.date.type === "gte")) {
+      result.reverse();
+    }
+    return result;
   }
 
   async find(
