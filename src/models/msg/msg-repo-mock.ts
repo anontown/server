@@ -44,7 +44,7 @@ export class MsgRepoMock implements IMsgRepo {
         if (query.date === null) {
           return true;
         }
-        const dateV = query.date.date.valueOf();
+        const dateV = new Date(query.date.date).valueOf();
         const xDateV = new Date(x.body.date).valueOf();
         switch (query.date.type) {
           case "gte":

@@ -122,7 +122,7 @@ export class MsgRepo implements IMsgRepo {
       filter.push({
         range: {
           date: {
-            [query.date.type]: query.date.date.toISOString(),
+            [query.date.type]: query.date.date,
           },
         },
       });

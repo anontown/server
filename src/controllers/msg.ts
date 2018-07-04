@@ -5,7 +5,27 @@ import {
   controller,
   http,
   IHttpAPICallParams,
+  DateType,
+  Context,
 } from "../server";
+
+export const msgResolver = {
+  Query: {
+    msgs: async (_obj: any,
+      args: {
+        id: string[] | null,
+        date: DateType | null,
+        limit: number
+      }, context: Context,
+      _info: any) => {
+      const msgs = await context.repo.msg.find2(context.auth.token, {
+        id: args.id,
+        date: args.date
+      }, args.limit);
+      return msgs.map(x => x.toAPI(context.auth.token));
+    }
+  }
+};
 
 @controller
 export class MsgController {
