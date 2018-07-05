@@ -3,8 +3,8 @@ import { IAuthToken, IAuthTokenMaster, IAuthUser } from "../auth";
 
 export class AuthContainer {
   constructor(private _token: IAuthToken | null,
-              private _user: IAuthUser | null,
-              private _recaptcha: boolean) {
+    private _user: IAuthUser | null,
+    private _recaptcha: boolean) {
   }
 
   recaptcha() {
@@ -15,7 +15,7 @@ export class AuthContainer {
 
   get token(): IAuthToken {
     if (this._token === null) {
-      throw new Error();
+      throw new AtAuthError("認証が必要です");
     }
 
     return this._token;
@@ -24,7 +24,7 @@ export class AuthContainer {
   get tokenMaster(): IAuthTokenMaster {
     const t = this.token;
     if (t.type === "general") {
-      throw new Error();
+      throw new AtAuthError("マスタートークンでの認証が必要です");
     }
     return t;
   }
@@ -43,7 +43,7 @@ export class AuthContainer {
 
   get user(): IAuthUser {
     if (this._user === null) {
-      throw new Error();
+      throw new AtAuthError("ユーザー認証が必要です");
     }
 
     return this._user;
