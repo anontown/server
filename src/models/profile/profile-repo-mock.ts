@@ -2,6 +2,7 @@ import { AtConflictError, AtNotFoundError, AtNotFoundPartError } from "../../at-
 import { IAuthToken } from "../../auth";
 import { IProfileRepo } from "./iprofile-repo";
 import { IProfileDB, Profile } from "./profile";
+import { AuthContainer } from "../../server/auth-container";
 
 export class ProfileRepoMock implements IProfileRepo {
   private profiles: IProfileDB[] = [];
@@ -32,6 +33,15 @@ export class ProfileRepoMock implements IProfileRepo {
   async findAll(authToken: IAuthToken): Promise<Profile[]> {
     const profiles = this.profiles
       .filter(x => x.user.toHexString() === authToken.user)
+      .sort((a, b) => b.date.valueOf() - a.date.valueOf());
+
+    return profiles.map(p => Profile.fromDB(p));
+  }
+
+  async find(auth: AuthContainer, query: { self: boolean | null, id: string[] }): Promise<Profile[]> {
+    const profiles = this.profiles
+      .filter(x => !query.self || x.user.toHexString() === auth.token.user)
+      .filter(x => query.id === null || query.id.includes(x._id.toHexString()))
       .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
     return profiles.map(p => Profile.fromDB(p));

@@ -4,6 +4,7 @@ import { IAuthToken } from "../../auth";
 import { DB } from "../../db";
 import { IProfileRepo } from "./iprofile-repo";
 import { IProfileDB, Profile } from "./profile";
+import { AuthContainer } from "../../server/auth-container";
 
 export class ProfileRepo implements IProfileRepo {
   async findOne(id: string): Promise<Profile> {
@@ -37,6 +38,22 @@ export class ProfileRepo implements IProfileRepo {
     const db = await DB;
     const profiles: IProfileDB[] = await db.collection("profiles")
       .find({ user: new ObjectID(authToken.user) })
+      .sort({ date: -1 })
+      .toArray();
+    return profiles.map(p => Profile.fromDB(p));
+  }
+
+  async find(auth: AuthContainer, query: { self: boolean | null, id: string[] }): Promise<Profile[]> {
+    const q: any = {};
+    if (query.self) {
+      q["user"] = new ObjectID(auth.token.user);
+    }
+    if (query.id !== null) {
+      q["_id"] = query.id.map(x => new ObjectID(x));
+    }
+    const db = await DB;
+    const profiles: IProfileDB[] = await db.collection("profiles")
+      .find(q)
       .sort({ date: -1 })
       .toArray();
     return profiles.map(p => Profile.fromDB(p));
