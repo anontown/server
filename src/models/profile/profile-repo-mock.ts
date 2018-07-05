@@ -38,7 +38,7 @@ export class ProfileRepoMock implements IProfileRepo {
     return profiles.map(p => Profile.fromDB(p));
   }
 
-  async find(auth: AuthContainer, query: { self: boolean | null, id: string[] }): Promise<Profile[]> {
+  async find(auth: AuthContainer, query: { self: boolean | null, id: string[] | null }): Promise<Profile[]> {
     const profiles = this.profiles
       .filter(x => !query.self || x.user.toHexString() === auth.token.user)
       .filter(x => query.id === null || query.id.includes(x._id.toHexString()))
