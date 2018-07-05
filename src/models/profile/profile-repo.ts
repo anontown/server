@@ -49,7 +49,7 @@ export class ProfileRepo implements IProfileRepo {
       q["user"] = new ObjectID(auth.token.user);
     }
     if (query.id !== null) {
-      q["_id"] = query.id.map(x => new ObjectID(x));
+      q["_id"] = { $in: query.id.map(x => new ObjectID(x)) };
     }
     const db = await DB;
     const profiles: IProfileDB[] = await db.collection("profiles")
