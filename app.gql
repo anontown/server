@@ -250,7 +250,7 @@ type Query{
   clients(id:[ID!],self:Boolean):[Client!]!
   histories(id:[ID!],topic:[ID!]):[History!]!
   msgs(id:[ID!],date:Date,limit:Int=100):[Msg!]!
-  profiles(id:[ID!],self:Boolean,limit:Int=100):[Profile!]!
+  profiles(id:[ID!],self:Boolean):[Profile!]!
   reses(
     id:[ID!],
     topic:ID,
