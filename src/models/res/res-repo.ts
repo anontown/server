@@ -4,6 +4,8 @@ import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
 import { IResFindQuery, IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
+import { AuthContainer } from "../../server/auth-container";
+import { DateType } from "../../server";
 
 export class ResRepo implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
@@ -259,5 +261,132 @@ export class ResRepo implements IResRepo {
   private async aggregate(reses: IResDB[]): Promise<Res[]> {
     const count = await this.replyCount(reses.map(x => x.id));
     return reses.map(r => fromDBToRes(r, count.get(r.id) || 0));
+  }
+
+  async find2(auth: AuthContainer, query: {
+    id: string[] | null,
+    topic: string | null,
+    notice: boolean | null,
+    hash: string | null,
+    reply: string | null,
+    profile: string | null,
+    text: string | null,
+    self: boolean | null,
+    date: DateType | null,
+  }, limit: number): Promise<Res[]> {
+    const filter: object[] = [];
+
+    if (query.date !== null) {
+      filter.push({
+        range: {
+          date: {
+            [query.date.type]: query.date.date,
+          },
+        },
+      });
+    }
+
+    if (query.id !== null) {
+      filter.push({
+        terms: {
+          _id: query.id,
+        }
+      });
+    }
+
+    if (query.topic !== null) {
+      filter.push({
+        term: {
+          topic: query.topic,
+        },
+      });
+    }
+
+    if (query.notice) {
+      filter.push({
+        nested: {
+          path: "reply",
+          query: {
+            term: {
+              "reply.user": auth.token.user,
+            },
+          },
+        },
+      });
+    }
+
+    if (query.hash !== null) {
+      filter.push({
+        term: {
+          hash: query.hash,
+        },
+      });
+    }
+
+    if (query.reply !== null) {
+      filter.push({
+        nested: {
+          path: "reply",
+          query: {
+            term: {
+              "reply.res": query.reply,
+            },
+          },
+        },
+      });
+    }
+
+    if (query.profile !== null) {
+      filter.push({
+        term: {
+          profile: query.profile,
+        },
+      });
+    }
+
+    if (query.self) {
+      filter.push({
+        term: {
+          user: auth.token.user,
+        },
+      });
+    }
+
+    if (query.text !== null) {
+      filter.push({
+        match: {
+          text: {
+            query: query.text,
+            operator: "and",
+            zero_terms_query: "all",
+          },
+        },
+      });
+    }
+
+    const reses = await ESClient.search<IResDB["body"]>({
+      index: "reses",
+      size: limit,
+      body: {
+        query: {
+          bool: {
+            filter,
+          },
+        },
+        sort: {
+          date: {
+            order: query.date !== null && (query.date.type === "gt" || query.date.type === "gte")
+              ? "asc"
+              : "desc"
+          }
+        },
+      },
+    });
+
+    const result = await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
+    if (query.date !== null && (query.date.type === "gt" || query.date.type === "gte")) {
+      result.reverse();
+    }
+    return result;
   }
 }
