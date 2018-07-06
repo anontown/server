@@ -44,6 +44,7 @@ export interface IResRepo {
     reply: string | null,
     profile: string | null,
     text: string | null,
+    self: boolean | null,
     date: DateType | null,
   }, limit: number): Promise<Res[]>;
 }
