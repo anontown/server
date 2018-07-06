@@ -3,6 +3,8 @@ import { AtAuthError, AtNotFoundError, AtNotFoundPartError } from "../../at-erro
 import { IAuthToken } from "../../auth";
 import { IResFindQuery, IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
+import { DateType } from "../../server";
+import { AuthContainer } from "../../server/auth-container";
 
 export class ResRepoMock implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
@@ -129,5 +131,65 @@ export class ResRepoMock implements IResRepo {
   private async aggregate(reses: IResDB[]): Promise<Res[]> {
     const count = await this.replyCount(reses.map(x => x.id));
     return reses.map(r => fromDBToRes(r, count.get(r.id) || 0));
+  }
+
+  async find2(auth: AuthContainer, query: {
+    id: string[] | null,
+    topic: string | null,
+    notice: boolean | null,
+    hash: string | null,
+    reply: string | null,
+    profile: string | null,
+    text: string | null,
+    self: boolean | null,
+    date: DateType | null,
+  }, limit: number): Promise<Res[]> {
+    const notice = query.notice !== null ? auth.token.user : null;
+    const self = query.self !== null ? auth.token.user : null;
+    const texts = query.text !== null
+      ? query.text
+        .split(/\s/)
+        .filter(x => x.length !== 0)
+      : null;
+
+    const reses = this.reses
+      .filter(x => query.topic === null || x.body.topic === query.topic)
+      .filter(x => notice === null || x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === notice)
+      .filter(x => query.hash === null || x.body.hash === query.hash)
+      .filter(x => query.reply === null ||
+        x.body.type === "normal" && x.body.reply !== null && x.body.reply.res === query.reply)
+      .filter(x => query.profile === null ||
+        x.body.type === "normal" && x.body.profile !== null && x.body.profile === query.profile)
+      .filter(x => self === null || x.body.user === self)
+      .filter(x => texts === null || texts.every(t => x.body.type === "normal" && x.body.text.includes(t)))
+      .filter(x => {
+        if (query.date === null) {
+          return true;
+        }
+        const dateV = new Date(query.date.date).valueOf();
+        const xDateV = new Date(x.body.date).valueOf();
+        switch (query.date.type) {
+          case "gte":
+            return dateV <= xDateV;
+          case "gt":
+            return dateV < xDateV;
+          case "lte":
+            return dateV >= xDateV;
+          case "lt":
+            return dateV > xDateV;
+        }
+      })
+      .sort((a, b) => {
+        const av = new Date(a.body.date).valueOf();
+        const bv = new Date(b.body.date).valueOf();
+        return query.date !== null && (query.date.type === "gt" || query.date.type === "gte") ? av - bv : bv - av;
+      })
+      .slice(0, limit);
+
+    const result = await this.aggregate(reses);
+    if (query.date !== null && (query.date.type === "gt" || query.date.type === "gte")) {
+      result.reverse();
+    }
+    return result;
   }
 }
