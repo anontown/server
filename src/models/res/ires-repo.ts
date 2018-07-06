@@ -1,6 +1,8 @@
 import { Subject } from "rxjs";
 import { IAuthToken } from "../../auth";
 import { Res } from "./res";
+import { AuthContainer } from "../../server/auth-container";
+import { DateType } from "../../server/index";
 
 export interface IResFindQuery {
   topic?: string;
@@ -33,4 +35,15 @@ export interface IResRepo {
   resCount(topicIDs: string[]): Promise<Map<string, number>>;
 
   replyCount(resIDs: string[]): Promise<Map<string, number>>;
+
+  find2(auth: AuthContainer, query: {
+    id: string[] | null,
+    topic: string | null,
+    notice: boolean | null,
+    hash: string | null,
+    reply: string | null,
+    profile: string | null,
+    text: string | null,
+    date: DateType | null,
+  }, limit: number): Promise<Res[]>;
 }
