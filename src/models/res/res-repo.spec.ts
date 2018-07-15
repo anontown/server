@@ -13,6 +13,7 @@ import {
   ResTopic,
 } from "../../";
 import { AuthContainer } from "../../server/auth-container";
+import { authToken } from "../../server/schemas";
 
 function run(repoGene: () => IResRepo, isReset: boolean) {
   beforeEach(async () => {
@@ -353,6 +354,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
   });
 
   describe("find2", () => {
+    const notAuth = new AuthContainer(null, null, false);
     it("正常に検索できるか", async () => {
       const repo = repoGene();
 
@@ -364,7 +366,6 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       };
 
       const auth = new AuthContainer(token, null, false);
-      const notAuth = new AuthContainer(null, null, false);
       const user2Auth = new AuthContainer({ ...token, user: "user2" }, null, false);
 
       const res1 = resNormal.copy({ id: "res1", date: new Date(50) });
@@ -635,7 +636,38 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         }
       }, 10)).toEqual([res7]);
     });
+
+    it("通知フィルタでトークンがないとエラーになるか", async () => {
+      const repo = repoGene();
+      await expect(repo.find2(notAuth, {
+        id: null,
+        topic: null,
+        notice: true,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: null,
+        date: null
+      }, 10)).rejects.toThrow(AtError);
+    });
+
+    it("selfフィルタでトークンがないとエラーになるか", async () => {
+      const repo = repoGene();
+      await expect(repo.find2(notAuth, {
+        id: null,
+        topic: null,
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: true,
+        date: null
+      }, 10)).rejects.toThrow(AtError);
+    });
   });
+
 }
 
 describe("ResRepoMock", () => {
