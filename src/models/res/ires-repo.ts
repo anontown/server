@@ -1,8 +1,8 @@
 import { Subject } from "rxjs";
 import { IAuthToken } from "../../auth";
-import { Res } from "./res";
 import { AuthContainer } from "../../server/auth-container";
 import { DateType } from "../../server/index";
+import { Res } from "./res";
 
 export interface IResFindQuery {
   topic?: string;
@@ -46,5 +46,5 @@ export interface IResRepo {
     text: string | null,
     self: boolean | null,
     date: DateType | null,
-  }, limit: number): Promise<Res[]>;
+  },    limit: number): Promise<Res[]>;
 }

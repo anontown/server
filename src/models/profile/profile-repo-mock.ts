@@ -1,8 +1,8 @@
 import { AtConflictError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
+import { AuthContainer } from "../../server/auth-container";
 import { IProfileRepo } from "./iprofile-repo";
 import { IProfileDB, Profile } from "./profile";
-import { AuthContainer } from "../../server/auth-container";
 
 export class ProfileRepoMock implements IProfileRepo {
   private profiles: IProfileDB[] = [];

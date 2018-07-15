@@ -3,8 +3,8 @@ import { IAuthToken, IAuthTokenMaster, IAuthUser } from "../auth";
 
 export class AuthContainer {
   constructor(private _token: IAuthToken | null,
-    private _user: IAuthUser | null,
-    private _recaptcha: boolean) {
+              private _user: IAuthUser | null,
+              private _recaptcha: boolean) {
   }
 
   recaptcha() {

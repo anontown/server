@@ -401,8 +401,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "gte",
-          date: new Date(0).toISOString()
-        }
+          date: new Date(0).toISOString(),
+        },
       }, 100)).toEqual([
         res4,
         res9,
@@ -425,8 +425,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "gte",
-          date: new Date(70).toISOString()
-        }
+          date: new Date(70).toISOString(),
+        },
       }, 100)).toEqual([
         res4,
         res9,
@@ -443,8 +443,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "gte",
-          date: new Date(70).toISOString()
-        }
+          date: new Date(70).toISOString(),
+        },
       }, 1)).toEqual([
         res9,
       ]);
@@ -460,8 +460,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "gt",
-          date: new Date(70).toISOString()
-        }
+          date: new Date(70).toISOString(),
+        },
       }, 100)).toEqual([
         res4,
       ]);
@@ -477,8 +477,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "lte",
-          date: new Date(30).toISOString()
-        }
+          date: new Date(30).toISOString(),
+        },
       }, 100)).toEqual([
         res3,
         res5,
@@ -496,8 +496,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "lte",
-          date: new Date(30).toISOString()
-        }
+          date: new Date(30).toISOString(),
+        },
       }, 2)).toEqual([
         res3,
         res5,
@@ -514,8 +514,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "lt",
-          date: new Date(30).toISOString()
-        }
+          date: new Date(30).toISOString(),
+        },
       }, 100)).toEqual([
         res5,
         res6,
@@ -532,8 +532,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "gt",
-          date: new Date(90).toISOString()
-        }
+          date: new Date(90).toISOString(),
+        },
       }, 100)).toEqual([]);
       expect(await repo.find2(notAuth, {
         id: null,
@@ -546,8 +546,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "lt",
-          date: new Date(30).toISOString()
-        }
+          date: new Date(30).toISOString(),
+        },
       }, 0)).toEqual([]);
 
       expect(await repo.find2(auth, {
@@ -561,8 +561,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "gte",
-          date: new Date(0).toISOString()
-        }
+          date: new Date(0).toISOString(),
+        },
       }, 10)).toEqual([res7]);
       expect(await repo.find2(notAuth, {
         id: null,
@@ -575,8 +575,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "gte",
-          date: new Date(0).toISOString()
-        }
+          date: new Date(0).toISOString(),
+        },
       }, 10)).toEqual([res7]);
       expect(await repo.find2(notAuth, {
         id: null,
@@ -589,8 +589,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "gte",
-          date: new Date(0).toISOString()
-        }
+          date: new Date(0).toISOString(),
+        },
       }, 10)).toEqual([res4]);
       expect(await repo.find2(notAuth, {
         id: null,
@@ -603,8 +603,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "gte",
-          date: new Date(0).toISOString()
-        }
+          date: new Date(0).toISOString(),
+        },
       }, 10)).toEqual([res5]);
       expect(await repo.find2(user2Auth, {
         id: null,
@@ -617,8 +617,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: true,
         date: {
           type: "gte",
-          date: new Date(0).toISOString()
-        }
+          date: new Date(0).toISOString(),
+        },
       }, 10)).toEqual([res3]);
       expect(await repo.find2(notAuth, {
         id: null,
@@ -631,8 +631,8 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         self: null,
         date: {
           type: "gte",
-          date: new Date(0).toISOString()
-        }
+          date: new Date(0).toISOString(),
+        },
       }, 10)).toEqual([res7]);
 
       expect(await repo.find2(notAuth, {
@@ -644,7 +644,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         profile: null,
         text: null,
         self: null,
-        date: null
+        date: null,
       }, 10)).toEqual([]);
 
       expect(await repo.find2(notAuth, {
@@ -656,7 +656,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         profile: null,
         text: null,
         self: null,
-        date: null
+        date: null,
       }, 10)).toEqual([res1]);
 
       expect(await repo.find2(notAuth, {
@@ -668,7 +668,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         profile: null,
         text: null,
         self: null,
-        date: null
+        date: null,
       }, 10)).toEqual([res3, res5]);
     });
 
@@ -683,7 +683,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         profile: null,
         text: null,
         self: null,
-        date: null
+        date: null,
       }, 10)).rejects.toThrow(AtError);
     });
 
@@ -698,7 +698,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         profile: null,
         text: null,
         self: true,
-        date: null
+        date: null,
       }, 10)).rejects.toThrow(AtError);
     });
   });

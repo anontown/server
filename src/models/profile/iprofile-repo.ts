@@ -1,6 +1,6 @@
 import { IAuthToken } from "../../auth";
-import { Profile } from "./profile";
 import { AuthContainer } from "../../server/auth-container";
+import { Profile } from "./profile";
 
 export interface IProfileRepo {
   findOne(id: string): Promise<Profile>;

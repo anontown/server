@@ -2,10 +2,10 @@ import { Subject } from "rxjs";
 import { AtAuthError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
+import { DateType } from "../../server";
+import { AuthContainer } from "../../server/auth-container";
 import { IResFindQuery, IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
-import { AuthContainer } from "../../server/auth-container";
-import { DateType } from "../../server";
 
 export class ResRepo implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
@@ -258,11 +258,6 @@ export class ResRepo implements IResRepo {
     return new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
   }
 
-  private async aggregate(reses: IResDB[]): Promise<Res[]> {
-    const count = await this.replyCount(reses.map(x => x.id));
-    return reses.map(r => fromDBToRes(r, count.get(r.id) || 0));
-  }
-
   async find2(auth: AuthContainer, query: {
     id: string[] | null,
     topic: string | null,
@@ -273,7 +268,7 @@ export class ResRepo implements IResRepo {
     text: string | null,
     self: boolean | null,
     date: DateType | null,
-  }, limit: number): Promise<Res[]> {
+  },          limit: number): Promise<Res[]> {
     const filter: object[] = [];
 
     if (query.date !== null) {
@@ -290,7 +285,7 @@ export class ResRepo implements IResRepo {
       filter.push({
         terms: {
           _id: query.id,
-        }
+        },
       });
     }
 
@@ -377,8 +372,8 @@ export class ResRepo implements IResRepo {
           date: {
             order: query.date !== null && (query.date.type === "gt" || query.date.type === "gte")
               ? "asc"
-              : "desc"
-          }
+              : "desc",
+          },
         },
       },
     });
@@ -388,5 +383,10 @@ export class ResRepo implements IResRepo {
       result.reverse();
     }
     return result;
+  }
+
+  private async aggregate(reses: IResDB[]): Promise<Res[]> {
+    const count = await this.replyCount(reses.map(x => x.id));
+    return reses.map(r => fromDBToRes(r, count.get(r.id) || 0));
   }
 }

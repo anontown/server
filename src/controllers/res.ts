@@ -6,17 +6,17 @@ import {
   ResNormal,
 } from "../models";
 import {
+  Context,
   controller,
+  DateType,
   http,
   IHttpAPICallParams,
-  DateType,
-  Context,
 } from "../server";
 
 export const resResolver = {
   Query: {
     reses: async (_obj: any,
-      args: {
+                  args: {
         id: string[] | null,
         topic: string | null,
         notice: boolean | null,
@@ -27,8 +27,8 @@ export const resResolver = {
         text: string | null,
         date: DateType | null,
         limit: number,
-      }, context: Context,
-      _info: any) => {
+      },          context: Context,
+                  _info: any) => {
       const reses = await context.repo.res.find2(context.auth, {
         id: args.id,
         topic: args.topic,
@@ -38,14 +38,14 @@ export const resResolver = {
         profile: args.profile,
         self: args.self,
         text: args.text,
-        date: args.date
+        date: args.date,
       }, args.limit);
       return reses.map(x => x.toAPI(context.auth.tokenOrNull));
     },
   },
   Mutation: {
 
-  }
+  },
 };
 
 @controller

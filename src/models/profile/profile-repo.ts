@@ -2,9 +2,9 @@ import { ObjectID, WriteError } from "mongodb";
 import { AtConflictError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { DB } from "../../db";
+import { AuthContainer } from "../../server/auth-container";
 import { IProfileRepo } from "./iprofile-repo";
 import { IProfileDB, Profile } from "./profile";
-import { AuthContainer } from "../../server/auth-container";
 
 export class ProfileRepo implements IProfileRepo {
   async findOne(id: string): Promise<Profile> {
@@ -46,10 +46,10 @@ export class ProfileRepo implements IProfileRepo {
   async find(auth: AuthContainer, query: { self: boolean | null, id: string[] | null }): Promise<Profile[]> {
     const q: any = {};
     if (query.self) {
-      q["user"] = new ObjectID(auth.token.user);
+      q.user = new ObjectID(auth.token.user);
     }
     if (query.id !== null) {
-      q["_id"] = { $in: query.id.map(x => new ObjectID(x)) };
+      q._id = { $in: query.id.map(x => new ObjectID(x)) };
     }
     const db = await DB;
     const profiles: IProfileDB[] = await db.collection("profiles")
