@@ -153,6 +153,7 @@ export class ResRepoMock implements IResRepo {
       : null;
 
     const reses = this.reses
+      .filter(x => query.id === null || query.id.includes(x.id))
       .filter(x => query.topic === null || x.body.topic === query.topic)
       .filter(x => notice === null || x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === notice)
       .filter(x => query.hash === null || x.body.hash === query.hash)
