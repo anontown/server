@@ -635,6 +635,54 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
           date: new Date(0).toISOString()
         }
       }, 10)).toEqual([res7]);
+
+      expect(await repo.find2(notAuth, {
+        id: [],
+        topic: null,
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: "abc",
+        self: null,
+        date: null
+      }, 10)).toEqual([]);
+
+      expect(await repo.find2(notAuth, {
+        id: [],
+        topic: null,
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: "abc",
+        self: null,
+        date: null
+      }, 10)).toEqual([]);
+
+      expect(await repo.find2(notAuth, {
+        id: ["res1"],
+        topic: null,
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: "abc",
+        self: null,
+        date: null
+      }, 10)).toEqual([res1]);
+
+      expect(await repo.find2(notAuth, {
+        id: ["res5", "res3"],
+        topic: null,
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: "abc",
+        self: null,
+        date: null
+      }, 10)).toEqual([res3, res5]);
     });
 
     it("通知フィルタでトークンがないとエラーになるか", async () => {
