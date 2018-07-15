@@ -642,19 +642,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         hash: null,
         reply: null,
         profile: null,
-        text: "abc",
-        self: null,
-        date: null
-      }, 10)).toEqual([]);
-
-      expect(await repo.find2(notAuth, {
-        id: [],
-        topic: null,
-        notice: null,
-        hash: null,
-        reply: null,
-        profile: null,
-        text: "abc",
+        text: null,
         self: null,
         date: null
       }, 10)).toEqual([]);
@@ -666,7 +654,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         hash: null,
         reply: null,
         profile: null,
-        text: "abc",
+        text: null,
         self: null,
         date: null
       }, 10)).toEqual([res1]);
@@ -678,7 +666,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         hash: null,
         reply: null,
         profile: null,
-        text: "abc",
+        text: null,
         self: null,
         date: null
       }, 10)).toEqual([res3, res5]);
