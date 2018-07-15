@@ -12,6 +12,7 @@ import {
   ResRepoMock,
   ResTopic,
 } from "../../";
+import { AuthContainer } from "../../server/auth-container";
 
 function run(repoGene: () => IResRepo, isReset: boolean) {
   beforeEach(async () => {
@@ -348,6 +349,291 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       expect(await repo.replyCount(["res1"])).toEqual(new Map([["res1", 1]]));
       expect(await repo.replyCount(range(0, 25).map(x => "res" + x)))
         .toEqual(new Map(range(0, 24).map<[string, number]>(x => ["res" + x, 1])));
+    });
+  });
+
+  describe("find2", () => {
+    it("正常に検索できるか", async () => {
+      const repo = repoGene();
+
+      const token: IAuthTokenMaster = {
+        id: "token",
+        key: "key",
+        user: "user",
+        type: "master",
+      };
+
+      const auth = new AuthContainer(token, null, false);
+      const notAuth = new AuthContainer(null, null, false);
+      const user2Auth = new AuthContainer({ ...token, user: "user2" }, null, false);
+
+      const res1 = resNormal.copy({ id: "res1", date: new Date(50) });
+      const res2 = resTopic.copy({ id: "res2", date: new Date(80), topic: "topic2" });
+      const res3 = resFork.copy({ id: "res3", date: new Date(30), user: "user2" });
+      const res4 = resHistory.copy({ id: "res4", date: new Date(90), hash: "hash2" });
+      const res5 = resNormal.copy({ id: "res5", date: new Date(20), profile: "p1" });
+      const res6 = resTopic.copy({ id: "res6", date: new Date(10), replyCount: 1 });
+      const res7 = resNormal.copy({
+        id: "res7", date: new Date(60), text: "abc"
+        , reply: { user: "user", res: "res6" },
+      });
+      const res8 = resHistory.copy({ id: "res8", date: new Date(40) });
+      const res9 = resFork.copy({ id: "res9", date: new Date(70) });
+
+      await repo.insert(res1);
+      await repo.insert(res2);
+      await repo.insert(res3);
+      await repo.insert(res4);
+      await repo.insert(res5);
+      await repo.insert(res6);
+      await repo.insert(res7);
+      await repo.insert(res8);
+      await repo.insert(res9);
+
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: "topic",
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: null,
+        date: {
+          type: "gte",
+          date: new Date(0).toISOString()
+        }
+      }, 100)).toEqual([
+        res4,
+        res9,
+        res7,
+        res1,
+        res8,
+        res3,
+        res5,
+        res6,
+      ]);
+
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: "topic",
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: null,
+        date: {
+          type: "gte",
+          date: new Date(70).toISOString()
+        }
+      }, 100)).toEqual([
+        res4,
+        res9,
+      ]);
+
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: "topic",
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: null,
+        date: {
+          type: "gte",
+          date: new Date(70).toISOString()
+        }
+      }, 1)).toEqual([
+        res9,
+      ]);
+
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: "topic",
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: null,
+        date: {
+          type: "gt",
+          date: new Date(70).toISOString()
+        }
+      }, 100)).toEqual([
+        res4,
+      ]);
+
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: "topic",
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: null,
+        date: {
+          type: "lte",
+          date: new Date(30).toISOString()
+        }
+      }, 100)).toEqual([
+        res3,
+        res5,
+        res6,
+      ]);
+
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: "topic",
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: null,
+        date: {
+          type: "lte",
+          date: new Date(30).toISOString()
+        }
+      }, 2)).toEqual([
+        res3,
+        res5,
+      ]);
+
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: "topic",
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: null,
+        date: {
+          type: "lt",
+          date: new Date(30).toISOString()
+        }
+      }, 100)).toEqual([
+        res5,
+        res6,
+      ]);
+
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: "topic",
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: null,
+        date: {
+          type: "gt",
+          date: new Date(90).toISOString()
+        }
+      }, 100)).toEqual([]);
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: "topic",
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: null,
+        date: {
+          type: "lt",
+          date: new Date(30).toISOString()
+        }
+      }, 0)).toEqual([]);
+
+      expect(await repo.find2(auth, {
+        id: null,
+        topic: null,
+        notice: true,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: null,
+        date: {
+          type: "gte",
+          date: new Date(0).toISOString()
+        }
+      }, 10)).toEqual([res7]);
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: null,
+        notice: null,
+        hash: null,
+        reply: "res6",
+        profile: null,
+        text: null,
+        self: null,
+        date: {
+          type: "gte",
+          date: new Date(0).toISOString()
+        }
+      }, 10)).toEqual([res7]);
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: null,
+        notice: null,
+        hash: "hash2",
+        reply: null,
+        profile: null,
+        text: null,
+        self: null,
+        date: {
+          type: "gte",
+          date: new Date(0).toISOString()
+        }
+      }, 10)).toEqual([res4]);
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: null,
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: "p1",
+        text: null,
+        self: null,
+        date: {
+          type: "gte",
+          date: new Date(0).toISOString()
+        }
+      }, 10)).toEqual([res5]);
+      expect(await repo.find2(user2Auth, {
+        id: null,
+        topic: null,
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: null,
+        self: true,
+        date: {
+          type: "gte",
+          date: new Date(0).toISOString()
+        }
+      }, 10)).toEqual([res3]);
+      expect(await repo.find2(notAuth, {
+        id: null,
+        topic: null,
+        notice: null,
+        hash: null,
+        reply: null,
+        profile: null,
+        text: "abc",
+        self: null,
+        date: {
+          type: "gte",
+          date: new Date(0).toISOString()
+        }
+      }, 10)).toEqual([res7]);
     });
   });
 }

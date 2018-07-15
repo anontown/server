@@ -11,6 +11,14 @@ import {
   IHttpAPICallParams,
 } from "../server";
 
+export const resResolver = {
+  Query: {
+  },
+  Mutation:{
+    
+  }
+};
+
 @controller
 export class ResController {
   @http({
