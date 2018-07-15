@@ -13,7 +13,6 @@ import {
   ResTopic,
 } from "../../";
 import { AuthContainer } from "../../server/auth-container";
-import { authToken } from "../../server/schemas";
 
 function run(repoGene: () => IResRepo, isReset: boolean) {
   beforeEach(async () => {
