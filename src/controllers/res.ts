@@ -9,13 +9,42 @@ import {
   controller,
   http,
   IHttpAPICallParams,
+  DateType,
+  Context,
 } from "../server";
 
 export const resResolver = {
   Query: {
+    reses: async (_obj: any,
+      args: {
+        id: string[] | null,
+        topic: string | null,
+        notice: boolean | null,
+        hash: string | null,
+        reply: string | null,
+        profile: string | null,
+        self: boolean | null,
+        text: string | null,
+        date: DateType | null,
+        limit: number,
+      }, context: Context,
+      _info: any) => {
+      const reses = await context.repo.res.find2(context.auth, {
+        id: args.id,
+        topic: args.topic,
+        notice: args.notice,
+        hash: args.hash,
+        reply: args.reply,
+        profile: args.profile,
+        self: args.self,
+        text: args.text,
+        date: args.date
+      }, args.limit);
+      return reses.map(x => x.toAPI(context.auth.tokenOrNull));
+    },
   },
-  Mutation:{
-    
+  Mutation: {
+
   }
 };
 
