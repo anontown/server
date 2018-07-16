@@ -16,7 +16,7 @@ import {
 export const resResolver = {
   Query: {
     reses: async (_obj: any,
-                  args: {
+      args: {
         id: string[] | null,
         topic: string | null,
         notice: boolean | null,
@@ -27,8 +27,8 @@ export const resResolver = {
         text: string | null,
         date: DateType | null,
         limit: number,
-      },          context: Context,
-                  _info: any) => {
+      }, context: Context,
+      _info: any) => {
       const reses = await context.repo.res.find2(context.auth, {
         id: args.id,
         topic: args.topic,
@@ -44,7 +44,43 @@ export const resResolver = {
     },
   },
   Mutation: {
+    createRes: async (_obj: any,
+      args: {
+        topic: string,
+        name: string | null,
+        text: string,
+        reply: string | null,
+        profile: string | null,
+        age: boolean,
+      }, context: Context,
+      _info: any) => {
+      const [topic, user, reply, profile] = await Promise.all([
+        context.repo.topic.findOne(args.topic),
+        context.repo.user.findOne(context.auth.token.user),
+        args.reply !== null ? context.repo.res.findOne(args.reply) : Promise.resolve(null),
+        args.profile !== null ? context.repo.profile.findOne(args.profile) : Promise.resolve(null),
+      ]);
 
+      const { res, user: newUser, topic: newTopic } = ResNormal.create(ObjectIDGenerator,
+        topic,
+        user,
+        context.auth.token,
+        args.name,
+        args.text,
+        reply,
+        profile,
+        args.age,
+        context.now);
+
+      await Promise.all([
+        context.repo.res.insert(res),
+        context.repo.topic.update(newTopic),
+        context.repo.user.update(newUser),
+      ]);
+
+      context.log("reses", res.id);
+      return res.toAPI(context.auth.token);
+    },
   },
 };
 
