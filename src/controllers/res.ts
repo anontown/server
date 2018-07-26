@@ -146,7 +146,7 @@ export const resResolver = {
         context.repo.user.update(newResUser),
       ]);
 
-      return newRes.toAPI(auth.token);
+      return newRes.toAPI(context.auth.token);
     }
   },
 };
