@@ -6,6 +6,18 @@ import { IStorageRepo } from "./istorage-repo";
 import { IStorageDB, Storage } from "./storage";
 
 export class StorageRepo implements IStorageRepo {
+  async find(token: IAuthToken, query: { key?: string[] }): Promise<Storage[]> {
+    const db = await DB;
+    const storages: IStorageDB[] = await db.collection("storages")
+      .find({
+        user: new ObjectID(token.user),
+        client: token.type === "general" ? new ObjectID(token.client) : null,
+        key: query.key !== undefined ? { $in: query.key } : undefined,
+      })
+      .toArray();
+    return storages.map(x => Storage.fromDB(x));
+  }
+
   async findOneKey(token: IAuthToken, key: string): Promise<Storage> {
     const db = await DB;
     const storage: IStorageDB | null = await db.collection("storages")

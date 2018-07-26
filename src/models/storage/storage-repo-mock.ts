@@ -6,6 +6,14 @@ import { IStorageDB, Storage } from "./storage";
 export class StorageRepoMock implements IStorageRepo {
   private storages: IStorageDB[] = [];
 
+  async find(token: IAuthToken, query: { key?: string[] }): Promise<Storage[]> {
+    const storages = this.storages.filter(x => x.user.toHexString() === token.user
+      && (x.client !== null ? x.client.toHexString() : null) === (token.type === "general" ? token.client : null))
+      .filter(x => query.key === undefined || query.key.includes(x.key));
+
+    return storages.map(x => Storage.fromDB(x));
+  }
+
   async findOneKey(token: IAuthToken, key: string): Promise<Storage> {
     const storage = this.storages.find(x => x.user.toHexString() === token.user
       && (x.client !== null ? x.client.toHexString() : null) === (token.type === "general" ? token.client : null)
