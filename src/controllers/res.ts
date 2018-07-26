@@ -81,6 +81,50 @@ export const resResolver = {
       context.log("reses", res.id);
       return res.toAPI(context.auth.token);
     },
+    voteRes: async (_obj: any,
+      args: {
+        id: string,
+        vote: "uv" | "dv" | "cv"
+      }, context: Context,
+      _info: any) => {
+      if (args.vote === "cv") {
+        const [res, user] = await Promise.all([
+          context.repo.res.findOne(args.id),
+          context.repo.user.findOne(context.auth.token.user),
+        ]);
+
+        // レスを書き込んだユーザー
+        const resUser = await context.repo.user.findOne(res.user);
+
+        const { res: newRes, resUser: newResUser } = res.cv(resUser, user, context.auth.token);
+
+        await Promise.all([
+          context.repo.res.update(newRes),
+          context.repo.user.update(newResUser),
+          context.repo.user.update(user),
+        ]);
+
+        return newRes.toAPI(context.auth.token);
+      } else {
+        const [res, user] = await Promise.all([
+          context.repo.res.findOne(args.id),
+          context.repo.user.findOne(context.auth.token.user),
+        ]);
+
+        // レスを書き込んだユーザー
+        const resUser = await context.repo.user.findOne(res.user);
+
+        const { res: newRes, resUser: newResUser } = res.v(resUser, user, args.vote, context.auth.token);
+
+        await Promise.all([
+          context.repo.res.update(newRes),
+          context.repo.user.update(newResUser),
+          context.repo.user.update(user),
+        ]);
+
+        return newRes.toAPI(context.auth.token);
+      }
+    }
   },
 };
 
