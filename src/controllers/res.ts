@@ -124,6 +124,29 @@ export const resResolver = {
 
         return newRes.toAPI(context.auth.token);
       }
+    },
+    delRes: async (_obj: any,
+      args: {
+        id: string,
+      }, context: Context,
+      _info: any) => {
+      const res = await context.repo.res.findOne(args.id);
+
+      if (res.type !== "normal") {
+        throw new AtPrerequisiteError("通常レス以外は削除出来ません");
+      }
+
+      // レスを書き込んだユーザー
+      const resUser = await context.repo.user.findOne(res.user);
+
+      const { res: newRes, resUser: newResUser } = res.del(resUser, context.auth.token);
+
+      await Promise.all([
+        context.repo.res.update(newRes),
+        context.repo.user.update(newResUser),
+      ]);
+
+      return newRes.toAPI(auth.token);
     }
   },
 };
