@@ -263,7 +263,8 @@ type Query{
     date:Date,
     limit:Int=100):[Res!]!
   storages(key:[String!]):[Storage!]!
-  token(id:ID!):Token!
+  token():Token!
+  tokens():[Token!]!
   topics(id:[ID!],title:String,tags:[String!],date:Date,limit:Int=100,activeOnly:Boolean,parent:ID):[Topic!]!
   topicTags(limit:Int=100):[Tags!]!
   userID(sn:String!):ID!
