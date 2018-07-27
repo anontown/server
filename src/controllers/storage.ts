@@ -3,7 +3,41 @@ import {
   controller,
   http,
   IHttpAPICallParams,
+  Context,
 } from "../server";
+
+export const storageResolver = {
+  Query: {
+    storages: async (_obj: any,
+      args: {
+        key: string[] | null
+      }, context: Context,
+      _info: any) => {
+      const storages = await context.repo.storage.find(context.auth.token, { key: args.key });
+      return storages.map(x => x.toAPI(context.auth.token));
+    },
+  },
+  Mutation: {
+    setStorage: async (_obj: any,
+      args: {
+        key: string,
+        value: string
+      }, context: Context,
+      _info: any) => {
+      const storage = Storage.create(context.auth.token, args.key, args.value);
+      await context.repo.storage.save(storage);
+      return null;
+    },
+    delStorage: async (_obj: any,
+      args: {
+        key: string,
+      }, context: Context,
+      _info: any) => {
+      const storage = await context.repo.storage.findOneKey(context.auth.token, args.key);
+      return storage.toAPI(context.auth.token);
+    },
+  },
+};
 
 @controller
 export class StorageController {
