@@ -69,6 +69,248 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
     });
   });
 
+  describe("find2", () => {
+    it("正常に探せるか", async () => {
+      const repo = repoGene();
+
+      const topic1 = topicNormal.copy({
+        id: "topic1",
+        tags: Im.List(["a"]),
+        title: "x",
+        ageUpdate: new Date(10),
+        active: false,
+      });
+
+      const topic2 = topicNormal.copy({
+        id: "topic2",
+        tags: Im.List(["a", "b"]),
+        title: "y",
+        ageUpdate: new Date(20),
+      });
+
+      const topic3 = topicOne.copy({
+        id: "topic3",
+        tags: Im.List([]),
+        title: "x y",
+        ageUpdate: new Date(40),
+      });
+
+      const topic4 = topicOne.copy({
+        id: "topic4",
+        tags: Im.List(["a"]),
+        title: "",
+        ageUpdate: new Date(50),
+        active: false
+      });
+
+      const topic5 = topicFork.copy({
+        id: "topic5",
+        parent: "topic2",
+        title: "x",
+        ageUpdate: new Date(60),
+      });
+
+      const topic6 = topicFork.copy({
+        id: "topic6",
+        parent: "topic1",
+        title: "x",
+        ageUpdate: new Date(30),
+        active: false
+      });
+
+      await repo.insert(topic1);
+      await repo.insert(topic2);
+      await repo.insert(topic3);
+      await repo.insert(topic4);
+      await repo.insert(topic5);
+      await repo.insert(topic6);
+
+      expect(await repo.find2({
+        id: null,
+        title: null,
+        tags: null,
+        activeOnly: null,
+        parent: null
+      }, 0, 100)).toEqual([
+        topic5,
+        topic4,
+        topic3,
+        topic6,
+        topic2,
+        topic1
+      ]);
+
+      expect(await repo.find2({
+        id: null,
+        title: null,
+        tags: null,
+        activeOnly: null,
+        parent: null
+      }, 1, 3)).toEqual([
+        topic4,
+        topic3,
+        topic6,
+      ]);
+
+      expect(await repo.find2({
+        id: [],
+        title: null,
+        tags: null,
+        activeOnly: null,
+        parent: null
+      }, 0, 100)).toEqual([]);
+
+      expect(await repo.find2({
+        id: ["topic1", "topic5", "other"],
+        title: null,
+        tags: null,
+        activeOnly: null,
+        parent: null
+      }, 0, 100)).toEqual([
+        topic5,
+        topic1
+      ]);
+
+      expect(await repo.find2({
+        id: null,
+        title: "",
+        tags: null,
+        activeOnly: null,
+        parent: null
+      }, 0, 100)).toEqual([
+        topic5,
+        topic4,
+        topic3,
+        topic6,
+        topic2,
+        topic1
+      ]);
+
+      expect(await repo.find2({
+        id: null,
+        title: "x",
+        tags: null,
+        activeOnly: null,
+        parent: null
+      }, 0, 100)).toEqual([
+        topic5,
+        topic3,
+        topic6,
+        topic1
+      ]);
+
+      expect(await repo.find2({
+        id: null,
+        title: "x a",
+        tags: null,
+        activeOnly: null,
+        parent: null
+      }, 0, 100)).toEqual([]);
+
+      expect(await repo.find2({
+        id: null,
+        title: "x y",
+        tags: null,
+        activeOnly: null,
+        parent: null
+      }, 0, 100)).toEqual([
+        topic3
+      ]);
+
+      expect(await repo.find2({
+        id: null,
+        title: null,
+        tags: [],
+        activeOnly: null,
+        parent: null
+      }, 0, 100)).toEqual([
+        topic5,
+        topic4,
+        topic3,
+        topic6,
+        topic2,
+        topic1
+      ]);
+
+      expect(await repo.find2({
+        id: null,
+        title: null,
+        tags: ["a"],
+        activeOnly: null,
+        parent: null
+      }, 0, 100)).toEqual([
+        topic4,
+        topic2,
+        topic1
+      ]);
+
+      expect(await repo.find2({
+        id: null,
+        title: null,
+        tags: ["a", "b"],
+        activeOnly: null,
+        parent: null
+      }, 0, 100)).toEqual([
+        topic2,
+      ]);
+
+      expect(await repo.find2({
+        id: null,
+        title: null,
+        tags: ["x"],
+        activeOnly: null,
+        parent: null
+      }, 0, 100)).toEqual([
+      ]);
+
+      expect(await repo.find2({
+        id: null,
+        title: null,
+        tags: null,
+        activeOnly: false,
+        parent: null
+      }, 0, 100)).toEqual([
+        topic5,
+        topic4,
+        topic3,
+        topic6,
+        topic2,
+        topic1
+      ]);
+
+      expect(await repo.find2({
+        id: null,
+        title: null,
+        tags: null,
+        activeOnly: true,
+        parent: null
+      }, 0, 100)).toEqual([
+        topic4,
+        topic6,
+        topic1
+      ]);
+
+      expect(await repo.find2({
+        id: null,
+        title: null,
+        tags: null,
+        activeOnly: null,
+        parent: "topic1"
+      }, 0, 100)).toEqual([
+        topic6,
+      ]);
+
+      expect(await repo.find2({
+        id: null,
+        title: null,
+        tags: null,
+        activeOnly: null,
+        parent: "other"
+      }, 0, 100)).toEqual([
+      ]);
+    });
+  });
+
   describe("findIn", () => {
     it("正常に探せるか", async () => {
       const repo = repoGene();
