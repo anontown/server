@@ -37,7 +37,7 @@ export const topicResolver = {
           tags: args.tags,
           activeOnly: args.activeOnly,
           parent: args.parent
-        }, args.skip, args.limit),
+        }, args.skip, args.limit);
       return topic.map(t => t.toAPI());
     },
   },
