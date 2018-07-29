@@ -20,7 +20,7 @@ import {
 export const topicResolver = {
   Query: {
     topics: async (_obj: any,
-      _args: {
+      args: {
         id: string[] | null,
         title: string | null,
         tags: string[] | null,
@@ -30,8 +30,15 @@ export const topicResolver = {
         parent: string | null
       }, context: Context,
       _info: any) => {
-      const token = await context.repo.token.findOne(context.auth.token.id);
-      return token.toAPI();
+      const topic = await context.repo.topic
+        .find2({
+          id: args.id,
+          title: args.title,
+          tags: args.tags,
+          activeOnly: args.activeOnly,
+          parent: args.parent
+        }, args.skip, args.limit),
+      return topic.map(t => t.toAPI());
     },
   },
   Mutation: {}
