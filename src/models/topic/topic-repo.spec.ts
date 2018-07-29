@@ -285,9 +285,9 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         activeOnly: true,
         parent: null
       }, 0, 100)).toEqual([
-        topic4,
-        topic6,
-        topic1
+        topic5,
+        topic3,
+        topic2,
       ]);
 
       expect(await repo.find2({
