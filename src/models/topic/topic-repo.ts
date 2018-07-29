@@ -124,6 +124,73 @@ export class TopicRepo implements ITopicRepo {
     return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source })));
   }
 
+  async find2(query: {
+    id: string[] | null,
+    title: string | null,
+    tags: string[] | null,
+    activeOnly: boolean | null,
+    parent: string | null
+  }, skip: number, limit: number): Promise<Topic[]> {
+    const filter: any[] = [];
+    if (query.id !== null) {
+      filter.push({
+        terms: {
+          _id: query.id,
+        }
+      });
+    }
+
+    if (query.title !== null) {
+      filter.push({
+        match: {
+          title: {
+            query: query.title,
+            operator: "and",
+            zero_terms_query: "all",
+          },
+        },
+      });
+    }
+
+    if (query.tags !== null) {
+      filter.push(...query.tags.map(t => ({
+        term: {
+          tags: t,
+        },
+      })));
+    }
+
+    if (query.activeOnly) {
+      filter.push({
+        term: { active: true }
+      });
+    }
+
+    if (query.parent !== null) {
+      filter.push({
+        match: {
+          parent: query.parent,
+        },
+      });
+    }
+
+    const topics = await ESClient.search<ITopicDB["body"]>({
+      index: "topics",
+      size: limit,
+      from: skip,
+      body: {
+        query: {
+          bool: {
+            filter: filter,
+          },
+        },
+        sort: { ageUpdate: { order: "desc" } },
+      },
+    });
+
+    return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source })));
+  }
+
   async findFork(parentID: string, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
     const topics = await ESClient.search<ITopicForkDB["body"]>({
       index: "topics",

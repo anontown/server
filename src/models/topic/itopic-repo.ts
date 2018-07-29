@@ -26,4 +26,12 @@ export interface ITopicRepo {
   update(topic: Topic): Promise<void>;
 
   cronTopicCheck(now: Date): Promise<void>;
+
+  find2(query: {
+    id: string[] | null,
+    title: string | null,
+    tags: string[] | null,
+    activeOnly: boolean | null,
+    parent: string | null
+  }, skip: number, limit: number): Promise<Topic[]>;
 }

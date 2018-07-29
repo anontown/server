@@ -14,7 +14,28 @@ import {
   IHttpAPICallParams,
   ISocketAPICallParams,
   socket,
+  Context,
 } from "../server";
+
+export const topicResolver = {
+  Query: {
+    topics: async (_obj: any,
+      _args: {
+        id: string[] | null,
+        title: string | null,
+        tags: string[] | null,
+        skip: number,
+        limit: number,
+        activeOnly: boolean | null,
+        parent: string | null
+      }, context: Context,
+      _info: any) => {
+      const token = await context.repo.token.findOne(context.auth.token.id);
+      return token.toAPI();
+    },
+  },
+  Mutation: {}
+};
 
 @controller
 export class TopicController {
