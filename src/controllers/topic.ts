@@ -40,8 +40,134 @@ export const topicResolver = {
         }, args.skip, args.limit);
       return topic.map(t => t.toAPI());
     },
+    topicTags: async (_obj: any,
+      args: {
+        limit: number
+      }, context: Context,
+      _info: any) => {
+      return await context.repo.topic.findTags(args.limit);
+    },
   },
-  Mutation: {}
+  Mutation: {
+    createTopicNormal: async (_obj: any,
+      args: {
+        title: string,
+        tags: string[],
+        text: string
+      }, context: Context,
+      _info: any) => {
+      const user = await context.repo.user.findOne(context.auth.token.user);
+      const create = TopicNormal.create(ObjectIDGenerator,
+        args.title,
+        args.tags,
+        args.text,
+        user,
+        context.auth.token,
+        context.now);
+
+      await context.repo.topic.insert(create.topic);
+      await Promise.all([
+        context.repo.user.update(create.user),
+        context.repo.res.insert(create.res),
+        context.repo.history.insert(create.history),
+      ]);
+      context.log("topics", create.topic.id);
+      context.log("reses", create.res.id);
+      context.log("histories", create.history.id);
+      return create.topic.toAPI();
+    },
+    createTopicOne: async (_obj: any,
+      args: {
+        title: string,
+        tags: string[],
+        text: string
+      }, context: Context,
+      _info: any) => {
+      const user = await context.repo.user.findOne(context.auth.token.user);
+      const create = TopicOne.create(ObjectIDGenerator,
+        args.title,
+        args.tags,
+        args.text,
+        user,
+        context.auth.token,
+        context.now);
+
+      await context.repo.topic.insert(create.topic);
+      await Promise.all([
+        context.repo.user.update(create.user),
+        context.repo.res.insert(create.res),
+      ]);
+
+      context.log("topics", create.topic.id);
+      context.log("reses", create.res.id);
+
+      return create.topic.toAPI();
+    },
+    createTopicFork: async (_obj: any,
+      args: {
+        title: string,
+        parent: string
+      }, context: Context,
+      _info: any) => {
+      const user = await context.repo.user.findOne(context.auth.token.user);
+      const parent = await context.repo.topic.findOne(args.parent);
+
+      if (parent.type !== "normal") {
+        throw new AtPrerequisiteError("通常トピック以外の派生トピックは作れません");
+      }
+
+      const create = TopicFork.create(ObjectIDGenerator,
+        args.title,
+        parent,
+        user,
+        context.auth.token,
+        context.now);
+
+      await context.repo.topic.insert(create.topic);
+      await context.repo.topic.update(create.parent);
+      await Promise.all([
+        context.repo.user.update(create.user),
+        context.repo.res.insert(create.res),
+        context.repo.res.insert(create.resParent),
+      ]);
+
+      context.log("topics", create.topic.id);
+      context.log("reses", create.res.id);
+      context.log("reses", create.resParent.id);
+
+      return create.topic.toAPI();
+    },
+    updateTopic: async (_obj: any,
+      args: {
+        id: string,
+        title: string,
+        tags: string[],
+        text: string
+      }, context: Context,
+      _info: any) => {
+      const [topic, user] = await Promise.all([
+        context.repo.topic.findOne(args.id),
+        context.repo.user.findOne(context.auth.token.user),
+      ]);
+
+      if (topic.type !== "normal") {
+        throw new AtPrerequisiteError("通常トピック以外は編集出来ません");
+      }
+
+      const val = topic.changeData(ObjectIDGenerator, user, context.auth.token, args.title, args.tags, args.text, context.now);
+
+      await Promise.all([
+        context.repo.res.insert(val.res),
+        context.repo.history.insert(val.history),
+        context.repo.topic.update(val.topic),
+        context.repo.user.update(val.user),
+      ]);
+
+      context.log("reses", val.res.id);
+      context.log("histories", val.history.id);
+      return topic.toAPI();
+    },
+  }
 };
 
 @controller
