@@ -1,7 +1,7 @@
 import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { DateType } from "../../server/index";
-import { IMsgRepo } from "./imsg-repo";
+import { IMsgRepo, MsgQuery } from "./imsg-repo";
 import { IMsgDB, Msg } from "./msg";
 
 export class MsgRepoMock implements IMsgRepo {
@@ -19,10 +19,7 @@ export class MsgRepoMock implements IMsgRepo {
 
   async find(
     authToken: IAuthToken,
-    query: {
-      date?: DateType,
-      id?: string[],
-    },
+    query: MsgQuery,
     limit: number): Promise<Msg[]> {
     const msgs = this.msgs
       .filter(x => x.body.receiver === null || x.body.receiver === authToken.user)

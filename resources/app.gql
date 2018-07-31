@@ -250,10 +250,15 @@ input HistoryQuery{
   topic:[ID!]
 }
 
+input MsgQuery{
+  id:[ID!]
+  date:DateQuery
+}
+
 type Query{
   clients(query:ClientQuery!):[Client!]!
   histories(query:HistoryQuery!):[History!]!
-  msgs(id:[ID!],date:DateQuery,limit:Int=100):[Msg!]!
+  msgs(query:MsgQuery!,limit:Int=100):[Msg!]!
   profiles(id:[ID!],self:Boolean):[Profile!]!
   reses(
     id:[ID!],

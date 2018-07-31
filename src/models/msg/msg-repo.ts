@@ -2,7 +2,7 @@ import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
 import { DateType } from "../../server/index";
-import { IMsgRepo } from "./imsg-repo";
+import { IMsgRepo, MsgQuery } from "./imsg-repo";
 import { IMsgDB, Msg } from "./msg";
 
 export class MsgRepo implements IMsgRepo {
@@ -25,10 +25,7 @@ export class MsgRepo implements IMsgRepo {
 
   async find(
     authToken: IAuthToken,
-    query: {
-      date?: DateType,
-      id?: string[],
-    },
+    query: MsgQuery,
     limit: number): Promise<Msg[]> {
     const filter: any[] = [{
       bool: {
