@@ -13,13 +13,15 @@ import {
 export const tokenResolver = (repo: IRepo) => {
   return {
     Query: {
-      token: async (_obj: any,
+      token: async (
+        _obj: any,
         _args: {}, context: Context,
         _info: any) => {
         const token = await repo.token.findOne(context.auth.token.id);
         return token.toAPI();
       },
-      tokens: async (_obj: any,
+      tokens: async (
+        _obj: any,
         _args: {}, context: Context,
         _info: any) => {
         const tokens = await repo.token.findAll(context.auth.tokenMaster);
@@ -27,7 +29,8 @@ export const tokenResolver = (repo: IRepo) => {
       },
     },
     Mutation: {
-      delTokenClient: async (_obj: any,
+      delTokenClient: async (
+        _obj: any,
         args: {
           client: string,
         }, context: Context,
@@ -36,7 +39,8 @@ export const tokenResolver = (repo: IRepo) => {
         await repo.token.delClientToken(context.auth.tokenMaster, client.id);
         return null;
       },
-      createTokenGeneral: async (_obj: any,
+      createTokenGeneral: async (
+        _obj: any,
         args: {
           client: string,
         }, context: Context,
@@ -51,7 +55,8 @@ export const tokenResolver = (repo: IRepo) => {
 
         return token.toAPI();
       },
-      createTokenMaster: async (_obj: any,
+      createTokenMaster: async (
+        _obj: any,
         _args: {}, context: Context,
         _info: any) => {
         const token = TokenMaster.create(ObjectIDGenerator, context.auth.user, context.now, RandomGenerator);
@@ -59,7 +64,8 @@ export const tokenResolver = (repo: IRepo) => {
 
         return token.toAPI();
       },
-      createTokenReq: async (_obj: any,
+      createTokenReq: async (
+        _obj: any,
         _args: {}, context: Context,
         _info: any) => {
         const token = await repo.token.findOne(context.auth.token.id);
@@ -72,7 +78,8 @@ export const tokenResolver = (repo: IRepo) => {
 
         return req;
       },
-      authTokenReq: async (_obj: any,
+      authTokenReq: async (
+        _obj: any,
         args: {
           id: string,
           key: string,
