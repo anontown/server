@@ -194,7 +194,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
         key: "key",
         user: user1,
         type: "master",
-      }, null, false), {})).toEqual([
+      }, null, false), { self: true })).toEqual([
         profile2,
         profile1,
         profile3,
@@ -205,7 +205,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
         key: "key",
         user: user2,
         type: "master",
-      }, null, false), {})).toEqual([
+      }, null, false), { self: true })).toEqual([
         profile4,
       ]);
 
@@ -214,7 +214,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
         key: "key",
         user: user3,
         type: "master",
-      }, null, false), {})).toEqual([]);
+      }, null, false), { self: true })).toEqual([]);
 
       expect(await repo.find(new AuthContainer(null, null, false), { id: [] })).toEqual([]);
       expect(await repo.find(new AuthContainer(null, null, false),
@@ -238,7 +238,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       const repo = repoGene();
 
       await expect(repo.find(new AuthContainer(null, null, false),
-        {})).rejects.toThrow(AtError);
+        { self: true })).rejects.toThrow(AtError);
     });
   });
 

@@ -488,6 +488,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       }, 0)).toEqual([]);
 
       expect(await repo.find2(auth, {
+        notice: true,
         date: {
           type: "gte",
           date: new Date(0).toISOString(),
