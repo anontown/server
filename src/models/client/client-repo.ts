@@ -42,8 +42,8 @@ export class ClientRepo implements IClientRepo {
   }
 
   async find(authToken: IAuthTokenMaster | null, query: {
-    id: string[] | null,
-    self: boolean | null,
+    id?: string[],
+    self?: boolean,
   }): Promise<Client[]> {
     if (query.self && authToken === null) {
       throw new AtAuthError("認証が必要です");
@@ -53,7 +53,7 @@ export class ClientRepo implements IClientRepo {
     if (query.self && authToken !== null) {
       q.user = new ObjectID(authToken.user);
     }
-    if (query.id !== null) {
+    if (query.id !== undefined) {
       q._id = { $in: query.id.map(id => new ObjectID(id)) };
     }
     const clients: IClientDB[] = await db.collection("clients")

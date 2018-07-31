@@ -10,8 +10,8 @@ export const clientResolver = (repo: IRepo) => {
     Query: {
       clients: async (_obj: any,
         args: {
-          id: string[] | null,
-          self: boolean | null,
+          id?: string[],
+          self?: boolean,
         }, context: Context,
         _info: any) => {
         const clients = await repo.client.find(context.auth.TokenMasterOrNull, {

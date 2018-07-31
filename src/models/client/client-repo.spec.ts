@@ -174,10 +174,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
       await repo.insert(client3);
       await repo.insert(client4);
 
-      expect(await repo.find(null, {
-        id: null,
-        self: null,
-      })).toEqual([
+      expect(await repo.find(null, {})).toEqual([
         client4,
         client2,
         client1,
@@ -189,24 +186,19 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
         key: "key",
         user: user1,
         type: "master",
-      }, {
-          id: null,
-          self: null,
-        })).toEqual([
-          client4,
-          client2,
-          client1,
-          client3,
-        ]);
+      }, {})).toEqual([
+        client4,
+        client2,
+        client1,
+        client3,
+      ]);
 
       expect(await repo.find(null, {
         id: [],
-        self: null,
       })).toEqual([]);
 
       expect(await repo.find(null, {
         id: [client1.id],
-        self: null,
       })).toEqual([client1]);
 
       expect(await repo.find({
@@ -214,19 +206,16 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
         key: "key",
         user: user1,
         type: "master",
-      }, {
-          id: null,
-          self: true,
-        })).toEqual([
-          client2,
-          client1,
-          client3,
-        ]);
+      }, {})).toEqual([
+        client2,
+        client1,
+        client3,
+      ]);
     });
 
     describe("トークンがnullでselfがtrueの時エラーになるか", async () => {
       const repo = repoGene();
-      await expect(repo.find(null, { id: null, self: true })).rejects.toThrow(AtError);
+      await expect(repo.find(null, {})).rejects.toThrow(AtError);
     });
   });
 
