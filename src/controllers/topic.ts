@@ -14,7 +14,8 @@ import {
 export const topicResolver = (repo: IRepo) => {
   return {
     Query: {
-      topics: async (_obj: any,
+      topics: async (
+        _obj: any,
         args: {
           id?: string[],
           title?: string,
@@ -23,7 +24,8 @@ export const topicResolver = (repo: IRepo) => {
           limit: number,
           activeOnly?: boolean,
           parent?: string,
-        }, _context: Context,
+        },
+        _context: Context,
         _info: any) => {
         const topic = await repo.topic
           .find({
@@ -35,21 +37,25 @@ export const topicResolver = (repo: IRepo) => {
           }, args.skip, args.limit);
         return topic.map(t => t.toAPI());
       },
-      topicTags: async (_obj: any,
+      topicTags: async (
+        _obj: any,
         args: {
           limit: number,
-        }, _context: Context,
+        },
+        _context: Context,
         _info: any) => {
         return await repo.topic.findTags(args.limit);
       },
     },
     Mutation: {
-      createTopicNormal: async (_obj: any,
+      createTopicNormal: async (
+        _obj: any,
         args: {
           title: string,
           tags: string[],
           text: string,
-        }, context: Context,
+        },
+        context: Context,
         _info: any) => {
         const user = await repo.user.findOne(context.auth.token.user);
         const create = TopicNormal.create(ObjectIDGenerator,
@@ -71,12 +77,14 @@ export const topicResolver = (repo: IRepo) => {
         context.log("histories", create.history.id);
         return create.topic.toAPI();
       },
-      createTopicOne: async (_obj: any,
+      createTopicOne: async (
+        _obj: any,
         args: {
           title: string,
           tags: string[],
           text: string,
-        }, context: Context,
+        },
+        context: Context,
         _info: any) => {
         const user = await repo.user.findOne(context.auth.token.user);
         const create = TopicOne.create(ObjectIDGenerator,
@@ -98,11 +106,13 @@ export const topicResolver = (repo: IRepo) => {
 
         return create.topic.toAPI();
       },
-      createTopicFork: async (_obj: any,
+      createTopicFork: async (
+        _obj: any,
         args: {
           title: string,
           parent: string,
-        }, context: Context,
+        },
+        context: Context,
         _info: any) => {
         const user = await repo.user.findOne(context.auth.token.user);
         const parent = await repo.topic.findOne(args.parent);
@@ -132,13 +142,15 @@ export const topicResolver = (repo: IRepo) => {
 
         return create.topic.toAPI();
       },
-      updateTopic: async (_obj: any,
+      updateTopic: async (
+        _obj: any,
         args: {
           id: string,
           title: string,
           tags: string[],
           text: string,
-        }, context: Context,
+        },
+        context: Context,
         _info: any) => {
         const [topic, user] = await Promise.all([
           repo.topic.findOne(args.id),
