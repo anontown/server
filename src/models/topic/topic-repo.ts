@@ -1,13 +1,10 @@
 import { CronJob } from "cron";
-import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { AtNotFoundError } from "../../at-error";
 import { ESClient } from "../../db";
 import { IResRepo } from "../res";
 import { ITopicRepo } from "./itopic-repo";
 import {
   ITopicDB,
-  ITopicForkDB,
-  ITopicNormalDB,
-  ITopicOneDB,
   Topic,
   TopicFork,
   TopicNormal,
@@ -29,29 +26,6 @@ export class TopicRepo implements ITopicRepo {
       throw new AtNotFoundError("レスが存在しません");
     }
     return (await this.aggregate([{ id: topic._id, body: topic._source } as ITopicDB]))[0];
-  }
-
-  async findIn(ids: string[]): Promise<Topic[]> {
-    const topics = await ESClient.search<ITopicDB["body"]>({
-      index: "topics",
-      type: "doc",
-      size: ids.length,
-      body: {
-        query: {
-          terms: {
-            _id: ids,
-          },
-        },
-        sort: { ageUpdate: { order: "desc" } },
-      },
-    });
-
-    if (topics.hits.total !== ids.length) {
-      throw new AtNotFoundPartError("トピックが存在しません",
-        topics.hits.hits.map(t => t._id));
-    }
-
-    return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source }) as ITopicDB));
   }
 
   async findTags(limit: number): Promise<{ name: string, count: number }[]> {
@@ -79,58 +53,16 @@ export class TopicRepo implements ITopicRepo {
     return tags.map(x => ({ name: x.key, count: x.doc_count }));
   }
 
-  async find(
-    title: string,
-    tags: string[],
+  async find2(
+    query: {
+      id?: string[],
+      title?: string,
+      tags?: string[],
+      activeOnly?: boolean,
+      parent?: string,
+    },
     skip: number,
-    limit: number,
-    activeOnly: boolean): Promise<Topic[]> {
-    const topics = await ESClient.search<ITopicOneDB["body"] | ITopicNormalDB["body"]>({
-      index: "topics",
-      size: limit,
-      from: skip,
-      body: {
-        query: {
-          bool: {
-            filter: [
-              {
-                match: {
-                  title: {
-                    query: title,
-                    operator: "and",
-                    zero_terms_query: "all",
-                  },
-                },
-              },
-              ...tags.map(t => ({
-                term: {
-                  tags: t,
-                },
-              })),
-              {
-                terms: {
-                  type: ["normal", "one"],
-                },
-              },
-              ...activeOnly ? [{ term: { active: true } }] : [],
-
-            ],
-          },
-        },
-        sort: { ageUpdate: { order: "desc" } },
-      },
-    });
-
-    return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source })));
-  }
-
-  async find2(query: {
-    id?: string[],
-    title?: string,
-    tags?: string[],
-    activeOnly?: boolean,
-    parent?: string,
-  },          skip: number, limit: number): Promise<Topic[]> {
+    limit: number): Promise<Topic[]> {
     const filter: any[] = [];
     if (query.id !== undefined) {
       filter.push({
@@ -182,36 +114,6 @@ export class TopicRepo implements ITopicRepo {
         query: {
           bool: {
             filter,
-          },
-        },
-        sort: { ageUpdate: { order: "desc" } },
-      },
-    });
-
-    return this.aggregate(topics.hits.hits.map(x => ({ id: x._id, body: x._source })));
-  }
-
-  async findFork(parentID: string, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
-    const topics = await ESClient.search<ITopicForkDB["body"]>({
-      index: "topics",
-      size: limit,
-      from: skip,
-      body: {
-        query: {
-          bool: {
-            filter: [
-              {
-                match: {
-                  parent: parentID,
-                },
-              },
-              {
-                term: {
-                  type: "fork",
-                },
-              },
-              ...activeOnly ? [{ term: { active: true } }] : [],
-            ],
           },
         },
         sort: { ageUpdate: { order: "desc" } },

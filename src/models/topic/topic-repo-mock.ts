@@ -1,11 +1,10 @@
 import { CronJob } from "cron";
-import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { AtNotFoundError } from "../../at-error";
 import { IResRepo } from "../res";
 import { ITopicRepo } from "./itopic-repo";
 import {
   ITopicDB,
   ITopicForkDB,
-  ITopicNormalDB,
   ITopicOneDB,
   Topic,
   TopicFork,
@@ -27,19 +26,6 @@ export class TopicRepoMock implements ITopicRepo {
     return (await this.aggregate([topic]))[0];
   }
 
-  async findIn(ids: string[]): Promise<Topic[]> {
-    const topics = this.topics
-      .filter(x => ids.includes(x.id))
-      .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf());
-
-    if (topics.length !== ids.length) {
-      throw new AtNotFoundPartError("トピックが存在しません",
-        topics.map(t => t.id));
-    }
-
-    return this.aggregate(topics);
-  }
-
   async findTags(limit: number): Promise<{ name: string, count: number }[]> {
     return Array.from(this.topics
       .map(x => x.body.type !== "fork" ? x.body.tags : [])
@@ -50,33 +36,16 @@ export class TopicRepoMock implements ITopicRepo {
       .slice(0, limit);
   }
 
-  async find(
-    title: string,
-    tags: string[],
+  async find2(
+    query: {
+      id?: string[],
+      title?: string,
+      tags?: string[],
+      activeOnly?: boolean,
+      parent?: string,
+    },
     skip: number,
-    limit: number,
-    activeOnly: boolean): Promise<Topic[]> {
-    const titles = title
-      .split(/\s/)
-      .filter(x => x.length !== 0);
-
-    return this.aggregate(this.topics.filter<ITopicNormalDB | ITopicOneDB>
-      ((x): x is ITopicNormalDB | ITopicOneDB => x.body.type === "normal" || x.body.type === "one")
-      .filter(x => titles.every(t => x.body.title.includes(t)))
-      .filter(x => tags.every(t => x.body.tags.includes(t)))
-      .filter(x => !activeOnly || x.body.active)
-      .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf())
-      .slice(skip)
-      .slice(0, limit));
-  }
-
-  async find2(query: {
-    id?: string[],
-    title?: string,
-    tags?: string[],
-    activeOnly?: boolean,
-    parent?: string,
-  },          skip: number, limit: number): Promise<Topic[]> {
+    limit: number): Promise<Topic[]> {
     const titles = query.title !== undefined ? query.title
       .split(/\s/)
       .filter(x => x.length !== 0) : null;
@@ -87,16 +56,6 @@ export class TopicRepoMock implements ITopicRepo {
       .filter(x => query.tags === undefined || (query.tags.every(t => "tags" in x.body && x.body.tags.includes(t))))
       .filter(x => !query.activeOnly || x.body.active)
       .filter(x => query.parent === undefined || ("parent" in x.body && x.body.parent === query.parent))
-      .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf())
-      .slice(skip)
-      .slice(0, limit));
-  }
-
-  async findFork(parentID: string, skip: number, limit: number, activeOnly: boolean): Promise<Topic[]> {
-    return this.aggregate(this.topics.filter<ITopicForkDB>
-      ((x): x is ITopicForkDB => x.body.type === "fork")
-      .filter(x => x.body.parent === parentID)
-      .filter(x => !activeOnly || x.body.active)
       .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf())
       .slice(skip)
       .slice(0, limit));
