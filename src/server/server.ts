@@ -40,7 +40,7 @@ export function serverRun(repo: IRepo) {
     playground: {
       tabs: [
         {
-          endpoint: "",
+          endpoint: "/",
           query: "",
           headers: {
             "X-User": "",
