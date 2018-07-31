@@ -2,7 +2,7 @@ import { Subject } from "rxjs";
 import { AtNotFoundError } from "../../at-error";
 import { DateType } from "../../server";
 import { AuthContainer } from "../../server/auth-container";
-import { IResRepo } from "./ires-repo";
+import { IResRepo, ResQuery } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
 
 export class ResRepoMock implements IResRepo {
@@ -45,17 +45,7 @@ export class ResRepoMock implements IResRepo {
 
   async find(
     auth: AuthContainer,
-    query: {
-      id?: string[],
-      topic?: string,
-      notice?: boolean,
-      hash?: string,
-      reply?: string,
-      profile?: string,
-      text?: string,
-      self?: boolean,
-      date?: DateType,
-    },
+    query: ResQuery,
     limit: number): Promise<Res[]> {
     const notice = query.notice !== undefined ? auth.token.user : null;
     const self = query.self !== undefined ? auth.token.user : null;

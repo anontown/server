@@ -260,22 +260,24 @@ input ProfileQuery{
   self:Boolean
 }
 
+input ResQuery{
+  id:[ID!]
+  topic:ID
+  notice:Boolean
+  hash:String
+  reply:ID
+  profile:ID
+  self:Boolean
+  text:String
+  date:DateQuery
+}
+
 type Query{
   clients(query:ClientQuery!):[Client!]!
   histories(query:HistoryQuery!):[History!]!
   msgs(query:MsgQuery!,limit:Int=100):[Msg!]!
   profiles(query:ProfileQuery!):[Profile!]!
-  reses(
-    id:[ID!],
-    topic:ID,
-    notice:Boolean,
-    hash:String,
-    reply:ID,
-    profile:ID,
-    self:Boolean,
-    text:String,
-    date:DateQuery,
-    limit:Int=100):[Res!]!
+  reses(query:ResQuery!,limit:Int=100):[Res!]!
   storages(key:[String!]):[Storage!]!
   token:Token!
   tokens:[Token!]!

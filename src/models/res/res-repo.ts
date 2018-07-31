@@ -3,7 +3,7 @@ import { AtNotFoundError } from "../../at-error";
 import { ESClient } from "../../db";
 import { DateType } from "../../server";
 import { AuthContainer } from "../../server/auth-container";
-import { IResRepo } from "./ires-repo";
+import { IResRepo, ResQuery } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
 
 export class ResRepo implements IResRepo {
@@ -122,17 +122,7 @@ export class ResRepo implements IResRepo {
 
   async find(
     auth: AuthContainer,
-    query: {
-      id?: string[],
-      topic?: string,
-      notice?: boolean,
-      hash?: string,
-      reply?: string,
-      profile?: string,
-      text?: string,
-      self?: boolean,
-      date?: DateType,
-    },
+    query: ResQuery,
     limit: number): Promise<Res[]> {
     const filter: object[] = [];
 

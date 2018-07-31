@@ -6,6 +6,7 @@ import {
   IResAPI,
   Res,
   ResNormal,
+  ResQuery,
 } from "../models";
 import {
   Context,
@@ -23,30 +24,12 @@ export const resResolver = (repo: IRepo) => {
       reses: async (
         _obj: any,
         args: {
-          id?: string[],
-          topic?: string,
-          notice?: boolean,
-          hash?: string,
-          reply?: string,
-          profile?: string,
-          self?: boolean,
-          text?: string,
-          date?: DateType,
+          query: ResQuery,
           limit: number,
         },
         context: Context,
         _info: any) => {
-        const reses = await repo.res.find(context.auth, {
-          id: args.id,
-          topic: args.topic,
-          notice: args.notice,
-          hash: args.hash,
-          reply: args.reply,
-          profile: args.profile,
-          self: args.self,
-          text: args.text,
-          date: args.date,
-        }, args.limit);
+        const reses = await repo.res.find(context.auth, args.query, args.limit);
         return reses.map(x => x.toAPI(context.auth.tokenOrNull));
       },
     },

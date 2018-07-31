@@ -3,6 +3,18 @@ import { AuthContainer } from "../../server/auth-container";
 import { DateType } from "../../server/index";
 import { Res } from "./res";
 
+export interface ResQuery {
+  id?: string[],
+  topic?: string,
+  notice?: boolean,
+  hash?: string,
+  reply?: string,
+  profile?: string,
+  text?: string,
+  self?: boolean,
+  date?: DateType,
+}
+
 export interface IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }>;
 
@@ -18,16 +30,6 @@ export interface IResRepo {
 
   find(
     auth: AuthContainer,
-    query: {
-      id?: string[],
-      topic?: string,
-      notice?: boolean,
-      hash?: string,
-      reply?: string,
-      profile?: string,
-      text?: string,
-      self?: boolean,
-      date?: DateType,
-    },
+    query: ResQuery,
     limit: number): Promise<Res[]>;
 }
