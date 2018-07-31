@@ -16,7 +16,7 @@ export interface IResRepo {
 
   replyCount(resIDs: string[]): Promise<Map<string, number>>;
 
-  find2(
+  find(
     auth: AuthContainer,
     query: {
       id?: string[],

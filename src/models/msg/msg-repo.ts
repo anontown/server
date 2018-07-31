@@ -23,7 +23,7 @@ export class MsgRepo implements IMsgRepo {
     return Msg.fromDB(({ id: msg._id, body: msg._source }));
   }
 
-  async find2(
+  async find(
     authToken: IAuthToken,
     query: {
       date?: DateType,

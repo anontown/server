@@ -41,7 +41,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
     });
   });
 
-  describe("find2", () => {
+  describe("find", () => {
     it("正常に検索出来るか", async () => {
       const repo = repoGene();
 
@@ -80,18 +80,18 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       await repo.insert(msg8);
       await repo.insert(msg9);
 
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
         id: [],
       }, 100)).toEqual([]);
 
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
         id: ["msg1", "msg2", "msg3"],
       }, 100)).toEqual([
         msg1,
         msg3,
       ]);
 
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
       }, 100)).toEqual([
         msg4,
         msg9,
@@ -103,7 +103,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg6,
       ]);
 
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
         date: {
           type: "gte",
           date: new Date(70).toISOString(),
@@ -113,7 +113,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg9,
       ]);
 
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
         date: {
           type: "gte",
           date: new Date(0).toISOString(),
@@ -129,7 +129,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg6,
       ]);
 
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
         date: {
           type: "gte",
           date: new Date(70).toISOString(),
@@ -139,7 +139,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg9,
       ]);
 
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
         date: {
           type: "gte",
           date: new Date(70).toISOString(),
@@ -148,7 +148,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg9,
       ]);
 
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
         date: {
           type: "gt",
           date: new Date(70).toISOString(),
@@ -157,7 +157,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg4,
       ]);
 
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
         date: {
           type: "lte",
           date: new Date(30).toISOString(),
@@ -168,7 +168,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg6,
       ]);
 
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
         date: {
           type: "lte",
           date: new Date(30).toISOString(),
@@ -178,7 +178,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg5,
       ]);
 
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
         date: {
           type: "lt",
           date: new Date(30).toISOString(),
@@ -188,13 +188,13 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg6,
       ]);
 
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
         date: {
           type: "gt",
           date: new Date(90).toISOString(),
         },
       }, 100)).toEqual([]);
-      expect(await repo.find2(token, {
+      expect(await repo.find(token, {
         date: {
           type: "lt",
           date: new Date(30).toISOString(),

@@ -16,7 +16,7 @@ export interface ITopicRepo {
 
   cronTopicCheck(now: Date): Promise<void>;
 
-  find2(
+  find(
     query: {
       id?: string[],
       title?: string,

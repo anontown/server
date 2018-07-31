@@ -5,7 +5,7 @@ export interface IMsgRepo {
   findOne(id: string): Promise<Msg>;
   insert(msg: Msg): Promise<void>;
   update(msg: Msg): Promise<void>;
-  find2(
+  find(
     authToken: IAuthToken,
     query: {
       date?: DateType,

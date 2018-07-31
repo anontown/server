@@ -53,7 +53,7 @@ export class TopicRepo implements ITopicRepo {
     return tags.map(x => ({ name: x.key, count: x.doc_count }));
   }
 
-  async find2(
+  async find(
     query: {
       id?: string[],
       title?: string,

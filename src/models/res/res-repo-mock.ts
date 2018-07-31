@@ -43,7 +43,7 @@ export class ResRepoMock implements IResRepo {
       .reduce((c, x) => c.set(x, (c.get(x) || 0) + 1), new Map<string, number>());
   }
 
-  async find2(
+  async find(
     auth: AuthContainer,
     query: {
       id?: string[],

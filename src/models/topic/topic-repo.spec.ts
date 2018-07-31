@@ -69,7 +69,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
     });
   });
 
-  describe("find2", () => {
+  describe("find", () => {
     it("正常に探せるか", async () => {
       const repo = repoGene();
 
@@ -125,7 +125,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       await repo.insert(topic5);
       await repo.insert(topic6);
 
-      expect(await repo.find2({
+      expect(await repo.find({
       }, 0, 100)).toEqual([
         topic5,
         topic4,
@@ -135,25 +135,25 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic1,
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
       }, 1, 3)).toEqual([
         topic4,
         topic3,
         topic6,
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         id: [],
       }, 0, 100)).toEqual([]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         id: ["topic1", "topic5", "other"],
       }, 0, 100)).toEqual([
         topic5,
         topic1,
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         title: "",
       }, 0, 100)).toEqual([
         topic5,
@@ -164,7 +164,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic1,
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         title: "x",
       }, 0, 100)).toEqual([
         topic5,
@@ -173,17 +173,17 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic1,
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         title: "x a",
       }, 0, 100)).toEqual([]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         title: "x y",
       }, 0, 100)).toEqual([
         topic3,
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         tags: [],
       }, 0, 100)).toEqual([
         topic5,
@@ -194,7 +194,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic1,
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         tags: ["a"],
       }, 0, 100)).toEqual([
         topic4,
@@ -202,18 +202,18 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic1,
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         tags: ["a", "b"],
       }, 0, 100)).toEqual([
         topic2,
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         tags: ["x"],
       }, 0, 100)).toEqual([
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         activeOnly: false,
       }, 0, 100)).toEqual([
         topic5,
@@ -224,7 +224,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic1,
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         activeOnly: true,
       }, 0, 100)).toEqual([
         topic5,
@@ -232,13 +232,13 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic2,
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         parent: "topic1",
       }, 0, 100)).toEqual([
         topic6,
       ]);
 
-      expect(await repo.find2({
+      expect(await repo.find({
         parent: "other",
       }, 0, 100)).toEqual([
       ]);

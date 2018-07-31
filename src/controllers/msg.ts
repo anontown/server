@@ -18,7 +18,7 @@ export const msgResolver = (repo: IRepo) => {
         },
         context: Context,
         _info: any) => {
-        const msgs = await repo.msg.find2(context.auth.token, {
+        const msgs = await repo.msg.find(context.auth.token, {
           id: args.id,
           date: args.date,
         }, args.limit);

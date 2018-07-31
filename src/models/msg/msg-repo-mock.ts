@@ -17,7 +17,7 @@ export class MsgRepoMock implements IMsgRepo {
     return Msg.fromDB(msg);
   }
 
-  async find2(
+  async find(
     authToken: IAuthToken,
     query: {
       date?: DateType,

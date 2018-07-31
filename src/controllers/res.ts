@@ -36,7 +36,7 @@ export const resResolver = (repo: IRepo) => {
         },
         context: Context,
         _info: any) => {
-        const reses = await repo.res.find2(context.auth, {
+        const reses = await repo.res.find(context.auth, {
           id: args.id,
           topic: args.topic,
           notice: args.notice,

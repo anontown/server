@@ -120,7 +120,7 @@ export class ResRepo implements IResRepo {
     return new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
   }
 
-  async find2(
+  async find(
     auth: AuthContainer,
     query: {
       id?: string[],

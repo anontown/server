@@ -36,7 +36,7 @@ export class TopicRepoMock implements ITopicRepo {
       .slice(0, limit);
   }
 
-  async find2(
+  async find(
     query: {
       id?: string[],
       title?: string,
