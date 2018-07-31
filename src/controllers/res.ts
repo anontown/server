@@ -10,7 +10,6 @@ import {
 } from "../models";
 import {
   Context,
-  DateType,
 } from "../server";
 import { pubsub, RES_ADDED } from "../server/pubsub";
 

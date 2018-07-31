@@ -1,6 +1,5 @@
 import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
-import { DateType } from "../../server/index";
 import { IMsgRepo, MsgQuery } from "./imsg-repo";
 import { IMsgDB, Msg } from "./msg";
 
