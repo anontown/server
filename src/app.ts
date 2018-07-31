@@ -1,24 +1,12 @@
 /* tslint:disable:no-var-requires */
 require("source-map-support").install();
 import * as fs from "fs-promise";
-import { Config } from "./config";
-import {
-  ClientController,
-  HistoryController,
-  MsgController,
-  ProfileController,
-  ResController,
-  StorageController,
-  TokenController,
-  TopicController,
-  UserController,
-} from "./controllers";
 import { createDB } from "./create-db";
 import { } from "./generator";
 import {
   Repo,
 } from "./models";
-import { AppServer } from "./server/app-server";
+import { serverRun } from "./server";
 (Symbol as any).asyncIterator = Symbol.for("Symbol.asyncIterator");
 
 (async () => {
@@ -37,17 +25,5 @@ import { AppServer } from "./server/app-server";
 
   await createDB();
 
-  const api = new AppServer(Config.server.port, new Repo(), [
-    ClientController,
-    HistoryController,
-    MsgController,
-    ProfileController,
-    ResController,
-    TokenController,
-    TopicController,
-    UserController,
-    StorageController,
-  ]);
-
-  api.run();
+  serverRun(new Repo());
 })();

@@ -1,9 +1,9 @@
-import { ObjectOmit } from "typelevel-ts";
+import { Omit } from "./omit";
 
 export interface ID { id: string; }
 
 interface EntityObject { [key: string]: ID; }
-export type IDEntity<T extends EntityObject, E extends keyof T> = Pick<T, E> & ObjectOmit<ToID<T>, E>;
+export type IDEntity<T extends EntityObject, E extends keyof T> = Pick<T, E> & Omit<ToID<T>, E>;
 type ToID<T extends EntityObject> = {
   [P in keyof T]: ID;
 };

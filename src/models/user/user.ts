@@ -1,6 +1,5 @@
 import { ObjectID } from "mongodb";
 import Copyable from "ts-copyable";
-import { StringOmit } from "typelevel-ts";
 import { AtPrerequisiteError, AtUserAuthError, paramsErrorMaker } from "../../at-error";
 import { IAuthUser } from "../../auth";
 import { Config } from "../../config";
@@ -19,7 +18,7 @@ export interface IUserDB {
   readonly lastOneTopic: Date;
 }
 
-export type ResWaitCountKey = StringOmit<keyof IResWait, "last">;
+export type ResWaitCountKey = Exclude<keyof IResWait, "last">;
 
 export interface IUserAPI {
   readonly id: string;
