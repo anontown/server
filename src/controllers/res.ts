@@ -154,7 +154,7 @@ export const resResolver = (repo: IRepo) => {
       }
     },
     Subscription: {
-      postAdded: {
+      resAdded: {
         resolve: (payload: { res: Res, count: number }, _args: any, context: Context, _info: any) => {
           return { ...payload, res: payload.res.toAPI(context.auth.tokenOrNull) };
         },

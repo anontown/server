@@ -10,7 +10,7 @@ import * as controllers from "../controllers";
 import { IRepo } from "../models";
 
 export function serverRun(repo: IRepo) {
-  const typeDefs = gql(fs.readFileSync("app.gql", "utf8"));
+  const typeDefs = gql(fs.readFileSync("resources/app.gql", "utf8"));
   const resolvers: IResolvers = combineResolvers([
     {
       DateTime: GraphQLDateTime

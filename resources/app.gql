@@ -257,8 +257,8 @@ type Query{
     date:DateQuery,
     limit:Int=100):[Res!]!
   storages(key:[String!]):[Storage!]!
-  token():Token!
-  tokens():[Token!]!
+  token:Token!
+  tokens:[Token!]!
   topics(id:[ID!],title:String,tags:[String!],skip:Int!,limit:Int=100,activeOnly:Boolean,parent:ID):[Topic!]!
   topicTags(limit:Int=100):[Tags!]!
   userID(sn:String!):ID!
@@ -283,8 +283,8 @@ type Mutation {
   delStorage(key:String!):Boolean
   delTokenClient(client:ID!):Boolean
   createTokenGeneral(client:ID!):TokenGeneral!
-  createTokenMaster():TokenMaster!
-  createTokenReq():TokenReq!
+  createTokenMaster:TokenMaster!
+  createTokenReq:TokenReq!
   authTokenReq(id:ID!,key:String!):TokenGeneral!
   createTopicNormal(title:String!,tags:[String!]!,text:String!):TopicNormal!
   createTopicOne(title:String!,tags:[String!]!,text:String!):TopicOne!

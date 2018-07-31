@@ -12,6 +12,8 @@ COPY tsconfig.json $APP_HOME/
 
 RUN npm run build
 
+COPY resources/ $APP_HOME/resources/
+
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh $APP_HOME/wait-for-it.sh
 RUN chmod +x ./wait-for-it.sh
 
