@@ -44,7 +44,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node ./dist/app.js",
-    "test": "jest",
+    "test": "jest -w 1",
     "lint": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts'",
     "lint:fix": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts' --fix",
     "loc": "sloc --format cli-table ./src"
