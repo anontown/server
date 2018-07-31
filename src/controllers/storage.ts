@@ -1,4 +1,4 @@
-import { Storage } from "../index";
+import { Storage, StorageQuery } from "../index";
 import { IRepo } from "../models/irepo";
 import {
   Context,
@@ -10,11 +10,11 @@ export const storageResolver = (repo: IRepo) => {
       storages: async (
         _obj: any,
         args: {
-          key?: string[],
+          query: StorageQuery
         },
         context: Context,
         _info: any) => {
-        const storages = await repo.storage.find(context.auth.token, { key: args.key });
+        const storages = await repo.storage.find(context.auth.token, args.query);
         return storages.map(x => x.toAPI(context.auth.token));
       },
     },

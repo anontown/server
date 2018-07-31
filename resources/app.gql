@@ -272,13 +272,17 @@ input ResQuery{
   date:DateQuery
 }
 
+input StorageQuery{
+  key:[String!]
+}
+
 type Query{
   clients(query:ClientQuery!):[Client!]!
   histories(query:HistoryQuery!):[History!]!
   msgs(query:MsgQuery!,limit:Int=100):[Msg!]!
   profiles(query:ProfileQuery!):[Profile!]!
   reses(query:ResQuery!,limit:Int=100):[Res!]!
-  storages(key:[String!]):[Storage!]!
+  storages(query:StorageQuery!):[Storage!]!
   token:Token!
   tokens:[Token!]!
   topics(id:[ID!],title:String,tags:[String!],skip:Int=0,limit:Int=100,activeOnly:Boolean,parent:ID):[Topic!]!

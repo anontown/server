@@ -2,11 +2,11 @@ import { ObjectID } from "mongodb";
 import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { DB } from "../../db";
-import { IStorageRepo } from "./istorage-repo";
+import { IStorageRepo, StorageQuery } from "./istorage-repo";
 import { IStorageDB, Storage } from "./storage";
 
 export class StorageRepo implements IStorageRepo {
-  async find(token: IAuthToken, query: { key?: string[] }): Promise<Storage[]> {
+  async find(token: IAuthToken, query: StorageQuery): Promise<Storage[]> {
     const db = await DB;
     const q: any = {
       user: new ObjectID(token.user),
