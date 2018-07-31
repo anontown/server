@@ -1,5 +1,5 @@
 import { ObjectID } from "mongodb";
-import { AtAuthError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { AtAuthError, AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { DB } from "../../db";
 import { Client, IClientDB } from "./client";
@@ -15,30 +15,6 @@ export class ClientRepo implements IClientRepo {
       throw new AtNotFoundError("クライアントが存在しません");
     }
     return Client.fromDB(client);
-  }
-
-  async findIn(ids: string[]): Promise<Client[]> {
-    const db = await DB;
-    const clients: IClientDB[] = await db.collection("clients")
-      .find({ _id: { $in: ids.map(id => new ObjectID(id)) } })
-      .sort({ date: -1 })
-      .toArray();
-
-    if (clients.length !== ids.length) {
-      throw new AtNotFoundPartError("クライアントが存在しません",
-        clients.map(x => x._id.toString()));
-    }
-
-    return clients.map(c => Client.fromDB(c));
-  }
-
-  async findAll(authToken: IAuthTokenMaster): Promise<Client[]> {
-    const db = await DB;
-    const clients: IClientDB[] = await db.collection("clients")
-      .find({ user: new ObjectID(authToken.user) })
-      .sort({ date: -1 })
-      .toArray();
-    return clients.map(c => Client.fromDB(c));
   }
 
   async find(authToken: IAuthTokenMaster | null, query: {
