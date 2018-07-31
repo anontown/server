@@ -11,13 +11,12 @@ export const clientResolver = (repo: IRepo) => {
     Query: {
       clients: async (
         _obj: any,
-        args: ClientQuery,
+        args: {
+          query: ClientQuery
+        },
         context: Context,
         _info: any) => {
-        const clients = await repo.client.find(context.auth.TokenMasterOrNull, {
-          id: args.id,
-          self: args.self,
-        });
+        const clients = await repo.client.find(context.auth.TokenMasterOrNull, args.query);
         return clients.map(c => c.toAPI(context.auth.TokenMasterOrNull));
       },
     },
