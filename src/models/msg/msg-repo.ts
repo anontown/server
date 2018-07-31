@@ -1,4 +1,4 @@
-import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
 import { DateType } from "../../server/index";
@@ -21,78 +21,6 @@ export class MsgRepo implements IMsgRepo {
     }
 
     return Msg.fromDB(({ id: msg._id, body: msg._source }));
-  }
-
-  async findIn(ids: string[]): Promise<Msg[]> {
-    const msgs = await ESClient.search<IMsgDB["body"]>({
-      index: "msgs",
-      type: "doc",
-      size: ids.length,
-      body: {
-        query: {
-          terms: {
-            _id: ids,
-          },
-        },
-        sort: { date: { order: "desc" } },
-      },
-    });
-
-    if (msgs.hits.total !== ids.length) {
-      throw new AtNotFoundPartError("メッセージが存在しません",
-        msgs.hits.hits.map(m => m._id));
-    }
-
-    return msgs.hits.hits.map(m => Msg.fromDB({ id: m._id, body: m._source }));
-  }
-
-  async find(
-    authToken: IAuthToken,
-    type: "gt" | "gte" | "lt" | "lte",
-    date: Date,
-    limit: number): Promise<Msg[]> {
-    const msgs = await ESClient.search<IMsgDB["body"]>({
-      index: "msgs",
-      size: limit,
-      body: {
-        query: {
-          bool: {
-            filter: [
-              {
-                range: {
-                  date: {
-                    [type]: date.toISOString(),
-                  },
-                },
-              },
-              {
-                bool: {
-                  should: [
-                    {
-                      bool: {
-                        must_not: {
-                          exists: {
-                            field: "receiver",
-                          },
-                        },
-                      },
-                    },
-                    { term: { receiver: authToken.user } },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-        sort: { date: { order: type === "gt" || type === "gte" ? "asc" : "desc" } },
-      },
-    });
-
-    const result = msgs.hits.hits.map(m => Msg.fromDB({ id: m._id, body: m._source }));
-    if (type === "gt" || type === "gte") {
-      result.reverse();
-    }
-    return result;
   }
 
   async find2(

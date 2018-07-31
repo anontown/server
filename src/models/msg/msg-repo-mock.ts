@@ -1,4 +1,4 @@
-import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { DateType } from "../../server/index";
 import { IMsgRepo } from "./imsg-repo";
@@ -15,19 +15,6 @@ export class MsgRepoMock implements IMsgRepo {
     }
 
     return Msg.fromDB(msg);
-  }
-
-  async findIn(ids: string[]): Promise<Msg[]> {
-    const msgs = this.msgs
-      .filter(x => ids.includes(x.id))
-      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf());
-
-    if (msgs.length !== ids.length) {
-      throw new AtNotFoundPartError("メッセージが存在しません",
-        msgs.map(x => x.id));
-    }
-
-    return msgs.map(x => Msg.fromDB(x));
   }
 
   async find2(
@@ -66,41 +53,6 @@ export class MsgRepoMock implements IMsgRepo {
 
     const result = msgs.map(x => Msg.fromDB(x));
     if (query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")) {
-      result.reverse();
-    }
-    return result;
-  }
-
-  async find(
-    authToken: IAuthToken,
-    type: "gt" | "gte" | "lt" | "lte",
-    date: Date,
-    limit: number): Promise<Msg[]> {
-    const msgs = this.msgs
-      .filter(x => x.body.receiver === null || x.body.receiver === authToken.user)
-      .filter(x => {
-        const dateV = date.valueOf();
-        const xDateV = new Date(x.body.date).valueOf();
-        switch (type) {
-          case "gte":
-            return dateV <= xDateV;
-          case "gt":
-            return dateV < xDateV;
-          case "lte":
-            return dateV >= xDateV;
-          case "lt":
-            return dateV > xDateV;
-        }
-      })
-      .sort((a, b) => {
-        const av = new Date(a.body.date).valueOf();
-        const bv = new Date(b.body.date).valueOf();
-        return type === "gt" || type === "gte" ? av - bv : bv - av;
-      })
-      .slice(0, limit);
-
-    const result = msgs.map(x => Msg.fromDB(x));
-    if (type === "gt" || type === "gte") {
       result.reverse();
     }
     return result;
