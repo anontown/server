@@ -37,7 +37,19 @@ export function serverRun(repo: IRepo) {
       },
     },
     introspection: true,
-    playground: true,
+    playground: {
+      tabs: [
+        {
+          endpoint: "",
+          query: "",
+          headers: {
+            "X-User": "",
+            "X-Token": "",
+            "X-Recaptcha": ""
+          }
+        },
+      ],
+    },
     debug: false
   });
 
