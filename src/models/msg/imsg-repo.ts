@@ -14,8 +14,8 @@ export interface IMsgRepo {
   find2(
     authToken: IAuthToken,
     query: {
-      date: DateType | null,
-      id: string[] | null,
+      date?: DateType,
+      id?: string[],
     },
     limit: number): Promise<Msg[]>;
 }

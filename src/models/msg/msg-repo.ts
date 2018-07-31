@@ -98,8 +98,8 @@ export class MsgRepo implements IMsgRepo {
   async find2(
     authToken: IAuthToken,
     query: {
-      date: DateType | null,
-      id: string[] | null,
+      date?: DateType,
+      id?: string[],
     },
     limit: number): Promise<Msg[]> {
     const filter: any[] = [{
@@ -118,7 +118,7 @@ export class MsgRepo implements IMsgRepo {
         ],
       },
     }];
-    if (query.date !== null) {
+    if (query.date !== undefined) {
       filter.push({
         range: {
           date: {
@@ -127,7 +127,7 @@ export class MsgRepo implements IMsgRepo {
         },
       });
     }
-    if (query.id !== null) {
+    if (query.id !== undefined) {
       filter.push({
         terms: {
           _id: query.id,
@@ -145,7 +145,7 @@ export class MsgRepo implements IMsgRepo {
         },
         sort: {
           date: {
-            order: query.date !== null && (query.date.type === "gt" || query.date.type === "gte")
+            order: query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")
               ? "asc"
               : "desc",
           },
@@ -154,7 +154,7 @@ export class MsgRepo implements IMsgRepo {
     });
 
     const result = msgs.hits.hits.map(m => Msg.fromDB({ id: m._id, body: m._source }));
-    if (query.date !== null && (query.date.type === "gt" || query.date.type === "gte")) {
+    if (query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")) {
       result.reverse();
     }
     return result;

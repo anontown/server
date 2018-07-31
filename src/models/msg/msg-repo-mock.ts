@@ -33,15 +33,15 @@ export class MsgRepoMock implements IMsgRepo {
   async find2(
     authToken: IAuthToken,
     query: {
-      date: DateType | null,
-      id: string[] | null,
+      date?: DateType,
+      id?: string[],
     },
     limit: number): Promise<Msg[]> {
     const msgs = this.msgs
       .filter(x => x.body.receiver === null || x.body.receiver === authToken.user)
-      .filter(x => query.id === null || query.id.includes(x.id))
+      .filter(x => query.id === undefined || query.id.includes(x.id))
       .filter(x => {
-        if (query.date === null) {
+        if (query.date === undefined) {
           return true;
         }
         const dateV = new Date(query.date.date).valueOf();
@@ -60,12 +60,12 @@ export class MsgRepoMock implements IMsgRepo {
       .sort((a, b) => {
         const av = new Date(a.body.date).valueOf();
         const bv = new Date(b.body.date).valueOf();
-        return query.date !== null && (query.date.type === "gt" || query.date.type === "gte") ? av - bv : bv - av;
+        return query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte") ? av - bv : bv - av;
       })
       .slice(0, limit);
 
     const result = msgs.map(x => Msg.fromDB(x));
-    if (query.date !== null && (query.date.type === "gt" || query.date.type === "gte")) {
+    if (query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")) {
       result.reverse();
     }
     return result;
