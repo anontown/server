@@ -50,7 +50,11 @@ export function serverRun(repo: IRepo) {
         },
       ],
     },
-    debug: false
+    debug: false,
+    formatError: (error: any) => {
+      console.log(error);
+      return new Error('Internal server error');
+    },
   });
 
   server.listen(Config.server.port).then(({ url, subscriptionsUrl }) => {
