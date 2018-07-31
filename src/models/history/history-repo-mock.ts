@@ -1,4 +1,4 @@
-import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { AtNotFoundError } from "../../at-error";
 import { History, IHistoryDB } from "./history";
 import { IHistoryRepo } from "./ihistory-repo";
 
@@ -21,27 +21,6 @@ export class HistoryRepoMock implements IHistoryRepo {
     }
 
     return History.fromDB(history);
-  }
-
-  async findIn(ids: string[]): Promise<History[]> {
-    const histories = this.histories
-      .filter(x => ids.includes(x.id))
-      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf());
-
-    if (histories.length !== ids.length) {
-      throw new AtNotFoundPartError("編集履歴が存在しません",
-        histories.map(x => x.id));
-    }
-
-    return histories.map(h => History.fromDB(h));
-  }
-
-  async findAll(topicID: string): Promise<History[]> {
-    const histories = this.histories
-      .filter(x => x.body.topic === topicID)
-      .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf());
-
-    return histories.map(h => History.fromDB(h));
   }
 
   async find(query: { id?: string[], topic?: string[] }): Promise<History[]> {

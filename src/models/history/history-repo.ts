@@ -1,4 +1,4 @@
-import { AtNotFoundError, AtNotFoundPartError } from "../../at-error";
+import { AtNotFoundError } from "../../at-error";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
 import { History, IHistoryDB } from "./history";
@@ -42,46 +42,6 @@ export class HistoryRepo implements IHistoryRepo {
     }
 
     return History.fromDB(({ id: history._id, body: history._source }));
-  }
-
-  async findIn(ids: string[]): Promise<History[]> {
-    const histories = await ESClient.search<IHistoryDB["body"]>({
-      index: "histories",
-      type: "doc",
-      size: ids.length,
-      body: {
-        query: {
-          terms: {
-            _id: ids,
-          },
-        },
-        sort: { date: { order: "desc" } },
-      },
-    });
-
-    if (histories.hits.total !== ids.length) {
-      throw new AtNotFoundPartError("編集履歴が存在しません",
-        histories.hits.hits.map(t => t._id));
-    }
-
-    return histories.hits.hits.map(h => History.fromDB({ id: h._id, body: h._source }));
-  }
-
-  async findAll(topicID: string): Promise<History[]> {
-    const histories = await ESClient.search<IHistoryDB["body"]>({
-      index: "histories",
-      size: Config.api.limit,
-      body: {
-        query: {
-          term: {
-            topic: topicID,
-          },
-        },
-        sort: { date: { order: "desc" } },
-      },
-    });
-
-    return histories.hits.hits.map(h => History.fromDB({ id: h._id, body: h._source }));
   }
 
   async find(query: { id?: string[], topic?: string[] }): Promise<History[]> {
