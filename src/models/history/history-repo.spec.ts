@@ -164,37 +164,37 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
       await repo.insert(history3);
       await repo.insert(history4);
 
-      expect(await repo.find({ topic: null, id: null })).toEqual([
+      expect(await repo.find({})).toEqual([
         history4,
         history2,
         history1,
         history3,
       ]);
 
-      expect(await repo.find({ topic: ["topic1"], id: null })).toEqual([
+      expect(await repo.find({ topic: ["topic1"] })).toEqual([
         history2,
         history1,
         history3,
       ]);
 
-      expect(await repo.find({ topic: ["topic2"], id: null })).toEqual([
+      expect(await repo.find({ topic: ["topic2"] })).toEqual([
         history4,
       ]);
 
-      expect(await repo.find({ topic: ["topic3"], id: null })).toEqual([]);
+      expect(await repo.find({ topic: ["topic3"] })).toEqual([]);
 
-      expect(await repo.find({ topic: [], id: null })).toEqual([]);
+      expect(await repo.find({ topic: [] })).toEqual([]);
 
-      expect(await repo.find({ topic: ["topic1", "topic2"], id: null })).toEqual([
+      expect(await repo.find({ topic: ["topic1", "topic2"] })).toEqual([
         history4,
         history2,
         history1,
         history3,
       ]);
 
-      expect(await repo.find({ topic: null, id: [] })).toEqual([]);
-      expect(await repo.find({ topic: null, id: ["history2", "a"] })).toEqual([history2]);
-      expect(await repo.find({ topic: null, id: ["history2", "history4"] })).toEqual([
+      expect(await repo.find({ id: [] })).toEqual([]);
+      expect(await repo.find({ id: ["history2", "a"] })).toEqual([history2]);
+      expect(await repo.find({ id: ["history2", "history4"] })).toEqual([
         history4,
         history2,
       ]);

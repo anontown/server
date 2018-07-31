@@ -84,9 +84,9 @@ export class HistoryRepo implements IHistoryRepo {
     return histories.hits.hits.map(h => History.fromDB({ id: h._id, body: h._source }));
   }
 
-  async find(query: { id: string[] | null, topic: string[] | null }): Promise<History[]> {
+  async find(query: { id?: string[], topic?: string[] }): Promise<History[]> {
     const filter: any[] = [];
-    if (query.id !== null) {
+    if (query.id !== undefined) {
       filter.push({
         terms: {
           _id: query.id,
@@ -94,7 +94,7 @@ export class HistoryRepo implements IHistoryRepo {
       });
     }
 
-    if (query.topic !== null) {
+    if (query.topic !== undefined) {
       filter.push({
         terms: {
           topic: query.topic,

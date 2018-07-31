@@ -44,10 +44,10 @@ export class HistoryRepoMock implements IHistoryRepo {
     return histories.map(h => History.fromDB(h));
   }
 
-  async find(query: { id: string[] | null, topic: string[] | null }): Promise<History[]> {
+  async find(query: { id?: string[], topic?: string[] }): Promise<History[]> {
     const histories = this.histories
-      .filter(x => query.id === null || query.id.includes(x.id))
-      .filter(x => query.topic === null || query.topic.includes(x.body.topic))
+      .filter(x => query.id === undefined || query.id.includes(x.id))
+      .filter(x => query.topic === undefined || query.topic.includes(x.body.topic))
       .sort((a, b) => new Date(b.body.date).valueOf() - new Date(a.body.date).valueOf());
 
     return histories.map(h => History.fromDB(h));

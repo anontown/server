@@ -8,12 +8,14 @@ import { Context } from "../server";
 export const clientResolver = (repo: IRepo) => {
   return {
     Query: {
-      clients: async (_obj: any,
-                      args: {
+      clients: async (
+        _obj: any,
+        args: {
           id?: string[],
           self?: boolean,
-        },            context: Context,
-                      _info: any) => {
+        },
+        context: Context,
+        _info: any) => {
         const clients = await repo.client.find(context.auth.TokenMasterOrNull, {
           id: args.id,
           self: args.self,
@@ -22,24 +24,28 @@ export const clientResolver = (repo: IRepo) => {
       },
     },
     Mutation: {
-      createClient: async (_obj: any,
-                           args: {
+      createClient: async (
+        _obj: any,
+        args: {
           name: string,
           url: string,
-        },                 context: Context,
-                           _info: any) => {
+        },
+        context: Context,
+        _info: any) => {
         const client = Client.create(ObjectIDGenerator, context.auth.tokenMaster, args.name, args.url, context.now);
         await repo.client.insert(client);
         context.log("clients", client.id);
         return client.toAPI(context.auth.tokenMaster);
       },
-      updateClient: async (_obj: any,
-                           args: {
+      updateClient: async (
+        _obj: any,
+        args: {
           id: string,
           name: string,
           url: string,
-        },                 context: Context,
-                           _info: any) => {
+        },
+        context: Context,
+        _info: any) => {
         const client = await repo.client.findOne(args.id);
         const newClient = client.changeData(context.auth.tokenMaster, args.name, args.url, context.now);
         await repo.client.update(newClient);

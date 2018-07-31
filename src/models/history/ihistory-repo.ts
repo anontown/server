@@ -6,5 +6,5 @@ export interface IHistoryRepo {
   findOne(id: string): Promise<History>;
   findIn(ids: string[]): Promise<History[]>;
   findAll(topicID: string): Promise<History[]>;
-  find(query: { id: string[] | null, topic: string[] | null }): Promise<History[]>;
+  find(query: { id?: string[], topic?: string[] }): Promise<History[]>;
 }

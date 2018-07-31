@@ -33,7 +33,8 @@ export const tokenResolver = (repo: IRepo) => {
         _obj: any,
         args: {
           client: string,
-        }, context: Context,
+        },
+        context: Context,
         _info: any) => {
         const client = await repo.client.findOne(args.client);
         await repo.token.delClientToken(context.auth.tokenMaster, client.id);
@@ -43,7 +44,8 @@ export const tokenResolver = (repo: IRepo) => {
         _obj: any,
         args: {
           client: string,
-        }, context: Context,
+        },
+        context: Context,
         _info: any) => {
         const client = await repo.client.findOne(args.client);
         const token = TokenGeneral.create(ObjectIDGenerator,
@@ -83,7 +85,8 @@ export const tokenResolver = (repo: IRepo) => {
         args: {
           id: string,
           key: string,
-        }, context: Context,
+        },
+        context: Context,
         _info: any) => {
         const token = await repo.token.findOne(args.id);
         if (token.type !== "general") {
