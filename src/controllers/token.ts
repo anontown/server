@@ -4,6 +4,7 @@ import {
   TokenGeneral,
   TokenMaster,
   IRepo,
+  ITokenAPI,
 } from "../models";
 import {
   Context,
@@ -81,5 +82,15 @@ export const tokenResolver = (repo: IRepo) => {
         return token.toAPI();
       },
     },
+    Token: {
+      __resolveType(obj: ITokenAPI) {
+        switch (obj.type) {
+          case "general":
+            return "TokenGeneral";
+          case "master":
+            return "TokenMaster";
+        }
+      }
+    }
   };
 };

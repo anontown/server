@@ -3,7 +3,8 @@ import { ObjectIDGenerator } from "../generator";
 import {
   ResNormal,
   Res,
-  IRepo
+  IRepo,
+  IResAPI
 } from "../models";
 import {
   Context,
@@ -166,5 +167,21 @@ export const resResolver = (repo: IRepo) => {
         ),
       },
     },
+    Res: {
+      __resolveType(obj: IResAPI) {
+        switch (obj.type) {
+          case "normal":
+            return "ResNormal";
+          case "history":
+            return "ResHistory";
+          case "topic":
+            return "ResTopic";
+          case "fork":
+            return "ResFork";
+          case "delete":
+            return "ResDelete";
+        }
+      }
+    }
   };
 };

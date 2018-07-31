@@ -5,6 +5,7 @@ import {
   TopicNormal,
   TopicOne,
   IRepo,
+  ITopicAPI,
 } from "../models";
 import {
   Context,
@@ -161,6 +162,18 @@ export const topicResolver = (repo: IRepo) => {
         context.log("histories", val.history.id);
         return topic.toAPI();
       },
+    },
+    Topic: {
+      __resolveType(obj: ITopicAPI) {
+        switch (obj.type) {
+          case "normal":
+            return "TopicNormal";
+          case "one":
+            return "TopicOne";
+          case "fork":
+            return "TopicFork";
+        }
+      }
     }
   };
 };
