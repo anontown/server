@@ -294,8 +294,13 @@ type Mutation {
   updateUser(sn:String!,pass:String!):User!
 }
 
+type ResSubscript{
+  res:Res!
+  count:Int!
+}
+
 type Subscription {
-  newRes(topic:ID!):Res!
+  resAdded(topic:ID!):ResSubscript!
 }
 
 schema {

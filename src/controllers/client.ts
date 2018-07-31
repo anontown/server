@@ -2,6 +2,7 @@ import { ObjectIDGenerator } from "../generator";
 import {
   Client,
   IClientAPI,
+  IRepo,
 } from "../models";
 import {
   controller,
@@ -10,47 +11,49 @@ import {
 } from "../server";
 import { Context } from "../server";
 
-export const clientResolver = {
-  Query: {
-    clients: async (_obj: any,
-                    args: {
-        id: string[] | null,
-        self: boolean | null,
-      },            context: Context,
-                    _info: any) => {
-      const clients = await context.repo.client.find(context.auth.TokenMasterOrNull, {
-        id: args.id,
-        self: args.self,
-      });
-      return clients.map(c => c.toAPI(context.auth.TokenMasterOrNull));
+export const clientResolver = (repo: IRepo) => {
+  return {
+    Query: {
+      clients: async (_obj: any,
+        args: {
+          id: string[] | null,
+          self: boolean | null,
+        }, context: Context,
+        _info: any) => {
+        const clients = await repo.client.find(context.auth.TokenMasterOrNull, {
+          id: args.id,
+          self: args.self,
+        });
+        return clients.map(c => c.toAPI(context.auth.TokenMasterOrNull));
+      },
     },
-  },
-  Mutation: {
-    createClient: async (_obj: any,
-                         args: {
-        name: string,
-        url: string,
-      },                 context: Context,
-                         _info: any) => {
-      const client = Client.create(ObjectIDGenerator, context.auth.tokenMaster, args.name, args.url, context.now);
-      await context.repo.client.insert(client);
-      context.log("clients", client.id);
-      return client.toAPI(context.auth.tokenMaster);
+    Mutation: {
+      createClient: async (_obj: any,
+        args: {
+          name: string,
+          url: string,
+        }, context: Context,
+        _info: any) => {
+        const client = Client.create(ObjectIDGenerator, context.auth.tokenMaster, args.name, args.url, context.now);
+        await repo.client.insert(client);
+        context.log("clients", client.id);
+        return client.toAPI(context.auth.tokenMaster);
+      },
+      updateClient: async (_obj: any,
+        args: {
+          id: string,
+          name: string,
+          url: string,
+        }, context: Context,
+        _info: any) => {
+        const client = await repo.client.findOne(args.id);
+        const newClient = client.changeData(context.auth.tokenMaster, args.name, args.url, context.now);
+        await repo.client.update(newClient);
+        context.log("clients", newClient.id);
+        return newClient.toAPI(context.auth.tokenMaster);
+      },
     },
-    updateClient: async (_obj: any,
-                         args: {
-        id: string,
-        name: string,
-        url: string,
-      },                 context: Context,
-                         _info: any) => {
-      const client = await context.repo.client.findOne(args.id);
-      const newClient = client.changeData(context.auth.tokenMaster, args.name, args.url, context.now);
-      await context.repo.client.update(newClient);
-      context.log("clients", newClient.id);
-      return newClient.toAPI(context.auth.tokenMaster);
-    },
-  },
+  };
 };
 
 @controller

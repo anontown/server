@@ -2,6 +2,7 @@
   "name": "anontown-server",
   "version": "1.0.0",
   "dependencies": {
+    "apollo-resolvers": "^1.4.1",
     "apollo-server": "^2.0.0",
     "array-range": "^1.0.1",
     "body-parser": "^1.15.2",
