@@ -1,4 +1,4 @@
-import fsExtra from "fs-extra";
+import * as fsExtra from "fs-extra";
 import * as fs from "fs-promise";
 import { ObjectID } from "mongodb";
 import { Config } from "./config";
@@ -77,7 +77,7 @@ updateFunc.push((async () => {
             },
           },
         },
-    ));
+      ));
   });
 
   await Promise.all(promises);

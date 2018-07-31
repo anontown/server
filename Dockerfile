@@ -1,4 +1,4 @@
-FROM node:8.1.2
+FROM node:10.7.0
 
 ENV HOME=/home/app
 ENV APP_HOME=$HOME/.anontown

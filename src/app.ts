@@ -7,7 +7,6 @@ import {
   Repo,
 } from "./models";
 import { serverRun } from "./server";
-(Symbol as any).asyncIterator = Symbol.for("Symbol.asyncIterator");
 
 (async () => {
   // フォルダ作成
