@@ -28,7 +28,7 @@ export function serverRun(repo: IRepo) {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: (req: any): Promise<Context> => {
+    context: ({ req }: any): Promise<Context> => {
       return createContext(req.headers, repo);
     },
     subscriptions: {
