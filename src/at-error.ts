@@ -138,14 +138,6 @@ export class AtNotFoundError extends AtError {
     }
 }
 
-export class AtNotFoundPartError extends AtError {
-    constructor(message: string, foundIds: string[]) {
-        super(StatusCode.ClientError,
-            "not_found_part",
-            [{ message, data: { foundIds } }]);
-    }
-}
-
 export enum StatusCode {
     /**
      * リクエストが不正
