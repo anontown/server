@@ -1,6 +1,5 @@
 import { ObjectID, WriteError } from "mongodb";
-import { AtConflictError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
-import { IAuthToken } from "../../auth";
+import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { DB } from "../../db";
 import { AuthContainer } from "../../server/auth-container";
 import { IProfileRepo } from "./iprofile-repo";
@@ -17,30 +16,6 @@ export class ProfileRepo implements IProfileRepo {
     }
 
     return Profile.fromDB(profile);
-  }
-
-  async findIn(ids: string[]): Promise<Profile[]> {
-    const db = await DB;
-    const profiles: IProfileDB[] = await db.collection("profiles")
-      .find({ _id: { $in: ids.map(id => new ObjectID(id)) } })
-      .sort({ date: -1 })
-      .toArray();
-
-    if (profiles.length !== ids.length) {
-      throw new AtNotFoundPartError("プロフィールが存在しません",
-        profiles.map(x => x._id.toString()));
-    }
-
-    return profiles.map(p => Profile.fromDB(p));
-  }
-
-  async findAll(authToken: IAuthToken): Promise<Profile[]> {
-    const db = await DB;
-    const profiles: IProfileDB[] = await db.collection("profiles")
-      .find({ user: new ObjectID(authToken.user) })
-      .sort({ date: -1 })
-      .toArray();
-    return profiles.map(p => Profile.fromDB(p));
   }
 
   async find(auth: AuthContainer, query: { self?: boolean, id?: string[] }): Promise<Profile[]> {

@@ -1,5 +1,4 @@
-import { AtConflictError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
-import { IAuthToken } from "../../auth";
+import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { AuthContainer } from "../../server/auth-container";
 import { IProfileRepo } from "./iprofile-repo";
 import { IProfileDB, Profile } from "./profile";
@@ -15,27 +14,6 @@ export class ProfileRepoMock implements IProfileRepo {
     }
 
     return Profile.fromDB(profile);
-  }
-
-  async findIn(ids: string[]): Promise<Profile[]> {
-    const profiles = this.profiles
-      .filter(x => ids.includes(x._id.toHexString()))
-      .sort((a, b) => b.date.valueOf() - a.date.valueOf());
-
-    if (profiles.length !== ids.length) {
-      throw new AtNotFoundPartError("プロフィールが存在しません",
-        profiles.map(x => x._id.toString()));
-    }
-
-    return profiles.map(p => Profile.fromDB(p));
-  }
-
-  async findAll(authToken: IAuthToken): Promise<Profile[]> {
-    const profiles = this.profiles
-      .filter(x => x.user.toHexString() === authToken.user)
-      .sort((a, b) => b.date.valueOf() - a.date.valueOf());
-
-    return profiles.map(p => Profile.fromDB(p));
   }
 
   async find(auth: AuthContainer, query: { self?: boolean, id?: string[] }): Promise<Profile[]> {
