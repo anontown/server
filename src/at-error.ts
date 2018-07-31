@@ -1,5 +1,3 @@
-import { IJSONSchemaValidationError } from "jsonschema";
-
 export interface AtErrorItem {
     message: string;
     data: any;
@@ -31,13 +29,6 @@ export class AtServerError extends AtError {
     }
 }
 
-export class AtParamTypeError extends AtError {
-    constructor(data: IJSONSchemaValidationError[]) {
-        super(StatusCode.ClientError, "param_type", [
-            { message: "パラメーターの型が不正です", data },
-        ]);
-    }
-}
 
 export class AtCaptchaError extends AtError {
     constructor() {
