@@ -19,6 +19,7 @@ import {
   Repo,
 } from "./models";
 import { AppServer } from "./server/app-server";
+(Symbol as any).asyncIterator = Symbol.for("Symbol.asyncIterator");
 
 (async () => {
   // フォルダ作成
