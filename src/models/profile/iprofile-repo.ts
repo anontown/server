@@ -2,8 +2,8 @@ import { AuthContainer } from "../../server/auth-container";
 import { Profile } from "./profile";
 
 export interface ProfileQuery {
-  self?: boolean,
-  id?: string[]
+  self?: boolean;
+  id?: string[];
 }
 
 export interface IProfileRepo {

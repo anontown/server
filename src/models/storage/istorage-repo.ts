@@ -2,7 +2,7 @@ import { IAuthToken } from "../../auth";
 import { Storage } from "./storage";
 
 export interface StorageQuery {
-  key?: string[]
+  key?: string[];
 }
 
 export interface IStorageRepo {

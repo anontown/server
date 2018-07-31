@@ -1,5 +1,5 @@
 import {
-  IRepo, HistoryQuery,
+  HistoryQuery, IRepo,
 } from "../models";
 import {
   Context,
@@ -11,7 +11,7 @@ export const historyResolver = (repo: IRepo) => {
       histories: async (
         _obj: any,
         args: {
-          query: HistoryQuery
+          query: HistoryQuery,
         },
         _context: Context,
         _info: any) => {

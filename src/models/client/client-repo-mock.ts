@@ -1,7 +1,7 @@
 import { AtAuthError, AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { Client, IClientDB } from "./client";
-import { IClientRepo, ClientQuery } from "./iclient-repo";
+import { ClientQuery, IClientRepo } from "./iclient-repo";
 
 export class ClientRepoMock implements IClientRepo {
   private clients: IClientDB[] = [];

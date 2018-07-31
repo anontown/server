@@ -1,8 +1,8 @@
 import { ObjectIDGenerator } from "../generator";
 import {
   Client,
-  IRepo,
   ClientQuery,
+  IRepo,
 } from "../models";
 import { Context } from "../server";
 
@@ -12,7 +12,7 @@ export const clientResolver = (repo: IRepo) => {
       clients: async (
         _obj: any,
         args: {
-          query: ClientQuery
+          query: ClientQuery,
         },
         context: Context,
         _info: any) => {

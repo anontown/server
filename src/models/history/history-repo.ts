@@ -2,7 +2,7 @@ import { AtNotFoundError } from "../../at-error";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
 import { History, IHistoryDB } from "./history";
-import { IHistoryRepo, HistoryQuery } from "./ihistory-repo";
+import { HistoryQuery, IHistoryRepo } from "./ihistory-repo";
 
 export class HistoryRepo implements IHistoryRepo {
   constructor(private refresh?: boolean) { }

@@ -14,7 +14,7 @@ export const profileResolver = (repo: IRepo) => {
       profiles: async (
         _obj: any,
         args: {
-          query: ProfileQuery
+          query: ProfileQuery,
         },
         context: Context,
         _info: any) => {

@@ -2,11 +2,11 @@ import { IResRepo } from "../res";
 import { Topic } from "./topic";
 
 export interface TopicQuery {
-  id?: string[],
-  title?: string,
-  tags?: string[],
-  activeOnly?: boolean,
-  parent?: string,
+  id?: string[];
+  title?: string;
+  tags?: string[];
+  activeOnly?: boolean;
+  parent?: string;
 }
 
 export interface ITopicRepo {

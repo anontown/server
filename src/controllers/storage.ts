@@ -10,7 +10,7 @@ export const storageResolver = (repo: IRepo) => {
       storages: async (
         _obj: any,
         args: {
-          query: StorageQuery
+          query: StorageQuery,
         },
         context: Context,
         _info: any) => {

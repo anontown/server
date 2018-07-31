@@ -1,8 +1,8 @@
 import { History } from "./history";
 
 export interface HistoryQuery {
-  id?: string[],
-  topic?: string[]
+  id?: string[];
+  topic?: string[];
 }
 
 export interface IHistoryRepo {

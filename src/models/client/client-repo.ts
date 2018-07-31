@@ -3,7 +3,7 @@ import { AtAuthError, AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { DB } from "../../db";
 import { Client, IClientDB } from "./client";
-import { IClientRepo, ClientQuery } from "./iclient-repo";
+import { ClientQuery, IClientRepo } from "./iclient-repo";
 
 export class ClientRepo implements IClientRepo {
   async findOne(id: string): Promise<Client> {

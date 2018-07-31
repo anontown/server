@@ -3,8 +3,8 @@ import { DateType } from "../../server";
 import { Msg } from "./msg";
 
 export interface MsgQuery {
-  date?: DateType,
-  id?: string[],
+  date?: DateType;
+  id?: string[];
 }
 
 export interface IMsgRepo {

@@ -2,8 +2,8 @@ import { IAuthTokenMaster } from "../../auth";
 import { Client } from "./client";
 
 export interface ClientQuery {
-  id?: string[],
-  self?: boolean,
+  id?: string[];
+  self?: boolean;
 }
 
 export interface IClientRepo {

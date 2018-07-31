@@ -1,6 +1,6 @@
 import { AtNotFoundError } from "../../at-error";
 import { History, IHistoryDB } from "./history";
-import { IHistoryRepo, HistoryQuery } from "./ihistory-repo";
+import { HistoryQuery, IHistoryRepo } from "./ihistory-repo";
 
 export class HistoryRepoMock implements IHistoryRepo {
   private histories: IHistoryDB[] = [];
