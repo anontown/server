@@ -71,6 +71,7 @@
     "coverageReporters": [
       "html",
       "json"
-    ]
+    ],
+    "testURL": "http://localhost"
   }
 }
