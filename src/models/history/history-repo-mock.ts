@@ -1,6 +1,6 @@
 import { AtNotFoundError } from "../../at-error";
 import { History, IHistoryDB } from "./history";
-import { IHistoryRepo } from "./ihistory-repo";
+import { IHistoryRepo, HistoryQuery } from "./ihistory-repo";
 
 export class HistoryRepoMock implements IHistoryRepo {
   private histories: IHistoryDB[] = [];
@@ -23,7 +23,7 @@ export class HistoryRepoMock implements IHistoryRepo {
     return History.fromDB(history);
   }
 
-  async find(query: { id?: string[], topic?: string[] }): Promise<History[]> {
+  async find(query: HistoryQuery): Promise<History[]> {
     const histories = this.histories
       .filter(x => query.id === undefined || query.id.includes(x.id))
       .filter(x => query.topic === undefined || query.topic.includes(x.body.topic))

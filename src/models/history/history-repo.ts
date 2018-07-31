@@ -2,7 +2,7 @@ import { AtNotFoundError } from "../../at-error";
 import { Config } from "../../config";
 import { ESClient } from "../../db";
 import { History, IHistoryDB } from "./history";
-import { IHistoryRepo } from "./ihistory-repo";
+import { IHistoryRepo, HistoryQuery } from "./ihistory-repo";
 
 export class HistoryRepo implements IHistoryRepo {
   constructor(private refresh?: boolean) { }
@@ -44,7 +44,7 @@ export class HistoryRepo implements IHistoryRepo {
     return History.fromDB(({ id: history._id, body: history._source }));
   }
 
-  async find(query: { id?: string[], topic?: string[] }): Promise<History[]> {
+  async find(query: HistoryQuery): Promise<History[]> {
     const filter: any[] = [];
     if (query.id !== undefined) {
       filter.push({

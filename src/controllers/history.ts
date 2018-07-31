@@ -1,5 +1,5 @@
 import {
-  IRepo,
+  IRepo, HistoryQuery,
 } from "../models";
 import {
   Context,
@@ -11,15 +11,11 @@ export const historyResolver = (repo: IRepo) => {
       histories: async (
         _obj: any,
         args: {
-          id?: string[],
-          topic?: string[],
+          query: HistoryQuery
         },
         _context: Context,
         _info: any) => {
-        const histories = await repo.history.find({
-          id: args.id,
-          topic: args.topic,
-        });
+        const histories = await repo.history.find(args.query);
         return histories.map(x => x.toAPI());
       },
     },

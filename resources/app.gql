@@ -245,9 +245,14 @@ input ClientQuery{
   self:Boolean
 }
 
+input HistoryQuery{
+  id:[ID!]
+  topic:[ID!]
+}
+
 type Query{
   clients(query:ClientQuery!):[Client!]!
-  histories(id:[ID!],topic:[ID!]):[History!]!
+  histories(query:HistoryQuery!):[History!]!
   msgs(id:[ID!],date:DateQuery,limit:Int=100):[Msg!]!
   profiles(id:[ID!],self:Boolean):[Profile!]!
   reses(
