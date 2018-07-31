@@ -206,7 +206,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
         key: "key",
         user: user1,
         type: "master",
-      }, {})).toEqual([
+      }, { self: true })).toEqual([
         client2,
         client1,
         client3,
@@ -215,7 +215,7 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
 
     describe("トークンがnullでselfがtrueの時エラーになるか", async () => {
       const repo = repoGene();
-      await expect(repo.find(null, {})).rejects.toThrow(AtError);
+      await expect(repo.find(null, { self: true })).rejects.toThrow(AtError);
     });
   });
 
