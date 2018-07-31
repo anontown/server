@@ -1,11 +1,11 @@
 import { AtPrerequisiteError } from "../at-error";
 import { ObjectIDGenerator } from "../generator";
 import {
+  IRepo,
+  ITopicAPI,
   TopicFork,
   TopicNormal,
   TopicOne,
-  IRepo,
-  ITopicAPI,
 } from "../models";
 import {
   Context,
@@ -15,42 +15,42 @@ export const topicResolver = (repo: IRepo) => {
   return {
     Query: {
       topics: async (_obj: any,
-        args: {
+                     args: {
           id: string[] | null,
           title: string | null,
           tags: string[] | null,
           skip: number,
           limit: number,
           activeOnly: boolean | null,
-          parent: string | null
-        }, _context: Context,
-        _info: any) => {
+          parent: string | null,
+        },           _context: Context,
+                     _info: any) => {
         const topic = await repo.topic
           .find2({
             id: args.id,
             title: args.title,
             tags: args.tags,
             activeOnly: args.activeOnly,
-            parent: args.parent
+            parent: args.parent,
           }, args.skip, args.limit);
         return topic.map(t => t.toAPI());
       },
       topicTags: async (_obj: any,
-        args: {
-          limit: number
-        }, _context: Context,
-        _info: any) => {
+                        args: {
+          limit: number,
+        },              _context: Context,
+                        _info: any) => {
         return await repo.topic.findTags(args.limit);
       },
     },
     Mutation: {
       createTopicNormal: async (_obj: any,
-        args: {
+                                args: {
           title: string,
           tags: string[],
-          text: string
-        }, context: Context,
-        _info: any) => {
+          text: string,
+        },                      context: Context,
+                                _info: any) => {
         const user = await repo.user.findOne(context.auth.token.user);
         const create = TopicNormal.create(ObjectIDGenerator,
           args.title,
@@ -72,12 +72,12 @@ export const topicResolver = (repo: IRepo) => {
         return create.topic.toAPI();
       },
       createTopicOne: async (_obj: any,
-        args: {
+                             args: {
           title: string,
           tags: string[],
-          text: string
-        }, context: Context,
-        _info: any) => {
+          text: string,
+        },                   context: Context,
+                             _info: any) => {
         const user = await repo.user.findOne(context.auth.token.user);
         const create = TopicOne.create(ObjectIDGenerator,
           args.title,
@@ -99,11 +99,11 @@ export const topicResolver = (repo: IRepo) => {
         return create.topic.toAPI();
       },
       createTopicFork: async (_obj: any,
-        args: {
+                              args: {
           title: string,
-          parent: string
-        }, context: Context,
-        _info: any) => {
+          parent: string,
+        },                    context: Context,
+                              _info: any) => {
         const user = await repo.user.findOne(context.auth.token.user);
         const parent = await repo.topic.findOne(args.parent);
 
@@ -133,13 +133,13 @@ export const topicResolver = (repo: IRepo) => {
         return create.topic.toAPI();
       },
       updateTopic: async (_obj: any,
-        args: {
+                          args: {
           id: string,
           title: string,
           tags: string[],
-          text: string
-        }, context: Context,
-        _info: any) => {
+          text: string,
+        },                context: Context,
+                          _info: any) => {
         const [topic, user] = await Promise.all([
           repo.topic.findOne(args.id),
           repo.user.findOne(context.auth.token.user),
@@ -149,7 +149,13 @@ export const topicResolver = (repo: IRepo) => {
           throw new AtPrerequisiteError("通常トピック以外は編集出来ません");
         }
 
-        const val = topic.changeData(ObjectIDGenerator, user, context.auth.token, args.title, args.tags, args.text, context.now);
+        const val = topic.changeData(ObjectIDGenerator,
+          user,
+          context.auth.token,
+          args.title,
+          args.tags,
+          args.text,
+          context.now);
 
         await Promise.all([
           repo.res.insert(val.res),
@@ -173,7 +179,7 @@ export const topicResolver = (repo: IRepo) => {
           case "fork":
             return "TopicFork";
         }
-      }
-    }
+      },
+    },
   };
 };

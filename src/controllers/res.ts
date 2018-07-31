@@ -1,16 +1,16 @@
+import { withFilter } from "apollo-server";
 import { AtPrerequisiteError } from "../at-error";
 import { ObjectIDGenerator } from "../generator";
 import {
-  ResNormal,
-  Res,
   IRepo,
-  IResAPI
+  IResAPI,
+  Res,
+  ResNormal,
 } from "../models";
 import {
   Context,
   DateType,
 } from "../server";
-import { withFilter } from "apollo-server";
 import { pubsub, RES_ADDED } from "../server/pubsub";
 
 export const resResolver = (repo: IRepo) => {
@@ -21,7 +21,7 @@ export const resResolver = (repo: IRepo) => {
   return {
     Query: {
       reses: async (_obj: any,
-        args: {
+                    args: {
           id: string[] | null,
           topic: string | null,
           notice: boolean | null,
@@ -32,8 +32,8 @@ export const resResolver = (repo: IRepo) => {
           text: string | null,
           date: DateType | null,
           limit: number,
-        }, context: Context,
-        _info: any) => {
+        },          context: Context,
+                    _info: any) => {
         const reses = await repo.res.find2(context.auth, {
           id: args.id,
           topic: args.topic,
@@ -50,15 +50,15 @@ export const resResolver = (repo: IRepo) => {
     },
     Mutation: {
       createRes: async (_obj: any,
-        args: {
+                        args: {
           topic: string,
           name: string | null,
           text: string,
           reply: string | null,
           profile: string | null,
           age: boolean,
-        }, context: Context,
-        _info: any) => {
+        },              context: Context,
+                        _info: any) => {
         const [topic, user, reply, profile] = await Promise.all([
           repo.topic.findOne(args.topic),
           repo.user.findOne(context.auth.token.user),
@@ -87,11 +87,11 @@ export const resResolver = (repo: IRepo) => {
         return res.toAPI(context.auth.token);
       },
       voteRes: async (_obj: any,
-        args: {
+                      args: {
           id: string,
-          vote: "uv" | "dv" | "cv"
-        }, context: Context,
-        _info: any) => {
+          vote: "uv" | "dv" | "cv",
+        },            context: Context,
+                      _info: any) => {
         if (args.vote === "cv") {
           const [res, user] = await Promise.all([
             repo.res.findOne(args.id),
@@ -131,10 +131,10 @@ export const resResolver = (repo: IRepo) => {
         }
       },
       delRes: async (_obj: any,
-        args: {
+                     args: {
           id: string,
-        }, context: Context,
-        _info: any) => {
+        },           context: Context,
+                     _info: any) => {
         const res = await repo.res.findOne(args.id);
 
         if (res.type !== "normal") {
@@ -152,7 +152,7 @@ export const resResolver = (repo: IRepo) => {
         ]);
 
         return newRes.toAPI(context.auth.token);
-      }
+      },
     },
     Subscription: {
       resAdded: {
@@ -181,7 +181,7 @@ export const resResolver = (repo: IRepo) => {
           case "delete":
             return "ResDelete";
         }
-      }
-    }
+      },
+    },
   };
 };

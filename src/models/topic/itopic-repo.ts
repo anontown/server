@@ -32,6 +32,6 @@ export interface ITopicRepo {
     title: string | null,
     tags: string[] | null,
     activeOnly: boolean | null,
-    parent: string | null
-  }, skip: number, limit: number): Promise<Topic[]>;
+    parent: string | null,
+  },    skip: number, limit: number): Promise<Topic[]>;
 }

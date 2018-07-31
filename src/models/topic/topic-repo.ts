@@ -129,14 +129,14 @@ export class TopicRepo implements ITopicRepo {
     title: string | null,
     tags: string[] | null,
     activeOnly: boolean | null,
-    parent: string | null
-  }, skip: number, limit: number): Promise<Topic[]> {
+    parent: string | null,
+  },          skip: number, limit: number): Promise<Topic[]> {
     const filter: any[] = [];
     if (query.id !== null) {
       filter.push({
         terms: {
           _id: query.id,
-        }
+        },
       });
     }
 
@@ -162,7 +162,7 @@ export class TopicRepo implements ITopicRepo {
 
     if (query.activeOnly) {
       filter.push({
-        term: { active: true }
+        term: { active: true },
       });
     }
 
@@ -181,7 +181,7 @@ export class TopicRepo implements ITopicRepo {
       body: {
         query: {
           bool: {
-            filter: filter,
+            filter,
           },
         },
         sort: { ageUpdate: { order: "desc" } },

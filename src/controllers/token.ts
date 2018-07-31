@@ -1,10 +1,10 @@
 import { AtPrerequisiteError } from "../at-error";
 import { ObjectIDGenerator, RandomGenerator } from "../generator";
 import {
-  TokenGeneral,
-  TokenMaster,
   IRepo,
   ITokenAPI,
+  TokenGeneral,
+  TokenMaster,
 } from "../models";
 import {
   Context,
@@ -29,7 +29,7 @@ export const tokenResolver = (repo: IRepo) => {
     Mutation: {
       delTokenClient: async (_obj: any,
         args: {
-          client: string
+          client: string,
         }, context: Context,
         _info: any) => {
         const client = await repo.client.findOne(args.client);
@@ -38,11 +38,15 @@ export const tokenResolver = (repo: IRepo) => {
       },
       createTokenGeneral: async (_obj: any,
         args: {
-          client: string
+          client: string,
         }, context: Context,
         _info: any) => {
         const client = await repo.client.findOne(args.client);
-        const token = TokenGeneral.create(ObjectIDGenerator, context.auth.tokenMaster, client, context.now, RandomGenerator);
+        const token = TokenGeneral.create(ObjectIDGenerator,
+          context.auth.tokenMaster,
+          client,
+          context.now,
+          RandomGenerator);
         await repo.token.insert(token);
 
         return token.toAPI();
@@ -71,7 +75,7 @@ export const tokenResolver = (repo: IRepo) => {
       authTokenReq: async (_obj: any,
         args: {
           id: string,
-          key: string
+          key: string,
         }, context: Context,
         _info: any) => {
         const token = await repo.token.findOne(args.id);
@@ -90,7 +94,7 @@ export const tokenResolver = (repo: IRepo) => {
           case "master":
             return "TokenMaster";
         }
-      }
-    }
+      },
+    },
   };
 };

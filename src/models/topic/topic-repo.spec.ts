@@ -100,7 +100,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         tags: Im.List(["a"]),
         title: "",
         ageUpdate: new Date(50),
-        active: false
+        active: false,
       });
 
       const topic5 = topicFork.copy({
@@ -115,7 +115,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         parent: "topic1",
         title: "x",
         ageUpdate: new Date(30),
-        active: false
+        active: false,
       });
 
       await repo.insert(topic1);
@@ -130,14 +130,14 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: null,
         tags: null,
         activeOnly: null,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic4,
         topic3,
         topic6,
         topic2,
-        topic1
+        topic1,
       ]);
 
       expect(await repo.find2({
@@ -145,7 +145,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: null,
         tags: null,
         activeOnly: null,
-        parent: null
+        parent: null,
       }, 1, 3)).toEqual([
         topic4,
         topic3,
@@ -157,7 +157,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: null,
         tags: null,
         activeOnly: null,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([]);
 
       expect(await repo.find2({
@@ -165,10 +165,10 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: null,
         tags: null,
         activeOnly: null,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([
         topic5,
-        topic1
+        topic1,
       ]);
 
       expect(await repo.find2({
@@ -176,14 +176,14 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: "",
         tags: null,
         activeOnly: null,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic4,
         topic3,
         topic6,
         topic2,
-        topic1
+        topic1,
       ]);
 
       expect(await repo.find2({
@@ -191,12 +191,12 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: "x",
         tags: null,
         activeOnly: null,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic3,
         topic6,
-        topic1
+        topic1,
       ]);
 
       expect(await repo.find2({
@@ -204,7 +204,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: "x a",
         tags: null,
         activeOnly: null,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([]);
 
       expect(await repo.find2({
@@ -212,9 +212,9 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: "x y",
         tags: null,
         activeOnly: null,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([
-        topic3
+        topic3,
       ]);
 
       expect(await repo.find2({
@@ -222,14 +222,14 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: null,
         tags: [],
         activeOnly: null,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic4,
         topic3,
         topic6,
         topic2,
-        topic1
+        topic1,
       ]);
 
       expect(await repo.find2({
@@ -237,11 +237,11 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: null,
         tags: ["a"],
         activeOnly: null,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([
         topic4,
         topic2,
-        topic1
+        topic1,
       ]);
 
       expect(await repo.find2({
@@ -249,7 +249,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: null,
         tags: ["a", "b"],
         activeOnly: null,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([
         topic2,
       ]);
@@ -259,7 +259,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: null,
         tags: ["x"],
         activeOnly: null,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([
       ]);
 
@@ -268,14 +268,14 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: null,
         tags: null,
         activeOnly: false,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic4,
         topic3,
         topic6,
         topic2,
-        topic1
+        topic1,
       ]);
 
       expect(await repo.find2({
@@ -283,7 +283,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: null,
         tags: null,
         activeOnly: true,
-        parent: null
+        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic3,
@@ -295,7 +295,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: null,
         tags: null,
         activeOnly: null,
-        parent: "topic1"
+        parent: "topic1",
       }, 0, 100)).toEqual([
         topic6,
       ]);
@@ -305,7 +305,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         title: null,
         tags: null,
         activeOnly: null,
-        parent: "other"
+        parent: "other",
       }, 0, 100)).toEqual([
       ]);
     });

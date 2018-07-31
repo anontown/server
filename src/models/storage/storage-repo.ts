@@ -13,7 +13,7 @@ export class StorageRepo implements IStorageRepo {
       client: token.type === "general" ? new ObjectID(token.client) : null,
     };
     if (query.key !== null) {
-      q["key"] = { $in: query.key };
+      q.key = { $in: query.key };
     }
     const storages: IStorageDB[] = await db.collection("storages")
       .find(q)

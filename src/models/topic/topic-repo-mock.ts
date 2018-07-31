@@ -75,8 +75,8 @@ export class TopicRepoMock implements ITopicRepo {
     title: string | null,
     tags: string[] | null,
     activeOnly: boolean | null,
-    parent: string | null
-  }, skip: number, limit: number): Promise<Topic[]> {
+    parent: string | null,
+  },          skip: number, limit: number): Promise<Topic[]> {
     const titles = query.title !== null ? query.title
       .split(/\s/)
       .filter(x => x.length !== 0) : null;
@@ -86,7 +86,7 @@ export class TopicRepoMock implements ITopicRepo {
       .filter(x => titles === null || titles.every(t => x.body.title.includes(t)))
       .filter(x => query.tags === null || (query.tags.every(t => "tags" in x.body && x.body.tags.includes(t))))
       .filter(x => !query.activeOnly || x.body.active)
-      .filter(x => query.parent === null || ("parent" in x.body && x.body.parent == query.parent))
+      .filter(x => query.parent === null || ("parent" in x.body && x.body.parent === query.parent))
       .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf())
       .slice(skip)
       .slice(0, limit));

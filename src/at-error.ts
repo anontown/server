@@ -29,7 +29,6 @@ export class AtServerError extends AtError {
     }
 }
 
-
 export class AtCaptchaError extends AtError {
     constructor() {
         super(StatusCode.ClientError, "captcha", [

@@ -1,19 +1,19 @@
+import { combineResolvers } from "apollo-resolvers";
 import { ApolloServer, gql, IResolvers } from "apollo-server";
 import * as fs from "fs";
-import { Config } from "../config";
-import { createContext, Context } from "./context";
 import {
-  GraphQLDateTime
-} from 'graphql-iso-date';
-import { combineResolvers } from "apollo-resolvers";
+  GraphQLDateTime,
+} from "graphql-iso-date";
+import { Config } from "../config";
 import * as controllers from "../controllers";
 import { IRepo } from "../models";
+import { Context, createContext } from "./context";
 
 export function serverRun(repo: IRepo) {
   const typeDefs = gql(fs.readFileSync("resources/app.gql", "utf8"));
   const resolvers: IResolvers = combineResolvers([
     {
-      DateTime: GraphQLDateTime
+      DateTime: GraphQLDateTime,
     },
     controllers.clientResolver(repo),
     controllers.historyResolver(repo),
@@ -23,7 +23,7 @@ export function serverRun(repo: IRepo) {
     controllers.storageResolver(repo),
     controllers.tokenResolver(repo),
     controllers.topicResolver(repo),
-    controllers.userResolver(repo)
+    controllers.userResolver(repo),
   ]);
   const server = new ApolloServer({
     typeDefs,
@@ -45,15 +45,15 @@ export function serverRun(repo: IRepo) {
           headers: {
             "X-User": "",
             "X-Token": "",
-            "X-Recaptcha": ""
-          }
+            "X-Recaptcha": "",
+          },
         },
       ],
     },
     debug: false,
     formatError: (error: any) => {
       console.log(error);
-      return new Error('Internal server error');
+      return new Error("Internal server error");
     },
   });
 
