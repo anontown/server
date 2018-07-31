@@ -2,6 +2,7 @@ import { ObjectIDGenerator } from "../generator";
 import {
   IRepo,
   Profile,
+  ProfileQuery,
 } from "../models";
 import {
   Context,
@@ -13,12 +14,11 @@ export const profileResolver = (repo: IRepo) => {
       profiles: async (
         _obj: any,
         args: {
-          id?: string[],
-          self?: boolean,
+          query: ProfileQuery
         },
         context: Context,
         _info: any) => {
-        const profiles = await repo.profile.find(context.auth, { id: args.id, self: args.self });
+        const profiles = await repo.profile.find(context.auth, args.query);
         return profiles.map(p => p.toAPI(context.auth.tokenOrNull));
       },
     },

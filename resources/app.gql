@@ -255,11 +255,16 @@ input MsgQuery{
   date:DateQuery
 }
 
+input ProfileQuery{
+  id:[ID!]
+  self:Boolean
+}
+
 type Query{
   clients(query:ClientQuery!):[Client!]!
   histories(query:HistoryQuery!):[History!]!
   msgs(query:MsgQuery!,limit:Int=100):[Msg!]!
-  profiles(id:[ID!],self:Boolean):[Profile!]!
+  profiles(query:ProfileQuery!):[Profile!]!
   reses(
     id:[ID!],
     topic:ID,

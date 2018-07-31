@@ -2,7 +2,7 @@ import { ObjectID, WriteError } from "mongodb";
 import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { DB } from "../../db";
 import { AuthContainer } from "../../server/auth-container";
-import { IProfileRepo } from "./iprofile-repo";
+import { IProfileRepo, ProfileQuery } from "./iprofile-repo";
 import { IProfileDB, Profile } from "./profile";
 
 export class ProfileRepo implements IProfileRepo {
@@ -18,7 +18,7 @@ export class ProfileRepo implements IProfileRepo {
     return Profile.fromDB(profile);
   }
 
-  async find(auth: AuthContainer, query: { self?: boolean, id?: string[] }): Promise<Profile[]> {
+  async find(auth: AuthContainer, query: ProfileQuery): Promise<Profile[]> {
     const q: any = {};
     if (query.self) {
       q.user = new ObjectID(auth.token.user);

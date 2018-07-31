@@ -1,6 +1,6 @@
 import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { AuthContainer } from "../../server/auth-container";
-import { IProfileRepo } from "./iprofile-repo";
+import { IProfileRepo, ProfileQuery } from "./iprofile-repo";
 import { IProfileDB, Profile } from "./profile";
 
 export class ProfileRepoMock implements IProfileRepo {
@@ -16,7 +16,7 @@ export class ProfileRepoMock implements IProfileRepo {
     return Profile.fromDB(profile);
   }
 
-  async find(auth: AuthContainer, query: { self?: boolean, id?: string[] }): Promise<Profile[]> {
+  async find(auth: AuthContainer, query: ProfileQuery): Promise<Profile[]> {
     const self = query.self ? auth.token.user : null;
     const profiles = this.profiles
       .filter(x => self === null || x.user.toHexString() === self)
