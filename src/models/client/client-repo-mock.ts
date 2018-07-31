@@ -1,7 +1,7 @@
 import { AtAuthError, AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { Client, IClientDB } from "./client";
-import { IClientRepo } from "./iclient-repo";
+import { IClientRepo, ClientQuery } from "./iclient-repo";
 
 export class ClientRepoMock implements IClientRepo {
   private clients: IClientDB[] = [];
@@ -23,10 +23,7 @@ export class ClientRepoMock implements IClientRepo {
     this.clients[this.clients.findIndex(c => c._id.toHexString() === client.id)] = client.toDB();
   }
 
-  async find(authToken: IAuthTokenMaster | null, query: {
-    id?: string[],
-    self?: boolean,
-  }): Promise<Client[]> {
+  async find(authToken: IAuthTokenMaster | null, query: ClientQuery): Promise<Client[]> {
     if (query.self && authToken === null) {
       throw new AtAuthError("認証が必要です");
     }

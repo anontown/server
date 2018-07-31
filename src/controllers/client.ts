@@ -2,6 +2,7 @@ import { ObjectIDGenerator } from "../generator";
 import {
   Client,
   IRepo,
+  ClientQuery,
 } from "../models";
 import { Context } from "../server";
 
@@ -10,10 +11,7 @@ export const clientResolver = (repo: IRepo) => {
     Query: {
       clients: async (
         _obj: any,
-        args: {
-          id?: string[],
-          self?: boolean,
-        },
+        args: ClientQuery,
         context: Context,
         _info: any) => {
         const clients = await repo.client.find(context.auth.TokenMasterOrNull, {

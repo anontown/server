@@ -3,7 +3,7 @@ import { AtAuthError, AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { DB } from "../../db";
 import { Client, IClientDB } from "./client";
-import { IClientRepo } from "./iclient-repo";
+import { IClientRepo, ClientQuery } from "./iclient-repo";
 
 export class ClientRepo implements IClientRepo {
   async findOne(id: string): Promise<Client> {
@@ -17,10 +17,7 @@ export class ClientRepo implements IClientRepo {
     return Client.fromDB(client);
   }
 
-  async find(authToken: IAuthTokenMaster | null, query: {
-    id?: string[],
-    self?: boolean,
-  }): Promise<Client[]> {
+  async find(authToken: IAuthTokenMaster | null, query: ClientQuery): Promise<Client[]> {
     if (query.self && authToken === null) {
       throw new AtAuthError("認証が必要です");
     }

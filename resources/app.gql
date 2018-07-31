@@ -240,8 +240,13 @@ type Tags{
   count:Int!
 }
 
+input ClientQuery{
+  id:[ID!]
+  self:Boolean
+}
+
 type Query{
-  clients(id:[ID!],self:Boolean):[Client!]!
+  clients(query:ClientQuery!):[Client!]!
   histories(id:[ID!],topic:[ID!]):[History!]!
   msgs(id:[ID!],date:DateQuery,limit:Int=100):[Msg!]!
   profiles(id:[ID!],self:Boolean):[Profile!]!
