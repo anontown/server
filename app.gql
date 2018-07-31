@@ -46,20 +46,11 @@ enum ResDeleteFlag{
   self
   freeze
 }
-
-interface ResBase{
-  id: ID!
-  topic: ID!
-  date: DateTime!
-  user: ID
-  uv: Int!
-  dv: Int!
-  hash: String!
-  replyCount: Int!
-  voteFlag: VoteFlag
+enum ResNormalType{
+  normal
 }
-
-type ResNormal implements ResBase{
+type ResNormal{
+  type:ResNormalType!
   id: ID!
   topic: ID!
   date: DateTime!
@@ -76,8 +67,11 @@ type ResNormal implements ResBase{
   profile: ID
   isReply: Boolean
 }
-
-type ResHistory implements ResBase{
+enum ResHistoryType{
+  history
+}
+type ResHistory{
+  type:ResHistoryType!
   id: ID!
   topic: ID!
   date: DateTime!
@@ -90,8 +84,11 @@ type ResHistory implements ResBase{
 
   history: ID!
 }
-
-type ResTopic implements ResBase{
+enum ResTopicType{
+  topic
+}
+type ResTopic{
+  type:ResTopicType!
   id: ID!
   topic: ID!
   date: DateTime!
@@ -102,8 +99,11 @@ type ResTopic implements ResBase{
   replyCount: Int!
   voteFlag: VoteFlag
 }
-
-type ResFork implements ResBase{
+enum ResForkType{
+  fork
+}
+type ResFork{
+  type:ResForkType!
   id: ID!
   topic: ID!
   date: String!
@@ -116,8 +116,11 @@ type ResFork implements ResBase{
 
   fork: ID!
 }
-
-type ResDelete implements ResBase{
+enum ResDeleteType{
+  delete
+}
+type ResDelete{
+  type:ResDeleteType!
   id: ID!
   topic: ID!
   date: DateTime!
@@ -137,22 +140,21 @@ type TokenReq{
   token: ID!
   key: String!
 }
-
-interface TokenBase{
+enum TokenMasterType{
+  master
+}
+type TokenMaster{
+  type:TokenMasterType!
   id: ID!
   key: String!
   user: ID!
   date: DateTime!
 }
-
-type TokenMaster implements TokenBase{
-  id: ID!
-  key: String!
-  user: ID!
-  date: DateTime!
+enum TokenGeneralType{
+  general
 }
-
-type TokenGeneral implements TokenBase{
+type TokenGeneral{
+  type:TokenGeneralType!
   id: ID!
   key: String!
   user: ID!
@@ -163,28 +165,12 @@ type TokenGeneral implements TokenBase{
 
 union Token=TokenMaster|TokenGeneral
 
-interface TopicBase{
-  id: ID!
-  title: String!
-  update: DateTime!
-  date: DateTime!
-  resCount: Int!
-  active: Boolean!
+enum TopicNormalType{
+  normal
 }
 
-interface TopicSearchBase implements TopicBase{
-  id: ID!
-  title: String!
-  update: DateTime!
-  date: DateTime!
-  resCount: Int!
-  active: Boolean!
-
-  tags: [String!]!
-  text:String!
-}
-
-type TopicNormal implements TopicSearchBase{
+type TopicNormal{
+  type:TopicNormalType!
   id: ID!
   title: String!
   update: DateTime!
@@ -195,8 +181,11 @@ type TopicNormal implements TopicSearchBase{
   tags: [String!]!
   text:String!
 }
-
-type TopicOne implements TopicSearchBase{
+enum TopicOneType{
+  one
+}
+type TopicOne{
+  type:TopicOneType!
   id: ID!
   title: String!
   update: DateTime!
@@ -207,8 +196,11 @@ type TopicOne implements TopicSearchBase{
   tags: [String!]!
   text:String!
 }
-
-type TopicFork implements TopicSearchBase{
+enum TopicForkType{
+  fork
+}
+type TopicFork{
+  TopicFork:TopicForkType!
   id: ID!
   title: String!
   update: DateTime!
