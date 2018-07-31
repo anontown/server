@@ -182,7 +182,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       await repo.insert(profile3);
       await repo.insert(profile4);
 
-      expect(await repo.find(new AuthContainer(null, null, false), { self: null, id: null })).toEqual([
+      expect(await repo.find(new AuthContainer(null, null, false), {})).toEqual([
         profile4,
         profile2,
         profile1,
@@ -194,7 +194,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
         key: "key",
         user: user1,
         type: "master",
-      }, null, false), { self: true, id: null })).toEqual([
+      }, null, false), {})).toEqual([
         profile2,
         profile1,
         profile3,
@@ -205,7 +205,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
         key: "key",
         user: user2,
         type: "master",
-      }, null, false), { self: true, id: null })).toEqual([
+      }, null, false), {})).toEqual([
         profile4,
       ]);
 
@@ -214,11 +214,11 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
         key: "key",
         user: user3,
         type: "master",
-      }, null, false), { self: true, id: null })).toEqual([]);
+      }, null, false), {})).toEqual([]);
 
-      expect(await repo.find(new AuthContainer(null, null, false), { self: null, id: [] })).toEqual([]);
+      expect(await repo.find(new AuthContainer(null, null, false), { id: [] })).toEqual([]);
       expect(await repo.find(new AuthContainer(null, null, false),
-        { self: null, id: [profile1.id, profile2.id, ObjectIDGenerator()] })).toEqual([
+        { id: [profile1.id, profile2.id, ObjectIDGenerator()] })).toEqual([
           profile2,
           profile1,
         ]);
@@ -238,7 +238,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       const repo = repoGene();
 
       await expect(repo.find(new AuthContainer(null, null, false),
-        { self: true, id: null })).rejects.toThrow(AtError);
+        {})).rejects.toThrow(AtError);
     });
   });
 

@@ -28,10 +28,10 @@ export interface ITopicRepo {
   cronTopicCheck(now: Date): Promise<void>;
 
   find2(query: {
-    id: string[] | null,
-    title: string | null,
-    tags: string[] | null,
-    activeOnly: boolean | null,
-    parent: string | null,
+    id?: string[],
+    title?: string,
+    tags?: string[],
+    activeOnly?: boolean,
+    parent?: string,
   },    skip: number, limit: number): Promise<Topic[]>;
 }

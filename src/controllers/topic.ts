@@ -16,13 +16,13 @@ export const topicResolver = (repo: IRepo) => {
     Query: {
       topics: async (_obj: any,
                      args: {
-          id: string[] | null,
-          title: string | null,
-          tags: string[] | null,
+          id?: string[],
+          title?: string,
+          tags?: string[],
           skip: number,
           limit: number,
-          activeOnly: boolean | null,
-          parent: string | null,
+          activeOnly?: boolean,
+          parent?: string,
         },           _context: Context,
                      _info: any) => {
         const topic = await repo.topic

@@ -126,11 +126,6 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       await repo.insert(topic6);
 
       expect(await repo.find2({
-        id: null,
-        title: null,
-        tags: null,
-        activeOnly: null,
-        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic4,
@@ -141,11 +136,6 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       ]);
 
       expect(await repo.find2({
-        id: null,
-        title: null,
-        tags: null,
-        activeOnly: null,
-        parent: null,
       }, 1, 3)).toEqual([
         topic4,
         topic3,
@@ -154,29 +144,17 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
 
       expect(await repo.find2({
         id: [],
-        title: null,
-        tags: null,
-        activeOnly: null,
-        parent: null,
       }, 0, 100)).toEqual([]);
 
       expect(await repo.find2({
         id: ["topic1", "topic5", "other"],
-        title: null,
-        tags: null,
-        activeOnly: null,
-        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic1,
       ]);
 
       expect(await repo.find2({
-        id: null,
         title: "",
-        tags: null,
-        activeOnly: null,
-        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic4,
@@ -187,11 +165,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       ]);
 
       expect(await repo.find2({
-        id: null,
         title: "x",
-        tags: null,
-        activeOnly: null,
-        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic3,
@@ -200,29 +174,17 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       ]);
 
       expect(await repo.find2({
-        id: null,
         title: "x a",
-        tags: null,
-        activeOnly: null,
-        parent: null,
       }, 0, 100)).toEqual([]);
 
       expect(await repo.find2({
-        id: null,
         title: "x y",
-        tags: null,
-        activeOnly: null,
-        parent: null,
       }, 0, 100)).toEqual([
         topic3,
       ]);
 
       expect(await repo.find2({
-        id: null,
-        title: null,
         tags: [],
-        activeOnly: null,
-        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic4,
@@ -233,11 +195,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       ]);
 
       expect(await repo.find2({
-        id: null,
-        title: null,
         tags: ["a"],
-        activeOnly: null,
-        parent: null,
       }, 0, 100)).toEqual([
         topic4,
         topic2,
@@ -245,30 +203,18 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       ]);
 
       expect(await repo.find2({
-        id: null,
-        title: null,
         tags: ["a", "b"],
-        activeOnly: null,
-        parent: null,
       }, 0, 100)).toEqual([
         topic2,
       ]);
 
       expect(await repo.find2({
-        id: null,
-        title: null,
         tags: ["x"],
-        activeOnly: null,
-        parent: null,
       }, 0, 100)).toEqual([
       ]);
 
       expect(await repo.find2({
-        id: null,
-        title: null,
-        tags: null,
         activeOnly: false,
-        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic4,
@@ -279,11 +225,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       ]);
 
       expect(await repo.find2({
-        id: null,
-        title: null,
-        tags: null,
         activeOnly: true,
-        parent: null,
       }, 0, 100)).toEqual([
         topic5,
         topic3,
@@ -291,20 +233,12 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       ]);
 
       expect(await repo.find2({
-        id: null,
-        title: null,
-        tags: null,
-        activeOnly: null,
         parent: "topic1",
       }, 0, 100)).toEqual([
         topic6,
       ]);
 
       expect(await repo.find2({
-        id: null,
-        title: null,
-        tags: null,
-        activeOnly: null,
         parent: "other",
       }, 0, 100)).toEqual([
       ]);

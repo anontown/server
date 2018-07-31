@@ -10,12 +10,14 @@ import {
 export const profileResolver = (repo: IRepo) => {
   return {
     Query: {
-      profiles: async (_obj: any,
-                       args: {
-          id: string[] | null,
-          self: boolean | null,
-        },             context: Context,
-                       _info: any) => {
+      profiles: async (
+        _obj: any,
+        args: {
+          id?: string[],
+          self?: boolean,
+        },
+        context: Context,
+        _info: any) => {
         const profiles = await repo.profile.find(context.auth, { id: args.id, self: args.self });
         return profiles.map(p => p.toAPI(context.auth.tokenOrNull));
       },

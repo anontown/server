@@ -20,20 +20,22 @@ export const resResolver = (repo: IRepo) => {
 
   return {
     Query: {
-      reses: async (_obj: any,
-                    args: {
-          id: string[] | null,
-          topic: string | null,
-          notice: boolean | null,
-          hash: string | null,
-          reply: string | null,
-          profile: string | null,
-          self: boolean | null,
-          text: string | null,
-          date: DateType | null,
+      reses: async (
+        _obj: any,
+        args: {
+          id?: string[],
+          topic?: string,
+          notice?: boolean,
+          hash?: string,
+          reply?: string,
+          profile?: string,
+          self?: boolean,
+          text?: string,
+          date?: DateType,
           limit: number,
-        },          context: Context,
-                    _info: any) => {
+        },
+        context: Context,
+        _info: any) => {
         const reses = await repo.res.find2(context.auth, {
           id: args.id,
           topic: args.topic,
@@ -49,28 +51,30 @@ export const resResolver = (repo: IRepo) => {
       },
     },
     Mutation: {
-      createRes: async (_obj: any,
-                        args: {
+      createRes: async (
+        _obj: any,
+        args: {
           topic: string,
-          name: string | null,
+          name?: string,
           text: string,
-          reply: string | null,
-          profile: string | null,
+          reply?: string,
+          profile?: string,
           age: boolean,
-        },              context: Context,
-                        _info: any) => {
+        },
+        context: Context,
+        _info: any) => {
         const [topic, user, reply, profile] = await Promise.all([
           repo.topic.findOne(args.topic),
           repo.user.findOne(context.auth.token.user),
-          args.reply !== null ? repo.res.findOne(args.reply) : Promise.resolve(null),
-          args.profile !== null ? repo.profile.findOne(args.profile) : Promise.resolve(null),
+          args.reply !== undefined ? repo.res.findOne(args.reply) : Promise.resolve(null),
+          args.profile !== undefined ? repo.profile.findOne(args.profile) : Promise.resolve(null),
         ]);
 
         const { res, user: newUser, topic: newTopic } = ResNormal.create(ObjectIDGenerator,
           topic,
           user,
           context.auth.token,
-          args.name,
+          args.name !== undefined ? args.name : null,
           args.text,
           reply,
           profile,
@@ -86,12 +90,14 @@ export const resResolver = (repo: IRepo) => {
         context.log("reses", res.id);
         return res.toAPI(context.auth.token);
       },
-      voteRes: async (_obj: any,
-                      args: {
+      voteRes: async (
+        _obj: any,
+        args: {
           id: string,
           vote: "uv" | "dv" | "cv",
-        },            context: Context,
-                      _info: any) => {
+        },
+        context: Context,
+        _info: any) => {
         if (args.vote === "cv") {
           const [res, user] = await Promise.all([
             repo.res.findOne(args.id),
@@ -130,11 +136,13 @@ export const resResolver = (repo: IRepo) => {
           return newRes.toAPI(context.auth.token);
         }
       },
-      delRes: async (_obj: any,
-                     args: {
+      delRes: async (
+        _obj: any,
+        args: {
           id: string,
-        },           context: Context,
-                     _info: any) => {
+        },
+        context: Context,
+        _info: any) => {
         const res = await repo.res.findOne(args.id);
 
         if (res.type !== "normal") {

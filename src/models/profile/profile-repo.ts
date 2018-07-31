@@ -43,12 +43,12 @@ export class ProfileRepo implements IProfileRepo {
     return profiles.map(p => Profile.fromDB(p));
   }
 
-  async find(auth: AuthContainer, query: { self: boolean | null, id: string[] | null }): Promise<Profile[]> {
+  async find(auth: AuthContainer, query: { self?: boolean, id?: string[] }): Promise<Profile[]> {
     const q: any = {};
     if (query.self) {
       q.user = new ObjectID(auth.token.user);
     }
-    if (query.id !== null) {
+    if (query.id !== undefined) {
       q._id = { $in: query.id.map(x => new ObjectID(x)) };
     }
     const db = await DB;

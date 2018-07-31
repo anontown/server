@@ -258,20 +258,23 @@ export class ResRepo implements IResRepo {
     return new Map(countArr.map<[string, number]>(x => [x.key, x.doc_count]));
   }
 
-  async find2(auth: AuthContainer, query: {
-    id: string[] | null,
-    topic: string | null,
-    notice: boolean | null,
-    hash: string | null,
-    reply: string | null,
-    profile: string | null,
-    text: string | null,
-    self: boolean | null,
-    date: DateType | null,
-  },          limit: number): Promise<Res[]> {
+  async find2(
+    auth: AuthContainer,
+    query: {
+      id?: string[],
+      topic?: string,
+      notice?: boolean,
+      hash?: string,
+      reply?: string,
+      profile?: string,
+      text?: string,
+      self?: boolean,
+      date?: DateType,
+    },
+    limit: number): Promise<Res[]> {
     const filter: object[] = [];
 
-    if (query.date !== null) {
+    if (query.date !== undefined) {
       filter.push({
         range: {
           date: {
@@ -281,7 +284,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.id !== null) {
+    if (query.id !== undefined) {
       filter.push({
         terms: {
           _id: query.id,
@@ -289,7 +292,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.topic !== null) {
+    if (query.topic !== undefined) {
       filter.push({
         term: {
           topic: query.topic,
@@ -310,7 +313,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.hash !== null) {
+    if (query.hash !== undefined) {
       filter.push({
         term: {
           hash: query.hash,
@@ -318,7 +321,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.reply !== null) {
+    if (query.reply !== undefined) {
       filter.push({
         nested: {
           path: "reply",
@@ -331,7 +334,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.profile !== null) {
+    if (query.profile !== undefined) {
       filter.push({
         term: {
           profile: query.profile,
@@ -347,7 +350,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.text !== null) {
+    if (query.text !== undefined) {
       filter.push({
         match: {
           text: {
@@ -370,7 +373,7 @@ export class ResRepo implements IResRepo {
         },
         sort: {
           date: {
-            order: query.date !== null && (query.date.type === "gt" || query.date.type === "gte")
+            order: query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")
               ? "asc"
               : "desc",
           },
@@ -379,7 +382,7 @@ export class ResRepo implements IResRepo {
     });
 
     const result = await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
-    if (query.date !== null && (query.date.type === "gt" || query.date.type === "gte")) {
+    if (query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")) {
       result.reverse();
     }
     return result;

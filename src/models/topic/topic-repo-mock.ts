@@ -71,22 +71,22 @@ export class TopicRepoMock implements ITopicRepo {
   }
 
   async find2(query: {
-    id: string[] | null,
-    title: string | null,
-    tags: string[] | null,
-    activeOnly: boolean | null,
-    parent: string | null,
+    id?: string[],
+    title?: string,
+    tags?: string[],
+    activeOnly?: boolean,
+    parent?: string,
   },          skip: number, limit: number): Promise<Topic[]> {
-    const titles = query.title !== null ? query.title
+    const titles = query.title !== undefined ? query.title
       .split(/\s/)
       .filter(x => x.length !== 0) : null;
 
     return this.aggregate(this.topics
-      .filter(x => query.id === null || query.id.includes(x.id))
+      .filter(x => query.id === undefined || query.id.includes(x.id))
       .filter(x => titles === null || titles.every(t => x.body.title.includes(t)))
-      .filter(x => query.tags === null || (query.tags.every(t => "tags" in x.body && x.body.tags.includes(t))))
+      .filter(x => query.tags === undefined || (query.tags.every(t => "tags" in x.body && x.body.tags.includes(t))))
       .filter(x => !query.activeOnly || x.body.active)
-      .filter(x => query.parent === null || ("parent" in x.body && x.body.parent === query.parent))
+      .filter(x => query.parent === undefined || ("parent" in x.body && x.body.parent === query.parent))
       .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf())
       .slice(skip)
       .slice(0, limit));

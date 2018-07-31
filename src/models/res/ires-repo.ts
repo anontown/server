@@ -36,15 +36,18 @@ export interface IResRepo {
 
   replyCount(resIDs: string[]): Promise<Map<string, number>>;
 
-  find2(auth: AuthContainer, query: {
-    id: string[] | null,
-    topic: string | null,
-    notice: boolean | null,
-    hash: string | null,
-    reply: string | null,
-    profile: string | null,
-    text: string | null,
-    self: boolean | null,
-    date: DateType | null,
-  },    limit: number): Promise<Res[]>;
+  find2(
+    auth: AuthContainer,
+    query: {
+      id?: string[],
+      topic?: string,
+      notice?: boolean,
+      hash?: string,
+      reply?: string,
+      profile?: string,
+      text?: string,
+      self?: boolean,
+      date?: DateType,
+    },
+    limit: number): Promise<Res[]>;
 }

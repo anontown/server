@@ -38,11 +38,11 @@ export class ProfileRepoMock implements IProfileRepo {
     return profiles.map(p => Profile.fromDB(p));
   }
 
-  async find(auth: AuthContainer, query: { self: boolean | null, id: string[] | null }): Promise<Profile[]> {
+  async find(auth: AuthContainer, query: { self?: boolean, id?: string[] }): Promise<Profile[]> {
     const self = query.self ? auth.token.user : null;
     const profiles = this.profiles
       .filter(x => self === null || x.user.toHexString() === self)
-      .filter(x => query.id === null || query.id.includes(x._id.toHexString()))
+      .filter(x => query.id === undefined || query.id.includes(x._id.toHexString()))
       .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
     return profiles.map(p => Profile.fromDB(p));

@@ -9,7 +9,7 @@ export const storageResolver = (repo: IRepo) => {
     Query: {
       storages: async (_obj: any,
                        args: {
-          key: string[] | null,
+          key?: string[],
         },             context: Context,
                        _info: any) => {
         const storages = await repo.storage.find(context.auth.token, { key: args.key });

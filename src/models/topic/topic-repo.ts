@@ -125,14 +125,14 @@ export class TopicRepo implements ITopicRepo {
   }
 
   async find2(query: {
-    id: string[] | null,
-    title: string | null,
-    tags: string[] | null,
-    activeOnly: boolean | null,
-    parent: string | null,
+    id?: string[],
+    title?: string,
+    tags?: string[],
+    activeOnly?: boolean,
+    parent?: string,
   },          skip: number, limit: number): Promise<Topic[]> {
     const filter: any[] = [];
-    if (query.id !== null) {
+    if (query.id !== undefined) {
       filter.push({
         terms: {
           _id: query.id,
@@ -140,7 +140,7 @@ export class TopicRepo implements ITopicRepo {
       });
     }
 
-    if (query.title !== null) {
+    if (query.title !== undefined) {
       filter.push({
         match: {
           title: {
@@ -152,7 +152,7 @@ export class TopicRepo implements ITopicRepo {
       });
     }
 
-    if (query.tags !== null) {
+    if (query.tags !== undefined) {
       filter.push(...query.tags.map(t => ({
         term: {
           tags: t,
@@ -166,7 +166,7 @@ export class TopicRepo implements ITopicRepo {
       });
     }
 
-    if (query.parent !== null) {
+    if (query.parent !== undefined) {
       filter.push({
         match: {
           parent: query.parent,
