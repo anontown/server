@@ -1,3 +1,3 @@
-import { PubSub } from "graphql-subscriptions";
+import { PubSub } from "apollo-server";
 
 export const pubsub = new PubSub();

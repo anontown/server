@@ -1,4 +1,3 @@
-import * as express from "express";
 import { AtAuthError } from "../at-error";
 import { Logger } from "../logger";
 import { IRepo, Repo } from "../models";
@@ -47,13 +46,13 @@ async function createRecaptcha(raw: any) {
   return true;
 }
 
-export async function createContext(req: express.Request): Promise<Context> {
-  const ip = req.headers["X-Real-IP"] || req.connection.remoteAddress;
+export async function createContext(headers: any): Promise<Context> {
+  const ip = headers["X-Real-IP"] || "unknown_ip";
   const repo = new Repo();
 
-  const user = await createUser(req.headers["X-User"], repo);
-  const token = await createToken(req.headers["X-Token"], repo);
-  const recaptcha = await createRecaptcha(req.headers["X-Recaptcha"]);
+  const user = await createUser(headers["X-User"], repo);
+  const token = await createToken(headers["X-Token"], repo);
+  const recaptcha = await createRecaptcha(headers["X-Recaptcha"]);
 
   return {
     auth: new AuthContainer(token, user, recaptcha),

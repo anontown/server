@@ -1,53 +1,39 @@
-import { graphiqlExpress, graphqlExpress } from "apollo-server-express";
-import bodyParser from "body-parser";
-import express from "express";
+import { ApolloServer, gql, withFilter, IResolvers } from "apollo-server";
 import * as fs from "fs";
-import { execute, subscribe } from "graphql";
-import { makeExecutableSchema } from "graphql-tools";
-import * as http from "http";
-import { SubscriptionServer } from "subscriptions-transport-ws";
 import { Config } from "../config";
-import { Context } from "./context";
+import { createContext, Context } from "./context";
+import {
+  GraphQLDateTime
+} from 'graphql-iso-date';
 
-const schema = makeExecutableSchema<Context>({
-  typeDefs: fs.readFileSync("app.gql", "utf8"),
-  resolvers: {
-    Query: {
+const typeDefs = gql(fs.readFileSync("app.gql", "utf8"));
+const resolvers: IResolvers = {
+  Query: {
 
-    },
-    Mutation: {
+  },
+  Mutation: {
 
-    },
-    Subscription: {
+  },
+  Subscription: {
 
+  },
+  DateTime: GraphQLDateTime
+};
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: (req: any): Promise<Context> => {
+    return createContext(req.headers);
+  },
+  subscriptions: {
+    onConnect: (connectionParams, _webSocket): Promise<Context> => {
+      return createContext(connectionParams);
     },
   },
+  introspection: true,
+  playground: true,
 });
 
-const app = express();
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-const server = http.createServer(app as any);
-
-app.use("/graphql", graphqlExpress(async (_req, _res) => {
-  return {
-    schema,
-    context: {},
-  };
-}));
-app.get("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
-
-server.listen(Config.server.port, () => {
-  SubscriptionServer.create({
-    schema,
-    execute,
-    subscribe,
-    onConnect: async () => {
-      /* tslint:disable:no-empty */
-    },
-  }, {
-      server, path: "subscriptions",
-    });
+server.listen(Config.server.port).then(({ url, subscriptionsUrl }) => {
+  console.log(`Server ready at ${url} ${subscriptionsUrl}`);
 });

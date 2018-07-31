@@ -1,10 +1,12 @@
+scalar DateTime
+
 type Client{
   id: ID!
   name: String!
   url: String!
   user: ID
-  date: String!
-  update: String!
+  date: DateTime!
+  update: DateTime!
 }
 
 type History{
@@ -13,7 +15,7 @@ type History{
   title: String!
   tags: [String!]!
   text: String!
-  date: String!
+  date: DateTime!
   hash: String!
 }
 
@@ -21,7 +23,7 @@ type Msg{
   id: ID!
   receiver: ID
   text: String!
-  date: String!
+  date: DateTime!
 }
 
 type Profile{
@@ -29,8 +31,8 @@ type Profile{
   user: ID
   name: String!
   text: String!
-  date: String!
-  update: String!
+  date: DateTime!
+  update: DateTime!
   sn: String!
 }
 
@@ -48,7 +50,7 @@ enum ResDeleteFlag{
 interface ResBase{
   id: ID!
   topic: ID!
-  date: String!
+  date: DateTime!
   user: ID
   uv: Int!
   dv: Int!
@@ -60,7 +62,7 @@ interface ResBase{
 type ResNormal implements ResBase{
   id: ID!
   topic: ID!
-  date: String!
+  date: DateTime!
   user: ID
   uv: Int!
   dv: Int!
@@ -78,7 +80,7 @@ type ResNormal implements ResBase{
 type ResHistory implements ResBase{
   id: ID!
   topic: ID!
-  date: String!
+  date: DateTime!
   user: ID
   uv: Int!
   dv: Int!
@@ -92,7 +94,7 @@ type ResHistory implements ResBase{
 type ResTopic implements ResBase{
   id: ID!
   topic: ID!
-  date: String!
+  date: DateTime!
   user: ID
   uv: Int!
   dv: Int!
@@ -118,7 +120,7 @@ type ResFork implements ResBase{
 type ResDelete implements ResBase{
   id: ID!
   topic: ID!
-  date: String!
+  date: DateTime!
   user: ID
   uv: Int!
   dv: Int!
@@ -140,21 +142,21 @@ interface TokenBase{
   id: ID!
   key: String!
   user: ID!
-  date: String!
+  date: DateTime!
 }
 
 type TokenMaster implements TokenBase{
   id: ID!
   key: String!
   user: ID!
-  date: String!
+  date: DateTime!
 }
 
 type TokenGeneral implements TokenBase{
   id: ID!
   key: String!
   user: ID!
-  date: String!
+  date: DateTime!
 
   client:ID!
 }
@@ -164,8 +166,8 @@ union Token=TokenMaster|TokenGeneral
 interface TopicBase{
   id: ID!
   title: String!
-  update: String!
-  date: String!
+  update: DateTime!
+  date: DateTime!
   resCount: Int!
   active: Boolean!
 }
@@ -173,8 +175,8 @@ interface TopicBase{
 interface TopicSearchBase implements TopicBase{
   id: ID!
   title: String!
-  update: String!
-  date: String!
+  update: DateTime!
+  date: DateTime!
   resCount: Int!
   active: Boolean!
 
@@ -185,8 +187,8 @@ interface TopicSearchBase implements TopicBase{
 type TopicNormal implements TopicSearchBase{
   id: ID!
   title: String!
-  update: String!
-  date: String!
+  update: DateTime!
+  date: DateTime!
   resCount: Int!
   active: Boolean!
 
@@ -197,8 +199,8 @@ type TopicNormal implements TopicSearchBase{
 type TopicOne implements TopicSearchBase{
   id: ID!
   title: String!
-  update: String!
-  date: String!
+  update: DateTime!
+  date: DateTime!
   resCount: Int!
   active: Boolean!
 
@@ -209,8 +211,8 @@ type TopicOne implements TopicSearchBase{
 type TopicFork implements TopicSearchBase{
   id: ID!
   title: String!
-  update: String!
-  date: String!
+  update: DateTime!
+  date: DateTime!
   resCount: Int!
   active: Boolean!
 
@@ -224,8 +226,8 @@ type Storage{
   value:String!
 }
 
-input Date{
-  date:String!
+input DateQuery{
+  date:DateTime!
   type:DateType!
 }
 
@@ -249,7 +251,7 @@ type Tags{
 type Query{
   clients(id:[ID!],self:Boolean):[Client!]!
   histories(id:[ID!],topic:[ID!]):[History!]!
-  msgs(id:[ID!],date:Date,limit:Int=100):[Msg!]!
+  msgs(id:[ID!],date:DateQuery,limit:Int=100):[Msg!]!
   profiles(id:[ID!],self:Boolean):[Profile!]!
   reses(
     id:[ID!],
@@ -260,7 +262,7 @@ type Query{
     profile:ID,
     self:Boolean,
     text:String,
-    date:Date,
+    date:DateQuery,
     limit:Int=100):[Res!]!
   storages(key:[String!]):[Storage!]!
   token():Token!
