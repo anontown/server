@@ -1,10 +1,9 @@
 import { Subject } from "rxjs";
-import { AtAuthError, AtNotFoundError, AtNotFoundPartError } from "../../at-error";
-import { IAuthToken } from "../../auth";
+import { AtNotFoundError } from "../../at-error";
 import { ESClient } from "../../db";
 import { DateType } from "../../server";
 import { AuthContainer } from "../../server/auth-container";
-import { IResFindQuery, IResRepo } from "./ires-repo";
+import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
 
 export class ResRepo implements IResRepo {
@@ -24,143 +23,6 @@ export class ResRepo implements IResRepo {
       throw new AtNotFoundError("レスが存在しません");
     }
     return (await this.aggregate([{ id: res._id, body: res._source }]))[0];
-  }
-
-  async findIn(ids: string[]): Promise<Res[]> {
-    const reses = await ESClient.search<IResDB["body"]>({
-      index: "reses",
-      type: "doc",
-      size: ids.length,
-      body: {
-        query: {
-          terms: {
-            _id: ids,
-          },
-        },
-        sort: { date: { order: "desc" } },
-      },
-    });
-
-    if (reses.hits.total !== ids.length) {
-      throw new AtNotFoundPartError("レスが存在しません",
-        reses.hits.hits.map(r => r._id));
-    }
-
-    return this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
-  }
-
-  async find(
-    query: IResFindQuery,
-    authToken: IAuthToken | null,
-    type: "gt" | "gte" | "lt" | "lte",
-    date: Date,
-    limit: number): Promise<Res[]> {
-    const filter: object[] = [
-      {
-        range: {
-          date: {
-            [type]: date.toISOString(),
-          },
-        },
-      },
-    ];
-
-    if (query.topic !== undefined) {
-      filter.push({
-        term: {
-          topic: query.topic,
-        },
-      });
-    }
-
-    if (query.notice) {
-      if (authToken !== null) {
-        filter.push({
-          nested: {
-            path: "reply",
-            query: {
-              term: {
-                "reply.user": authToken.user,
-              },
-            },
-          },
-        });
-      } else {
-        throw new AtAuthError("認証が必要です");
-      }
-    }
-
-    if (query.hash !== undefined) {
-      filter.push({
-        term: {
-          hash: query.hash,
-        },
-      });
-    }
-
-    if (query.reply !== undefined) {
-      filter.push({
-        nested: {
-          path: "reply",
-          query: {
-            term: {
-              "reply.res": query.reply,
-            },
-          },
-        },
-      });
-    }
-
-    if (query.profile !== undefined) {
-      filter.push({
-        term: {
-          profile: query.profile,
-        },
-      });
-    }
-
-    if (query.self) {
-      if (authToken !== null) {
-        filter.push({
-          term: {
-            user: authToken.user,
-          },
-        });
-      } else {
-        throw new AtAuthError("認証が必要です");
-      }
-    }
-
-    if (query.text !== undefined) {
-      filter.push({
-        match: {
-          text: {
-            query: query.text,
-            operator: "and",
-            zero_terms_query: "all",
-          },
-        },
-      });
-    }
-
-    const reses = await ESClient.search<IResDB["body"]>({
-      index: "reses",
-      size: limit,
-      body: {
-        query: {
-          bool: {
-            filter,
-          },
-        },
-        sort: { date: { order: type === "gt" || type === "gte" ? "asc" : "desc" } },
-      },
-    });
-
-    const result = await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
-    if (type === "gt" || type === "gte") {
-      result.reverse();
-    }
-    return result;
   }
 
   async insert(res: Res): Promise<void> {
