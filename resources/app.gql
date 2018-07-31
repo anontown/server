@@ -276,6 +276,14 @@ input StorageQuery{
   key:[String!]
 }
 
+input TopicQuery{
+  id:[ID!]
+  title:String
+  tags:[String!]
+  activeOnly:Boolean
+  parent:ID
+}
+
 type Query{
   clients(query:ClientQuery!):[Client!]!
   histories(query:HistoryQuery!):[History!]!
@@ -285,7 +293,7 @@ type Query{
   storages(query:StorageQuery!):[Storage!]!
   token:Token!
   tokens:[Token!]!
-  topics(id:[ID!],title:String,tags:[String!],skip:Int=0,limit:Int=100,activeOnly:Boolean,parent:ID):[Topic!]!
+  topics(query:TopicQuery!,skip:Int=0,limit:Int=100):[Topic!]!
   topicTags(limit:Int=100):[Tags!]!
   userID(sn:String!):ID!
   userSN(id:ID!):String!

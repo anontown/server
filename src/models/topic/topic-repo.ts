@@ -2,7 +2,7 @@ import { CronJob } from "cron";
 import { AtNotFoundError } from "../../at-error";
 import { ESClient } from "../../db";
 import { IResRepo } from "../res";
-import { ITopicRepo } from "./itopic-repo";
+import { ITopicRepo, TopicQuery } from "./itopic-repo";
 import {
   ITopicDB,
   Topic,
@@ -54,13 +54,7 @@ export class TopicRepo implements ITopicRepo {
   }
 
   async find(
-    query: {
-      id?: string[],
-      title?: string,
-      tags?: string[],
-      activeOnly?: boolean,
-      parent?: string,
-    },
+    query: TopicQuery,
     skip: number,
     limit: number): Promise<Topic[]> {
     const filter: any[] = [];

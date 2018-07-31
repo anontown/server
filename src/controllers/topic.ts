@@ -6,6 +6,7 @@ import {
   TopicFork,
   TopicNormal,
   TopicOne,
+  TopicQuery,
 } from "../models";
 import {
   Context,
@@ -17,24 +18,14 @@ export const topicResolver = (repo: IRepo) => {
       topics: async (
         _obj: any,
         args: {
-          id?: string[],
-          title?: string,
-          tags?: string[],
+          query: TopicQuery,
           skip: number,
           limit: number,
-          activeOnly?: boolean,
-          parent?: string,
         },
         _context: Context,
         _info: any) => {
         const topic = await repo.topic
-          .find({
-            id: args.id,
-            title: args.title,
-            tags: args.tags,
-            activeOnly: args.activeOnly,
-            parent: args.parent,
-          }, args.skip, args.limit);
+          .find(args.query, args.skip, args.limit);
         return topic.map(t => t.toAPI());
       },
       topicTags: async (
