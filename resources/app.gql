@@ -28,7 +28,7 @@ type Msg{
 
 type Profile{
   id: ID!
-  user: ID
+  self: Boolean
   name: String!
   text: String!
   date: DateTime!

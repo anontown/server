@@ -42,7 +42,7 @@ describe("Profile", () => {
     it("認証あり(同一ユーザー)", () => {
       expect(profile.toAPI(auth)).toEqual({
         id: profileID,
-        user: userID,
+        self: true,
         name: "name",
         text: "text",
         date: new Date(0).toISOString(),
@@ -57,7 +57,7 @@ describe("Profile", () => {
         user: ObjectIDGenerator(),
       })).toEqual({
         id: profileID,
-        user: null,
+        self: false,
         name: "name",
         text: "text",
         date: new Date(0).toISOString(),
@@ -69,7 +69,7 @@ describe("Profile", () => {
     it("認証なし", () => {
       expect(profile.toAPI(null)).toEqual({
         id: profileID,
-        user: null,
+        self: null,
         name: "name",
         text: "text",
         date: new Date(0).toISOString(),

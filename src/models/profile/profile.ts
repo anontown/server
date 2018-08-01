@@ -17,7 +17,7 @@ export interface IProfileDB {
 
 export interface IProfileAPI {
   readonly id: string;
-  readonly user: string | null;
+  readonly self: boolean | null;
   readonly name: string;
   readonly text: string;
   readonly date: string;
@@ -93,7 +93,7 @@ export class Profile extends Copyable<Profile> {
   toAPI(authToken: IAuthToken | null): IProfileAPI {
     return {
       id: this.id,
-      user: authToken !== null && authToken.user === this.user ? this.user : null,
+      self: authToken !== null ? authToken.user === this.user : null,
       name: this.name,
       text: this.text,
       date: this.date.toISOString(),
