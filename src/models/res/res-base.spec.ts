@@ -234,7 +234,7 @@ describe("ResBase", () => {
         id: res.id,
         topic: res.topic,
         date: res.date,
-        user: false,
+        self: false,
         uv: 1,
         dv: 1,
         hash: res.hash,
