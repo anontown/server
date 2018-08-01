@@ -147,7 +147,6 @@ type TokenMaster{
   type:TokenMasterType!
   id: ID!
   key: String!
-  user: ID!
   date: DateTime!
 }
 enum TokenGeneralType{
@@ -157,7 +156,6 @@ type TokenGeneral{
   type:TokenGeneralType!
   id: ID!
   key: String!
-  user: ID!
   date: DateTime!
 
   client:ID!

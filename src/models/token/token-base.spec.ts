@@ -52,7 +52,6 @@ describe("TokenBase", () => {
     expect(token.toBaseAPI()).toEqual({
       id: "token",
       key: "key",
-      user: "user",
       date: new Date(0).toISOString(),
       type: "general",
     });

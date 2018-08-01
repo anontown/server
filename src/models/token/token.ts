@@ -45,7 +45,6 @@ export type ITokenAPI = ITokenGeneralAPI | ITokenMasterAPI;
 export interface ITokenBaseAPI<T extends TokenType> {
   readonly id: string;
   readonly key: string;
-  readonly user: string;
   readonly date: string;
   readonly type: T;
 }
@@ -87,7 +86,6 @@ export abstract class TokenBase<T extends TokenType, C extends TokenBase<T, C>> 
     return {
       id: this.id,
       key: this.key,
-      user: this.user,
       date: this.date.toISOString(),
       type: this.type,
     };
