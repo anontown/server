@@ -1,4 +1,4 @@
-import { Omit } from "./omit";
+import { Omit } from "type-zoo";
 
 export interface ID { id: string; }
 

@@ -5,5 +5,3 @@ import * as List from "./list";
 import * as Option from "./option";
 
 export { List, Option };
-
-export * from "./omit";
