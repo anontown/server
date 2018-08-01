@@ -1,6 +1,12 @@
 import { IRepo } from "./irepo";
 import DataLoader from "dataloader";
 import { AuthContainer } from "../server/auth-container";
+import { Res } from "./res";
+import { Topic } from "./topic";
+import { Profile } from "./profile";
+import { Msg } from "./msg";
+import { Client } from "./client";
+import { History } from "./history";
 
 function sort<T extends { id: string }>(ids: string[], data: T[]): (T | Error)[] {
     const map = new Map(data.map<[string, T]>(x => [x.id, x]));
@@ -14,7 +20,16 @@ function loader<T extends { id: string }>(f: (ids: string[]) => Promise<T[]>): D
     });
 }
 
-export function createLoader(repo: IRepo, auth: AuthContainer) {
+export interface Loader {
+    client: DataLoader<string, Client>;
+    history: DataLoader<string, History>;
+    msg: DataLoader<string, Msg>;
+    profile: DataLoader<string, Profile>;
+    res: DataLoader<string, Res>;
+    topic: DataLoader<string, Topic>;
+}
+
+export function createLoader(repo: IRepo, auth: AuthContainer): Loader {
     return {
         client: loader(ids => repo.client.find(auth.TokenMasterOrNull, { id: ids })),
         history: loader(ids => repo.history.find({ id: ids })),
