@@ -84,7 +84,7 @@ export interface IResBaseAPI<T extends ResAPIType> {
   readonly id: string;
   readonly topic: string;
   readonly date: Date;
-  readonly user: string | null;
+  readonly self: boolean | null;
   readonly uv: number;
   readonly dv: number;
   readonly hash: string;
@@ -201,7 +201,7 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
       id: this.id,
       topic: this.topic,
       date: this.date,
-      user: (authToken !== null && authToken.user === this.user ? this.user : null),
+      self: authToken !== null ? authToken.user === this.user : null,
       uv: this.votes.filter(x => x.value > 0).size,
       dv: this.votes.filter(x => x.value < 0).size,
       hash: this.hash,

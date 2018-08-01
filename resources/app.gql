@@ -54,7 +54,7 @@ type ResNormal{
   id: ID!
   topic: ID!
   date: DateTime!
-  user: ID
+  self: Boolean
   uv: Int!
   dv: Int!
   hash: String!
@@ -75,7 +75,7 @@ type ResHistory{
   id: ID!
   topic: ID!
   date: DateTime!
-  user: ID
+  self: Boolean
   uv: Int!
   dv: Int!
   hash: String!
@@ -92,7 +92,7 @@ type ResTopic{
   id: ID!
   topic: ID!
   date: DateTime!
-  user: ID
+  self: Boolean
   uv: Int!
   dv: Int!
   hash: String!
@@ -107,7 +107,7 @@ type ResFork{
   id: ID!
   topic: ID!
   date: String!
-  user: ID
+  self: Boolean
   uv: Int!
   dv: Int!
   hash: String!
@@ -124,7 +124,7 @@ type ResDelete{
   id: ID!
   topic: ID!
   date: DateTime!
-  user: ID
+  self: Boolean
   uv: Int!
   dv: Int!
   hash: String!
