@@ -1,12 +1,6 @@
 import { IRepo } from "./irepo";
 import DataLoader from "dataloader";
 import { AuthContainer } from "../server/auth-container";
-import { Client } from "./client";
-import { History } from "./history";
-import { Msg } from "./msg";
-import { Profile } from "./profile/index";
-import { Res } from "./res/res";
-import { Topic } from "./topic/topic";
 
 function sort<T extends { id: string }>(ids: string[], data: T[]): (T | Error)[] {
     const map = new Map(data.map<[string, T]>(x => [x.id, x]));
