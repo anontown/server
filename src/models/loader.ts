@@ -1,12 +1,12 @@
-import { IRepo } from "./irepo";
 import DataLoader from "dataloader";
 import { AuthContainer } from "../server/auth-container";
-import { Res } from "./res";
-import { Topic } from "./topic";
-import { Profile } from "./profile";
-import { Msg } from "./msg";
 import { Client } from "./client";
 import { History } from "./history";
+import { IRepo } from "./irepo";
+import { Msg } from "./msg";
+import { Profile } from "./profile";
+import { Res } from "./res";
+import { Topic } from "./topic";
 
 function sort<T extends { id: string }>(ids: string[], data: T[]): (T | Error)[] {
     const map = new Map(data.map<[string, T]>(x => [x.id, x]));

@@ -1,6 +1,6 @@
 import { AtAuthError } from "../at-error";
 import { Logger } from "../logger";
-import { IRepo, Loader, createLoader } from "../models";
+import { createLoader, IRepo, Loader } from "../models";
 import { AuthContainer } from "./auth-container";
 import * as authFromApiParam from "./auth-from-api-param";
 
@@ -9,7 +9,7 @@ export interface Context {
   ip: string;
   now: Date;
   log: (name: string, id: string) => void;
-  loader: Loader
+  loader: Loader;
 }
 
 async function createUser(raw: any, repo: IRepo) {
@@ -56,10 +56,10 @@ export async function createContext(headers: any, repo: IRepo): Promise<Context>
   const auth = new AuthContainer(token, user, recaptcha);
 
   return {
-    auth: auth,
+    auth,
     ip,
     now: new Date(),
     log: (name, id) => Logger.app.info(ip, name, id),
-    loader: createLoader(repo, auth)
+    loader: createLoader(repo, auth),
   };
 }
