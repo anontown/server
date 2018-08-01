@@ -10,3 +10,4 @@ export * from "./storage";
 export * from "./irepo";
 export * from "./repo";
 export * from "./repo-mock";
+export * from "./loader";
