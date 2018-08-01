@@ -8,6 +8,7 @@ import {
 } from "./models";
 import { serverRun } from "./server";
 
+/* tslint:disable:no-floating-promises */
 (async () => {
   // フォルダ作成
   try {
@@ -24,5 +25,5 @@ import { serverRun } from "./server";
 
   await createDB();
 
-  serverRun(new Repo());
+  await serverRun(new Repo());
 })();

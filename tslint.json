@@ -34,8 +34,8 @@
       true,
       "array"
     ],
-    "strict-type-predicates": true
+    "strict-type-predicates": true,
+    "no-floating-promises": true
   },
-  "rulesDirectory": [],
-  "no-floating-promises": true
+  "rulesDirectory": []
 }

@@ -9,7 +9,7 @@ import * as controllers from "../controllers";
 import { IRepo } from "../models";
 import { Context, createContext } from "./context";
 
-export function serverRun(repo: IRepo) {
+export async function serverRun(repo: IRepo) {
   const typeDefs = gql(fs.readFileSync("resources/app.gql", "utf8"));
   const resolvers: IResolvers = combineResolvers([
     {
@@ -57,7 +57,7 @@ export function serverRun(repo: IRepo) {
     },
   });
 
-  server.listen(Config.server.port).then(({ url, subscriptionsUrl }) => {
+  await server.listen(Config.server.port).then(({ url, subscriptionsUrl }) => {
     console.log(`Server ready at ${url} ${subscriptionsUrl}`);
   });
 }

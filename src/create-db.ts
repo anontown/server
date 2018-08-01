@@ -216,7 +216,7 @@ updateFunc.push((async () => {
   await storages.createIndex({ client: 1, user: 1, key: 1 }, { unique: true });
 
   // ユニークインデックス削除
-  db.collection("tokens").dropIndexes();
+  await db.collection("tokens").dropIndexes();
 
   const tokenIDs = (await fs.readdir("./storage"))
     .map(x => {
