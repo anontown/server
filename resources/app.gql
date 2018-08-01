@@ -4,7 +4,7 @@ type Client{
   id: ID!
   name: String!
   url: String!
-  user: ID
+  self: Boolean
   date: DateTime!
   update: DateTime!
 }

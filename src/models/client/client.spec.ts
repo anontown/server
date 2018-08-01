@@ -252,7 +252,7 @@ describe("Client", () => {
         id: clientID,
         name: "name",
         url: "http://hoge.com",
-        user: userID,
+        self: true,
         date: new Date(0).toISOString(),
         update: new Date(100).toISOString(),
       });
@@ -266,7 +266,7 @@ describe("Client", () => {
         id: clientID,
         name: "name",
         url: "http://hoge.com",
-        user: null,
+        self: false,
         date: new Date(0).toISOString(),
         update: new Date(100).toISOString(),
       });
@@ -277,7 +277,7 @@ describe("Client", () => {
         id: clientID,
         name: "name",
         url: "http://hoge.com",
-        user: null,
+        self: null,
         date: new Date(0).toISOString(),
         update: new Date(100).toISOString(),
       });

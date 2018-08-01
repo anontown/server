@@ -18,7 +18,7 @@ export interface IClientAPI {
   readonly id: string;
   readonly name: string;
   readonly url: string;
-  readonly user: string | null;
+  readonly self: boolean | null;
   readonly date: string;
   readonly update: string;
 }
@@ -84,7 +84,7 @@ export class Client extends Copyable<Client> {
       id: this.id,
       name: this.name,
       url: this.url,
-      user: authToken !== null && authToken.user === this.user ? this.user : null,
+      self: authToken !== null ? authToken.user === this.user : null,
       date: this.date.toISOString(),
       update: this.update.toISOString(),
     };
