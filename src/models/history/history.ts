@@ -19,7 +19,7 @@ export interface IHistoryDB {
 
 export interface IHistoryAPI {
   readonly id: string;
-  readonly topic: string;
+  readonly topicID: string;
   readonly title: string;
   readonly tags: string[];
   readonly text: string;
@@ -56,13 +56,13 @@ export class History extends Copyable<History> {
   }
 
   constructor(readonly id: string,
-              readonly topic: string,
-              readonly title: string,
-              readonly tags: Im.List<string>,
-              readonly text: string,
-              readonly date: Date,
-              readonly hash: string,
-              readonly user: string) {
+    readonly topic: string,
+    readonly title: string,
+    readonly tags: Im.List<string>,
+    readonly text: string,
+    readonly date: Date,
+    readonly hash: string,
+    readonly user: string) {
     super(History);
   }
 
@@ -84,7 +84,7 @@ export class History extends Copyable<History> {
   toAPI(): IHistoryAPI {
     return {
       id: this.id,
-      topic: this.topic,
+      topicID: this.topic,
       title: this.title,
       tags: this.tags.toArray(),
       text: this.text,

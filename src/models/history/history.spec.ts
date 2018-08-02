@@ -105,7 +105,7 @@ describe("History", () => {
       it("正常に変換できるか", () => {
         expect(history.toAPI()).toEqual({
           id: "history",
-          topic: "topic",
+          topicID: "topic",
           title: "title",
           tags: ["x"],
           text: "text",

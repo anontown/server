@@ -11,7 +11,7 @@ type Client{
 
 type History{
   id: ID!
-  topic: ID!
+  topic: TopicNormal!
   title: String!
   tags: [String!]!
   text: String!

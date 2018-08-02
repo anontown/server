@@ -1,5 +1,5 @@
 import {
-  HistoryQuery, IRepo,
+  HistoryQuery, IRepo, IHistoryAPI,
 } from "../models";
 import {
   Context,
@@ -19,5 +19,15 @@ export const historyResolver = (repo: IRepo) => {
         return histories.map(x => x.toAPI());
       },
     },
+    History: {
+      topic: async (
+        history: IHistoryAPI,
+        args: {},
+        context: Context,
+        _info: any) => {
+        const topic = await context.loader.topic.load(history.topicID);
+        return topic.toAPI();
+      },
+    }
   };
 };
