@@ -114,7 +114,7 @@ type ResFork{
   replyCount: Int!
   voteFlag: VoteFlag
 
-  fork: TopicNormal!
+  fork: TopicFork!
 }
 enum ResDeleteType{
   delete
