@@ -64,7 +64,7 @@ export interface ITopicOneAPI extends ITopicSearchBaseAPI<"one"> {
 }
 
 export interface ITopicForkAPI extends ITopicBaseAPI<"fork"> {
-  readonly parent: string;
+  readonly parentID: string;
 }
 
 export type TopicSearchType = "one" | "normal";
@@ -433,7 +433,7 @@ export class TopicFork extends Copyable<TopicFork> implements TopicBase<"fork", 
   toAPI(): ITopicForkAPI {
     return {
       ...this.toBaseAPI(),
-      parent: this.parent,
+      parentID: this.parent,
     };
   }
 }

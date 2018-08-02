@@ -7,6 +7,7 @@ import {
   TopicNormal,
   TopicOne,
   TopicQuery,
+  ITopicForkAPI,
 } from "../models";
 import {
   Context,
@@ -184,5 +185,15 @@ export const topicResolver = (repo: IRepo) => {
         }
       },
     },
+    TopicFork: {
+      parent: async (
+        token: ITopicForkAPI,
+        _args: {},
+        context: Context,
+        _info: any) => {
+        const parent = await context.loader.topic.load(token.parentID);
+        return parent.toAPI();
+      },
+    }
   };
 };

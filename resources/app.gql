@@ -206,7 +206,7 @@ type TopicFork{
   resCount: Int!
   active: Boolean!
 
-  parent:ID!
+  parent:TopicNormal!
 }
 
 union Topic=TopicNormal|TopicOne|TopicFork
