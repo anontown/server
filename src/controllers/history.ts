@@ -22,7 +22,7 @@ export const historyResolver = (repo: IRepo) => {
     History: {
       topic: async (
         history: IHistoryAPI,
-        args: {},
+        _args: {},
         context: Context,
         _info: any) => {
         const topic = await context.loader.topic.load(history.topicID);
