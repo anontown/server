@@ -9,6 +9,7 @@ import {
   ResQuery,
   IResNormalAPI,
   IResHistoryAPI,
+  IResForkAPI,
 } from "../models";
 import {
   Context,
@@ -218,6 +219,16 @@ export const resResolver = (repo: IRepo) => {
         const history = await context.loader.history.load(res.historyID);
         return history.toAPI();
       },
-    }
+    },
+    ResFork: {
+      fork: async (
+        res: IResForkAPI,
+        _args: {},
+        context: Context,
+        _info: any) => {
+        const fork = await context.loader.topic.load(res.forkID);
+        return fork.toAPI();
+      },
+    },
   };
 };
