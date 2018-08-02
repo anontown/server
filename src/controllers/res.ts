@@ -8,6 +8,7 @@ import {
   ResNormal,
   ResQuery,
   IResNormalAPI,
+  IResHistoryAPI,
 } from "../models";
 import {
   Context,
@@ -206,6 +207,16 @@ export const resResolver = (repo: IRepo) => {
         } else {
           return null;
         }
+      },
+    },
+    ResHistory: {
+      history: async (
+        res: IResHistoryAPI,
+        _args: {},
+        context: Context,
+        _info: any) => {
+        const history = await context.loader.history.load(res.historyID);
+        return history.toAPI();
       },
     }
   };

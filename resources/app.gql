@@ -82,7 +82,7 @@ type ResHistory{
   replyCount: Int!
   voteFlag: VoteFlag
 
-  history: ID!
+  history: History!
 }
 enum ResTopicType{
   topic
