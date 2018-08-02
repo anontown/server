@@ -72,7 +72,7 @@ describe("TokenMaster", () => {
     it("正常に変換出来るか", () => {
       expect(token.toAPI()).toEqual({
         ...token.toBaseAPI(),
-        client: clientID,
+        clientID: clientID,
       });
     });
   });

@@ -53,7 +53,7 @@ export interface ITokenMasterAPI extends ITokenBaseAPI<"master"> {
 }
 
 export interface ITokenGeneralAPI extends ITokenBaseAPI<"general"> {
-  readonly client: string;
+  readonly clientID: string;
 }
 
 export type Token = TokenMaster | TokenGeneral;
@@ -184,7 +184,7 @@ export class TokenGeneral extends Copyable<TokenGeneral> implements TokenBase<"g
   toAPI(): ITokenGeneralAPI {
     return {
       ...this.toBaseAPI(),
-      client: this.client,
+      clientID: this.client,
     };
   }
 

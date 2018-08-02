@@ -5,6 +5,7 @@ import {
   ITokenAPI,
   TokenGeneral,
   TokenMaster,
+  ITokenGeneralAPI,
 } from "../models";
 import {
   Context,
@@ -106,5 +107,15 @@ export const tokenResolver = (repo: IRepo) => {
         }
       },
     },
+    TokenGeneral: {
+      client: async (
+        token: ITokenGeneralAPI,
+        _args: {},
+        context: Context,
+        _info: any) => {
+        const client = await context.loader.client.load(token.clientID);
+        return client.toAPI(context.auth.TokenMasterOrNull);
+      },
+    }
   };
 };

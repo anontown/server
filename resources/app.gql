@@ -158,7 +158,7 @@ type TokenGeneral{
   key: String!
   date: DateTime!
 
-  client:ID!
+  client:Client!
 }
 
 union Token=TokenMaster|TokenGeneral
