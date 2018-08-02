@@ -158,7 +158,7 @@ describe("ResBase", () => {
       const api = res.toBaseAPI(null);
       expect(api).toEqual({
         id: res.id,
-        topic: res.topic,
+        topicID: res.topic,
         date: res.date,
         self: null,
         uv: 0,
@@ -174,7 +174,7 @@ describe("ResBase", () => {
       const api = res.toBaseAPI(token);
       expect(api).toEqual({
         id: res.id,
-        topic: res.topic,
+        topicID: res.topic,
         date: res.date,
         self: true,
         uv: 0,
@@ -192,7 +192,7 @@ describe("ResBase", () => {
       }).toBaseAPI({ ...token, user: "user1" });
       expect(api).toEqual({
         id: res.id,
-        topic: res.topic,
+        topicID: res.topic,
         date: res.date,
         self: false,
         uv: 0,
@@ -212,7 +212,7 @@ describe("ResBase", () => {
 
       expect(api).toEqual({
         id: res.id,
-        topic: res.topic,
+        topicID: res.topic,
         date: res.date,
         self: false,
         uv: 1,
@@ -232,7 +232,7 @@ describe("ResBase", () => {
 
       expect(api).toEqual({
         id: res.id,
-        topic: res.topic,
+        topicID: res.topic,
         date: res.date,
         self: false,
         uv: 1,

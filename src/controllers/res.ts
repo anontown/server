@@ -172,6 +172,14 @@ export const resResolver = (repo: IRepo) => {
             return "ResDelete";
         }
       },
+      topic: async (
+        res: IResAPI,
+        _args: {},
+        context: Context,
+        _info: any) => {
+        const topic = await context.loader.topic.load(res.topicID);
+        return topic.toAPI();
+      },
     },
   };
 };
