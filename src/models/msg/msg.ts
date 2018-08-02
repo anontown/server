@@ -15,7 +15,7 @@ export interface IMsgDB {
 
 export interface IMsgAPI {
   readonly id: string;
-  readonly receiver: string | null;
+  readonly priv: boolean;
   readonly text: string;
   readonly date: string;
 }
@@ -58,7 +58,7 @@ export class Msg extends Copyable<Msg> {
 
     return {
       id: this.id,
-      receiver: this.receiver,
+      priv: this.receiver !== null,
       text: this.text,
       date: this.date.toISOString(),
     };

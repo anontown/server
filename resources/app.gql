@@ -21,7 +21,7 @@ type History{
 
 type Msg{
   id: ID!
-  receiver: ID
+  priv: Boolean
   text: String!
   date: DateTime!
 }

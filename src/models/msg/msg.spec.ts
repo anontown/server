@@ -32,7 +32,7 @@ describe("Msg", () => {
     it("正常に変換出来るか", () => {
       expect(msg.toAPI(auth)).toEqual({
         id: "msg",
-        receiver: "user",
+        priv: true,
         text: "text",
         date: new Date(0).toISOString(),
       });
@@ -41,7 +41,7 @@ describe("Msg", () => {
     it("receiverがnull", () => {
       expect(receiverNullMsg.toAPI(auth)).toEqual({
         id: "msg",
-        receiver: null,
+        priv: false,
         text: "text",
         date: new Date(0).toISOString(),
       });
