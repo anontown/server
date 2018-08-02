@@ -52,7 +52,7 @@ enum ResNormalType{
 type ResNormal{
   type:ResNormalType!
   id: ID!
-  topic: ID!
+  topic: Topic!
   date: DateTime!
   self: Boolean
   uv: Int!
@@ -73,7 +73,7 @@ enum ResHistoryType{
 type ResHistory{
   type:ResHistoryType!
   id: ID!
-  topic: ID!
+  topic: Topic!
   date: DateTime!
   self: Boolean
   uv: Int!
@@ -90,7 +90,7 @@ enum ResTopicType{
 type ResTopic{
   type:ResTopicType!
   id: ID!
-  topic: ID!
+  topic: Topic!
   date: DateTime!
   self: Boolean
   uv: Int!
@@ -105,7 +105,7 @@ enum ResForkType{
 type ResFork{
   type:ResForkType!
   id: ID!
-  topic: ID!
+  topic: Topic!
   date: String!
   self: Boolean
   uv: Int!
@@ -122,7 +122,7 @@ enum ResDeleteType{
 type ResDelete{
   type:ResDeleteType!
   id: ID!
-  topic: ID!
+  topic: Topic!
   date: DateTime!
   self: Boolean
   uv: Int!
