@@ -63,8 +63,8 @@ type ResNormal{
 
   name: String
   text: String!
-  reply: ID
-  profile: ID
+  reply: Res
+  profile: Profile
   isReply: Boolean
 }
 enum ResHistoryType{

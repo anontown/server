@@ -96,20 +96,20 @@ export interface IResBaseAPI<T extends ResAPIType> {
 export interface IResNormalAPI extends IResBaseAPI<"normal"> {
   readonly name: string | null;
   readonly text: string;
-  readonly reply: string | null;
-  readonly profile: string | null;
+  readonly replyID: string | null;
+  readonly profileID: string | null;
   readonly isReply: boolean | null;
 }
 
 export interface IResHistoryAPI extends IResBaseAPI<"history"> {
-  readonly history: string;
+  readonly historyID: string;
 }
 
 export interface IResTopicAPI extends IResBaseAPI<"topic"> {
 }
 
 export interface IResForkAPI extends IResBaseAPI<"fork"> {
-  readonly fork: string;
+  readonly forkID: string;
 }
 
 export interface IResDeleteAPI extends IResBaseAPI<"delete"> {
@@ -336,8 +336,8 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
         ...this.toBaseAPI(authToken),
         name: this.name,
         text: this.text,
-        reply: this.reply !== null ? this.reply.res : null,
-        profile: this.profile !== null ? this.profile : null,
+        replyID: this.reply !== null ? this.reply.res : null,
+        profileID: this.profile !== null ? this.profile : null,
         isReply: authToken === null || this.reply === null ? null : authToken.user === this.reply.user,
       };
     } else {
@@ -430,7 +430,7 @@ export class ResHistory extends Copyable<ResHistory> implements ResBase<"history
   toAPI(authToken: IAuthToken | null): IResHistoryAPI {
     return {
       ...this.toBaseAPI(authToken),
-      history: this.history,
+      historyID: this.history,
     };
   }
 }
@@ -558,7 +558,7 @@ export class ResFork extends Copyable<ResFork> implements ResBase<"fork", ResFor
   toAPI(authToken: IAuthToken | null): IResForkAPI {
     return {
       ...this.toBaseAPI(authToken),
-      fork: this.fork,
+      forkID: this.fork,
     };
   }
 }

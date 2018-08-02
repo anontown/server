@@ -121,7 +121,7 @@ describe("ResFork", () => {
 
   describe("toAPI", () => {
     it("正常に変換出来るか", () => {
-      expect(resFork.toAPI(token)).toEqual({ ...resFork.toBaseAPI(token), fork: "topicfork" });
+      expect(resFork.toAPI(token)).toEqual({ ...resFork.toBaseAPI(token), forkID: "topicfork" });
     });
   });
 });

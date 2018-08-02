@@ -124,7 +124,7 @@ describe("ResHistory", () => {
 
       expect(api).toEqual({
         ...resHistory.toBaseAPI(null),
-        history: resHistory.history,
+        historyID: resHistory.history,
       });
     });
   });

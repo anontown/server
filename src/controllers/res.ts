@@ -7,6 +7,7 @@ import {
   Res,
   ResNormal,
   ResQuery,
+  IResNormalAPI,
 } from "../models";
 import {
   Context,
@@ -181,5 +182,31 @@ export const resResolver = (repo: IRepo) => {
         return topic.toAPI();
       },
     },
+    ResNormal: {
+      reply: async (
+        res: IResNormalAPI,
+        _args: {},
+        context: Context,
+        _info: any) => {
+        if (res.replyID !== null) {
+          const reply = await context.loader.res.load(res.replyID);
+          return reply.toAPI(context.auth.tokenOrNull);
+        } else {
+          return null;
+        }
+      },
+      profile: async (
+        res: IResNormalAPI,
+        _args: {},
+        context: Context,
+        _info: any) => {
+        if (res.profileID !== null) {
+          const profile = await context.loader.profile.load(res.profileID);
+          return profile.toAPI(context.auth.tokenOrNull);
+        } else {
+          return null;
+        }
+      },
+    }
   };
 };

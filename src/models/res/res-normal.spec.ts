@@ -360,8 +360,8 @@ describe("ResNormal", () => {
           ...resNormal.toBaseAPI(null),
           name: resNormal.name,
           text: resNormal.text,
-          reply: "replyres",
-          profile: resNormal.profile,
+          replyID: "replyres",
+          profileID: resNormal.profile,
           isReply: null,
         });
       });
