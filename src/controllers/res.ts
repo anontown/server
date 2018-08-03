@@ -16,6 +16,17 @@ import {
 } from "../server";
 import { pubsub, RES_ADDED } from "../server/pubsub";
 
+const resProps = {
+  topic: async (
+    res: IResAPI,
+    _args: {},
+    context: Context,
+    _info: any) => {
+    const topic = await context.loader.topic.load(res.topicID);
+    return topic.toAPI();
+  }
+};
+
 export const resResolver = (repo: IRepo) => {
   repo.res.insertEvent.subscribe(data => {
     pubsub.publish(RES_ADDED, data);
@@ -175,16 +186,9 @@ export const resResolver = (repo: IRepo) => {
             return "ResDelete";
         }
       },
-      topic: async (
-        res: IResAPI,
-        _args: {},
-        context: Context,
-        _info: any) => {
-        const topic = await context.loader.topic.load(res.topicID);
-        return topic.toAPI();
-      },
     },
     ResNormal: {
+      ...resProps,
       reply: async (
         res: IResNormalAPI,
         _args: {},
@@ -211,6 +215,7 @@ export const resResolver = (repo: IRepo) => {
       },
     },
     ResHistory: {
+      ...resProps,
       history: async (
         res: IResHistoryAPI,
         _args: {},
@@ -220,7 +225,11 @@ export const resResolver = (repo: IRepo) => {
         return history.toAPI();
       },
     },
+    ResTopic: {
+      ...resProps
+    },
     ResFork: {
+      ...resProps,
       fork: async (
         res: IResForkAPI,
         _args: {},
@@ -230,5 +239,8 @@ export const resResolver = (repo: IRepo) => {
         return fork.toAPI();
       },
     },
+    ResDelete: {
+      ...resProps
+    }
   };
 };
