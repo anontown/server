@@ -9,6 +9,13 @@ import {
 } from "../../";
 
 function run(repoGene: () => IClientRepo, isReset: boolean) {
+  const client = new Client(ObjectIDGenerator(),
+    "name",
+    "https://hoge.com",
+    ObjectIDGenerator(),
+    new Date(0),
+    new Date(100));
+
   beforeEach(async () => {
     if (isReset) {
       await dbReset();
@@ -17,13 +24,6 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
   describe("findOne", () => {
     it("正常に探せるか", async () => {
       const repo = repoGene();
-
-      const client = new Client(ObjectIDGenerator(),
-        "name",
-        "https://hoge.com",
-        ObjectIDGenerator(),
-        new Date(0),
-        new Date(10));
 
       await repo.insert(client);
       await repo.insert(client.copy({ id: ObjectIDGenerator() }));
@@ -48,13 +48,6 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
   describe("find", () => {
     it("正常に検索出来るか", async () => {
       const repo = repoGene();
-
-      const client = new Client(ObjectIDGenerator(),
-        "name",
-        "https://hoge.com",
-        ObjectIDGenerator(),
-        new Date(0),
-        new Date(100));
 
       const user1 = ObjectIDGenerator();
       const user2 = ObjectIDGenerator();
@@ -118,13 +111,6 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
     it("正常に保存出来るか", async () => {
       const repo = repoGene();
 
-      const client = new Client(ObjectIDGenerator(),
-        "name",
-        "https://hoge.com",
-        ObjectIDGenerator(),
-        new Date(0),
-        new Date(10));
-
       await repo.insert(client);
 
       expect(await repo.findOne(client.id)).toEqual(client);
@@ -136,13 +122,6 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
   describe("update", () => {
     it("正常に更新出来るか", async () => {
       const repo = repoGene();
-
-      const client = new Client(ObjectIDGenerator(),
-        "name",
-        "https://hoge.com",
-        ObjectIDGenerator(),
-        new Date(0),
-        new Date(10));
 
       const client1 = client.copy({ id: ObjectIDGenerator(), name: "client1" });
       const client2 = client.copy({ id: ObjectIDGenerator(), name: "client2" });
