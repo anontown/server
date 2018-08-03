@@ -17,11 +17,14 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
     }
   });
 
+  const client = ObjectIDGenerator();
+  const user = ObjectIDGenerator();
+  const key = "key";
+  const storage = new Storage(client, user, key, "value");
+
   describe("findOneKey", () => {
     it("正常に検索出来るか", async () => {
       const repo = repoGene();
-
-      const storage = new Storage(null, ObjectIDGenerator(), "key", "value");
 
       const client1 = ObjectIDGenerator();
       const client2 = ObjectIDGenerator();
@@ -104,10 +107,6 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
     it("存在しない時エラーになるか(通常トークン)", async () => {
       const repo = repoGene();
 
-      const client = ObjectIDGenerator();
-      const user = ObjectIDGenerator();
-      const key = "key";
-
       const authGeneral: IAuthTokenGeneral = {
         id: ObjectIDGenerator(),
         key: "tk",
@@ -122,8 +121,6 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
         user,
         type: "master",
       };
-
-      const storage = new Storage(client, user, key, "value");
 
       await repo.save(storage);
 
@@ -228,11 +225,6 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
     it("新しく作れるか", async () => {
       const repo = repoGene();
 
-      const client = ObjectIDGenerator();
-      const user = ObjectIDGenerator();
-      const key = "key";
-
-      const storage = new Storage(client, user, key, "value");
       await repo.save(storage);
 
       const authGeneral: IAuthTokenGeneral = {
@@ -249,14 +241,9 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
     it("更新出来るか", async () => {
       const repo = repoGene();
 
-      const client = ObjectIDGenerator();
-      const user = ObjectIDGenerator();
-      const key = "key";
-
-      const storage = new Storage(client, user, key, "value");
       await repo.save(storage);
 
-      const storageUpdate = new Storage(client, user, key, "value2");
+      const storageUpdate = storage.copy({ value: "value2" });
       await repo.save(storageUpdate);
 
       const authGeneral: IAuthTokenGeneral = {
@@ -275,11 +262,6 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
     it("正常に削除出来るか", async () => {
       const repo = repoGene();
 
-      const client = ObjectIDGenerator();
-      const user = ObjectIDGenerator();
-      const key = "key";
-
-      const storage = new Storage(client, user, key, "value");
       await repo.save(storage);
       await repo.del(storage);
 
@@ -299,8 +281,6 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
     it("正常に列挙出来るか", async () => {
       const repo = repoGene();
 
-      const client = ObjectIDGenerator();
-      const user = ObjectIDGenerator();
 
       const storage = new Storage(client, user, "key", "value");
       await repo.save(storage.copy({ key: "a" }));
