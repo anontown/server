@@ -1,4 +1,4 @@
-import DataLoader from "dataloader";
+import * as DataLoader from "dataloader";
 import { AuthContainer } from "../server/auth-container";
 import { Client } from "./client";
 import { History } from "./history";
