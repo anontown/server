@@ -15,17 +15,18 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       await dbReset();
     }
   });
+
+  const profile = new Profile(ObjectIDGenerator(),
+    ObjectIDGenerator(),
+    "name",
+    "text",
+    new Date(0),
+    new Date(10),
+    "sn");
+
   describe("findOne", () => {
     it("正常に探せるか", async () => {
       const repo = repoGene();
-
-      const profile = new Profile(ObjectIDGenerator(),
-        ObjectIDGenerator(),
-        "name",
-        "text",
-        new Date(0),
-        new Date(10),
-        "sn");
 
       await repo.insert(profile);
       await repo.insert(profile.copy({ id: ObjectIDGenerator(), sn: "sn2" }));
@@ -51,14 +52,6 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
   describe("find", () => {
     it("正常に探せるか", async () => {
       const repo = repoGene();
-
-      const profile = new Profile(ObjectIDGenerator(),
-        ObjectIDGenerator(),
-        "name",
-        "text",
-        new Date(0),
-        new Date(10),
-        "sn");
 
       const user1 = ObjectIDGenerator();
       const user2 = ObjectIDGenerator();
@@ -138,14 +131,6 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
     it("正常に保存出来るか", async () => {
       const repo = repoGene();
 
-      const profile = new Profile(ObjectIDGenerator(),
-        ObjectIDGenerator(),
-        "name",
-        "text",
-        new Date(0),
-        new Date(10),
-        "sn");
-
       await repo.insert(profile);
 
       expect(await repo.findOne(profile.id)).toEqual(profile);
@@ -153,14 +138,6 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
 
     it("sn被りでエラーになるか", async () => {
       const repo = repoGene();
-
-      const profile = new Profile(ObjectIDGenerator(),
-        ObjectIDGenerator(),
-        "name",
-        "text",
-        new Date(0),
-        new Date(10),
-        "sn");
 
       const profile2 = profile.copy({ id: ObjectIDGenerator() });
 
@@ -174,14 +151,6 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
   describe("update", () => {
     it("正常に更新出来るか", async () => {
       const repo = repoGene();
-
-      const profile = new Profile(ObjectIDGenerator(),
-        ObjectIDGenerator(),
-        "name",
-        "text",
-        new Date(0),
-        new Date(10),
-        "sn");
 
       const profile1 = profile.copy({ id: ObjectIDGenerator(), sn: "sn1" });
       const profile2 = profile.copy({ id: ObjectIDGenerator(), sn: "sn2" });
@@ -202,14 +171,6 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
 
     it("sn被りでエラーになるか", async () => {
       const repo = repoGene();
-
-      const profile = new Profile(ObjectIDGenerator(),
-        ObjectIDGenerator(),
-        "name",
-        "text",
-        new Date(0),
-        new Date(10),
-        "sn");
 
       const profile1 = profile.copy({ id: ObjectIDGenerator(), sn: "sn1" });
       const profile2 = profile.copy({ id: ObjectIDGenerator(), sn: "sn2" });
