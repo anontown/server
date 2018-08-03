@@ -14,14 +14,15 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       await dbReset();
     }
   });
+
+  const msg = new Msg("msg",
+    "user",
+    "text",
+    new Date(0));
+
   describe("findOne", () => {
     it("正常に探せるか", async () => {
       const repo = repoGene();
-
-      const msg = new Msg("msg",
-        "user",
-        "text",
-        new Date(0));
 
       await repo.insert(msg);
       await repo.insert(msg.copy({ id: "msg2" }));
@@ -44,11 +45,6 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
   describe("find", () => {
     it("正常に検索出来るか", async () => {
       const repo = repoGene();
-
-      const msg = new Msg("msg",
-        "user",
-        "text",
-        new Date(0));
 
       const user1 = "user1";
       const user2 = "user2";
@@ -207,11 +203,6 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
     it("正常に保存出来るか", async () => {
       const repo = repoGene();
 
-      const msg = new Msg("msg",
-        "user",
-        "text",
-        new Date(0));
-
       await repo.insert(msg);
 
       expect(await repo.findOne(msg.id)).toEqual(msg);
@@ -223,11 +214,6 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
   describe("update", () => {
     it("正常に更新出来るか", async () => {
       const repo = repoGene();
-
-      const msg = new Msg("msg",
-        "user",
-        "text",
-        new Date(0));
 
       const msg1 = msg.copy({ id: "msg1" });
       const msg2 = msg.copy({ id: "msg2" });
