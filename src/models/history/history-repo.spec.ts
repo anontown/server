@@ -14,18 +14,19 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
       await dbReset();
     }
   });
+
+  const history = new History("history",
+    "topic",
+    "title",
+    Im.List(["x"]),
+    "text",
+    new Date(0),
+    "hash",
+    "user");
+
   describe("findOne", () => {
     it("正常に探せるか", async () => {
       const repo = repoGene();
-
-      const history = new History("history",
-        "topic",
-        "title",
-        Im.List(["x"]),
-        "text",
-        new Date(0),
-        "hash",
-        "user");
 
       await repo.insert(history);
       await repo.insert(history.copy({ id: "topic2" }));
@@ -52,15 +53,6 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
   describe("find", () => {
     it("正常に検索出来るか", async () => {
       const repo = repoGene();
-
-      const history = new History("history",
-        "topic",
-        "title",
-        Im.List(["x"]),
-        "text",
-        new Date(0),
-        "hash",
-        "user");
 
       const history1 = history.copy({ id: "history1", topic: "topic1", date: new Date(50) });
       const history2 = history.copy({ id: "history2", topic: "topic1", date: new Date(80) });
@@ -117,15 +109,6 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
     it("正常に保存出来るか", async () => {
       const repo = repoGene();
 
-      const history = new History("history",
-        "topic",
-        "title",
-        Im.List(["x"]),
-        "text",
-        new Date(0),
-        "hash",
-        "user");
-
       await repo.insert(history);
 
       expect(await repo.findOne(history.id)).toEqual(history);
@@ -137,15 +120,6 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
   describe("update", () => {
     it("正常に更新出来るか", async () => {
       const repo = repoGene();
-
-      const history = new History("history",
-        "topic",
-        "title",
-        Im.List(["x"]),
-        "text",
-        new Date(0),
-        "hash",
-        "user");
 
       const history1 = history.copy({ id: "history1" });
       const history2 = history.copy({ id: "history2" });
