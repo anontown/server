@@ -40,10 +40,4 @@ export class StorageRepoMock implements IStorageRepo {
       && x.key === storage.key);
     this.storages.splice(index, 1);
   }
-  async list(token: IAuthToken): Promise<string[]> {
-    return this.storages
-      .filter(x => x.user.toHexString() === token.user
-        && (x.client !== null ? x.client.toHexString() : null) === (token.type === "general" ? token.client : null))
-      .map(x => x.key);
-  }
 }

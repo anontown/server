@@ -54,14 +54,4 @@ export class StorageRepo implements IStorageRepo {
         key: storage.key,
       });
   }
-  async list(token: IAuthToken): Promise<string[]> {
-    const db = await DB;
-    const ls: IStorageDB[] = await db.collection("storages")
-      .find({
-        user: new ObjectID(token.user),
-        client: token.type === "general" ? new ObjectID(token.client) : null,
-      })
-      .toArray();
-    return ls.map(s => s.key);
-  }
 }

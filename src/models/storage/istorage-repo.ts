@@ -10,5 +10,4 @@ export interface IStorageRepo {
   find(token: IAuthToken, query: StorageQuery): Promise<Storage[]>;
   save(storage: Storage): Promise<void>;
   del(storage: Storage): Promise<void>;
-  list(token: IAuthToken): Promise<string[]>;
 }
