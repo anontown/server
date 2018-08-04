@@ -240,14 +240,10 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       await repo.insert(res8);
       await repo.insert(res9);
 
-      expect(await repo.find(notAuth, {
-        topic: "topic",
-        date: {
-          type: "gte",
-          date: new Date(0).toISOString(),
-        },
-      }, 100)).toEqual([
+      // 無
+      expect(await repo.find(notAuth, {}, 100)).toEqual([
         res4,
+        res2,
         res9,
         res7,
         res1,
@@ -257,140 +253,109 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         res6,
       ]);
 
-      expect(await repo.find(notAuth, {
-        topic: "topic",
-        date: {
-          type: "gte",
-          date: new Date(70).toISOString(),
-        },
-      }, 100)).toEqual([
+      expect(await repo.find(notAuth, {}, 3)).toEqual([
         res4,
+        res2,
         res9,
       ]);
 
-      expect(await repo.find(notAuth, {
-        topic: "topic",
-        date: {
-          type: "gte",
-          date: new Date(70).toISOString(),
-        },
-      }, 1)).toEqual([
-        res9,
+      // topic
+      expect(await repo.find(notAuth, { topic: "topic2" }, 100)).toEqual([
+        res2,
       ]);
 
-      expect(await repo.find(notAuth, {
-        topic: "topic",
-        date: {
-          type: "gt",
-          date: new Date(70).toISOString(),
-        },
-      }, 100)).toEqual([
-        res4,
-      ]);
-
-      expect(await repo.find(notAuth, {
-        topic: "topic",
-        date: {
-          type: "lte",
-          date: new Date(30).toISOString(),
-        },
-      }, 100)).toEqual([
-        res3,
-        res5,
-        res6,
-      ]);
-
-      expect(await repo.find(notAuth, {
-        topic: "topic",
-        date: {
-          type: "lte",
-          date: new Date(30).toISOString(),
-        },
-      }, 2)).toEqual([
-        res3,
-        res5,
-      ]);
-
-      expect(await repo.find(notAuth, {
-        topic: "topic",
-        date: {
-          type: "lt",
-          date: new Date(30).toISOString(),
-        },
-      }, 100)).toEqual([
-        res5,
-        res6,
-      ]);
-
-      expect(await repo.find(notAuth, {
-        topic: "topic",
-        date: {
-          type: "gt",
-          date: new Date(90).toISOString(),
-        },
-      }, 100)).toEqual([]);
-      expect(await repo.find(notAuth, {
-        topic: "topic",
-        date: {
-          type: "lt",
-          date: new Date(30).toISOString(),
-        },
-      }, 0)).toEqual([]);
-
+      // notice
       expect(await repo.find(auth, {
         notice: true,
-        date: {
-          type: "gte",
-          date: new Date(0).toISOString(),
-        },
-      }, 10)).toEqual([res7]);
-      expect(await repo.find(notAuth, {
-        reply: "res6",
-        date: {
-          type: "gte",
-          date: new Date(0).toISOString(),
-        },
-      }, 10)).toEqual([res7]);
+      }, 100)).toEqual([res7]);
+
+      expect(await repo.find(notAuth, { notice: false }, 100)).toEqual([
+        res4,
+        res2,
+        res9,
+        res7,
+        res1,
+        res8,
+        res3,
+        res5,
+        res6,
+      ]);
+
+      // hash
       expect(await repo.find(notAuth, {
         hash: "hash2",
-        date: {
-          type: "gte",
-          date: new Date(0).toISOString(),
-        },
-      }, 10)).toEqual([res4]);
+      }, 100)).toEqual([res4]);
+
+      // reply
+      expect(await repo.find(notAuth, {
+        reply: "res6",
+      }, 100)).toEqual([res7]);
+
+      // profile
       expect(await repo.find(notAuth, {
         profile: "p1",
-        date: {
-          type: "gte",
-          date: new Date(0).toISOString(),
-        },
-      }, 10)).toEqual([res5]);
-      expect(await repo.find(user2Auth, {
-        self: true,
-        date: {
-          type: "gte",
-          date: new Date(0).toISOString(),
-        },
-      }, 10)).toEqual([res3]);
+      }, 100)).toEqual([res5]);
+
+      // text
       expect(await repo.find(notAuth, {
         text: "abc",
+      }, 100)).toEqual([res7]);
+
+      // self
+      expect(await repo.find(user2Auth, {
+        self: true,
+      }, 100)).toEqual([res3]);
+
+      expect(await repo.find(notAuth, { self: false }, 100)).toEqual([
+        res4,
+        res2,
+        res9,
+        res7,
+        res1,
+        res8,
+        res3,
+        res5,
+        res6,
+      ]);
+
+      // date
+      expect(await repo.find(notAuth, {
         date: {
           type: "gte",
-          date: new Date(0).toISOString(),
-        },
-      }, 10)).toEqual([res7]);
+          date: new Date(80).toISOString(),
+        }
+      }, 100)).toEqual([
+        res4,
+        res2,
+      ]);
 
       expect(await repo.find(notAuth, {
-        id: [],
-      }, 10)).toEqual([]);
+        date: {
+          type: "gt",
+          date: new Date(80).toISOString(),
+        }
+      }, 100)).toEqual([
+        res4,
+      ]);
 
       expect(await repo.find(notAuth, {
-        id: ["res1"],
-      }, 10)).toEqual([res1]);
+        date: {
+          type: "lte",
+          date: new Date(20).toISOString(),
+        }
+      }, 100)).toEqual([
+        res5,
+        res6,
+      ]);
 
       expect(await repo.find(notAuth, {
-        id: ["res5", "res3"],
-      }, 10)).toEqual([res3, res5]);
+        date: {
+          type: "lt",
+          date: new Date(20).toISOString(),
+        }
+      }, 100)).toEqual([
+        res6,
+      ]);
     });
 
     it("通知フィルタでトークンがないとエラーになるか", async () => {
