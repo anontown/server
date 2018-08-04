@@ -55,7 +55,6 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
 
       const user1 = ObjectIDGenerator();
       const user2 = ObjectIDGenerator();
-      const user3 = ObjectIDGenerator();
 
       const profile1 = profile.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(50), sn: "sn1" });
       const profile2 = profile.copy({ id: ObjectIDGenerator(), user: user1, date: new Date(80), sn: "sn2" });
