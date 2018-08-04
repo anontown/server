@@ -64,12 +64,16 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
       await repo.insert(history3);
       await repo.insert(history4);
 
+      // 無
+
       expect(await repo.find({})).toEqual([
         history4,
         history2,
         history1,
         history3,
       ]);
+
+      // topic
 
       expect(await repo.find({ topic: ["topic1"] })).toEqual([
         history2,
@@ -92,6 +96,8 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
         history3,
       ]);
 
+      // id
+
       expect(await repo.find({ id: [] })).toEqual([]);
       expect(await repo.find({ id: ["history2", "a"] })).toEqual([history2]);
       expect(await repo.find({ id: ["history2", "history4"] })).toEqual([
@@ -99,8 +105,10 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
         history2,
       ]);
 
-      expect(await repo.find({ topic: ["topic1"], id: ["history2", "history4"] })).toEqual([
-        history2,
+      // 複合
+
+      expect(await repo.find({ topic: ["topic1"], id: ["history1", "history4"] })).toEqual([
+        history1,
       ]);
     });
   });
