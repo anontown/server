@@ -76,6 +76,26 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
       await repo.insert(msg8);
       await repo.insert(msg9);
 
+      // 無
+      expect(await repo.find(token, {}, 100)).toEqual([
+        msg4,
+        msg9,
+        msg7,
+        msg1,
+        msg8,
+        msg3,
+        msg5,
+        msg6,
+      ]);
+
+      expect(await repo.find(token, {}, 3)).toEqual([
+        msg4,
+        msg9,
+        msg7,
+      ]);
+
+      // id
+
       expect(await repo.find(token, {
         id: [],
       }, 100)).toEqual([]);
@@ -87,43 +107,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg3,
       ]);
 
-      expect(await repo.find(token, {
-      }, 100)).toEqual([
-        msg4,
-        msg9,
-        msg7,
-        msg1,
-        msg8,
-        msg3,
-        msg5,
-        msg6,
-      ]);
-
-      expect(await repo.find(token, {
-        date: {
-          type: "gte",
-          date: new Date(70).toISOString(),
-        },
-        id: ["msg9", "msg1"],
-      }, 100)).toEqual([
-        msg9,
-      ]);
-
-      expect(await repo.find(token, {
-        date: {
-          type: "gte",
-          date: new Date(0).toISOString(),
-        },
-      }, 100)).toEqual([
-        msg4,
-        msg9,
-        msg7,
-        msg1,
-        msg8,
-        msg3,
-        msg5,
-        msg6,
-      ]);
+      // date
 
       expect(await repo.find(token, {
         date: {
@@ -132,15 +116,6 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         },
       }, 100)).toEqual([
         msg4,
-        msg9,
-      ]);
-
-      expect(await repo.find(token, {
-        date: {
-          type: "gte",
-          date: new Date(70).toISOString(),
-        },
-      }, 1)).toEqual([
         msg9,
       ]);
 
@@ -166,16 +141,6 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
 
       expect(await repo.find(token, {
         date: {
-          type: "lte",
-          date: new Date(30).toISOString(),
-        },
-      }, 2)).toEqual([
-        msg3,
-        msg5,
-      ]);
-
-      expect(await repo.find(token, {
-        date: {
           type: "lt",
           date: new Date(30).toISOString(),
         },
@@ -184,18 +149,16 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
         msg6,
       ]);
 
-      expect(await repo.find(token, {
-        date: {
-          type: "gt",
-          date: new Date(90).toISOString(),
-        },
-      }, 100)).toEqual([]);
+      // 複合
       expect(await repo.find(token, {
         date: {
           type: "lt",
           date: new Date(30).toISOString(),
         },
-      }, 0)).toEqual([]);
+        id: ["msg5", "msg3"]
+      }, 100)).toEqual([
+        msg5,
+      ]);
     });
   });
 
