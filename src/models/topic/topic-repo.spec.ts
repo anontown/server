@@ -125,6 +125,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       await repo.insert(topic5);
       await repo.insert(topic6);
 
+      // 無
       expect(await repo.find({
       }, 0, 100)).toEqual([
         topic5,
@@ -142,6 +143,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic6,
       ]);
 
+      // id
       expect(await repo.find({
         id: [],
       }, 0, 100)).toEqual([]);
@@ -153,6 +155,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic1,
       ]);
 
+      // title
       expect(await repo.find({
         title: "",
       }, 0, 100)).toEqual([
@@ -183,6 +186,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic3,
       ]);
 
+      // tags
       expect(await repo.find({
         tags: [],
       }, 0, 100)).toEqual([
@@ -213,6 +217,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       }, 0, 100)).toEqual([
       ]);
 
+      // activeOnly
       expect(await repo.find({
         activeOnly: false,
       }, 0, 100)).toEqual([
@@ -232,6 +237,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
         topic2,
       ]);
 
+      // parent
       expect(await repo.find({
         parent: "topic1",
       }, 0, 100)).toEqual([
@@ -241,6 +247,14 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       expect(await repo.find({
         parent: "other",
       }, 0, 100)).toEqual([
+      ]);
+
+      // 複合
+      expect(await repo.find({
+        tags: ["a"],
+        id: ["topic1", "topic3"]
+      }, 0, 100)).toEqual([
+        topic1,
       ]);
     });
   });
