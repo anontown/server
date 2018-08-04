@@ -356,6 +356,17 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
       }, 100)).toEqual([
         res6,
       ]);
+
+      // 複合
+      expect(await repo.find(notAuth, {
+        date: {
+          type: "lte",
+          date: new Date(20).toISOString(),
+        },
+        id: ["res5", "res1"]
+      }, 100)).toEqual([
+        res5,
+      ]);
     });
 
     it("通知フィルタでトークンがないとエラーになるか", async () => {
