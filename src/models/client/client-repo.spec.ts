@@ -62,19 +62,9 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
       await repo.insert(client3);
       await repo.insert(client4);
 
-      expect(await repo.find(null, {})).toEqual([
-        client4,
-        client2,
-        client1,
-        client3,
-      ]);
+      // 無
 
-      expect(await repo.find({
-        id: ObjectIDGenerator(),
-        key: "key",
-        user: user1,
-        type: "master",
-      }, {})).toEqual([
+      expect(await repo.find(null, {})).toEqual([
         client4,
         client2,
         client1,
@@ -113,6 +103,17 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
         client2,
         client1,
         client3,
+      ]);
+
+
+      // 複合
+      expect(await repo.find({
+        id: ObjectIDGenerator(),
+        key: "key",
+        user: user1,
+        type: "master",
+      }, { self: true, id: [client1.id, client4.id] })).toEqual([
+        client1,
       ]);
     });
 
