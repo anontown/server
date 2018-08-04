@@ -1,18 +1,9 @@
-const dbUser = process.env.DB_USER as string | undefined;
-const dbPass = process.env.DB_PASS as string | undefined;
-
 export const Config = {
     server: {
         port: Number(process.env.SERVER_PORT),
     },
     db: {
         url: process.env.DB_URL as string,
-        auth: dbUser !== undefined && dbPass !== undefined ?
-            {
-                user: dbUser,
-                pass: dbPass,
-            } :
-            null,
     },
     api: {
         limit: 1000,
