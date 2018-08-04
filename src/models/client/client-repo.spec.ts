@@ -81,6 +81,8 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
         client3,
       ]);
 
+      // id
+
       expect(await repo.find(null, {
         id: [],
       })).toEqual([]);
@@ -88,6 +90,19 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
       expect(await repo.find(null, {
         id: [client1.id],
       })).toEqual([client1]);
+
+      expect(await repo.find(null, {
+        id: [client1.id, ObjectIDGenerator()],
+      })).toEqual([client1]);
+
+      // self
+
+      expect(await repo.find(null, { self: false })).toEqual([
+        client4,
+        client2,
+        client1,
+        client3,
+      ]);
 
       expect(await repo.find({
         id: ObjectIDGenerator(),
