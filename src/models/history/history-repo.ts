@@ -80,10 +80,12 @@ export class HistoryRepo implements IHistoryRepo {
             filter,
           },
         },
-        date: {
-          order: query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")
-            ? "asc"
-            : "desc",
+        sort: {
+          date: {
+            order: query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")
+              ? "asc"
+              : "desc",
+          },
         },
       },
     });
