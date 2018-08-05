@@ -49,7 +49,7 @@ export class HistoryRepoMock implements IHistoryRepo {
         const bv = new Date(b.body.date).valueOf();
         return query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte") ? av - bv : bv - av;
       })
-      .slice(0, limit);;
+      .slice(0, limit);
 
     const result = histories.map(h => History.fromDB(h));
     if (query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")) {

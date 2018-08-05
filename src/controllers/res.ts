@@ -4,12 +4,12 @@ import { ObjectIDGenerator } from "../generator";
 import {
   IRepo,
   IResAPI,
+  IResForkAPI,
+  IResHistoryAPI,
+  IResNormalAPI,
   Res,
   ResNormal,
   ResQuery,
-  IResNormalAPI,
-  IResHistoryAPI,
-  IResForkAPI,
 } from "../models";
 import {
   Context,
@@ -24,7 +24,7 @@ const resProps = {
     _info: any) => {
     const topic = await context.loader.topic.load(res.topicID);
     return topic.toAPI();
-  }
+  },
 };
 
 export const resResolver = (repo: IRepo) => {
@@ -226,7 +226,7 @@ export const resResolver = (repo: IRepo) => {
       },
     },
     ResTopic: {
-      ...resProps
+      ...resProps,
     },
     ResFork: {
       ...resProps,
@@ -240,7 +240,7 @@ export const resResolver = (repo: IRepo) => {
       },
     },
     ResDelete: {
-      ...resProps
-    }
+      ...resProps,
+    },
   };
 };

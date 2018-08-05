@@ -252,7 +252,7 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
       // 複合
       expect(await repo.find({
         tags: ["a"],
-        id: ["topic1", "topic3"]
+        id: ["topic1", "topic3"],
       }, 0, 100)).toEqual([
         topic1,
       ]);

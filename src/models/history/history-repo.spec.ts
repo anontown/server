@@ -112,8 +112,8 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
       expect(await repo.find({
         date: {
           type: "gte",
-          date: new Date(80).toISOString()
-        }
+          date: new Date(80).toISOString(),
+        },
       }, 100)).toEqual([
         history4,
         history2,
@@ -122,8 +122,8 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
       expect(await repo.find({
         date: {
           type: "gt",
-          date: new Date(80).toISOString()
-        }
+          date: new Date(80).toISOString(),
+        },
       }, 100)).toEqual([
         history4,
       ]);
@@ -131,8 +131,8 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
       expect(await repo.find({
         date: {
           type: "lte",
-          date: new Date(50).toISOString()
-        }
+          date: new Date(50).toISOString(),
+        },
       }, 100)).toEqual([
         history1,
         history3,
@@ -141,8 +141,8 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
       expect(await repo.find({
         date: {
           type: "lt",
-          date: new Date(50).toISOString()
-        }
+          date: new Date(50).toISOString(),
+        },
       }, 100)).toEqual([
         history3,
       ]);

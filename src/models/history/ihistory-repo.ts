@@ -1,5 +1,5 @@
-import { History } from "./history";
 import { DateType } from "../../server";
+import { History } from "./history";
 
 export interface HistoryQuery {
   id?: string[];

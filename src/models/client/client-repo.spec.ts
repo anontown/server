@@ -105,7 +105,6 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
         client3,
       ]);
 
-
       // 複合
       expect(await repo.find({
         id: ObjectIDGenerator(),

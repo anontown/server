@@ -3,9 +3,9 @@ import { ObjectIDGenerator, RandomGenerator } from "../generator";
 import {
   IRepo,
   ITokenAPI,
+  ITokenGeneralAPI,
   TokenGeneral,
   TokenMaster,
-  ITokenGeneralAPI,
 } from "../models";
 import {
   Context,
@@ -116,6 +116,6 @@ export const tokenResolver = (repo: IRepo) => {
         const client = await context.loader.client.load(token.clientID);
         return client.toAPI(context.auth.TokenMasterOrNull);
       },
-    }
+    },
   };
 };

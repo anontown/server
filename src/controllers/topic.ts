@@ -3,11 +3,11 @@ import { ObjectIDGenerator } from "../generator";
 import {
   IRepo,
   ITopicAPI,
+  ITopicForkAPI,
   TopicFork,
   TopicNormal,
   TopicOne,
   TopicQuery,
-  ITopicForkAPI,
 } from "../models";
 import {
   Context,
@@ -194,6 +194,6 @@ export const topicResolver = (repo: IRepo) => {
         const parent = await context.loader.topic.load(token.parentID);
         return parent.toAPI();
       },
-    }
+    },
   };
 };

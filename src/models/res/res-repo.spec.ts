@@ -323,7 +323,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         date: {
           type: "gte",
           date: new Date(80).toISOString(),
-        }
+        },
       }, 100)).toEqual([
         res4,
         res2,
@@ -333,7 +333,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         date: {
           type: "gt",
           date: new Date(80).toISOString(),
-        }
+        },
       }, 100)).toEqual([
         res4,
       ]);
@@ -342,7 +342,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         date: {
           type: "lte",
           date: new Date(20).toISOString(),
-        }
+        },
       }, 100)).toEqual([
         res5,
         res6,
@@ -352,7 +352,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
         date: {
           type: "lt",
           date: new Date(20).toISOString(),
-        }
+        },
       }, 100)).toEqual([
         res6,
       ]);
@@ -363,7 +363,7 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
           type: "lte",
           date: new Date(20).toISOString(),
         },
-        id: ["res5", "res1"]
+        id: ["res5", "res1"],
       }, 100)).toEqual([
         res5,
       ]);

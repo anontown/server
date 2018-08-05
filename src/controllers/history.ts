@@ -1,5 +1,5 @@
 import {
-  HistoryQuery, IRepo, IHistoryAPI,
+  HistoryQuery, IHistoryAPI, IRepo,
 } from "../models";
 import {
   Context,
@@ -12,7 +12,7 @@ export const historyResolver = (repo: IRepo) => {
         _obj: any,
         args: {
           query: HistoryQuery,
-          limit: number
+          limit: number,
         },
         _context: Context,
         _info: any) => {
@@ -29,6 +29,6 @@ export const historyResolver = (repo: IRepo) => {
         const topic = await context.loader.topic.load(history.topicID);
         return topic.toAPI();
       },
-    }
+    },
   };
 };

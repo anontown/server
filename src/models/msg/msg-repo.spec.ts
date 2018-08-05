@@ -155,7 +155,7 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
           type: "lt",
           date: new Date(30).toISOString(),
         },
-        id: ["msg5", "msg3"]
+        id: ["msg5", "msg3"],
       }, 100)).toEqual([
         msg5,
       ]);
