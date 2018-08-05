@@ -1,5 +1,4 @@
 import { AtNotFoundError } from "../../at-error";
-import { Config } from "../../config";
 import { ESClient } from "../../db";
 import { History, IHistoryDB } from "./history";
 import { HistoryQuery, IHistoryRepo } from "./ihistory-repo";

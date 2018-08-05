@@ -5,9 +5,6 @@ export const Config = {
     db: {
         url: process.env.DB_URL as string,
     },
-    api: {
-        limit: 1000,
-    },
     es: {
         host: process.env.ES_HOST as string,
     },

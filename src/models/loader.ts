@@ -32,7 +32,7 @@ export interface Loader {
 export function createLoader(repo: IRepo, auth: AuthContainer): Loader {
     return {
         client: loader(ids => repo.client.find(auth.TokenMasterOrNull, { id: ids })),
-        history: loader(ids => repo.history.find({ id: ids })),
+        history: loader(ids => repo.history.find({ id: ids }, ids.length)),
         msg: loader(ids => repo.msg.find(auth.token, { id: ids }, ids.length)),
         profile: loader(ids => repo.profile.find(auth, { id: ids })),
         res: loader(ids => repo.res.find(auth, { id: ids }, ids.length)),
