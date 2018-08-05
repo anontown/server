@@ -44,12 +44,22 @@ export class HistoryRepo implements IHistoryRepo {
     return History.fromDB(({ id: history._id, body: history._source }));
   }
 
-  async find(query: HistoryQuery): Promise<History[]> {
+  async find(query: HistoryQuery, limit: number): Promise<History[]> {
     const filter: any[] = [];
     if (query.id !== undefined) {
       filter.push({
         terms: {
           _id: query.id,
+        },
+      });
+    }
+
+    if (query.date !== undefined) {
+      filter.push({
+        range: {
+          date: {
+            [query.date.type]: query.date.date,
+          },
         },
       });
     }
@@ -64,17 +74,25 @@ export class HistoryRepo implements IHistoryRepo {
 
     const histories = await ESClient.search<IHistoryDB["body"]>({
       index: "histories",
-      size: Config.api.limit,
+      size: limit,
       body: {
         query: {
           bool: {
             filter,
           },
         },
-        sort: { date: { order: "desc" } },
+        date: {
+          order: query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")
+            ? "asc"
+            : "desc",
+        },
       },
     });
 
-    return histories.hits.hits.map(h => History.fromDB({ id: h._id, body: h._source }));
+    const result = histories.hits.hits.map(h => History.fromDB({ id: h._id, body: h._source }));
+    if (query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")) {
+      result.reverse();
+    }
+    return result;
   }
 }

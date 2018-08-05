@@ -246,6 +246,7 @@ input ClientQuery{
 input HistoryQuery{
   id:[ID!]
   topic:[ID!]
+  date:DateQuery
 }
 
 input MsgQuery{
@@ -284,7 +285,7 @@ input TopicQuery{
 
 type Query{
   clients(query:ClientQuery!):[Client!]!
-  histories(query:HistoryQuery!):[History!]!
+  histories(query:HistoryQuery!,limit:Int=100):[History!]!
   msgs(query:MsgQuery!,limit:Int=100):[Msg!]!
   profiles(query:ProfileQuery!):[Profile!]!
   reses(query:ResQuery!,limit:Int=100):[Res!]!
