@@ -46,8 +46,8 @@ export class ResRepoMock implements IResRepo {
     auth: AuthContainer,
     query: ResQuery,
     limit: number): Promise<Res[]> {
-    const notice = query.notice !== undefined ? auth.token.user : null;
-    const self = query.self !== undefined ? auth.token.user : null;
+    const notice = query.notice ? auth.token.user : null;
+    const self = query.self ? auth.token.user : null;
     const texts = query.text !== undefined
       ? query.text
         .split(/\s/)
