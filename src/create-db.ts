@@ -77,7 +77,7 @@ updateFunc.push((async () => {
             },
           },
         },
-      ));
+    ));
   });
 
   await Promise.all(promises);
@@ -669,6 +669,39 @@ updateFunc.push(async () => {
   await mongo2ESBulk("histories");
   await mongo2ESBulk("msgs");
   await mongo2ESBulk("topics");
+});
+
+updateFunc.push(async () => {
+  const db = await DB;
+  await db.collection("clients").createIndexes([
+    { user: 1 },
+    { date: 1 },
+    { update: 1 }
+  ]);
+
+  await db.collection("profiles").createIndexes([
+    { user: 1 },
+    { date: 1 },
+    { update: 1 }
+  ]);
+
+  await db.collection("tokens").createIndexes([
+    { type: 1 },
+    { user: 1 },
+    { date: 1 },
+    { client: 1 },
+  ]);
+
+  await db.collection("users").createIndexes([
+    { "resWait.m10": 1 },
+    { "resWait.m30": 1 },
+    { "resWait.h1": 1 },
+    { "resWait.h6": 1 },
+    { "resWait.h12": 1 },
+    { "resWait.d1": 1 },
+    { point: 1 },
+    { date: 1 },
+  ]);
 });
 
 /*
