@@ -222,7 +222,7 @@ export const resResolver = (repo: IRepo) => {
         context: Context,
         _info: any) => {
         const history = await context.loader.history.load(res.historyID);
-        return history.toAPI();
+        return history.toAPI(context.auth.tokenOrNull);
       },
     },
     ResTopic: {
