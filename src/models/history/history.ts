@@ -3,6 +3,7 @@ import Copyable from "ts-copyable";
 import { IGenerator } from "../../generator";
 import { TopicNormal } from "../topic";
 import { User } from "../user";
+import { IAuthToken } from "../../auth";
 
 export interface IHistoryDB {
   readonly id: string;
@@ -25,6 +26,7 @@ export interface IHistoryAPI {
   readonly text: string;
   readonly date: string;
   readonly hash: string;
+  readonly self: boolean | null;
 }
 
 export class History extends Copyable<History> {
@@ -55,14 +57,15 @@ export class History extends Copyable<History> {
       user.id);
   }
 
-  constructor(readonly id: string,
-              readonly topic: string,
-              readonly title: string,
-              readonly tags: Im.List<string>,
-              readonly text: string,
-              readonly date: Date,
-              readonly hash: string,
-              readonly user: string) {
+  constructor(
+    readonly id: string,
+    readonly topic: string,
+    readonly title: string,
+    readonly tags: Im.List<string>,
+    readonly text: string,
+    readonly date: Date,
+    readonly hash: string,
+    readonly user: string) {
     super(History);
   }
 
@@ -81,7 +84,7 @@ export class History extends Copyable<History> {
     };
   }
 
-  toAPI(): IHistoryAPI {
+  toAPI(authToken: IAuthToken | null): IHistoryAPI {
     return {
       id: this.id,
       topicID: this.topic,
@@ -90,6 +93,7 @@ export class History extends Copyable<History> {
       text: this.text,
       date: this.date.toISOString(),
       hash: this.hash,
+      self: authToken !== null ? authToken.user === this.user : null
     };
   }
 }

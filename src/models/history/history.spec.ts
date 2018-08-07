@@ -105,8 +105,8 @@ describe("History", () => {
   });
 
   describe("#toAPI", () => {
-    it("正常に変換できるか", () => {
-      expect(history.toAPI()).toEqual({
+    it("正常に変換できるか(tokenがnull)", () => {
+      expect(history.toAPI(null)).toEqual({
         id: "history",
         topicID: "topic",
         title: "title",
@@ -114,6 +114,43 @@ describe("History", () => {
         text: "text",
         date: new Date(0).toISOString(),
         hash: "hash",
+        self: null
+      });
+    });
+
+    it("正常に変換できるか(tokenが投稿ユーザー)", () => {
+      expect(history.toAPI({
+        id: "token",
+        key: "key",
+        user: "user",
+        type: "master",
+      })).toEqual({
+        id: "history",
+        topicID: "topic",
+        title: "title",
+        tags: ["x"],
+        text: "text",
+        date: new Date(0).toISOString(),
+        hash: "hash",
+        self: true
+      });
+    });
+
+    it("正常に変換できるか(tokenが別ユーザー)", () => {
+      expect(history.toAPI({
+        id: "token",
+        key: "key",
+        user: "user2",
+        type: "master",
+      })).toEqual({
+        id: "history",
+        topicID: "topic",
+        title: "title",
+        tags: ["x"],
+        text: "text",
+        date: new Date(0).toISOString(),
+        hash: "hash",
+        self: false
       });
     });
   });

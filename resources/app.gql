@@ -17,6 +17,7 @@ type History{
   text: String!
   date: DateTime!
   hash: String!
+  self:Boolean
 }
 
 type Msg{
