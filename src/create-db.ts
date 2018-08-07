@@ -673,35 +673,33 @@ updateFunc.push(async () => {
 
 updateFunc.push(async () => {
   const db = await DB;
-  await db.collection("clients").createIndexes([
-    { user: 1 },
-    { date: 1 },
-    { update: 1 }
-  ]);
 
-  await db.collection("profiles").createIndexes([
-    { user: 1 },
-    { date: 1 },
-    { update: 1 }
-  ]);
+  const clients = db.collection("clients");
+  await clients.createIndex({ user: 1 });
+  await clients.createIndex({ date: 1 });
+  await clients.createIndex({ update: 1 });
 
-  await db.collection("tokens").createIndexes([
-    { type: 1 },
-    { user: 1 },
-    { date: 1 },
-    { client: 1 },
-  ]);
 
-  await db.collection("users").createIndexes([
-    { "resWait.m10": 1 },
-    { "resWait.m30": 1 },
-    { "resWait.h1": 1 },
-    { "resWait.h6": 1 },
-    { "resWait.h12": 1 },
-    { "resWait.d1": 1 },
-    { point: 1 },
-    { date: 1 },
-  ]);
+  const profiles = db.collection("profiles");
+  await profiles.createIndex({ user: 1 });
+  await profiles.createIndex({ date: 1 });
+  await profiles.createIndex({ update: 1 });
+
+  const tokens = db.collection("tokens");
+  await tokens.createIndex({ type: 1 });
+  await tokens.createIndex({ user: 1 });
+  await tokens.createIndex({ date: 1 });
+  await tokens.createIndex({ client: 1 });
+
+  const users = db.collection("users");
+  await users.createIndex({ "resWait.m10": 1 });
+  await users.createIndex({ "resWait.m30": 1 });
+  await users.createIndex({ "resWait.h1": 1 });
+  await users.createIndex({ "resWait.h6": 1 });
+  await users.createIndex({ "resWait.h12": 1 });
+  await users.createIndex({ "resWait.d1": 1 });
+  await users.createIndex({ point: 1 });
+  await users.createIndex({ date: 1 });
 });
 
 /*
