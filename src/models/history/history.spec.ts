@@ -7,25 +7,27 @@ import {
 
 describe("History", () => {
   describe("fromDB", () => {
-    expect(History.fromDB({
-      id: "history",
-      body: {
-        topic: "topic",
-        title: "title",
-        tags: ["x"],
-        text: "text",
-        date: new Date(0).toISOString(),
-        hash: "hash",
-        user: "user",
-      },
-    })).toEqual(new History("history",
-      "topic",
-      "title",
-      Im.List(["x"]),
-      "text",
-      new Date(0),
-      "hash",
-      "user"));
+    it("正常に変換出来るか", () => {
+      expect(History.fromDB({
+        id: "history",
+        body: {
+          topic: "topic",
+          title: "title",
+          tags: ["x"],
+          text: "text",
+          date: new Date(0).toISOString(),
+          hash: "hash",
+          user: "user",
+        },
+      })).toEqual(new History("history",
+        "topic",
+        "title",
+        Im.List(["x"]),
+        "text",
+        new Date(0),
+        "hash",
+        "user"));
+    });
   });
 
   describe("create", () => {
@@ -71,47 +73,47 @@ describe("History", () => {
           "hash",
           "user"));
     });
+  });
 
-    const history = History.fromDB({
-      id: "history",
-      body: {
-        topic: "topic",
-        title: "title",
-        tags: ["x"],
-        text: "text",
-        date: new Date(0).toISOString(),
-        hash: "hash",
-        user: "user",
-      },
-    });
-    describe("#toDB", () => {
-      it("正常に変換できるか", () => {
-        expect(history.toDB()).toEqual({
-          id: "history",
-          body: {
-            topic: "topic",
-            title: "title",
-            tags: ["x"],
-            text: "text",
-            date: new Date(0).toISOString(),
-            hash: "hash",
-            user: "user",
-          },
-        });
-      });
-    });
-
-    describe("#toAPI", () => {
-      it("正常に変換できるか", () => {
-        expect(history.toAPI()).toEqual({
-          id: "history",
-          topicID: "topic",
+  const history = History.fromDB({
+    id: "history",
+    body: {
+      topic: "topic",
+      title: "title",
+      tags: ["x"],
+      text: "text",
+      date: new Date(0).toISOString(),
+      hash: "hash",
+      user: "user",
+    },
+  });
+  describe("#toDB", () => {
+    it("正常に変換できるか", () => {
+      expect(history.toDB()).toEqual({
+        id: "history",
+        body: {
+          topic: "topic",
           title: "title",
           tags: ["x"],
           text: "text",
           date: new Date(0).toISOString(),
           hash: "hash",
-        });
+          user: "user",
+        },
+      });
+    });
+  });
+
+  describe("#toAPI", () => {
+    it("正常に変換できるか", () => {
+      expect(history.toAPI()).toEqual({
+        id: "history",
+        topicID: "topic",
+        title: "title",
+        tags: ["x"],
+        text: "text",
+        date: new Date(0).toISOString(),
+        hash: "hash",
       });
     });
   });
