@@ -1,42 +1,40 @@
-
-import { ApolloError } from "apollo-server";
+export const AtErrorSymbol = Symbol("AtError");
 
 export interface AtErrorItem {
     message: string;
     data: any;
 }
 
-export class AtError extends ApolloError {
-    constructor(public code: string, public errors: AtErrorItem[]) {
-        super("error", code, { errors });
-    }
+export interface AtErrorPublic {
+    code: string;
+    message: string;
+    data: any;
+}
 
-    toString(): string {
-        return JSON.stringify(this.toJSON());
-    }
-
-    toJSON() {
-        return {
-            statusCode: this.statusCode,
-            type: this.type,
-            errors: this.errors,
-        };
+export class AtError extends Error {
+    [AtErrorSymbol] = true;
+    constructor(public data: AtErrorPublic) {
+        super(data.message);
     }
 }
 
 export class AtServerError extends AtError {
     constructor() {
-        super("server", [
-            { message: "サーバー内部エラー", data: null },
-        ]);
+        super({
+            code: "server",
+            message: "サーバー内部エラー",
+            data: null
+        });
     }
 }
 
 export class AtCaptchaError extends AtError {
     constructor() {
-        super("captcha", [
-            { message: "キャプチャ認証に失敗", data: null },
-        ]);
+        super({
+            code: "captcha",
+            message: "キャプチャ認証に失敗",
+            data: null
+        });
     }
 }
 
@@ -47,8 +45,11 @@ export interface IParamErrorData {
 
 export class AtParamsError extends AtError {
     constructor(data: IParamErrorData[]) {
-        super("params",
-            data.map(x => ({ message: x.message, data: { field: x.field } })));
+        super({
+            code: "params",
+            message: "パラメーターが不正です",
+            data: data.map(x => ({ message: x.message, data: { field: x.field } }))
+        });
     }
 }
 
@@ -80,15 +81,21 @@ export function paramsErrorMaker(fs: paramsErrorMakerData[]) {
 
 export class AtRightError extends AtError {
     constructor(message: string) {
-        super("right",
-            [{ message, data: null }]);
+        super({
+            code: "right",
+            message,
+            data: null
+        });
     }
 }
 
 export class AtConflictError extends AtError {
     constructor(message: string) {
-        super("conflict",
-            [{ message, data: null }]);
+        super({
+            code: "conflict",
+            message,
+            data: null
+        });
     }
 }
 
@@ -97,8 +104,11 @@ export class AtConflictError extends AtError {
  */
 export class AtPrerequisiteError extends AtError {
     constructor(message: string) {
-        super("prerequisite",
-            [{ message, data: null }]);
+        super({
+            code: "prerequisite",
+            message,
+            data: null
+        });
     }
 }
 
@@ -107,28 +117,40 @@ export class AtPrerequisiteError extends AtError {
  */
 export class AtTokenAuthError extends AtError {
     constructor() {
-        super("token_auth",
-            [{ message: "認証に失敗しました", data: null }]);
+        super({
+            code: "token_auth",
+            message: "認証に失敗しました",
+            data: null
+        });
     }
 }
 
 export class AtAuthError extends AtError {
     constructor(message: string) {
-        super("auth",
-            [{ message, data: null }]);
+        super({
+            code: "auth",
+            message,
+            data: null
+        });
     }
 }
 
 export class AtUserAuthError extends AtError {
     constructor() {
-        super("user_auth",
-            [{ message: "認証に失敗しました", data: null }]);
+        super({
+            code: "user_auth",
+            message: "認証に失敗しました",
+            data: null
+        });
     }
 }
 
 export class AtNotFoundError extends AtError {
     constructor(message: string) {
-        super("not_found",
-            [{ message, data: null }]);
+        super({
+            code: "not_found",
+            message,
+            data: null
+        });
     }
 }

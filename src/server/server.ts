@@ -8,6 +8,7 @@ import { Config } from "../config";
 import * as controllers from "../controllers";
 import { IRepo } from "../models";
 import { Context, createContext } from "./context";
+import { AtServerError, AtErrorSymbol } from "../at-error";
 
 export async function serverRun(repo: IRepo) {
   const typeDefs = gql(fs.readFileSync("resources/app.gql", "utf8"));
@@ -53,7 +54,11 @@ export async function serverRun(repo: IRepo) {
     debug: false,
     formatError: (error: any) => {
       console.log(error);
-      return new Error("Internal server error");
+      if (error.extensions.exception[AtErrorSymbol]) {
+        return error.extensions.exception.data;
+      } else {
+        return new AtServerError().data;
+      }
     },
   });
 
