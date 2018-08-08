@@ -4,11 +4,11 @@ import * as fs from "fs";
 import {
   GraphQLDateTime,
 } from "graphql-iso-date";
+import { AtErrorSymbol, AtServerError } from "../at-error";
 import { Config } from "../config";
 import * as controllers from "../controllers";
 import { IRepo } from "../models";
 import { Context, createContext } from "./context";
-import { AtServerError, AtErrorSymbol } from "../at-error";
 
 export async function serverRun(repo: IRepo) {
   const typeDefs = gql(fs.readFileSync("resources/app.gql", "utf8"));

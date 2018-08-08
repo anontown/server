@@ -23,7 +23,7 @@ export class AtServerError extends AtError {
         super({
             code: "server",
             message: "サーバー内部エラー",
-            data: null
+            data: null,
         });
     }
 }
@@ -33,7 +33,7 @@ export class AtCaptchaError extends AtError {
         super({
             code: "captcha",
             message: "キャプチャ認証に失敗",
-            data: null
+            data: null,
         });
     }
 }
@@ -48,7 +48,7 @@ export class AtParamsError extends AtError {
         super({
             code: "params",
             message: "パラメーターが不正です",
-            data: data.map(x => ({ message: x.message, data: { field: x.field } }))
+            data: data.map(x => ({ message: x.message, data: { field: x.field } })),
         });
     }
 }
@@ -84,7 +84,7 @@ export class AtRightError extends AtError {
         super({
             code: "right",
             message,
-            data: null
+            data: null,
         });
     }
 }
@@ -94,7 +94,7 @@ export class AtConflictError extends AtError {
         super({
             code: "conflict",
             message,
-            data: null
+            data: null,
         });
     }
 }
@@ -107,7 +107,7 @@ export class AtPrerequisiteError extends AtError {
         super({
             code: "prerequisite",
             message,
-            data: null
+            data: null,
         });
     }
 }
@@ -120,7 +120,7 @@ export class AtTokenAuthError extends AtError {
         super({
             code: "token_auth",
             message: "認証に失敗しました",
-            data: null
+            data: null,
         });
     }
 }
@@ -130,7 +130,7 @@ export class AtAuthError extends AtError {
         super({
             code: "auth",
             message,
-            data: null
+            data: null,
         });
     }
 }
@@ -140,7 +140,7 @@ export class AtUserAuthError extends AtError {
         super({
             code: "user_auth",
             message: "認証に失敗しました",
-            data: null
+            data: null,
         });
     }
 }
@@ -150,7 +150,7 @@ export class AtNotFoundError extends AtError {
         super({
             code: "not_found",
             message,
-            data: null
+            data: null,
         });
     }
 }

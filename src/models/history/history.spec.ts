@@ -114,7 +114,7 @@ describe("History", () => {
         text: "text",
         date: new Date(0).toISOString(),
         hash: "hash",
-        self: null
+        self: null,
       });
     });
 
@@ -132,7 +132,7 @@ describe("History", () => {
         text: "text",
         date: new Date(0).toISOString(),
         hash: "hash",
-        self: true
+        self: true,
       });
     });
 
@@ -150,7 +150,7 @@ describe("History", () => {
         text: "text",
         date: new Date(0).toISOString(),
         hash: "hash",
-        self: false
+        self: false,
       });
     });
   });

@@ -679,7 +679,6 @@ updateFunc.push(async () => {
   await clients.createIndex({ date: 1 });
   await clients.createIndex({ update: 1 });
 
-
   const profiles = db.collection("profiles");
   await profiles.createIndex({ user: 1 });
   await profiles.createIndex({ date: 1 });

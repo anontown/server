@@ -1,9 +1,9 @@
 import * as Im from "immutable";
 import Copyable from "ts-copyable";
+import { IAuthToken } from "../../auth";
 import { IGenerator } from "../../generator";
 import { TopicNormal } from "../topic";
 import { User } from "../user";
-import { IAuthToken } from "../../auth";
 
 export interface IHistoryDB {
   readonly id: string;
@@ -93,7 +93,7 @@ export class History extends Copyable<History> {
       text: this.text,
       date: this.date.toISOString(),
       hash: this.hash,
-      self: authToken !== null ? authToken.user === this.user : null
+      self: authToken !== null ? authToken.user === this.user : null,
     };
   }
 }
