@@ -1,11 +1,14 @@
+
+import { ApolloError } from "apollo-server";
+
 export interface AtErrorItem {
     message: string;
     data: any;
 }
 
-export class AtError extends Error {
-    constructor(public statusCode: StatusCode, public type: string, public errors: AtErrorItem[]) {
-        super();
+export class AtError extends ApolloError {
+    constructor(public code: string, public errors: AtErrorItem[]) {
+        super("error", code, { errors });
     }
 
     toString(): string {
@@ -23,7 +26,7 @@ export class AtError extends Error {
 
 export class AtServerError extends AtError {
     constructor() {
-        super(StatusCode.InternalServerError, "server", [
+        super("server", [
             { message: "サーバー内部エラー", data: null },
         ]);
     }
@@ -31,7 +34,7 @@ export class AtServerError extends AtError {
 
 export class AtCaptchaError extends AtError {
     constructor() {
-        super(StatusCode.ClientError, "captcha", [
+        super("captcha", [
             { message: "キャプチャ認証に失敗", data: null },
         ]);
     }
@@ -44,8 +47,7 @@ export interface IParamErrorData {
 
 export class AtParamsError extends AtError {
     constructor(data: IParamErrorData[]) {
-        super(StatusCode.ClientError,
-            "params",
+        super("params",
             data.map(x => ({ message: x.message, data: { field: x.field } })));
     }
 }
@@ -78,16 +80,14 @@ export function paramsErrorMaker(fs: paramsErrorMakerData[]) {
 
 export class AtRightError extends AtError {
     constructor(message: string) {
-        super(StatusCode.ClientError,
-            "right",
+        super("right",
             [{ message, data: null }]);
     }
 }
 
 export class AtConflictError extends AtError {
     constructor(message: string) {
-        super(StatusCode.ClientError,
-            "conflict",
+        super("conflict",
             [{ message, data: null }]);
     }
 }
@@ -97,8 +97,7 @@ export class AtConflictError extends AtError {
  */
 export class AtPrerequisiteError extends AtError {
     constructor(message: string) {
-        super(StatusCode.ClientError,
-            "prerequisite",
+        super("prerequisite",
             [{ message, data: null }]);
     }
 }
@@ -108,44 +107,28 @@ export class AtPrerequisiteError extends AtError {
  */
 export class AtTokenAuthError extends AtError {
     constructor() {
-        super(StatusCode.ClientError,
-            "token_auth",
+        super("token_auth",
             [{ message: "認証に失敗しました", data: null }]);
     }
 }
 
 export class AtAuthError extends AtError {
     constructor(message: string) {
-        super(StatusCode.ClientError,
-            "auth",
+        super("auth",
             [{ message, data: null }]);
     }
 }
 
 export class AtUserAuthError extends AtError {
     constructor() {
-        super(StatusCode.ClientError,
-            "user_auth",
+        super("user_auth",
             [{ message: "認証に失敗しました", data: null }]);
     }
 }
 
 export class AtNotFoundError extends AtError {
     constructor(message: string) {
-        super(StatusCode.ClientError,
-            "not_found",
+        super("not_found",
             [{ message, data: null }]);
     }
-}
-
-export enum StatusCode {
-    /**
-     * リクエストが不正
-     */
-    ClientError = 400,
-
-    /**
-     * サーバー内部エラー
-     */
-    InternalServerError = 500,
 }
