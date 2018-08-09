@@ -12,19 +12,6 @@ export interface Context {
   loader: Loader;
 }
 
-async function createUser(raw: any, repo: IRepo) {
-  if (typeof raw !== "string") {
-    return null;
-  }
-  const arr = raw.split(",");
-  if (arr.length !== 2) {
-    throw new AtAuthError("パラメーターが不正です");
-  }
-
-  const [id, pass] = arr;
-  return authFromApiParam.user(repo.user, { id, pass }, true);
-}
-
 async function createToken(raw: any, repo: IRepo) {
   if (typeof raw !== "string") {
     return null;
@@ -35,25 +22,15 @@ async function createToken(raw: any, repo: IRepo) {
   }
 
   const [id, key] = arr;
-  return authFromApiParam.token(repo.token, { id, key }, "no");
-}
-
-async function createRecaptcha(raw: any) {
-  if (typeof raw !== "string") {
-    return false;
-  }
-  await authFromApiParam.recaptcha(raw, true);
-  return true;
+  return authFromApiParam.token(repo.token, { id, key });
 }
 
 export async function createContext(headers: any, repo: IRepo): Promise<Context> {
   const ip = headers["X-Real-IP"] || "unknown_ip";
 
-  const user = await createUser(headers["X-User"], repo);
   const token = await createToken(headers["X-Token"], repo);
-  const recaptcha = await createRecaptcha(headers["X-Recaptcha"]);
 
-  const auth = new AuthContainer(token, user, recaptcha);
+  const auth = new AuthContainer(token);
 
   return {
     auth,

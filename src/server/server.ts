@@ -44,9 +44,7 @@ export async function serverRun(repo: IRepo) {
           endpoint: "/",
           query: "",
           headers: {
-            "X-User": "",
             "X-Token": "",
-            "X-Recaptcha": "",
           },
         },
       ],

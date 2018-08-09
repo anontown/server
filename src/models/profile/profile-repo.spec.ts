@@ -67,7 +67,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       await repo.insert(profile4);
 
       // id
-      expect(await repo.find(new AuthContainer(null, null, false), {})).toEqual([
+      expect(await repo.find(new AuthContainer(null), {})).toEqual([
         profile4,
         profile2,
         profile1,
@@ -80,13 +80,13 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
         key: "key",
         user: user1,
         type: "master",
-      }, null, false), { self: true })).toEqual([
+      }), { self: true })).toEqual([
         profile2,
         profile1,
         profile3,
       ]);
 
-      expect(await repo.find(new AuthContainer(null, null, false), {
+      expect(await repo.find(new AuthContainer(null), {
         self: false,
       })).toEqual([
         profile4,
@@ -96,8 +96,8 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
       ]);
 
       // id
-      expect(await repo.find(new AuthContainer(null, null, false), { id: [] })).toEqual([]);
-      expect(await repo.find(new AuthContainer(null, null, false),
+      expect(await repo.find(new AuthContainer(null), { id: [] })).toEqual([]);
+      expect(await repo.find(new AuthContainer(null),
         { id: [profile1.id, profile2.id, ObjectIDGenerator()] })).toEqual([
           profile2,
           profile1,
@@ -109,7 +109,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
         key: "key",
         user: user1,
         type: "master",
-      }, null, false), { self: true, id: [profile1.id, profile2.id, profile4.id] })).toEqual([
+      }), { self: true, id: [profile1.id, profile2.id, profile4.id] })).toEqual([
         profile2,
         profile1,
       ]);
@@ -118,7 +118,7 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
     it("認証していない状態でselfしたらエラーになるか", async () => {
       const repo = repoGene();
 
-      await expect(repo.find(new AuthContainer(null, null, false),
+      await expect(repo.find(new AuthContainer(null),
         { self: true })).rejects.toThrow(AtError);
     });
   });

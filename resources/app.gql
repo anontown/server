@@ -272,6 +272,11 @@ input ResQuery{
   date:DateQuery
 }
 
+input AuthUser{
+  id:String!
+  pass:String!
+}
+
 input StorageQuery{
   key:[String!]
 }
@@ -317,15 +322,15 @@ type Mutation {
   delStorage(key:String!):Boolean
   delTokenClient(client:ID!):Boolean
   createTokenGeneral(client:ID!):TokenGeneral!
-  createTokenMaster:TokenMaster!
+  createTokenMaster(auth:AuthUser!):TokenMaster!
   createTokenReq:TokenReq!
   authTokenReq(id:ID!,key:String!):TokenGeneral!
   createTopicNormal(title:String!,tags:[String!]!,text:String!):TopicNormal!
   createTopicOne(title:String!,tags:[String!]!,text:String!):TopicOne!
   createTopicFork(title:String!,parent:ID!):TopicFork!
   updateTopic(id:ID!,title:String!,tags:[String!],text:String!):TopicNormal!
-  createUser(sn:String!,pass:String!):User!
-  updateUser(sn:String!,pass:String!):User!
+  createUser(sn:String!,pass:String!,recaptcha:String!):User!
+  updateUser(sn:String!,pass:String!,auth:AuthUser!):User!
 }
 
 type ResSubscript{

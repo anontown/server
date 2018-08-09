@@ -10,6 +10,7 @@ import {
 import {
   Context,
 } from "../server";
+import * as authFromApiParam from "../server/auth-from-api-param";
 
 export const tokenResolver = (repo: IRepo) => {
   return {
@@ -60,9 +61,13 @@ export const tokenResolver = (repo: IRepo) => {
       },
       createTokenMaster: async (
         _obj: any,
-        _args: {}, context: Context,
+        args: {
+          auth: { id: string, pass: string }
+        },
+        context: Context,
         _info: any) => {
-        const token = TokenMaster.create(ObjectIDGenerator, context.auth.user, context.now, RandomGenerator);
+        const authUser = await authFromApiParam.user(repo.user, args.auth);
+        const token = TokenMaster.create(ObjectIDGenerator, authUser, context.now, RandomGenerator);
         await repo.token.insert(token);
 
         return token.toAPI();

@@ -1,16 +1,8 @@
 import { AtAuthError } from "../at-error";
-import { IAuthToken, IAuthTokenMaster, IAuthUser } from "../auth";
+import { IAuthToken, IAuthTokenMaster } from "../auth";
 
 export class AuthContainer {
-  constructor(private _token: IAuthToken | null,
-              private _user: IAuthUser | null,
-              private _recaptcha: boolean) {
-  }
-
-  recaptcha() {
-    if (!this._recaptcha) {
-      throw new AtAuthError("キャプチャ認証が必要です");
-    }
+  constructor(private _token: IAuthToken | null) {
   }
 
   get token(): IAuthToken {
@@ -39,13 +31,5 @@ export class AuthContainer {
     }
 
     return this._token;
-  }
-
-  get user(): IAuthUser {
-    if (this._user === null) {
-      throw new AtAuthError("ユーザー認証が必要です");
-    }
-
-    return this._user;
   }
 }

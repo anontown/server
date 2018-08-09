@@ -6,6 +6,7 @@ import {
 import {
   Context,
 } from "../server";
+import * as authFromApiParam from "../server/auth-from-api-param";
 
 export const userResolver = (repo: IRepo) => {
   return {
@@ -35,9 +36,11 @@ export const userResolver = (repo: IRepo) => {
         args: {
           sn: string,
           pass: string,
+          recaptcha: string
         },
         context: Context,
         _info: any) => {
+        await authFromApiParam.recaptcha(args.recaptcha)
         const user = User.create(ObjectIDGenerator, args.sn, args.pass, context.now);
         await repo.user.insert(user);
         return user.toAPI();
@@ -47,13 +50,18 @@ export const userResolver = (repo: IRepo) => {
         args: {
           sn: string,
           pass: string,
+          auth: {
+            id: string,
+            pass: string
+          }
         },
-        context: Context,
+        _context: Context,
         _info: any) => {
-        const user = await repo.user.findOne(context.auth.user.id);
-        const newUser = user.change(context.auth.user, args.pass, args.sn);
+        const authUser = await authFromApiParam.user(repo.user, args.auth);
+        const user = await repo.user.findOne(authUser.id);
+        const newUser = user.change(authUser, args.pass, args.sn);
         await repo.user.update(newUser);
-        await repo.token.delMasterToken(context.auth.user);
+        await repo.token.delMasterToken(authUser);
         return newUser.toAPI();
       },
     },
