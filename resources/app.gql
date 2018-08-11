@@ -1,160 +1,233 @@
 scalar DateTime
 
+# client app
 type Client{
+  # client id
   id: ID!
   name: String!
+  # callback url
   url: String!
+  # yours
   self: Boolean
+  # create date
   date: DateTime!
+  # update date
   update: DateTime!
 }
 
+# topic edit history
 type History{
+  # history id
   id: ID!
+  # target topic
   topic: TopicNormal!
+  # topic title
   title: String!
+  # topic tags
   tags: [String!]!
+  # topic text
   text: String!
+  # history create date
   date: DateTime!
+  # hash(user,date,topic)
   hash: String!
+  # yours
   self:Boolean
 }
 
+# notice message
 type Msg{
+  # msg id
   id: ID!
+  # is private msg
   priv: Boolean
+  # msg text
   text: String!
+  # create date
   date: DateTime!
 }
 
+# user profile
 type Profile{
+  # profile id
   id: ID!
+  # yours
   self: Boolean
+  # profile name
   name: String!
+  # profile text
   text: String!
+  # create date
   date: DateTime!
+  # update
   update: DateTime!
+  # screen name
   sn: String!
 }
 
+# res vote flag
 enum VoteFlag{
+  # up voted
   uv
+  # down voted
   dv
+  # not voted
   not
 }
 
+# res delete flag
 enum ResDeleteFlag{
+  # by user
   self
+  # by manager
   freeze
 }
-enum ResNormalType{
-  normal
-}
+
+# normal res
 type ResNormal{
-  type:ResNormalType!
+  # res id
   id: ID!
+  # posted topic
   topic: Topic!
+  # post date
   date: DateTime!
+  # yours
   self: Boolean
+  # up vote count
   uv: Int!
+  # down vote count
   dv: Int!
+  # hash(user,topic,date)
   hash: String!
+  # reply count
   replyCount: Int!
+  # you vote flag
   voteFlag: VoteFlag
 
+  # res name
   name: String
+  # res text
   text: String!
+  # reply res
   reply: Res
+  # res profile
   profile: Profile
+  # is yours reply
   isReply: Boolean
 }
-enum ResHistoryType{
-  history
-}
+
+# post history notice res
 type ResHistory{
-  type:ResHistoryType!
+  # res id
   id: ID!
+  # post topic
   topic: Topic!
+  # post date
   date: DateTime!
+  # yours
   self: Boolean
+  # up vote count
   uv: Int!
+  # down vote count
   dv: Int!
+  # hash(date,user,topic)
   hash: String!
+  # was reply count
   replyCount: Int!
+  # you vote flag
   voteFlag: VoteFlag
 
+  # target history
   history: History!
 }
-enum ResTopicType{
-  topic
-}
+
+# first res in One/Fork Topic
 type ResTopic{
-  type:ResTopicType!
+  # res id
   id: ID!
+  # post topic
   topic: Topic!
+  # post date
   date: DateTime!
+  # yours
   self: Boolean
+  # up vote count
   uv: Int!
+  # down vote count
   dv: Int!
+  # hash(user,topic,date)
   hash: String!
+  # reply count
   replyCount: Int!
+  # you vote flag
   voteFlag: VoteFlag
 }
-enum ResForkType{
-  fork
-}
+
+# new fork topic notice res
 type ResFork{
-  type:ResForkType!
+  # res id
   id: ID!
+  # post topic
   topic: Topic!
+  # post date
   date: String!
+  # yours
   self: Boolean
+  # up vote count
   uv: Int!
+  # down vote count
   dv: Int!
+  # hash(user,topic,date)
   hash: String!
+  # reply count
   replyCount: Int!
+  # you vote flag
   voteFlag: VoteFlag
 
+  # target fork topic
   fork: TopicFork!
 }
-enum ResDeleteType{
-  delete
-}
+
+# deteled res
 type ResDelete{
-  type:ResDeleteType!
+  # res id
   id: ID!
+  # post topic
   topic: Topic!
-  date: DateTime!
+  # post date
+  date: String!
+  # yours
   self: Boolean
+  # up vote count
   uv: Int!
+  # down vote count
   dv: Int!
+  # hash(user,topic,date)
   hash: String!
+  # reply count
   replyCount: Int!
+  # you vote flag
   voteFlag: VoteFlag
 
+  # delete flag
   flag: ResDeleteFlag!
 }
 
+# All Res
 union Res=ResNormal|ResHistory|ResTopic|ResFork|ResDelete
 
 type TokenReq{
   token: ID!
   key: String!
 }
-enum TokenMasterType{
-  master
-}
+
 type TokenMaster{
-  type:TokenMasterType!
   id: ID!
   key: String!
   date: DateTime!
 }
-enum TokenGeneralType{
-  general
-}
+
 type TokenGeneral{
-  type:TokenGeneralType!
   id: ID!
   key: String!
   date: DateTime!
@@ -164,12 +237,8 @@ type TokenGeneral{
 
 union Token=TokenMaster|TokenGeneral
 
-enum TopicNormalType{
-  normal
-}
 
 type TopicNormal{
-  type:TopicNormalType!
   id: ID!
   title: String!
   update: DateTime!
@@ -180,11 +249,8 @@ type TopicNormal{
   tags: [String!]!
   text:String!
 }
-enum TopicOneType{
-  one
-}
+
 type TopicOne{
-  type:TopicOneType!
   id: ID!
   title: String!
   update: DateTime!
@@ -195,11 +261,8 @@ type TopicOne{
   tags: [String!]!
   text:String!
 }
-enum TopicForkType{
-  fork
-}
+
 type TopicFork{
-  TopicFork:TopicForkType!
   id: ID!
   title: String!
   update: DateTime!
