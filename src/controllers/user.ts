@@ -29,6 +29,13 @@ export const userResolver = (repo: IRepo) => {
         _info: any) => {
         return (await repo.user.findOne(args.id)).sn;
       },
+      user: async (
+        _obj: any,
+        _args: {},
+        context: Context,
+        _info: any) => {
+        return (await repo.user.findOne(context.auth.token.user)).toAPI();
+      },
     },
     Mutation: {
       createUser: async (

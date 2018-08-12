@@ -365,6 +365,7 @@ type Query{
   topicTags(limit:Int=100):[Tags!]!
   userID(sn:String!):ID!
   userSN(id:ID!):String!
+  user:User!
 }
 
 enum VoteType{
