@@ -233,6 +233,7 @@ type TokenGeneral{
   date: DateTime!
 
   client:Client!
+  createReq:TokenReq!
 }
 
 union Token=TokenMaster|TokenGeneral
@@ -387,7 +388,6 @@ type Mutation {
   delTokenClient(client:ID!):Boolean
   createTokenGeneral(client:ID!):TokenGeneral!
   createTokenMaster(auth:AuthUser!):TokenMaster!
-  createTokenReq:TokenReq!
   authTokenReq(id:ID!,key:String!):TokenGeneral!
   createTopicNormal(title:String!,tags:[String!]!,text:String!):TopicNormal!
   createTopicOne(title:String!,tags:[String!]!,text:String!):TopicOne!

@@ -72,20 +72,6 @@ export const tokenResolver = (repo: IRepo) => {
 
         return token.toAPI();
       },
-      createTokenReq: async (
-        _obj: any,
-        _args: {}, context: Context,
-        _info: any) => {
-        const token = await repo.token.findOne(context.auth.token.id);
-        if (token.type !== "general") {
-          throw new AtPrerequisiteError("通常トークン以外では出来ません");
-        }
-        const { req, token: newToken } = token.createReq(context.now, RandomGenerator);
-
-        await repo.token.update(newToken);
-
-        return req;
-      },
       authTokenReq: async (
         _obj: any,
         args: {
@@ -120,6 +106,20 @@ export const tokenResolver = (repo: IRepo) => {
         _info: any) => {
         const client = await context.loader.client.load(token.clientID);
         return client.toAPI(context.auth.TokenMasterOrNull);
+      },
+      createReq: async (
+        tokenAPI: ITokenGeneralAPI,
+        _args: {}, context: Context,
+        _info: any) => {
+        const token = await repo.token.findOne(tokenAPI.id);
+        if (token.type !== "general") {
+          throw new AtPrerequisiteError("通常トークン以外では出来ません");
+        }
+        const { req, token: newToken } = token.createReq(context.now, RandomGenerator);
+
+        await repo.token.update(newToken);
+
+        return req;
       },
     },
   };
