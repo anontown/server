@@ -83,8 +83,29 @@ enum ResDeleteFlag{
   freeze
 }
 
+interface Res{
+  # res id
+  id: ID!
+  # posted topic
+  topic: Topic!
+  # post date
+  date: DateTime!
+  # yours
+  self: Boolean
+  # up vote count
+  uv: Int!
+  # down vote count
+  dv: Int!
+  # hash(user,topic,date)
+  hash: String!
+  # reply count
+  replyCount: Int!
+  # you vote flag
+  voteFlag: VoteFlag
+}
+
 # normal res
-type ResNormal{
+type ResNormal implements Res{
   # res id
   id: ID!
   # posted topic
@@ -117,7 +138,7 @@ type ResNormal{
 }
 
 # post history notice res
-type ResHistory{
+type ResHistory implements Res{
   # res id
   id: ID!
   # post topic
@@ -142,7 +163,7 @@ type ResHistory{
 }
 
 # first res in One/Fork Topic
-type ResTopic{
+type ResTopic implements Res{
   # res id
   id: ID!
   # post topic
@@ -164,13 +185,13 @@ type ResTopic{
 }
 
 # new fork topic notice res
-type ResFork{
+type ResFork implements Res{
   # res id
   id: ID!
   # post topic
   topic: Topic!
   # post date
-  date: String!
+  date: DateTime!
   # yours
   self: Boolean
   # up vote count
@@ -189,13 +210,13 @@ type ResFork{
 }
 
 # deteled res
-type ResDelete{
+type ResDelete implements Res{
   # res id
   id: ID!
   # post topic
   topic: Topic!
   # post date
-  date: String!
+  date: DateTime!
   # yours
   self: Boolean
   # up vote count
@@ -213,21 +234,24 @@ type ResDelete{
   flag: ResDeleteFlag!
 }
 
-# All Res
-union Res=ResNormal|ResHistory|ResTopic|ResFork|ResDelete
-
 type TokenReq{
   token: ID!
   key: String!
 }
 
-type TokenMaster{
+interface Token{
   id: ID!
   key: String!
   date: DateTime!
 }
 
-type TokenGeneral{
+type TokenMaster implements Token{
+  id: ID!
+  key: String!
+  date: DateTime!
+}
+
+type TokenGeneral implements Token{
   id: ID!
   key: String!
   date: DateTime!
@@ -236,10 +260,16 @@ type TokenGeneral{
   createReq:TokenReq!
 }
 
-union Token=TokenMaster|TokenGeneral
+interface Topic{
+  id: ID!
+  title: String!
+  update: DateTime!
+  date: DateTime!
+  resCount: Int!
+  active: Boolean!
+}
 
-
-type TopicNormal{
+interface TopicSearch{
   id: ID!
   title: String!
   update: DateTime!
@@ -251,7 +281,7 @@ type TopicNormal{
   text:String!
 }
 
-type TopicOne{
+type TopicNormal implements Topic&TopicSearch{
   id: ID!
   title: String!
   update: DateTime!
@@ -263,7 +293,19 @@ type TopicOne{
   text:String!
 }
 
-type TopicFork{
+type TopicOne implements Topic&TopicSearch{
+  id: ID!
+  title: String!
+  update: DateTime!
+  date: DateTime!
+  resCount: Int!
+  active: Boolean!
+
+  tags: [String!]!
+  text:String!
+}
+
+type TopicFork implements Topic{
   id: ID!
   title: String!
   update: DateTime!
@@ -273,8 +315,6 @@ type TopicFork{
 
   parent:TopicNormal!
 }
-
-union Topic=TopicNormal|TopicOne|TopicFork
 
 type Storage{
   key:String!

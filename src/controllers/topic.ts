@@ -185,6 +185,18 @@ export const topicResolver = (repo: IRepo) => {
         }
       },
     },
+    TopicSearch: {
+      __resolveType(obj: ITopicAPI) {
+        switch (obj.type) {
+          case "normal":
+            return "TopicNormal";
+          case "one":
+            return "TopicOne";
+          case "fork":
+            return "TopicFork";
+        }
+      },
+    },
     TopicFork: {
       parent: async (
         token: ITopicForkAPI,
