@@ -2,6 +2,7 @@ const dbUser = process.env.DB_USER as string | undefined;
 const dbPass = process.env.DB_PASS as string | undefined;
 
 export const Config = {
+    timezone: "Asia/Tokyo",
     server: {
         port: Number(process.env.SERVER_PORT),
     },
