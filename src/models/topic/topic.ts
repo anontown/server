@@ -9,7 +9,7 @@ import { applyMixins } from "../../utils";
 import { History } from "../history";
 import { Res, ResFork, ResHistory, ResTopic } from "../res";
 import { User } from "../user";
-import * as moment from "moment-timezone";
+import moment from "moment-timezone";
 
 export interface ITopicDB {
   id: string;
