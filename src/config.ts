@@ -1,4 +1,5 @@
 export const Config = {
+    timezone: "Asia/Tokyo",
     server: {
         port: Number(process.env.SERVER_PORT),
     },
