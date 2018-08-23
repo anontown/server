@@ -9,7 +9,6 @@ import { applyMixins } from "../../utils";
 import { History } from "../history";
 import { Res, ResFork, ResHistory, ResTopic } from "../res";
 import { User } from "../user";
-import moment from "moment-timezone";
 
 export interface ITopicDB {
   id: string;
@@ -176,13 +175,12 @@ export abstract class TopicBase<T extends TopicType, C extends TopicBase<T, C>> 
   }
 
   hash(date: Date, user: User): string {
-    const mdate = moment(date).tz(Config.timezone);
     return hash(
       // ユーザー依存
       user.id + " " +
 
       // 書き込み年月日依存
-      mdate.year() + " " + mdate.month() + " " + mdate.date() + " " +
+      date.getFullYear() + " " + date.getMonth() + " " + date.getDate() + " " +
 
       // トピ依存
       this.id +
