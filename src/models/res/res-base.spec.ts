@@ -111,9 +111,7 @@ describe("ResBase", () => {
         const auth = { ...token, user: "voteuser" };
         const data = votedRes.cv(user, voteUser, auth);
 
-        expect(() => {
-          votedRes.v(user, voteUser, "dv", auth);
-        }).toEqual(data.res.v(data.resUser, voteUser, "dv", auth));
+        expect(votedRes.v(user, voteUser, "dv", auth)).toEqual(data.res.v(data.resUser, voteUser, "dv", auth));
       }
 
       {
@@ -122,9 +120,7 @@ describe("ResBase", () => {
         const auth = { ...token, user: "voteuser" };
         const data = votedRes.cv(user, voteUser, auth);
 
-        expect(() => {
-          votedRes.v(user, voteUser, "uv", auth);
-        }).toEqual(data.res.v(data.resUser, voteUser, "uv", auth));
+        expect(votedRes.v(user, voteUser, "uv", auth)).toEqual(data.res.v(data.resUser, voteUser, "uv", auth));
       }
     });
 
