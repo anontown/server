@@ -139,7 +139,7 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
 
   v(resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken): { res: C, resUser: User } {
     const voted = this.votes.find(x => x.user === user.id);
-    const data = voted !== undefined && ((voted.value > 0 && type === "uv") || (voted.value < 0 && type === "dv"))
+    const data = voted !== undefined && ((voted.value > 0 && type === "dv") || (voted.value < 0 && type === "uv"))
       ? this.cv(resUser, user, _authToken)
       : { res: this, resUser };
     return data.res._v(data.resUser, user, type, _authToken);
