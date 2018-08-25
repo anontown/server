@@ -138,6 +138,14 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
   abstract mapCopy(partial: PartialMap<ResBase<T, C>>): C;
 
   v(resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken): { res: C, resUser: User } {
+    const voted = this.votes.find(x => x.user === user.id);
+    const data = voted !== undefined && ((voted.value > 0 && type === "uv") || (voted.value < 0 && type === "dv"))
+      ? this.cv(resUser, user, _authToken)
+      : { res: this, resUser };
+    return data.res._v(data.resUser, user, type, _authToken);
+  }
+
+  _v(resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken): { res: C, resUser: User } {
     if (user.id === this.user) {
       throw new AtRightError("自分に投票は出来ません");
     }
@@ -299,6 +307,7 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
   toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"normal">;
   toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"normal", Body>;
   cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResNormal, resUser: User };
+  _v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResNormal, resUser: User };
   v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResNormal, resUser: User };
 
   constructor(
@@ -406,6 +415,7 @@ export class ResHistory extends Copyable<ResHistory> implements ResBase<"history
   toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"history">;
   toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"history", Body>;
   cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResHistory, resUser: User };
+  _v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResHistory, resUser: User };
   v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResHistory, resUser: User };
 
   readonly type: "history" = "history";
@@ -471,6 +481,7 @@ export class ResTopic extends Copyable<ResTopic> implements ResBase<"topic", Res
   toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"topic">;
   toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"topic", Body>;
   cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResTopic, resUser: User };
+  _v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResTopic, resUser: User };
   v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResTopic, resUser: User };
 
   readonly type: "topic" = "topic";
@@ -534,6 +545,7 @@ export class ResFork extends Copyable<ResFork> implements ResBase<"fork", ResFor
   toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"fork">;
   toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"fork", Body>;
   cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResFork, resUser: User };
+  _v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResFork, resUser: User };
   v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResFork, resUser: User };
 
   readonly type: "fork" = "fork";
