@@ -16,6 +16,7 @@ describe("ResBase", () => {
     toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"normal">;
     toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"normal", Body>;
     cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResBaseTest, resUser: User };
+    _v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResBaseTest, resUser: User };
     v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResBaseTest, resUser: User };
 
     readonly type: "normal" = "normal";
@@ -103,13 +104,48 @@ describe("ResBase", () => {
       }).toThrow(AtError);
     });
 
-    it("重複投票でエラーになるか", () => {
-      const votedRes = res.copy({ votes: Im.List([{ user: "voteuser", value: 2 }]) });
-      const voteUser = user.copy({ id: "voteuser" });
+    it("異なる重複投票を正常に出来るか", () => {
+      {
+        const votedRes = res.copy({ votes: Im.List([{ user: "voteuser", value: 2 }]) });
+        const voteUser = user.copy({ id: "voteuser" });
+        const auth = { ...token, user: "voteuser" };
+        const data = votedRes.cv(user, voteUser, auth);
 
-      expect(() => {
-        votedRes.v(user, voteUser, "uv", { ...token, user: "voteuser" });
-      }).toThrow(AtError);
+        expect(() => {
+          votedRes.v(user, voteUser, "dv", auth);
+        }).toEqual(data.res.v(data.resUser, voteUser, "dv", auth));
+      }
+
+      {
+        const votedRes = res.copy({ votes: Im.List([{ user: "voteuser", value: -2 }]) });
+        const voteUser = user.copy({ id: "voteuser" });
+        const auth = { ...token, user: "voteuser" };
+        const data = votedRes.cv(user, voteUser, auth);
+
+        expect(() => {
+          votedRes.v(user, voteUser, "uv", auth);
+        }).toEqual(data.res.v(data.resUser, voteUser, "uv", auth));
+      }
+    });
+
+    it("同様の重複投票でエラーになるか", () => {
+      {
+        const votedRes = res.copy({ votes: Im.List([{ user: "voteuser", value: 2 }]) });
+        const voteUser = user.copy({ id: "voteuser" });
+
+        expect(() => {
+          votedRes.v(user, voteUser, "uv", { ...token, user: "voteuser" });
+        }).toThrow(AtError);
+      }
+
+      {
+        const votedRes = res.copy({ votes: Im.List([{ user: "voteuser", value: -2 }]) });
+        const voteUser = user.copy({ id: "voteuser" });
+
+        expect(() => {
+          votedRes.v(user, voteUser, "dv", { ...token, user: "voteuser" });
+        }).toThrow(AtError);
+      }
     });
   });
 
