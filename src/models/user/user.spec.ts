@@ -247,9 +247,9 @@ describe("User", () => {
       }));
     });
 
-    it("30秒以上経ってない時エラーになるか", () => {
+    it("すぐに投稿するとエラーになるか", () => {
       expect(() => {
-        user.changeLastRes(new Date(20 * 1000));
+        user.changeLastRes(new Date(10));
       }).toThrow(AtError);
     });
 
@@ -259,12 +259,12 @@ describe("User", () => {
           user.copy({
             resWait: {
               last: new Date(0),
-              m10: 5,
-              m30: 5,
-              h1: 5,
-              h6: 5,
-              h12: 5,
-              d1: 5,
+              m10: 10000,
+              m30: 10000,
+              h1: 10000,
+              h6: 10000,
+              h12: 10000,
+              d1: 10000,
             },
           }).changeLastRes(new Date(30 * 1000));
         }).toThrow(AtError);
@@ -276,11 +276,11 @@ describe("User", () => {
             resWait: {
               last: new Date(0),
               m10: 0,
-              m30: 10,
-              h1: 10,
-              h6: 10,
-              h12: 10,
-              d1: 10,
+              m30: 10000,
+              h1: 10000,
+              h6: 10000,
+              h12: 10000,
+              d1: 10000,
             },
           }).changeLastRes(new Date(30 * 1000));
         }).toThrow(AtError);
@@ -293,10 +293,10 @@ describe("User", () => {
               last: new Date(0),
               m10: 0,
               m30: 0,
-              h1: 15,
-              h6: 15,
-              h12: 15,
-              d1: 15,
+              h1: 10000,
+              h6: 10000,
+              h12: 10000,
+              d1: 10000,
             },
           }).changeLastRes(new Date(30 * 1000));
         }).toThrow(AtError);
@@ -310,9 +310,9 @@ describe("User", () => {
               m10: 0,
               m30: 0,
               h1: 0,
-              h6: 20,
-              h12: 20,
-              d1: 20,
+              h6: 10000,
+              h12: 10000,
+              d1: 10000,
             },
           }).changeLastRes(new Date(30 * 1000));
         }).toThrow(AtError);
@@ -327,8 +327,8 @@ describe("User", () => {
               m30: 0,
               h1: 0,
               h6: 0,
-              h12: 35,
-              d1: 35,
+              h12: 10000,
+              d1: 10000,
             },
           }).changeLastRes(new Date(30 * 1000));
         }).toThrow(AtError);
@@ -344,7 +344,7 @@ describe("User", () => {
               h1: 0,
               h6: 0,
               h12: 0,
-              d1: 50,
+              d1: 10000,
             },
           }).changeLastRes(new Date(30 * 1000));
         }).toThrow(AtError);
