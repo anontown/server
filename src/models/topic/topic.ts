@@ -188,7 +188,7 @@ export abstract class TopicBase<T extends TopicType, C extends TopicBase<T, C>> 
       this.id +
 
       // ソルト依存
-      Config.salt.hash);
+      Config.salt.hash).substr(0, Config.topic.hashLen);
   }
 }
 
