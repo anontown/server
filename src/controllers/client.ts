@@ -38,8 +38,8 @@ export const clientResolver = (repo: IRepo) => {
         _obj: any,
         args: {
           id: string,
-          name: string,
-          url: string,
+          name?: string,
+          url?: string,
         },
         context: Context,
         _info: any) => {

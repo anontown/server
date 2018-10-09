@@ -1,9 +1,10 @@
 import { ObjectID } from "mongodb";
 import Copyable from "ts-copyable";
-import { AtRightError, paramsErrorMaker } from "../../at-error";
+import { AtRightError, paramsErrorMaker, paramsErrorMakerData } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
+import { delUndef } from "../../utils/index";
 
 export interface IClientDB {
   readonly _id: ObjectID;
@@ -90,7 +91,7 @@ export class Client extends Copyable<Client> {
     };
   }
 
-  changeData(authToken: IAuthTokenMaster, name: string, url: string, now: Date): Client {
+  changeData(authToken: IAuthTokenMaster, name: string | undefined, url: string | undefined, now: Date): Client {
     if (authToken.user !== this.user) {
       throw new AtRightError("人のクライアント変更は出来ません");
     }
@@ -109,6 +110,6 @@ export class Client extends Copyable<Client> {
       },
     ]);
 
-    return this.copy({ name, url, update: now });
+    return this.copy(delUndef({ name, url, update: now }));
   }
 }

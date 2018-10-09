@@ -181,6 +181,26 @@ describe("Client", () => {
           userID,
           new Date(0),
           new Date(200)));
+
+      expect(client.changeData(auth,
+        undefined,
+        "http://hoge2.com",
+        new Date(200))).toEqual(new Client(clientID,
+          "name",
+          "http://hoge2.com",
+          userID,
+          new Date(0),
+          new Date(200)));
+
+      expect(client.changeData(auth,
+        "name2",
+        undefined,
+        new Date(200))).toEqual(new Client(clientID,
+          "name2",
+          "http://hoge.com",
+          userID,
+          new Date(0),
+          new Date(200)));
     });
 
     it("違うユーザーが変更しようとしたらエラーになるか", () => {
@@ -222,7 +242,7 @@ describe("Client", () => {
           "http://hoge",
           new Date(0));
 
-        client.changeData(auth, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "http://foo", new Date(100));
+        client.changeData(auth, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", undefined, new Date(100));
       }).toThrow(AtError);
     });
 
@@ -238,10 +258,10 @@ describe("Client", () => {
         const client = Client.create(ObjectIDGenerator,
           auth,
           "hoge",
-          "hogehttp://hoge",
+          "http://hoge",
           new Date(0));
 
-        client.changeData(auth, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "http://foo", new Date(100));
+        client.changeData(auth, undefined, "hogehttp://foo", new Date(100));
       }).toThrow(AtError);
     });
   });
