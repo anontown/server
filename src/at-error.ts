@@ -55,7 +55,7 @@ export class AtParamsError extends AtError {
 
 export type paramsErrorMakerData =
     (() => IParamErrorData | null)
-    | { field: string, val: string, regex: RegExp, message: string };
+    | { field: string, val: string | undefined, regex: RegExp, message: string };
 
 export function paramsErrorMaker(fs: paramsErrorMakerData[]) {
     const errors: IParamErrorData[] = [];
@@ -66,7 +66,7 @@ export function paramsErrorMaker(fs: paramsErrorMakerData[]) {
                 errors.push(error);
             }
         } else {
-            if (!f.regex.test(f.val)) {
+            if (f.val !== undefined && !f.regex.test(f.val)) {
                 errors.push({
                     field: f.field,
                     message: f.message,
