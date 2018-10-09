@@ -78,7 +78,7 @@ describe("Profile", () => {
       });
     });
   });
-
+  // TODO: createの異常系とchangeDataのテスト
   describe("create", () => {
     it("正常に作れるか", () => {
       expect(Profile.create(() => profileID,

@@ -46,9 +46,9 @@ export const profileResolver = (repo: IRepo) => {
         _obj: any,
         args: {
           id: string,
-          name: string,
-          text: string,
-          sn: string,
+          name?: string,
+          text?: string,
+          sn?: string,
         },
         context: Context,
         _info: any) => {
