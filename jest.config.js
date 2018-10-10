@@ -8,8 +8,8 @@ module.exports = {
     "**/src/**/*.spec.ts"
   ],
   testPathIgnorePatterns: [
-    "<rootDir>/node_modules/",
-    ...(!ioMode ? ["\\.io\\.spec\\.ts"] : [])
+    "/node_modules/",
+    ...(!ioMode ? ["\\.io\\.spec\\.ts$"] : [])
   ],
   moduleFileExtensions: [
     "ts",
@@ -22,6 +22,10 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: [
     "src/**/*.ts"
+  ],
+  coveragePathIgnorePatterns: [
+    "/node_modules/",
+    "\\.d\\.ts$"
   ],
   coverageReporters: [
     "html",
