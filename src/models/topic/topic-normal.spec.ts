@@ -137,6 +137,76 @@ describe("TopicNormal", () => {
             point: 10,
           }),
         });
+
+      expect(topic.changeData(() => "id",
+        user,
+        auth,
+        undefined,
+        ["x"],
+        "text2",
+        new Date(1000))).toEqual({
+          topic: topic.copy({
+            update: new Date(1000),
+            title: "title",
+            text: "text2",
+            tags: Im.List(["x"]),
+          }),
+          history: new History("id",
+            "topic",
+            "title",
+            Im.List(["x"]),
+            "text2",
+            new Date(1000),
+            topic.hash(new Date(1000), user),
+            "user"),
+          res: new ResHistory("id",
+            "id",
+            "topic",
+            new Date(1000),
+            "user",
+            Im.List(),
+            50,
+            topic.hash(new Date(1000), user),
+            0),
+          user: user.copy({
+            point: 10,
+          }),
+        });
+
+      expect(topic.changeData(() => "id",
+        user,
+        auth,
+        "title2",
+        undefined,
+        "text2",
+        new Date(1000))).toEqual({
+          topic: topic.copy({
+            update: new Date(1000),
+            title: "title2",
+            text: "text2",
+            tags: Im.List(),
+          }),
+          history: new History("id",
+            "topic",
+            "title2",
+            Im.List(),
+            "text2",
+            new Date(1000),
+            topic.hash(new Date(1000), user),
+            "user"),
+          res: new ResHistory("id",
+            "id",
+            "topic",
+            new Date(1000),
+            "user",
+            Im.List(),
+            50,
+            topic.hash(new Date(1000), user),
+            0),
+          user: user.copy({
+            point: 10,
+          }),
+        });
     });
   });
 });

@@ -4,7 +4,7 @@ import { AtPrerequisiteError, paramsErrorMaker, paramsErrorMakerData } from "../
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { hash } from "../../utils";
+import { hash, delUndef } from "../../utils";
 import { applyMixins } from "../../utils";
 import { History } from "../history";
 import { Res, ResFork, ResHistory, ResTopic } from "../res";
@@ -277,14 +277,14 @@ export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBas
     objidGenerator: IGenerator<string>,
     user: User,
     authToken: IAuthToken,
-    title: string,
-    tags: string[],
-    text: string,
+    title: string | undefined,
+    tags: string[] | undefined,
+    text: string | undefined,
     now: Date) {
     const newUser = user.usePoint(10);
     TopicBase.checkData({ title, tags, text });
 
-    const newTopic = this.copy({ title, tags: Im.List(tags), text });
+    const newTopic = this.copy(delUndef({ title, tags: tags !== undefined ? Im.List(tags) : undefined, text }));
 
     const history = History.create(objidGenerator, newTopic, now, newTopic.hash(now, newUser), newUser);
     const { res, topic: newNewTopic } = ResHistory.create(objidGenerator,

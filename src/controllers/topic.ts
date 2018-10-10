@@ -138,9 +138,9 @@ export const topicResolver = (repo: IRepo) => {
         _obj: any,
         args: {
           id: string,
-          title: string,
-          tags: string[],
-          text: string,
+          title?: string,
+          tags?: string[],
+          text?: string,
         },
         context: Context,
         _info: any) => {
