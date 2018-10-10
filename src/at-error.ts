@@ -1,4 +1,4 @@
-import { Option } from "fp-ts/lib/Option";
+import { Option, fromNullable } from "fp-ts/lib/Option";
 
 export const AtErrorSymbol = Symbol("AtError");
 
@@ -68,7 +68,9 @@ export function paramsErrorMaker(fs: paramsErrorMakerData[]) {
                 errors.push(error);
             }
         } else {
-            if (typeof f.val === "string" && !f.regex.test(f.val)) {
+            if ((typeof f.val !== "object" || f.val === null ? fromNullable(f.val) : f.val)
+                .map(val => !f.regex.test(val))
+                .getOrElse(false)) {
                 errors.push({
                     field: f.field,
                     message: f.message,
