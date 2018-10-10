@@ -31,5 +31,7 @@ module.exports = {
     "html",
     "json"
   ],
-  testEnvironment: "node"
+  testEnvironment: "node",
+  verbose: true,
+  testURL: "http://localhost/"
 };
