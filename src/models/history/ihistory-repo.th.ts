@@ -3,12 +3,10 @@ import {
   AtError,
   dbReset,
   History,
-  HistoryRepo,
-  HistoryRepoMock,
   IHistoryRepo,
 } from "../../";
 
-function run(repoGene: () => IHistoryRepo, isReset: boolean) {
+export function run(repoGene: () => IHistoryRepo, isReset: boolean) {
   beforeEach(async () => {
     if (isReset) {
       await dbReset();
@@ -186,11 +184,3 @@ function run(repoGene: () => IHistoryRepo, isReset: boolean) {
     // TODO:存在しないID
   });
 }
-
-describe("HistoryRepoMock", () => {
-  run(() => new HistoryRepoMock(), false);
-});
-
-describe("HistoryRepo", () => {
-  run(() => new HistoryRepo(true), true);
-});

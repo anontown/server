@@ -4,11 +4,9 @@ import {
   IAuthTokenMaster,
   IMsgRepo,
   Msg,
-  MsgRepo,
-  MsgRepoMock,
 } from "../../";
 
-function run(repoGene: () => IMsgRepo, isReset: boolean) {
+export function run(repoGene: () => IMsgRepo, isReset: boolean) {
   beforeEach(async () => {
     if (isReset) {
       await dbReset();
@@ -195,10 +193,3 @@ function run(repoGene: () => IMsgRepo, isReset: boolean) {
   });
 }
 
-describe("MsgRepoMock", () => {
-  run(() => new MsgRepoMock(), false);
-});
-
-describe("MsgRepo", () => {
-  run(() => new MsgRepo(true), true);
-});

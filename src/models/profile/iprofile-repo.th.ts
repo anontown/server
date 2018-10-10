@@ -4,12 +4,10 @@ import {
   IProfileRepo,
   ObjectIDGenerator,
   Profile,
-  ProfileRepo,
-  ProfileRepoMock,
 } from "../../";
 import { AuthContainer } from "../../server/auth-container";
 
-function run(repoGene: () => IProfileRepo, isReset: boolean) {
+export function run(repoGene: () => IProfileRepo, isReset: boolean) {
   beforeEach(async () => {
     if (isReset) {
       await dbReset();
@@ -181,11 +179,3 @@ function run(repoGene: () => IProfileRepo, isReset: boolean) {
     // TODO:存在しないID
   });
 }
-
-describe("ProfileRepoMock", () => {
-  run(() => new ProfileRepoMock(), false);
-});
-
-describe("ProfileRepo", () => {
-  run(() => new ProfileRepo(), true);
-});

@@ -6,11 +6,9 @@ import {
   IStorageRepo,
   ObjectIDGenerator,
   Storage,
-  StorageRepo,
-  StorageRepoMock,
 } from "../../";
 
-function run(repoGene: () => IStorageRepo, isReset: boolean) {
+export function run(repoGene: () => IStorageRepo, isReset: boolean) {
   beforeEach(async () => {
     if (isReset) {
       await dbReset();
@@ -277,11 +275,3 @@ function run(repoGene: () => IStorageRepo, isReset: boolean) {
     });
   });
 }
-
-describe("StorageRepoMock", () => {
-  run(() => new StorageRepoMock(), false);
-});
-
-describe("StorageRepo", () => {
-  run(() => new StorageRepo(), true);
-});

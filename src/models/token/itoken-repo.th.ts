@@ -6,11 +6,9 @@ import {
   ObjectIDGenerator,
   TokenGeneral,
   TokenMaster,
-  TokenRepo,
-  TokenRepoMock,
 } from "../../";
 
-function run(repoGene: () => ITokenRepo, isReset: boolean) {
+export function run(repoGene: () => ITokenRepo, isReset: boolean) {
   beforeEach(async () => {
     if (isReset) {
       await dbReset();
@@ -193,10 +191,3 @@ function run(repoGene: () => ITokenRepo, isReset: boolean) {
   });
 }
 
-describe("TokenRepoMock", () => {
-  run(() => new TokenRepoMock(), false);
-});
-
-describe("TokenRepo", () => {
-  run(() => new TokenRepo(), true);
-});

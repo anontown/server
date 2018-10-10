@@ -5,11 +5,9 @@ import {
   ObjectIDGenerator,
   ResWaitCountKey,
   User,
-  UserRepo,
-  UserRepoMock,
 } from "../../";
 
-function run(repoGene: () => IUserRepo, isReset: boolean) {
+export function run(repoGene: () => IUserRepo, isReset: boolean) {
   beforeEach(async () => {
     if (isReset) {
       await dbReset();
@@ -199,11 +197,3 @@ function run(repoGene: () => IUserRepo, isReset: boolean) {
     }
   });
 }
-
-describe("UserRepoMock", () => {
-  run(() => new UserRepoMock(), false);
-});
-
-describe("UserRepo", () => {
-  run(() => new UserRepo(), true);
-});

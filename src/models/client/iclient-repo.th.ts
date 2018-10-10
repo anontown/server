@@ -1,14 +1,12 @@
 import {
   AtError,
   Client,
-  ClientRepo,
-  ClientRepoMock,
   dbReset,
   IClientRepo,
   ObjectIDGenerator,
 } from "../../";
 
-function run(repoGene: () => IClientRepo, isReset: boolean) {
+export function run(repoGene: () => IClientRepo, isReset: boolean) {
   const client = new Client(ObjectIDGenerator(),
     "name",
     "https://hoge.com",
@@ -155,10 +153,5 @@ function run(repoGene: () => IClientRepo, isReset: boolean) {
   });
 }
 
-describe("ClientRepoMock", () => {
-  run(() => new ClientRepoMock(), false);
-});
 
-describe("ClientRepo", () => {
-  run(() => new ClientRepo(), true);
-});
+

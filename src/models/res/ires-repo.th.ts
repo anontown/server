@@ -8,13 +8,11 @@ import {
   ResFork,
   ResHistory,
   ResNormal,
-  ResRepo,
-  ResRepoMock,
   ResTopic,
 } from "../../";
 import { AuthContainer } from "../../server/auth-container";
 
-function run(repoGene: () => IResRepo, isReset: boolean) {
+export function run(repoGene: () => IResRepo, isReset: boolean) {
   beforeEach(async () => {
     if (isReset) {
       await dbReset();
@@ -386,10 +384,3 @@ function run(repoGene: () => IResRepo, isReset: boolean) {
 
 }
 
-describe("ResRepoMock", () => {
-  run(() => new ResRepoMock(), false);
-});
-
-describe("ResRepo", () => {
-  run(() => new ResRepo(true), true);
-});

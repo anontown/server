@@ -3,15 +3,12 @@ import {
   AtError,
   dbReset,
   ITopicRepo,
-  ResRepoMock,
   TopicFork,
   TopicNormal,
   TopicOne,
-  TopicRepo,
-  TopicRepoMock,
 } from "../../";
 
-function run(repoGene: () => ITopicRepo, isReset: boolean) {
+export function run(repoGene: () => ITopicRepo, isReset: boolean) {
   const topicNormal = new TopicNormal("topicn",
     "title",
     Im.List(),
@@ -369,10 +366,3 @@ function run(repoGene: () => ITopicRepo, isReset: boolean) {
   });
 }
 
-describe("TopicRepoMock", () => {
-  run(() => new TopicRepoMock(new ResRepoMock()), false);
-});
-
-describe("TopicRepo", () => {
-  run(() => new TopicRepo(new ResRepoMock(), true), true);
-});
