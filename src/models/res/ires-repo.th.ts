@@ -1,4 +1,4 @@
-import range from "array-range";
+import * as range from "array-range";
 import * as Im from "immutable";
 import {
   AtError,
@@ -195,8 +195,8 @@ export function run(repoGene: () => IResRepo, isReset: boolean) {
 
       expect(await repo.replyCount([])).toEqual(new Map());
       expect(await repo.replyCount(["res1"])).toEqual(new Map([["res1", 1]]));
-      expect(await repo.replyCount(range(0, 25).map(x => "res" + x)))
-        .toEqual(new Map(range(0, 24).map<[string, number]>(x => ["res" + x, 1])));
+      expect(await repo.replyCount(range(0, 25).map((x: number) => "res" + x)))
+        .toEqual(new Map(range(0, 24).map((x: number) => ["res" + x, 1])));
     });
   });
 
@@ -383,4 +383,3 @@ export function run(repoGene: () => IResRepo, isReset: boolean) {
   });
 
 }
-
