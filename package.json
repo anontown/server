@@ -54,7 +54,7 @@
     "build": "tsc",
     "start": "node ./dist/app.js",
     "test": "jest",
-    "test:io": "TEST_MODE=IO jest -w 1",
+    "test:io": "TEST_MODE=IO jest -w 1 --detectOpenHandles",
     "lint": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts'",
     "lint:fix": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts' --fix",
     "loc": "sloc --format cli-table ./src",
