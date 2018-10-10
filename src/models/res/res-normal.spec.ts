@@ -345,11 +345,11 @@ describe("ResNormal", () => {
           votes: resNormal.votes.toArray(),
           lv: resNormal.lv,
           hash: resNormal.hash,
-          name: resNormal.name,
+          name: resNormal.name.toNullable(),
           text: resNormal.text,
-          reply: resNormal.reply,
+          reply: resNormal.reply.toNullable(),
           deleteFlag: resNormal.deleteFlag,
-          profile: resNormal.profile,
+          profile: resNormal.profile.toNullable(),
           age: resNormal.age,
         },
       });
@@ -359,11 +359,11 @@ describe("ResNormal", () => {
         const api = resNormal.toAPI(none);
         expect(api).toEqual({
           ...resNormal.toBaseAPI(none),
-          name: resNormal.name,
+          name: resNormal.name.toNullable(),
           text: resNormal.text,
           replyID: "replyres",
-          profileID: resNormal.profile,
-          isReply: none,
+          profileID: resNormal.profile.toNullable(),
+          isReply: null,
         });
       });
 
