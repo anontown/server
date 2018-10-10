@@ -13,4 +13,4 @@ before_install:
  - cp es/.env.sample es/.env
  - AT_MODE=TEST docker-compose up -d
 script:
-  - AT_MODE=TEST docker-compose run app npm test:io
+  - AT_MODE=TEST docker-compose run app npm run test:io
