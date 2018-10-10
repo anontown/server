@@ -1,10 +1,9 @@
 import { ObjectID } from "mongodb";
-import Copyable from "ts-copyable";
+import { Copyable } from "../../utils";
 import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { delUndef } from "../../utils/index";
 
 export interface IProfileDB {
   readonly _id: ObjectID;
@@ -128,11 +127,11 @@ export class Profile extends Copyable<Profile> {
       },
     ]);
 
-    return this.copy(delUndef({
+    return this.copy({
       name,
       text,
       sn,
       update: now,
-    }));
+    });
   }
 }

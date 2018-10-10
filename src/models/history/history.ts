@@ -1,5 +1,5 @@
 import * as Im from "immutable";
-import Copyable from "ts-copyable";
+import { Copyable } from "../../utils";
 import { IAuthToken } from "../../auth";
 import { IGenerator } from "../../generator";
 import { TopicNormal } from "../topic";

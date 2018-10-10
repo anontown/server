@@ -1,10 +1,10 @@
 import { ObjectID } from "mongodb";
-import Copyable from "ts-copyable";
+import { Copyable } from "../../utils";
 import { AtPrerequisiteError, AtUserAuthError, paramsErrorMaker } from "../../at-error";
 import { IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { hash, delUndef } from "../../utils";
+import { hash } from "../../utils";
 
 export interface IUserDB {
   readonly _id: ObjectID;
@@ -118,7 +118,7 @@ export class User extends Copyable<User> {
       },
     ]);
 
-    return this.copy(delUndef({ pass: pass !== undefined ? hash(pass + Config.salt.pass) : undefined, sn }));
+    return this.copy({ pass: pass !== undefined ? hash(pass + Config.salt.pass) : undefined, sn });
   }
 
   auth(pass: string): IAuthUser {

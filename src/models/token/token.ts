@@ -1,6 +1,6 @@
 import * as Im from "immutable";
 import { ObjectID } from "mongodb";
-import Copyable from "ts-copyable";
+import { Copyable } from "../../utils";
 import { AtNotFoundError, AtTokenAuthError } from "../../at-error";
 import { IAuthTokenGeneral, IAuthTokenMaster, IAuthUser } from "../../auth";
 import { Config } from "../../config";

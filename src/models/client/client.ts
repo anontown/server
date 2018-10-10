@@ -1,10 +1,9 @@
 import { ObjectID } from "mongodb";
-import Copyable from "ts-copyable";
+import { Copyable } from "../../utils";
 import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { delUndef } from "../../utils/index";
 
 export interface IClientDB {
   readonly _id: ObjectID;
@@ -110,6 +109,6 @@ export class Client extends Copyable<Client> {
       },
     ]);
 
-    return this.copy(delUndef({ name, url, update: now }));
+    return this.copy({ name, url, update: now });
   }
 }

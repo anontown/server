@@ -1,5 +1,5 @@
 import { ObjectID } from "mongodb";
-import Copyable from "ts-copyable";
+import { Copyable } from "../../utils";
 import {
   ITokenBaseAPI,
   ITokenBaseDB,

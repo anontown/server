@@ -1,4 +1,4 @@
-import Copyable from "ts-copyable";
+import { Copyable } from "../../utils";
 import { AtRightError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { IGenerator } from "../../generator";

@@ -1,5 +1,5 @@
 import * as Im from "immutable";
-import Copyable from "ts-copyable";
+import { Copyable } from "../../utils";
 import {
   AtPrerequisiteError,
   AtRightError,

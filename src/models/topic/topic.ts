@@ -1,10 +1,10 @@
 import * as Im from "immutable";
-import Copyable from "ts-copyable";
+import { Copyable } from "../../utils";
 import { AtPrerequisiteError, paramsErrorMaker, paramsErrorMakerData } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { hash, delUndef } from "../../utils";
+import { hash } from "../../utils";
 import { applyMixins } from "../../utils";
 import { History } from "../history";
 import { Res, ResFork, ResHistory, ResTopic } from "../res";
@@ -283,7 +283,7 @@ export class TopicNormal extends Copyable<TopicNormal> implements TopicSearchBas
     const newUser = user.usePoint(10);
     TopicBase.checkData({ title, tags, text });
 
-    const newTopic = this.copy(delUndef({ title, tags: tags !== undefined ? Im.List(tags) : undefined, text }));
+    const newTopic = this.copy({ title, tags: tags !== undefined ? Im.List(tags) : undefined, text });
 
     const history = History.create(objidGenerator, newTopic, now, newTopic.hash(now, newUser), newUser);
     const { res, topic: newNewTopic } = ResHistory.create(objidGenerator,
