@@ -1,5 +1,5 @@
 import * as Im from "immutable";
-import Copyable, { PartialMap } from "ts-copyable";
+import Copyable from "ts-copyable";
 import {
   AtPrerequisiteError,
   AtRightError,
@@ -135,7 +135,6 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
   abstract readonly replyCount: number;
 
   abstract copy(partial: Partial<ResBase<T, C>>): C;
-  abstract mapCopy(partial: PartialMap<ResBase<T, C>>): C;
 
   v(resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken): { res: C, resUser: User } {
     const voted = this.votes.find(x => x.user === user.id);

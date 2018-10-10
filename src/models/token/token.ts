@@ -1,6 +1,6 @@
 import * as Im from "immutable";
 import { ObjectID } from "mongodb";
-import Copyable, { PartialMap } from "ts-copyable";
+import Copyable from "ts-copyable";
 import { AtNotFoundError, AtTokenAuthError } from "../../at-error";
 import { IAuthTokenGeneral, IAuthTokenMaster, IAuthUser } from "../../auth";
 import { Config } from "../../config";
@@ -70,7 +70,6 @@ export abstract class TokenBase<T extends TokenType, C extends TokenBase<T, C>> 
   abstract readonly type: T;
 
   abstract copy(partial: Partial<TokenBase<T, C>>): C;
-  abstract mapCopy(partial: PartialMap<TokenBase<T, C>>): C;
 
   toBaseDB(): ITokenBaseDB<T> {
     return {

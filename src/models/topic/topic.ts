@@ -1,5 +1,5 @@
 import * as Im from "immutable";
-import Copyable, { PartialMap } from "ts-copyable";
+import Copyable from "ts-copyable";
 import { AtPrerequisiteError, paramsErrorMaker, paramsErrorMakerData } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
@@ -136,7 +136,6 @@ export abstract class TopicBase<T extends TopicType, C extends TopicBase<T, C>> 
   abstract readonly active: boolean;
 
   abstract copy(partial: Partial<TopicBase<T, C>>): C;
-  abstract mapCopy(partial: PartialMap<TopicBase<T, C>>): C;
 
   toBaseDB<Body extends object>(body: Body): ITopicBaseDB<T, Body> {
     return {
