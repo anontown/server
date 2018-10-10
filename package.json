@@ -59,29 +59,4 @@
     "loc": "sloc --format cli-table ./src",
     "schema:generate": "apollo schema:download --endpoint ./resources/app.gql ./schema/schema.json"
   },
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testMatch": [
-      "**/src/**/*.spec.ts"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ],
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "src/**/*.ts"
-    ],
-    "coverageReporters": [
-      "html",
-      "json"
-    ],
-    "testEnvironment": "node"
-  }
 }
