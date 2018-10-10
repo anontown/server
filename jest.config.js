@@ -8,8 +8,8 @@ module.exports = {
     "**/src/**/*.spec.ts"
   ],
   testPathIgnorePatterns: [
-    "/node_modules/",
-    ...(!ioMode ? ["**/src/**/*.io.spec.ts"] : [])
+    "<rootDir>/node_modules/",
+    ...(!ioMode ? ["\\.io\\.spec\\.ts"] : [])
   ],
   moduleFileExtensions: [
     "ts",
