@@ -1,3 +1,4 @@
+import { some } from "fp-ts/lib/Option";
 import * as Im from "immutable";
 import {
   IAuthToken,
@@ -102,7 +103,7 @@ describe("ResTopic", () => {
 
   describe("toAPI", () => {
     it("正常に変換出来るか", () => {
-      expect(resTopic.toAPI(token)).toEqual(resTopic.toBaseAPI(token));
+      expect(resTopic.toAPI(some(token))).toEqual(resTopic.toBaseAPI(some(token)));
     });
   });
 });

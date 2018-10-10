@@ -1,4 +1,5 @@
 import { withFilter } from "apollo-server";
+import { fromNullable, some } from "fp-ts/lib/Option";
 import { AtPrerequisiteError } from "../at-error";
 import { ObjectIDGenerator } from "../generator";
 import {
@@ -32,7 +33,7 @@ export const resResolver = (repo: IRepo) => {
         context: Context,
         _info: any) => {
         const reses = await repo.res.find(context.auth, args.query, args.limit);
-        return reses.map(x => x.toAPI(context.auth.tokenOrNull));
+        return reses.map(x => x.toAPI(fromNullable(context.auth.tokenOrNull)));
       },
     },
     Mutation: {
@@ -59,10 +60,10 @@ export const resResolver = (repo: IRepo) => {
           topic,
           user,
           context.auth.token,
-          args.name !== undefined ? args.name : null,
+          fromNullable(args.name),
           args.text,
-          reply,
-          profile,
+          fromNullable(reply),
+          fromNullable(profile),
           args.age,
           context.now);
 
@@ -73,7 +74,7 @@ export const resResolver = (repo: IRepo) => {
         ]);
 
         context.log("reses", res.id);
-        return res.toAPI(context.auth.token);
+        return res.toAPI(some(context.auth.token));
       },
       voteRes: async (
         _obj: any,
@@ -100,7 +101,7 @@ export const resResolver = (repo: IRepo) => {
             repo.user.update(user),
           ]);
 
-          return newRes.toAPI(context.auth.token);
+          return newRes.toAPI(some(context.auth.token));
         } else {
           const [res, user] = await Promise.all([
             repo.res.findOne(args.id),
@@ -118,7 +119,7 @@ export const resResolver = (repo: IRepo) => {
             repo.user.update(user),
           ]);
 
-          return newRes.toAPI(context.auth.token);
+          return newRes.toAPI(some(context.auth.token));
         }
       },
       delRes: async (
@@ -144,13 +145,13 @@ export const resResolver = (repo: IRepo) => {
           repo.user.update(newResUser),
         ]);
 
-        return newRes.toAPI(context.auth.token);
+        return newRes.toAPI(some(context.auth.token));
       },
     },
     Subscription: {
       resAdded: {
         resolve: (payload: { res: Res, count: number }, _args: any, context: Context, _info: any) => {
-          return { ...payload, res: payload.res.toAPI(context.auth.tokenOrNull) };
+          return { ...payload, res: payload.res.toAPI(fromNullable(context.auth.tokenOrNull)) };
         },
         subscribe: () => withFilter(
           () => pubsub.asyncIterator(RES_ADDED),
@@ -192,7 +193,7 @@ export const resResolver = (repo: IRepo) => {
         _info: any) => {
         if (res.replyID !== null) {
           const reply = await context.loader.res.load(res.replyID);
-          return reply.toAPI(context.auth.tokenOrNull);
+          return reply.toAPI(fromNullable(context.auth.tokenOrNull));
         } else {
           return null;
         }

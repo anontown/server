@@ -1,3 +1,4 @@
+import { fromNullable, Option } from "fp-ts/lib/Option";
 import * as Im from "immutable";
 import {
   AtPrerequisiteError,
@@ -191,24 +192,21 @@ export abstract class ResBase<T extends ResType, C extends ResBase<T, C>> {
     };
   }
 
-  toBaseAPI(authToken: IAuthToken | null): IResBaseAPI<T> {
-    let voteFlag: VoteFlag | null;
-    if (authToken === null) {
-      voteFlag = null;
-    } else {
+  toBaseAPI(authToken: Option<IAuthToken>): IResBaseAPI<T> {
+    const voteFlag = authToken.map(authToken => {
       const vote = this.votes.find(v => authToken.user === v.user);
       if (vote === undefined) {
-        voteFlag = "not";
+        return "not";
       } else {
-        voteFlag = vote.value > 0 ? "uv" : "dv";
+        return vote.value > 0 ? "uv" : "dv";
       }
-    }
+    }).toNullable();
 
     return {
       id: this.id,
       topicID: this.topic,
       date: this.date,
-      self: authToken !== null ? authToken.user === this.user : null,
+      self: authToken.map(authToken => authToken.user === this.user).toNullable(),
       uv: this.votes.filter(x => x.value > 0).size,
       dv: this.votes.filter(x => x.value < 0).size,
       hash: this.hash,
@@ -223,11 +221,11 @@ export type Res = ResNormal | ResHistory | ResTopic | ResFork;
 
 export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", ResNormal> {
   static fromDB(r: IResNormalDB, replyCount: number): ResNormal {
-    return new ResNormal(r.body.name,
+    return new ResNormal(fromNullable(r.body.name),
       r.body.text,
-      r.body.reply,
+      fromNullable(r.body.reply),
       r.body.deleteFlag,
-      r.body.profile,
+      fromNullable(r.body.profile),
       r.body.age,
       r.id,
       r.body.topic,
@@ -244,10 +242,10 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
     topic: Topic,
     user: User,
     _authToken: IAuthToken,
-    name: string | null,
+    name: Option<string>,
     text: string,
-    reply: Res | null,
-    profile: Profile | null,
+    reply: Option<Res>,
+    profile: Option<Profile>,
     age: boolean,
     now: Date) {
     const bodyCheck = {
@@ -257,26 +255,22 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
       message: Config.res.text.msg,
     };
 
-    paramsErrorMaker(name !== null ?
-      [
-        bodyCheck,
-        {
-          field: "name",
-          val: name,
-          regex: Config.res.name.regex,
-          message: Config.res.name.msg,
-        },
-      ] :
-      [
-        bodyCheck,
-      ]);
+    paramsErrorMaker([
+      bodyCheck,
+      {
+        field: "name",
+        val: name,
+        regex: Config.res.name.regex,
+        message: Config.res.name.msg,
+      },
+    ]);
 
-    if (profile !== null && profile.user !== user.id) {
+    if (profile.map(profile => profile.user !== user.id).getOrElse(false)) {
       throw new AtRightError("自分のプロフィールを指定して下さい。");
     }
 
     // もしリプ先があるかつ、トピックがリプ先と違えばエラー
-    if (reply !== null && reply.topic !== topic.id) {
+    if (reply.map(reply => reply.topic !== topic.id).getOrElse(false)) {
       throw new AtPrerequisiteError("他のトピックのレスへのリプは出来ません");
     }
 
@@ -284,9 +278,9 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
 
     const result = new ResNormal(name,
       text,
-      reply !== null ? { res: reply.id, user: reply.user } : null,
+      reply.map(reply => ({ res: reply.id, user: reply.user })),
       "active",
-      profile !== null ? profile.id : null,
+      profile.map(profile => profile.id),
       age,
       objidGenerator(),
       topic.id,
@@ -303,18 +297,18 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
 
   readonly type: "normal" = "normal";
 
-  toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"normal">;
+  toBaseAPI!: (authToken: Option<IAuthToken>) => IResBaseAPI<"normal">;
   toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"normal", Body>;
   cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResNormal, resUser: User };
   _v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResNormal, resUser: User };
   v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResNormal, resUser: User };
 
   constructor(
-    readonly name: string | null,
+    readonly name: Option<string>,
     readonly text: string,
-    readonly reply: IReply | null,
+    readonly reply: Option<IReply>,
     readonly deleteFlag: ResDeleteFlag,
-    readonly profile: string | null,
+    readonly profile: Option<string>,
     readonly age: boolean,
     readonly id: string,
     readonly topic: string,
@@ -329,24 +323,24 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
 
   toDB(): IResNormalDB {
     return this.toBaseDB({
-      name: this.name,
+      name: this.name.toNullable(),
       text: this.text,
-      reply: this.reply,
+      reply: this.reply.toNullable(),
       deleteFlag: this.deleteFlag,
-      profile: this.profile,
+      profile: this.profile.toNullable(),
       age: this.age,
     });
   }
 
-  toAPI(authToken: IAuthToken | null): IResNormalAPI | IResDeleteAPI {
+  toAPI(authToken: Option<IAuthToken>): IResNormalAPI | IResDeleteAPI {
     if (this.deleteFlag === "active") {
       return {
         ...this.toBaseAPI(authToken),
-        name: this.name,
+        name: this.name.toNullable(),
         text: this.text,
-        replyID: this.reply !== null ? this.reply.res : null,
-        profileID: this.profile !== null ? this.profile : null,
-        isReply: authToken === null || this.reply === null ? null : authToken.user === this.reply.user,
+        replyID: this.reply.map(x => x.res).toNullable(),
+        profileID: this.profile.toNullable(),
+        isReply: authToken.chain(authToken => this.reply.map(reply => authToken.user === reply.user)).toNullable(),
       };
     } else {
       return {
@@ -411,7 +405,7 @@ export class ResHistory extends Copyable<ResHistory> implements ResBase<"history
     return { res: result, topic: newTopic };
   }
 
-  toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"history">;
+  toBaseAPI!: (authToken: Option<IAuthToken>) => IResBaseAPI<"history">;
   toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"history", Body>;
   cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResHistory, resUser: User };
   _v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResHistory, resUser: User };
@@ -436,7 +430,7 @@ export class ResHistory extends Copyable<ResHistory> implements ResBase<"history
     return this.toBaseDB({ history: this.history });
   }
 
-  toAPI(authToken: IAuthToken | null): IResHistoryAPI {
+  toAPI(authToken: Option<IAuthToken>): IResHistoryAPI {
     return {
       ...this.toBaseAPI(authToken),
       historyID: this.history,
@@ -477,7 +471,7 @@ export class ResTopic extends Copyable<ResTopic> implements ResBase<"topic", Res
     return { res: result, topic: newTopic };
   }
 
-  toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"topic">;
+  toBaseAPI!: (authToken: Option<IAuthToken>) => IResBaseAPI<"topic">;
   toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"topic", Body>;
   cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResTopic, resUser: User };
   _v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResTopic, resUser: User };
@@ -501,7 +495,7 @@ export class ResTopic extends Copyable<ResTopic> implements ResBase<"topic", Res
     return this.toBaseDB({});
   }
 
-  toAPI(authToken: IAuthToken | null): IResTopicAPI {
+  toAPI(authToken: Option<IAuthToken>): IResTopicAPI {
     return this.toBaseAPI(authToken);
   }
 }
@@ -541,7 +535,7 @@ export class ResFork extends Copyable<ResFork> implements ResBase<"fork", ResFor
     return { res: result, topic: newTopic };
   }
 
-  toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"fork">;
+  toBaseAPI!: (authToken: Option<IAuthToken>) => IResBaseAPI<"fork">;
   toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"fork", Body>;
   cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResFork, resUser: User };
   _v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResFork, resUser: User };
@@ -566,7 +560,7 @@ export class ResFork extends Copyable<ResFork> implements ResBase<"fork", ResFor
     return this.toBaseDB({ fork: this.fork });
   }
 
-  toAPI(authToken: IAuthToken | null): IResForkAPI {
+  toAPI(authToken: Option<IAuthToken>): IResForkAPI {
     return {
       ...this.toBaseAPI(authToken),
       forkID: this.fork,

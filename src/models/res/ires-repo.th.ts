@@ -1,4 +1,5 @@
 import * as range from "array-range";
+import { none, some } from "fp-ts/lib/Option";
 import * as Im from "immutable";
 import {
   AtError,
@@ -19,11 +20,11 @@ export function run(repoGene: () => IResRepo, isReset: boolean) {
     }
   });
 
-  const resNormal = new ResNormal("name",
+  const resNormal = new ResNormal(some("name"),
     "text",
-    null,
+    none,
     "active",
-    null,
+    none,
     true,
     "res",
     "topic",
@@ -178,7 +179,7 @@ export function run(repoGene: () => IResRepo, isReset: boolean) {
       await repo.insert(resNormal.copy({ id: "res0" }));
 
       for (const i of range(1, 25)) {
-        await repo.insert(resNormal.copy({ id: "res" + i, reply: { user: "user", res: "res" + (i - 1) } }));
+        await repo.insert(resNormal.copy({ id: "res" + i, reply: some({ user: "user", res: "res" + (i - 1) }) }));
       }
 
       for (let i = 25; i < 50; i++) {
@@ -219,11 +220,11 @@ export function run(repoGene: () => IResRepo, isReset: boolean) {
       const res2 = resTopic.copy({ id: "res2", date: new Date(80), topic: "topic2" });
       const res3 = resFork.copy({ id: "res3", date: new Date(30), user: "user2" });
       const res4 = resHistory.copy({ id: "res4", date: new Date(90), hash: "hash2" });
-      const res5 = resNormal.copy({ id: "res5", date: new Date(20), profile: "p1" });
+      const res5 = resNormal.copy({ id: "res5", date: new Date(20), profile: some("p1") });
       const res6 = resTopic.copy({ id: "res6", date: new Date(10), replyCount: 1 });
       const res7 = resNormal.copy({
         id: "res7", date: new Date(60), text: "abc"
-        , reply: { user: "user", res: "res6" },
+        , reply: some({ user: "user", res: "res6" }),
       });
       const res8 = resHistory.copy({ id: "res8", date: new Date(40) });
       const res9 = resFork.copy({ id: "res9", date: new Date(70) });

@@ -1,3 +1,4 @@
+import { none } from "fp-ts/lib/Option";
 import * as Im from "immutable";
 import {
   applyMixins,
@@ -136,11 +137,11 @@ describe("TopicBase", () => {
   });
 
   describe("resUpdate", () => {
-    const resNormal = new ResNormal(null,
+    const resNormal = new ResNormal(none,
       "text",
-      null,
+      none,
       "active",
-      null,
+      none,
       true,
       "res",
       "topic",

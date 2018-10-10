@@ -1,3 +1,4 @@
+import { none, some } from "fp-ts/lib/Option";
 import {
   AtError,
   dbReset,
@@ -5,7 +6,6 @@ import {
   IMsgRepo,
   Msg,
 } from "../../";
-import { some, none } from "fp-ts/lib/Option";
 
 export function run(repoGene: () => IMsgRepo, isReset: boolean) {
   beforeEach(async () => {

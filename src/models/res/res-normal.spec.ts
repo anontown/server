@@ -1,3 +1,4 @@
+import { fromNullable, none, some } from "fp-ts/lib/Option";
 import * as Im from "immutable";
 import {
   AtError,
@@ -10,14 +11,14 @@ import {
 
 describe("ResNormal", () => {
   const resNormal = new ResNormal(
-    "name",
+    some("name"),
     "text",
-    {
+    some({
       res: "replyres",
       user: "replyuser",
-    },
+    }),
     "active",
-    "profile",
+    some("profile"),
     true,
     "res",
     "topic",
@@ -97,14 +98,14 @@ describe("ResNormal", () => {
           profile: "profile",
           age: true,
         },
-      }, 2)).toEqual(new ResNormal("name",
+      }, 2)).toEqual(new ResNormal(some("name"),
         "text",
-        {
+        some({
           res: "replyres",
           user: "replyuser",
-        },
+        }),
         "active",
-        "profile",
+        some("profile"),
         true,
         "res",
         "topic",
@@ -124,18 +125,18 @@ describe("ResNormal", () => {
         topicNormal,
         user,
         token,
-        "name",
+        some("name"),
         "text",
-        null,
-        null,
+        none,
+        none,
         true,
         new Date(60000));
 
-      expect(res).toEqual(new ResNormal("name",
+      expect(res).toEqual(new ResNormal(some("name"),
         "text",
-        null,
+        none,
         "active",
-        null,
+        none,
         true,
         "res",
         "topic",
@@ -171,18 +172,18 @@ describe("ResNormal", () => {
         topicNormal,
         user,
         token,
-        null,
+        none,
         "text",
-        resNormal.copy({ id: "res2", user: "res2" }),
-        null,
+        some(resNormal.copy({ id: "res2", user: "res2" })),
+        none,
         true,
         new Date(60000));
 
-      expect(res).toEqual(new ResNormal(null,
+      expect(res).toEqual(new ResNormal(none,
         "text",
-        { res: "res2", user: "res2" },
+        some({ res: "res2", user: "res2" }),
         "active",
-        null,
+        none,
         true,
         "res",
         "topic",
@@ -219,18 +220,18 @@ describe("ResNormal", () => {
         topicNormal,
         user,
         token,
-        null,
+        none,
         "text",
-        null,
-        profile,
+        none,
+        some(profile),
         true,
         date);
 
-      expect(res).toEqual(new ResNormal(null,
+      expect(res).toEqual(new ResNormal(none,
         "text",
-        null,
+        none,
         "active",
-        "profile",
+        some("profile"),
         true,
         "res",
         "topic",
@@ -267,10 +268,10 @@ describe("ResNormal", () => {
           topicNormal,
           user,
           token,
-          null,
+          none,
           "text",
-          resNormal.copy({ id: "res2", user: "res2", topic: "topic2" }),
-          null,
+          some(resNormal.copy({ id: "res2", user: "res2", topic: "topic2" })),
+          none,
           true,
           new Date(60000));
       }).toThrow(AtError);
@@ -283,10 +284,10 @@ describe("ResNormal", () => {
           topicNormal,
           user,
           token,
-          null,
+          none,
           "text",
-          null,
-          profile.copy({ user: "user2" }),
+          none,
+          some(profile.copy({ user: "user2" })),
           true,
           new Date(60000));
       }).toThrow(AtError);
@@ -300,10 +301,10 @@ describe("ResNormal", () => {
             topicNormal,
             user,
             token,
-            name,
+            some(name),
             "text",
-            null,
-            null,
+            none,
+            none,
             true,
             new Date(60000));
         }).toThrow(AtError);
@@ -319,10 +320,10 @@ describe("ResNormal", () => {
               topicNormal,
               user,
               token,
-              name,
+              fromNullable(name),
               text,
-              null,
-              null,
+              none,
+              none,
               true,
               new Date(60000));
           }).toThrow(AtError);
@@ -355,19 +356,19 @@ describe("ResNormal", () => {
     });
     describe("#toAPI", () => {
       it("正常に変換出来るか", () => {
-        const api = resNormal.toAPI(null);
+        const api = resNormal.toAPI(none);
         expect(api).toEqual({
-          ...resNormal.toBaseAPI(null),
+          ...resNormal.toBaseAPI(none),
           name: resNormal.name,
           text: resNormal.text,
           replyID: "replyres",
           profileID: resNormal.profile,
-          isReply: null,
+          isReply: none,
         });
       });
 
       it("自分に対するリプライ", () => {
-        const api = resNormal.toAPI({ ...token, user: "replyuser" });
+        const api = resNormal.toAPI(some({ ...token, user: "replyuser" }));
         if (api.type === "normal") {
           expect(api.isReply).toBe(true);
         } else {
@@ -376,7 +377,7 @@ describe("ResNormal", () => {
       });
 
       it("他人に対するリプライ", () => {
-        const api = resNormal.toAPI({ ...token, user: "user2" });
+        const api = resNormal.toAPI(some({ ...token, user: "user2" }));
         if (api.type === "normal") {
           expect(api.isReply).toBe(false);
         } else {
@@ -385,18 +386,18 @@ describe("ResNormal", () => {
       });
 
       it("自主削除されたレス", () => {
-        const api = resNormal.copy({ deleteFlag: "self" }).toAPI(null);
+        const api = resNormal.copy({ deleteFlag: "self" }).toAPI(none);
         expect(api).toEqual({
-          ...resNormal.toBaseAPI(null),
+          ...resNormal.toBaseAPI(none),
           type: "delete",
           flag: "self",
         });
       });
 
       it("強制削除されたレス", () => {
-        const api = resNormal.copy({ deleteFlag: "freeze" }).toAPI(null);
+        const api = resNormal.copy({ deleteFlag: "freeze" }).toAPI(none);
         expect(api).toEqual({
-          ...resNormal.toBaseAPI(null),
+          ...resNormal.toBaseAPI(none),
           type: "delete",
           flag: "freeze",
         });

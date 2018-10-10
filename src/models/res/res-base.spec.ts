@@ -1,3 +1,4 @@
+import { none, Option, some } from "fp-ts/lib/Option";
 import * as Im from "immutable";
 import {
   AtError,
@@ -13,7 +14,7 @@ import { applyMixins } from "../../utils";
 
 describe("ResBase", () => {
   class ResBaseTest extends Copyable<ResBaseTest> implements ResBase<"normal", ResBaseTest> {
-    toBaseAPI!: (authToken: IAuthToken | null) => IResBaseAPI<"normal">;
+    toBaseAPI!: (authToken: Option<IAuthToken>) => IResBaseAPI<"normal">;
     toBaseDB!: <Body extends object>(body: Body) => IResBaseDB<"normal", Body>;
     cv!: (resUser: User, user: User, _authToken: IAuthToken) => { res: ResBaseTest, resUser: User };
     _v!: (resUser: User, user: User, type: "uv" | "dv", _authToken: IAuthToken) => { res: ResBaseTest, resUser: User };
@@ -187,7 +188,7 @@ describe("ResBase", () => {
 
   describe("#toBaseAPI", () => {
     it("tokenがnullの時", () => {
-      const api = res.toBaseAPI(null);
+      const api = res.toBaseAPI(none);
       expect(api).toEqual({
         id: res.id,
         topicID: res.topic,
@@ -203,7 +204,7 @@ describe("ResBase", () => {
     });
 
     it("tokenが投稿ユーザーの時", () => {
-      const api = res.toBaseAPI(token);
+      const api = res.toBaseAPI(some(token));
       expect(api).toEqual({
         id: res.id,
         topicID: res.topic,
@@ -221,7 +222,7 @@ describe("ResBase", () => {
     it("tokenが投稿ユーザーでない時", () => {
       const api = res.copy({
         votes: Im.List([{ user: "user2", value: -2 }]),
-      }).toBaseAPI({ ...token, user: "user1" });
+      }).toBaseAPI(some({ ...token, user: "user1" }));
       expect(api).toEqual({
         id: res.id,
         topicID: res.topic,
@@ -240,7 +241,7 @@ describe("ResBase", () => {
       const api = res.copy({
         votes: Im.List([{ user: "user2", value: -2 }, { user: "user1", value: 5 }]),
       })
-        .toBaseAPI({ ...token, user: "user1" });
+        .toBaseAPI(some({ ...token, user: "user1" }));
 
       expect(api).toEqual({
         id: res.id,
@@ -260,7 +261,7 @@ describe("ResBase", () => {
       const api = res.copy({
         votes: Im.List([{ user: "user1", value: -1 }, { user: "user2", value: 1 }]),
       })
-        .toBaseAPI({ ...token, user: "user1" });
+        .toBaseAPI(some({ ...token, user: "user1" }));
 
       expect(api).toEqual({
         id: res.id,

@@ -1,10 +1,10 @@
+import { none, some } from "fp-ts/lib/Option";
 import {
   AtError,
   IAuthTokenMaster,
   Msg,
   User,
 } from "../../";
-import { some, none } from "fp-ts/lib/Option";
 
 describe("Msg", () => {
   const msg = new Msg("msg", some("user"), "text", new Date(0));

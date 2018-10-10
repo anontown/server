@@ -1,3 +1,4 @@
+import { some } from "fp-ts/lib/Option";
 import * as Im from "immutable";
 import {
   IAuthToken,
@@ -121,7 +122,7 @@ describe("ResFork", () => {
 
   describe("toAPI", () => {
     it("正常に変換出来るか", () => {
-      expect(resFork.toAPI(token)).toEqual({ ...resFork.toBaseAPI(token), forkID: "topicfork" });
+      expect(resFork.toAPI(some(token))).toEqual({ ...resFork.toBaseAPI(some(token)), forkID: "topicfork" });
     });
   });
 });

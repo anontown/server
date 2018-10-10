@@ -1,3 +1,4 @@
+import { none } from "fp-ts/lib/Option";
 import * as Im from "immutable";
 import {
   History,
@@ -120,10 +121,10 @@ describe("ResHistory", () => {
 
   describe("#toAPI", () => {
     it("正常に変換できるか", () => {
-      const api = resHistory.toAPI(null);
+      const api = resHistory.toAPI(none);
 
       expect(api).toEqual({
-        ...resHistory.toBaseAPI(null),
+        ...resHistory.toBaseAPI(none),
         historyID: resHistory.history,
       });
     });
