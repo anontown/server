@@ -9,7 +9,7 @@ module.exports = {
   ],
   testPathIgnorePatterns: [
     "/node_modules/",
-    ...(!ioMode ? ["**/src/**/*.spec.io.ts"] : [])
+    ...(!ioMode ? ["**/src/**/*.io.spec.ts"] : [])
   ],
   moduleFileExtensions: [
     "ts",
