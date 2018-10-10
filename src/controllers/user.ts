@@ -55,8 +55,8 @@ export const userResolver = (repo: IRepo) => {
       updateUser: async (
         _obj: any,
         args: {
-          sn: string,
-          pass: string,
+          sn?: string,
+          pass?: string,
           auth: {
             id: string,
             pass: string

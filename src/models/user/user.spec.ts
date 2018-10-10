@@ -139,8 +139,13 @@ describe("User", () => {
     };
 
     it("正常に変更出来るか", () => {
-      expect(user.change(authUser, "pass2", "scn2")).toEqual(user.copy({
+      expect(user.change(authUser, undefined, "scn2")).toEqual(user.copy({
         sn: "scn2",
+        pass: hash("pass" + Config.salt.pass),
+      }));
+
+      expect(user.change(authUser, "pass2", undefined)).toEqual(user.copy({
+        sn: "scn",
         pass: hash("pass2" + Config.salt.pass),
       }));
     });

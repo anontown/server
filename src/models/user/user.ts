@@ -4,7 +4,7 @@ import { AtPrerequisiteError, AtUserAuthError, paramsErrorMaker } from "../../at
 import { IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { hash } from "../../utils";
+import { hash, delUndef } from "../../utils";
 
 export interface IUserDB {
   readonly _id: ObjectID;
@@ -102,7 +102,7 @@ export class User extends Copyable<User> {
     };
   }
 
-  change(_authUser: IAuthUser, pass: string, sn: string): User {
+  change(_authUser: IAuthUser, pass: string | undefined, sn: string | undefined): User {
     paramsErrorMaker([
       {
         field: "pass",
@@ -118,7 +118,7 @@ export class User extends Copyable<User> {
       },
     ]);
 
-    return this.copy({ pass: hash(pass + Config.salt.pass), sn });
+    return this.copy(delUndef({ pass: pass !== undefined ? hash(pass + Config.salt.pass) : undefined, sn }));
   }
 
   auth(pass: string): IAuthUser {

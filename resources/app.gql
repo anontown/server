@@ -434,7 +434,7 @@ type Mutation {
   createTopicFork(title:String!,parent:ID!):TopicFork!
   updateTopic(id:ID!,title:String,tags:[String!],text:String):TopicNormal!
   createUser(sn:String!,pass:String!,recaptcha:String!):User!
-  updateUser(sn:String!,pass:String!,auth:AuthUser!):User!
+  updateUser(sn:String,pass:String,auth:AuthUser!):User!
 }
 
 type ResSubscript{
