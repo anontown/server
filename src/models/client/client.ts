@@ -1,6 +1,6 @@
 import { ObjectID } from "mongodb";
 import Copyable from "ts-copyable";
-import { AtRightError, paramsErrorMaker, paramsErrorMakerData } from "../../at-error";
+import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
