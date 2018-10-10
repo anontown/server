@@ -44,9 +44,9 @@
     "@types/ramda": "^0.25.36",
     "@types/request": "0.0.39",
     "apollo": "^1.7.0",
-    "jest": "^22.0.4",
+    "jest": "^23.6.0",
     "sloc": "^0.2.0",
-    "ts-jest": "^22.0.0",
+    "ts-jest": "^23.10.4",
     "tslint": "^5.8.0",
     "typescript": "^3.0.1"
   },

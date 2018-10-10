@@ -33,5 +33,4 @@ module.exports = {
   ],
   testEnvironment: "node",
   verbose: true,
-  testURL: "http://localhost/"
 };
