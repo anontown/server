@@ -365,4 +365,3 @@ export function run(repoGene: () => ITopicRepo, isReset: boolean) {
     // TODO:存在しないID
   });
 }
-

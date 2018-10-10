@@ -1,7 +1,7 @@
-import { Copyable } from "../../utils";
 import { AtRightError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { IGenerator } from "../../generator";
+import { Copyable } from "../../utils";
 import { User } from "../user";
 
 export interface IMsgDB {

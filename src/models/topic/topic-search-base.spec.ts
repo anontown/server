@@ -1,5 +1,4 @@
 import * as Im from "immutable";
-import { Copyable } from "../../utils";
 import {
   applyMixins,
   ITopicBaseAPI,
@@ -10,6 +9,7 @@ import {
   TopicSearchBase,
   User,
 } from "../../";
+import { Copyable } from "../../utils";
 
 describe("TopicSearchBase", () => {
   class TopicSearchBaseTest

@@ -1,7 +1,7 @@
 import * as Im from "immutable";
-import { Copyable } from "../../utils";
 import { IAuthToken } from "../../auth";
 import { IGenerator } from "../../generator";
+import { Copyable } from "../../utils";
 import { TopicNormal } from "../topic";
 import { User } from "../user";
 

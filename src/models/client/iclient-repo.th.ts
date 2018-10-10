@@ -152,6 +152,3 @@ export function run(repoGene: () => IClientRepo, isReset: boolean) {
     // TODO:存在しないID
   });
 }
-
-
-

@@ -1,9 +1,9 @@
 import { ObjectID } from "mongodb";
-import { Copyable } from "../../utils";
 import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
+import { Copyable } from "../../utils";
 
 export interface IProfileDB {
   readonly _id: ObjectID;
@@ -102,7 +102,12 @@ export class Profile extends Copyable<Profile> {
     };
   }
 
-  changeData(authToken: IAuthToken, name: string | undefined, text: string | undefined, sn: string | undefined, now: Date) {
+  changeData(
+    authToken: IAuthToken,
+    name: string | undefined,
+    text: string | undefined,
+    sn: string | undefined,
+    now: Date) {
     if (authToken.user !== this.user) {
       throw new AtRightError("人のプロフィール変更は出来ません");
     }

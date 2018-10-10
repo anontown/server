@@ -192,4 +192,3 @@ export function run(repoGene: () => IMsgRepo, isReset: boolean) {
     // TODO:存在しないID
   });
 }
-

@@ -1,8 +1,8 @@
 import { ObjectID } from "mongodb";
-import { Copyable } from "../../utils";
 import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
+import { Copyable } from "../../utils";
 
 export interface IStorageDB {
   client: ObjectID | null;

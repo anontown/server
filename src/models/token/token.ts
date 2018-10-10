@@ -1,10 +1,10 @@
 import * as Im from "immutable";
 import { ObjectID } from "mongodb";
-import { Copyable } from "../../utils";
 import { AtNotFoundError, AtTokenAuthError } from "../../at-error";
 import { IAuthTokenGeneral, IAuthTokenMaster, IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
+import { Copyable } from "../../utils";
 import { hash } from "../../utils";
 import { applyMixins } from "../../utils";
 import { Client } from "../client";

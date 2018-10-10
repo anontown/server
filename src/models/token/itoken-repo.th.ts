@@ -190,4 +190,3 @@ export function run(repoGene: () => ITokenRepo, isReset: boolean) {
     });
   });
 }
-

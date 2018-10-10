@@ -1,9 +1,9 @@
 import { ObjectID } from "mongodb";
-import { Copyable } from "../../utils";
 import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
+import { Copyable } from "../../utils";
 
 export interface IClientDB {
   readonly _id: ObjectID;

@@ -1,5 +1,4 @@
 import * as Im from "immutable";
-import { Copyable } from "../../utils";
 import {
   AtPrerequisiteError,
   AtRightError,
@@ -8,6 +7,7 @@ import {
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
+import { Copyable } from "../../utils";
 import { applyMixins } from "../../utils";
 import { History } from "../history";
 import { Profile } from "../profile";

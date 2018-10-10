@@ -62,7 +62,7 @@ export const tokenResolver = (repo: IRepo) => {
       createTokenMaster: async (
         _obj: any,
         args: {
-          auth: { id: string, pass: string }
+          auth: { id: string, pass: string },
         },
         context: Context,
         _info: any) => {

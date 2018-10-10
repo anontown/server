@@ -43,11 +43,11 @@ export const userResolver = (repo: IRepo) => {
         args: {
           sn: string,
           pass: string,
-          recaptcha: string
+          recaptcha: string,
         },
         context: Context,
         _info: any) => {
-        await authFromApiParam.recaptcha(args.recaptcha)
+        await authFromApiParam.recaptcha(args.recaptcha);
         const user = User.create(ObjectIDGenerator, args.sn, args.pass, context.now);
         await repo.user.insert(user);
         return user.toAPI();
@@ -59,8 +59,8 @@ export const userResolver = (repo: IRepo) => {
           pass?: string,
           auth: {
             id: string,
-            pass: string
-          }
+            pass: string,
+          },
         },
         _context: Context,
         _info: any) => {

@@ -1,5 +1,4 @@
 import * as Im from "immutable";
-import { Copyable } from "../../utils";
 import {
   AtError,
   IAuthToken,
@@ -9,6 +8,7 @@ import {
   ResBase,
   User,
 } from "../../";
+import { Copyable } from "../../utils";
 import { applyMixins } from "../../utils";
 
 describe("ResBase", () => {

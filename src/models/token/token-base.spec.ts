@@ -1,11 +1,11 @@
 import { ObjectID } from "mongodb";
-import { Copyable } from "../../utils";
 import {
   ITokenBaseAPI,
   ITokenBaseDB,
   ObjectIDGenerator,
   TokenBase,
 } from "../../";
+import { Copyable } from "../../utils";
 import { applyMixins } from "../../utils";
 
 describe("TokenBase", () => {

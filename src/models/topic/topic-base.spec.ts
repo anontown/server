@@ -1,5 +1,4 @@
 import * as Im from "immutable";
-import { Copyable } from "../../utils";
 import {
   applyMixins,
   AtError,
@@ -11,6 +10,7 @@ import {
   TopicBase,
   User,
 } from "../../";
+import { Copyable } from "../../utils";
 
 describe("TopicBase", () => {
   class TopicBaseTest extends Copyable<TopicBaseTest> implements TopicBase<"normal", TopicBaseTest> {

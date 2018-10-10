@@ -5,7 +5,6 @@ import {
   TopicRepoMock,
 } from "../../";
 
-
 describe("TopicRepoMock", () => {
   run(() => new TopicRepoMock(new ResRepoMock()), false);
 });

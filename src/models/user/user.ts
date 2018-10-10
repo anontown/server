@@ -1,9 +1,9 @@
 import { ObjectID } from "mongodb";
-import { Copyable } from "../../utils";
 import { AtPrerequisiteError, AtUserAuthError, paramsErrorMaker } from "../../at-error";
 import { IAuthUser } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
+import { Copyable } from "../../utils";
 import { hash } from "../../utils";
 
 export interface IUserDB {

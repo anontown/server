@@ -87,7 +87,7 @@ export const Config = {
             regex: /^[\s\S]{1,10000}$/,
             msg: "本文は1～1万文字以内にして下さい",
         },
-        hashLen: 6
+        hashLen: 6,
     },
     res: {
         name: {

@@ -1,15 +1,15 @@
 import * as Im from "immutable";
-import { Copyable } from "../../utils";
+import * as moment from "moment-timezone";
 import { AtPrerequisiteError, paramsErrorMaker, paramsErrorMakerData } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
-import { hash } from "../../utils";
+import { Copyable } from "../../utils";
 import { applyMixins } from "../../utils";
+import { hash } from "../../utils";
 import { History } from "../history";
 import { Res, ResFork, ResHistory, ResTopic } from "../res";
 import { User } from "../user";
-import * as moment from "moment-timezone";
 
 export interface ITopicDB {
   id: string;

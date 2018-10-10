@@ -2,7 +2,7 @@ import { delUndef } from "./del-undef";
 
 // https://github.com/nwtgck/ts-copyable-npm
 
-export class Copyable<T>{
+export class Copyable<T> {
   constructor(private _constructor: new (...args: any[]) => T) {
   }
 
