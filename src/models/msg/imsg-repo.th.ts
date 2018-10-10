@@ -5,6 +5,7 @@ import {
   IMsgRepo,
   Msg,
 } from "../../";
+import { some, none } from "fp-ts/lib/Option";
 
 export function run(repoGene: () => IMsgRepo, isReset: boolean) {
   beforeEach(async () => {
@@ -14,7 +15,7 @@ export function run(repoGene: () => IMsgRepo, isReset: boolean) {
   });
 
   const msg = new Msg("msg",
-    "user",
+    some("user"),
     "text",
     new Date(0));
 
@@ -32,7 +33,7 @@ export function run(repoGene: () => IMsgRepo, isReset: boolean) {
       const repo = repoGene();
 
       await repo.insert(new Msg("msg",
-        "user",
+        some("user"),
         "text",
         new Date(0)));
 
@@ -54,15 +55,15 @@ export function run(repoGene: () => IMsgRepo, isReset: boolean) {
         type: "master",
       };
 
-      const msg1 = msg.copy({ id: "msg1", date: new Date(50), receiver: null });
-      const msg2 = msg.copy({ id: "msg2", date: new Date(80), receiver: user2 });
-      const msg3 = msg.copy({ id: "msg3", date: new Date(30), receiver: user1 });
-      const msg4 = msg.copy({ id: "msg4", date: new Date(90), receiver: user1 });
-      const msg5 = msg.copy({ id: "msg5", date: new Date(20), receiver: user1 });
-      const msg6 = msg.copy({ id: "msg6", date: new Date(10), receiver: user1 });
-      const msg7 = msg.copy({ id: "msg7", date: new Date(60), receiver: user1 });
-      const msg8 = msg.copy({ id: "msg8", date: new Date(40), receiver: user1 });
-      const msg9 = msg.copy({ id: "msg9", date: new Date(70), receiver: user1 });
+      const msg1 = msg.copy({ id: "msg1", date: new Date(50), receiver: none });
+      const msg2 = msg.copy({ id: "msg2", date: new Date(80), receiver: some(user2) });
+      const msg3 = msg.copy({ id: "msg3", date: new Date(30), receiver: some(user1) });
+      const msg4 = msg.copy({ id: "msg4", date: new Date(90), receiver: some(user1) });
+      const msg5 = msg.copy({ id: "msg5", date: new Date(20), receiver: some(user1) });
+      const msg6 = msg.copy({ id: "msg6", date: new Date(10), receiver: some(user1) });
+      const msg7 = msg.copy({ id: "msg7", date: new Date(60), receiver: some(user1) });
+      const msg8 = msg.copy({ id: "msg8", date: new Date(40), receiver: some(user1) });
+      const msg9 = msg.copy({ id: "msg9", date: new Date(70), receiver: some(user1) });
 
       await repo.insert(msg1);
       await repo.insert(msg2);

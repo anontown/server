@@ -1,3 +1,4 @@
+import { fromNullable, Option } from "fp-ts/lib/Option";
 import { AtRightError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { IGenerator } from "../../generator";
@@ -22,19 +23,19 @@ export interface IMsgAPI {
 
 export class Msg extends Copyable<Msg> {
   static fromDB(m: IMsgDB): Msg {
-    return new Msg(m.id, m.body.receiver, m.body.text, new Date(m.body.date));
+    return new Msg(m.id, fromNullable(m.body.receiver), m.body.text, new Date(m.body.date));
   }
 
-  static create(objidGenerator: IGenerator<string>, receiver: User | null, text: string, now: Date): Msg {
+  static create(objidGenerator: IGenerator<string>, receiver: Option<User>, text: string, now: Date): Msg {
     return new Msg(objidGenerator(),
-      receiver !== null ? receiver.id : null,
+      receiver.map(x => x.id),
       text,
       now);
   }
 
   constructor(
     readonly id: string,
-    readonly receiver: string | null,
+    readonly receiver: Option<string>,
     readonly text: string,
     readonly date: Date) {
     super(Msg);
@@ -44,7 +45,7 @@ export class Msg extends Copyable<Msg> {
     return {
       id: this.id,
       body: {
-        receiver: this.receiver,
+        receiver: this.receiver.toNullable(),
         text: this.text,
         date: this.date.toISOString(),
       },
@@ -52,13 +53,13 @@ export class Msg extends Copyable<Msg> {
   }
 
   toAPI(authToken: IAuthToken): IMsgAPI {
-    if (this.receiver !== null && this.receiver !== authToken.user) {
+    if (this.receiver.map(x => x !== authToken.user).getOrElse(false)) {
       throw new AtRightError("アクセス権がありません。");
     }
 
     return {
       id: this.id,
-      priv: this.receiver !== null,
+      priv: this.receiver.isSome(),
       text: this.text,
       date: this.date.toISOString(),
     };

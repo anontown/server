@@ -4,10 +4,11 @@ import {
   Msg,
   User,
 } from "../../";
+import { some, none } from "fp-ts/lib/Option";
 
 describe("Msg", () => {
-  const msg = new Msg("msg", "user", "text", new Date(0));
-  const receiverNullMsg = new Msg("msg", null, "text", new Date(0));
+  const msg = new Msg("msg", some("user"), "text", new Date(0));
+  const receiverNullMsg = new Msg("msg", none, "text", new Date(0));
   const auth: IAuthTokenMaster = {
     id: "token",
     key: "key",
@@ -69,7 +70,7 @@ describe("Msg", () => {
 
   describe("create", () => {
     it("receiverがnullの時正常に生成できるか", () => {
-      expect(Msg.create(() => "msg", null, "text", new Date(0))).toEqual(receiverNullMsg);
+      expect(Msg.create(() => "msg", none, "text", new Date(0))).toEqual(receiverNullMsg);
     });
 
     it("receiverがnullでない時正常に生成出来るか", () => {
@@ -91,7 +92,7 @@ describe("Msg", () => {
         new Date(20),
         0,
         new Date(250));
-      expect(Msg.create(() => "msg", user, "text", new Date(0))).toEqual(msg);
+      expect(Msg.create(() => "msg", some(user), "text", new Date(0))).toEqual(msg);
     });
   });
 });
