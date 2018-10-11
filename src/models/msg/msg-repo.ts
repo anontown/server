@@ -10,7 +10,7 @@ export class MsgRepo implements IMsgRepo {
   async findOne(id: string): Promise<Msg> {
     let msg;
     try {
-      msg = await ESClient.get<IMsgDB["body"]>({
+      msg = await ESClient().get<IMsgDB["body"]>({
         index: "msgs",
         type: "doc",
         id,
@@ -58,7 +58,7 @@ export class MsgRepo implements IMsgRepo {
         },
       });
     }
-    const msgs = await ESClient.search<IMsgDB["body"]>({
+    const msgs = await ESClient().search<IMsgDB["body"]>({
       index: "msgs",
       size: limit,
       body: {
@@ -86,7 +86,7 @@ export class MsgRepo implements IMsgRepo {
 
   async insert(msg: Msg): Promise<void> {
     const mDB = msg.toDB();
-    await ESClient.create({
+    await ESClient().create({
       index: "msgs",
       type: "doc",
       id: mDB.id,
@@ -97,7 +97,7 @@ export class MsgRepo implements IMsgRepo {
 
   async update(msg: Msg): Promise<void> {
     const mDB = msg.toDB();
-    await ESClient.index({
+    await ESClient().index({
       index: "msgs",
       type: "doc",
       id: mDB.id,

@@ -10,7 +10,7 @@ import { hash } from "./utils";
 const updateFunc: (() => Promise<void>)[] = [];
 
 updateFunc.push((async () => {
-  const db = await DB;
+  const db = await DB();
 
   await db.createCollection("clients");
 
@@ -32,13 +32,13 @@ updateFunc.push((async () => {
 }));
 
 updateFunc.push((async () => {
-  const db = await DB;
+  const db = await DB();
 
   await db.collection("users").update({}, { $set: { point: 0 } }, { multi: true });
 }));
 
 updateFunc.push((async () => {
-  const db = await DB;
+  const db = await DB();
 
   const board = await db.createCollection("boards");
   await board.createIndex({ category: 1 }, { unique: true });
@@ -46,7 +46,7 @@ updateFunc.push((async () => {
 }));
 
 updateFunc.push((async () => {
-  const db = await DB;
+  const db = await DB();
 
   // reply:ObjectID(ResID)|nullをreply:{res:ObjectID,User:ObjectID}|nullに変換
 
@@ -77,7 +77,7 @@ updateFunc.push((async () => {
             },
           },
         },
-    ));
+      ));
   });
 
   await Promise.all(promises);
@@ -85,7 +85,7 @@ updateFunc.push((async () => {
 
 updateFunc.push((async () => {
   // HASHのイコール削除
-  const db = await DB;
+  const db = await DB();
   const promises: Promise<any>[] = [];
 
   const reses: { _id: ObjectID, hash: string }[] = await db.collection("reses").find().toArray();
@@ -119,7 +119,7 @@ updateFunc.push((async () => {
       Config.salt.hash);
 
   // レス、履歴取得
-  const db = await DB;
+  const db = await DB();
   const rdb = db.collection("reses");
   const hdb = db.collection("histories");
   const reses = await rdb.find().toArray();
@@ -138,7 +138,7 @@ updateFunc.push((async () => {
 
 updateFunc.push((async () => {
   // topicにsage機能を実装するための修正
-  const db = await DB;
+  const db = await DB();
   const promises: Promise<any>[] = [];
 
   const topics = await db.collection("topics").find().toArray();
@@ -151,7 +151,7 @@ updateFunc.push((async () => {
 }));
 
 updateFunc.push((async () => {
-  const db = await DB;
+  const db = await DB();
   const promises: Promise<any>[] = [];
 
   const profiles: IProfileDB[] = await db.collection("profiles").find().toArray();
@@ -164,20 +164,20 @@ updateFunc.push((async () => {
 }));
 
 updateFunc.push((async () => {
-  const db = await DB;
+  const db = await DB();
 
   await db.collection("reses").update({}, { $set: { vote: [] }, $unset: { voteUser: 1 } }, { multi: true });
 }));
 
 updateFunc.push((async () => {
-  const db = await DB;
+  const db = await DB();
 
   await db.collection("users").update({}, { $set: { lastOneTopic: new Date() } }, { multi: true });
   await db.collection("topics").update({}, { $set: { active: true } }, { multi: true });
 }));
 
 updateFunc.push((async () => {
-  const db = await DB;
+  const db = await DB();
 
   await db.dropCollection("boards");
   await db.collection("topics").update({ type: "board" }, { $set: { type: "normal", active: false } }, { multi: true });
@@ -186,7 +186,7 @@ updateFunc.push((async () => {
 }));
 
 updateFunc.push((async () => {
-  const db = await DB;
+  const db = await DB();
 
   const ts: { _id: ObjectID, storage: string }[] = await db.collection("tokens").find().toArray();
   const ps: Promise<void>[] = [];
@@ -204,13 +204,13 @@ updateFunc.push((async () => {
 }));
 
 updateFunc.push((async () => {
-  const db = await DB;
+  const db = await DB();
 
   await db.collection("tokens").update({}, { $set: { type: "general" } }, { multi: true });
 }));
 
 updateFunc.push((async () => {
-  const db = await DB;
+  const db = await DB();
 
   const storages = await db.createCollection("storages");
   await storages.createIndex({ client: 1, user: 1, key: 1 }, { unique: true });
@@ -253,7 +253,7 @@ updateFunc.push((async () => {
 }));
 
 updateFunc.push((async () => {
-  const db = await DB;
+  const db = await DB();
 
   // mdtext削除
   for (const col of ["topics", "reses", "profiles", "msgs", "histories"]) {
@@ -378,12 +378,12 @@ updateFunc.push((async () => {
 }));
 
 updateFunc.push(async () => {
-  const db = await DB;
+  const db = await DB();
 
   await db.collection("reses").update({}, { $unset: { "vote.lv": 1 } }, { multi: true });
   await db.collection("reses").update({}, { $rename: { vote: "votes" } }, { multi: true });
 
-  await ESClient.putTemplate({
+  await ESClient().putTemplate({
     id: "template",
     body: {
       index_patterns: ["*"],
@@ -412,7 +412,7 @@ updateFunc.push(async () => {
     },
   });
 
-  await ESClient.indices.create({
+  await ESClient().indices.create({
     index: "reses_1",
     body: {
       mappings: {
@@ -494,7 +494,7 @@ updateFunc.push(async () => {
     },
   });
 
-  await ESClient.indices.create({
+  await ESClient().indices.create({
     index: "histories_1",
     body: {
       mappings: {
@@ -528,7 +528,7 @@ updateFunc.push(async () => {
     },
   });
 
-  await ESClient.indices.create({
+  await ESClient().indices.create({
     index: "msgs_1",
     body: {
       mappings: {
@@ -550,7 +550,7 @@ updateFunc.push(async () => {
     },
   });
 
-  await ESClient.indices.create({
+  await ESClient().indices.create({
     index: "topics_1",
     body: {
       mappings: {
@@ -597,22 +597,22 @@ updateFunc.push(async () => {
     },
   });
 
-  await ESClient.indices.putAlias({
+  await ESClient().indices.putAlias({
     name: "reses",
     index: "reses_1",
   });
 
-  await ESClient.indices.putAlias({
+  await ESClient().indices.putAlias({
     name: "histories",
     index: "histories_1",
   });
 
-  await ESClient.indices.putAlias({
+  await ESClient().indices.putAlias({
     name: "msgs",
     index: "msgs_1",
   });
 
-  await ESClient.indices.putAlias({
+  await ESClient().indices.putAlias({
     name: "topics",
     index: "topics_1",
   });
@@ -657,7 +657,7 @@ updateFunc.push(async () => {
         ];
       }));
     if (body.length !== 0) {
-      await ESClient.bulk({
+      await ESClient().bulk({
         body,
       });
     }
@@ -672,7 +672,7 @@ updateFunc.push(async () => {
 });
 
 updateFunc.push(async () => {
-  const db = await DB;
+  const db = await DB();
 
   const clients = db.collection("clients");
   await clients.createIndex({ user: 1 });
@@ -733,7 +733,7 @@ export async function createDB() {
 
 export async function dbReset() {
   if (process.env.AT_MODE === "TEST") {
-    const db = await DB;
+    const db = await DB();
     const cls = await db.collections();
     for (const cl of cls) {
       if (cl.collectionName.indexOf("system.") !== 0) {
@@ -741,7 +741,7 @@ export async function dbReset() {
       }
     }
 
-    await ESClient.indices.delete({ index: "*" });
+    await ESClient().indices.delete({ index: "*" });
     await createDBVer(0);
   } else {
     throw new Error("dbReset:not test");

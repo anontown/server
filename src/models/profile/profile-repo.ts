@@ -7,7 +7,7 @@ import { IProfileDB, Profile } from "./profile";
 
 export class ProfileRepo implements IProfileRepo {
   async findOne(id: string): Promise<Profile> {
-    const db = await DB;
+    const db = await DB();
     const profile: IProfileDB | null = await db.collection("profiles")
       .findOne({ _id: new ObjectID(id) });
 
@@ -26,7 +26,7 @@ export class ProfileRepo implements IProfileRepo {
     if (query.id !== undefined) {
       q._id = { $in: query.id.map(x => new ObjectID(x)) };
     }
-    const db = await DB;
+    const db = await DB();
     const profiles: IProfileDB[] = await db.collection("profiles")
       .find(q)
       .sort({ date: -1 })
@@ -35,7 +35,7 @@ export class ProfileRepo implements IProfileRepo {
   }
 
   async insert(profile: Profile): Promise<void> {
-    const db = await DB;
+    const db = await DB();
     try {
       await db.collection("profiles").insert(profile.toDB());
     } catch (ex) {
@@ -49,7 +49,7 @@ export class ProfileRepo implements IProfileRepo {
   }
 
   async update(profile: Profile): Promise<void> {
-    const db = await DB;
+    const db = await DB();
     try {
       await db.collection("profiles").update({ _id: new ObjectID(profile.id) }, profile.toDB());
     } catch (ex) {

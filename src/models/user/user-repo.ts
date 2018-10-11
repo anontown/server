@@ -8,7 +8,7 @@ import { IUserDB, ResWaitCountKey, User } from "./user";
 
 export class UserRepo implements IUserRepo {
   async findOne(id: string): Promise<User> {
-    const db = await DB;
+    const db = await DB();
     const user: IUserDB | null = await db.collection("users").findOne({ _id: new ObjectID(id) });
 
     if (user === null) {
@@ -19,7 +19,7 @@ export class UserRepo implements IUserRepo {
   }
 
   async findID(sn: string): Promise<string> {
-    const db = await DB;
+    const db = await DB();
     const user: IUserDB | null = await db.collection("users").findOne({ sn });
 
     if (user === null) {
@@ -30,7 +30,7 @@ export class UserRepo implements IUserRepo {
   }
 
   async insert(user: User): Promise<void> {
-    const db = await DB;
+    const db = await DB();
     try {
       await db.collection("users").insert(user.toDB());
     } catch (ex) {
@@ -44,7 +44,7 @@ export class UserRepo implements IUserRepo {
   }
 
   async update(user: User): Promise<void> {
-    const db = await DB;
+    const db = await DB();
     try {
       await db.collection("users").update({ _id: new ObjectID(user.id) }, user.toDB());
     } catch (ex) {
@@ -58,12 +58,12 @@ export class UserRepo implements IUserRepo {
   }
 
   async cronPointReset(): Promise<void> {
-    const db = await DB;
+    const db = await DB();
     await db.collection("users").update({}, { $set: { point: 0 } }, { multi: true });
   }
 
   async cronCountReset(key: ResWaitCountKey): Promise<void> {
-    const db = await DB;
+    const db = await DB();
     await db.collection("users").update({}, { $set: { ["resWait." + key]: 0 } }, { multi: true });
   }
 

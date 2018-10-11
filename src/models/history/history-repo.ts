@@ -8,7 +8,7 @@ export class HistoryRepo implements IHistoryRepo {
 
   async insert(history: History): Promise<void> {
     const hDB = history.toDB();
-    await ESClient.create({
+    await ESClient().create({
       index: "histories",
       type: "doc",
       id: hDB.id,
@@ -19,7 +19,7 @@ export class HistoryRepo implements IHistoryRepo {
 
   async update(history: History): Promise<void> {
     const hDB = history.toDB();
-    await ESClient.index({
+    await ESClient().index({
       index: "histories",
       type: "doc",
       id: hDB.id,
@@ -31,7 +31,7 @@ export class HistoryRepo implements IHistoryRepo {
   async findOne(id: string): Promise<History> {
     let history;
     try {
-      history = await ESClient.get<IHistoryDB["body"]>({
+      history = await ESClient().get<IHistoryDB["body"]>({
         index: "histories",
         type: "doc",
         id,
@@ -71,7 +71,7 @@ export class HistoryRepo implements IHistoryRepo {
       });
     }
 
-    const histories = await ESClient.search<IHistoryDB["body"]>({
+    const histories = await ESClient().search<IHistoryDB["body"]>({
       index: "histories",
       size: limit,
       body: {

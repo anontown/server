@@ -7,7 +7,7 @@ import { IStorageDB, Storage } from "./storage";
 
 export class StorageRepo implements IStorageRepo {
   async find(token: IAuthToken, query: StorageQuery): Promise<Storage[]> {
-    const db = await DB;
+    const db = await DB();
     const q: any = {
       user: new ObjectID(token.user),
       client: token.type === "general" ? new ObjectID(token.client) : null,
@@ -22,7 +22,7 @@ export class StorageRepo implements IStorageRepo {
   }
 
   async findOneKey(token: IAuthToken, key: string): Promise<Storage> {
-    const db = await DB;
+    const db = await DB();
     const storage: IStorageDB | null = await db.collection("storages")
       .findOne({
         user: new ObjectID(token.user),
@@ -35,7 +35,7 @@ export class StorageRepo implements IStorageRepo {
     return Storage.fromDB(storage);
   }
   async save(storage: Storage): Promise<void> {
-    const db = await DB;
+    const db = await DB();
 
     await db.collection("storages")
       .update({
@@ -45,7 +45,7 @@ export class StorageRepo implements IStorageRepo {
       }, storage.toDB(), { upsert: true });
   }
   async del(storage: Storage): Promise<void> {
-    const db = await DB;
+    const db = await DB();
 
     await db.collection("storages")
       .deleteOne({

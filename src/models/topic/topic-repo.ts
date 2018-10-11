@@ -17,7 +17,7 @@ export class TopicRepo implements ITopicRepo {
   async findOne(id: string): Promise<Topic> {
     let topic;
     try {
-      topic = await ESClient.get<ITopicDB["body"]>({
+      topic = await ESClient().get<ITopicDB["body"]>({
         index: "topics",
         type: "doc",
         id,
@@ -33,7 +33,7 @@ export class TopicRepo implements ITopicRepo {
       return [];
     }
 
-    const data = await ESClient.search({
+    const data = await ESClient().search({
       index: "topics",
       size: 0,
       body: {
@@ -100,7 +100,7 @@ export class TopicRepo implements ITopicRepo {
       });
     }
 
-    const topics = await ESClient.search<ITopicDB["body"]>({
+    const topics = await ESClient().search<ITopicDB["body"]>({
       index: "topics",
       size: limit,
       from: skip,
@@ -118,7 +118,7 @@ export class TopicRepo implements ITopicRepo {
   }
 
   async cronTopicCheck(now: Date): Promise<void> {
-    await ESClient.updateByQuery({
+    await ESClient().updateByQuery({
       index: "topics",
       type: "doc",
       body: {
@@ -162,7 +162,7 @@ export class TopicRepo implements ITopicRepo {
 
   async insert(topic: Topic): Promise<void> {
     const tDB = topic.toDB();
-    await ESClient.create({
+    await ESClient().create({
       index: "topics",
       type: "doc",
       id: tDB.id,
@@ -173,7 +173,7 @@ export class TopicRepo implements ITopicRepo {
 
   async update(topic: Topic): Promise<void> {
     const tDB = topic.toDB();
-    await ESClient.index({
+    await ESClient().index({
       index: "topics",
       type: "doc",
       id: tDB.id,

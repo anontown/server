@@ -13,7 +13,7 @@ export class ResRepo implements IResRepo {
   async findOne(id: string): Promise<Res> {
     let res;
     try {
-      res = await ESClient.get<IResDB["body"]>({
+      res = await ESClient().get<IResDB["body"]>({
         index: "reses",
         type: "doc",
         id,
@@ -26,7 +26,7 @@ export class ResRepo implements IResRepo {
 
   async insert(res: Res): Promise<void> {
     const rDB = res.toDB();
-    await ESClient.create({
+    await ESClient().create({
       index: "reses",
       type: "doc",
       id: rDB.id,
@@ -41,7 +41,7 @@ export class ResRepo implements IResRepo {
 
   async update(res: Res): Promise<void> {
     const rDB = res.toDB();
-    await ESClient.index({
+    await ESClient().index({
       index: "reses",
       type: "doc",
       id: rDB.id,
@@ -55,7 +55,7 @@ export class ResRepo implements IResRepo {
       return new Map();
     }
 
-    const data = await ESClient.search({
+    const data = await ESClient().search({
       index: "reses",
       size: 0,
       body: {
@@ -83,7 +83,7 @@ export class ResRepo implements IResRepo {
     if (resIDs.length === 0) {
       return new Map();
     }
-    const data = await ESClient.search({
+    const data = await ESClient().search({
       index: "reses",
       size: 0,
       body: {
@@ -213,7 +213,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    const reses = await ESClient.search<IResDB["body"]>({
+    const reses = await ESClient().search<IResDB["body"]>({
       index: "reses",
       size: limit,
       body: {
