@@ -1,3 +1,4 @@
+import { some } from "fp-ts/lib/Option";
 import { ObjectIDGenerator } from "../generator";
 import {
   Client,
@@ -32,7 +33,7 @@ export const clientResolver = (repo: IRepo) => {
         const client = Client.create(ObjectIDGenerator, context.auth.tokenMaster, args.name, args.url, context.now);
         await repo.client.insert(client);
         context.log("clients", client.id);
-        return client.toAPI(context.auth.tokenMaster);
+        return client.toAPI(some(context.auth.tokenMaster));
       },
       updateClient: async (
         _obj: any,
@@ -47,7 +48,7 @@ export const clientResolver = (repo: IRepo) => {
         const newClient = client.changeData(context.auth.tokenMaster, args.name, args.url, context.now);
         await repo.client.update(newClient);
         context.log("clients", newClient.id);
-        return newClient.toAPI(context.auth.tokenMaster);
+        return newClient.toAPI(some(context.auth.tokenMaster));
       },
     },
   };

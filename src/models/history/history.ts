@@ -1,3 +1,4 @@
+import { Option } from "fp-ts/lib/Option";
 import * as Im from "immutable";
 import { IAuthToken } from "../../auth";
 import { IGenerator } from "../../generator";
@@ -84,7 +85,7 @@ export class History extends Copyable<History> {
     };
   }
 
-  toAPI(authToken: IAuthToken | null): IHistoryAPI {
+  toAPI(authToken: Option<IAuthToken>): IHistoryAPI {
     return {
       id: this.id,
       topicID: this.topic,
@@ -93,7 +94,7 @@ export class History extends Copyable<History> {
       text: this.text,
       date: this.date.toISOString(),
       hash: this.hash,
-      self: authToken !== null ? authToken.user === this.user : null,
+      self: authToken.map(authToken => authToken.user === this.user).toNullable(),
     };
   }
 }

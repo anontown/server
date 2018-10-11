@@ -1,3 +1,4 @@
+import { Option } from "fp-ts/lib/Option";
 import { ObjectID } from "mongodb";
 import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
@@ -79,12 +80,12 @@ export class Client extends Copyable<Client> {
     };
   }
 
-  toAPI(authToken: IAuthTokenMaster | null): IClientAPI {
+  toAPI(authToken: Option<IAuthTokenMaster>): IClientAPI {
     return {
       id: this.id,
       name: this.name,
       url: this.url,
-      self: authToken !== null ? authToken.user === this.user : null,
+      self: authToken.map(authToken => authToken.user === this.user).toNullable(),
       date: this.date.toISOString(),
       update: this.update.toISOString(),
     };

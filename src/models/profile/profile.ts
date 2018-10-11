@@ -1,3 +1,4 @@
+import { Option } from "fp-ts/lib/Option";
 import { ObjectID } from "mongodb";
 import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthToken } from "../../auth";
@@ -90,10 +91,10 @@ export class Profile extends Copyable<Profile> {
     };
   }
 
-  toAPI(authToken: IAuthToken | null): IProfileAPI {
+  toAPI(authToken: Option<IAuthToken>): IProfileAPI {
     return {
       id: this.id,
-      self: authToken !== null ? authToken.user === this.user : null,
+      self: authToken.map(authToken => authToken.user === this.user).toNullable(),
       name: this.name,
       text: this.text,
       date: this.date.toISOString(),

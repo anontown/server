@@ -1,3 +1,4 @@
+import { none, some } from "fp-ts/lib/Option";
 import {
   AtError,
   dbReset,
@@ -5,6 +6,7 @@ import {
   ObjectIDGenerator,
   Profile,
 } from "../../";
+import { IAuthToken } from "../../auth";
 import { AuthContainer } from "../../server/auth-container";
 
 export function run(repoGene: () => IProfileRepo, isReset: boolean) {
@@ -65,7 +67,7 @@ export function run(repoGene: () => IProfileRepo, isReset: boolean) {
       await repo.insert(profile4);
 
       // id
-      expect(await repo.find(new AuthContainer(null), {})).toEqual([
+      expect(await repo.find(new AuthContainer(none), {})).toEqual([
         profile4,
         profile2,
         profile1,
@@ -73,18 +75,18 @@ export function run(repoGene: () => IProfileRepo, isReset: boolean) {
       ]);
 
       // self
-      expect(await repo.find(new AuthContainer({
+      expect(await repo.find(new AuthContainer(some<IAuthToken>({
         id: ObjectIDGenerator(),
         key: "key",
         user: user1,
         type: "master",
-      }), { self: true })).toEqual([
+      })), { self: true })).toEqual([
         profile2,
         profile1,
         profile3,
       ]);
 
-      expect(await repo.find(new AuthContainer(null), {
+      expect(await repo.find(new AuthContainer(none), {
         self: false,
       })).toEqual([
         profile4,
@@ -94,20 +96,20 @@ export function run(repoGene: () => IProfileRepo, isReset: boolean) {
       ]);
 
       // id
-      expect(await repo.find(new AuthContainer(null), { id: [] })).toEqual([]);
-      expect(await repo.find(new AuthContainer(null),
+      expect(await repo.find(new AuthContainer(none), { id: [] })).toEqual([]);
+      expect(await repo.find(new AuthContainer(none),
         { id: [profile1.id, profile2.id, ObjectIDGenerator()] })).toEqual([
           profile2,
           profile1,
         ]);
 
       // 複合
-      expect(await repo.find(new AuthContainer({
+      expect(await repo.find(new AuthContainer(some<IAuthToken>({
         id: ObjectIDGenerator(),
         key: "key",
         user: user1,
         type: "master",
-      }), { self: true, id: [profile1.id, profile2.id, profile4.id] })).toEqual([
+      })), { self: true, id: [profile1.id, profile2.id, profile4.id] })).toEqual([
         profile2,
         profile1,
       ]);
@@ -116,7 +118,7 @@ export function run(repoGene: () => IProfileRepo, isReset: boolean) {
     it("認証していない状態でselfしたらエラーになるか", async () => {
       const repo = repoGene();
 
-      await expect(repo.find(new AuthContainer(null),
+      await expect(repo.find(new AuthContainer(none),
         { self: true })).rejects.toThrow(AtError);
     });
   });

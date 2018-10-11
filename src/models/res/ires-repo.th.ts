@@ -202,7 +202,7 @@ export function run(repoGene: () => IResRepo, isReset: boolean) {
   });
 
   describe("find", () => {
-    const notAuth = new AuthContainer(null);
+    const notAuth = new AuthContainer(none);
     it("正常に検索できるか", async () => {
       const repo = repoGene();
 
@@ -213,8 +213,8 @@ export function run(repoGene: () => IResRepo, isReset: boolean) {
         type: "master",
       };
 
-      const auth = new AuthContainer(token);
-      const user2Auth = new AuthContainer({ ...token, user: "user2" });
+      const auth = new AuthContainer(some(token));
+      const user2Auth = new AuthContainer(some({ ...token, user: "user2" }));
 
       const res1 = resNormal.copy({ id: "res1", date: new Date(50) });
       const res2 = resTopic.copy({ id: "res2", date: new Date(80), topic: "topic2" });

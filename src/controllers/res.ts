@@ -33,7 +33,7 @@ export const resResolver = (repo: IRepo) => {
         context: Context,
         _info: any) => {
         const reses = await repo.res.find(context.auth, args.query, args.limit);
-        return reses.map(x => x.toAPI(fromNullable(context.auth.tokenOrNull)));
+        return reses.map(x => x.toAPI(context.auth.tokenOrNull));
       },
     },
     Mutation: {
@@ -151,7 +151,7 @@ export const resResolver = (repo: IRepo) => {
     Subscription: {
       resAdded: {
         resolve: (payload: { res: Res, count: number }, _args: any, context: Context, _info: any) => {
-          return { ...payload, res: payload.res.toAPI(fromNullable(context.auth.tokenOrNull)) };
+          return { ...payload, res: payload.res.toAPI(context.auth.tokenOrNull) };
         },
         subscribe: () => withFilter(
           () => pubsub.asyncIterator(RES_ADDED),
@@ -193,7 +193,7 @@ export const resResolver = (repo: IRepo) => {
         _info: any) => {
         if (res.replyID !== null) {
           const reply = await context.loader.res.load(res.replyID);
-          return reply.toAPI(fromNullable(context.auth.tokenOrNull));
+          return reply.toAPI(context.auth.tokenOrNull);
         } else {
           return null;
         }

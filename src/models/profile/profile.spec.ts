@@ -1,5 +1,6 @@
 import { ObjectID } from "mongodb";
 
+import { none, some } from "fp-ts/lib/Option";
 import {
   IAuthTokenMaster,
   ObjectIDGenerator,
@@ -40,7 +41,7 @@ describe("Profile", () => {
 
   describe("#toAPI", () => {
     it("認証あり(同一ユーザー)", () => {
-      expect(profile.toAPI(auth)).toEqual({
+      expect(profile.toAPI(some(auth))).toEqual({
         id: profileID,
         self: true,
         name: "name",
@@ -52,10 +53,10 @@ describe("Profile", () => {
     });
 
     it("認証あり(別ユーザー)", () => {
-      expect(profile.toAPI({
+      expect(profile.toAPI(some({
         ...auth,
         user: ObjectIDGenerator(),
-      })).toEqual({
+      }))).toEqual({
         id: profileID,
         self: false,
         name: "name",
@@ -67,7 +68,7 @@ describe("Profile", () => {
     });
 
     it("認証なし", () => {
-      expect(profile.toAPI(null)).toEqual({
+      expect(profile.toAPI(none)).toEqual({
         id: profileID,
         self: null,
         name: "name",

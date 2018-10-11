@@ -1,3 +1,4 @@
+import { none, some } from "fp-ts/lib/Option";
 import { ObjectID } from "mongodb";
 import {
   AtError,
@@ -268,7 +269,7 @@ describe("Client", () => {
 
   describe("#toAPI", () => {
     it("認証あり(同一ユーザー)", () => {
-      expect(client.toAPI(auth)).toEqual({
+      expect(client.toAPI(some(auth))).toEqual({
         id: clientID,
         name: "name",
         url: "http://hoge.com",
@@ -279,10 +280,10 @@ describe("Client", () => {
     });
 
     it("認証あり(別ユーザー)", () => {
-      expect(client.toAPI({
+      expect(client.toAPI(some({
         ...auth,
         user: ObjectIDGenerator(),
-      })).toEqual({
+      }))).toEqual({
         id: clientID,
         name: "name",
         url: "http://hoge.com",
@@ -293,7 +294,7 @@ describe("Client", () => {
     });
 
     it("認証無し", () => {
-      expect(client.toAPI(null)).toEqual({
+      expect(client.toAPI(none)).toEqual({
         id: clientID,
         name: "name",
         url: "http://hoge.com",

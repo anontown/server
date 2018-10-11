@@ -1,16 +1,17 @@
+import { none, Option, some } from "fp-ts/lib/Option";
 import { AtAuthError } from "../at-error";
 import { IAuthToken, IAuthTokenMaster } from "../auth";
 
 export class AuthContainer {
-  constructor(private _token: IAuthToken | null) {
+  constructor(private _token: Option<IAuthToken>) {
   }
 
   get token(): IAuthToken {
-    if (this._token === null) {
+    if (this._token.isNone()) {
       throw new AtAuthError("認証が必要です");
     }
 
-    return this._token;
+    return this._token.value;
   }
 
   get tokenMaster(): IAuthTokenMaster {
@@ -21,15 +22,11 @@ export class AuthContainer {
     return t;
   }
 
-  get tokenOrNull(): IAuthToken | null {
+  get tokenOrNull(): Option<IAuthToken> {
     return this._token;
   }
 
-  get TokenMasterOrNull(): IAuthTokenMaster | null {
-    if (this._token !== null && this._token.type === "general") {
-      return null;
-    }
-
-    return this._token;
+  get TokenMasterOrNull(): Option<IAuthTokenMaster> {
+    return this._token.chain(token => token.type === "master" ? some(token) : none);
   }
 }

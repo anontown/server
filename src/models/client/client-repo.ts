@@ -1,3 +1,4 @@
+import { Option } from "fp-ts/lib/Option";
 import { ObjectID } from "mongodb";
 import { AtAuthError, AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
@@ -17,14 +18,14 @@ export class ClientRepo implements IClientRepo {
     return Client.fromDB(client);
   }
 
-  async find(authToken: IAuthTokenMaster | null, query: ClientQuery): Promise<Client[]> {
-    if (query.self && authToken === null) {
+  async find(authToken: Option<IAuthTokenMaster>, query: ClientQuery): Promise<Client[]> {
+    if (query.self && authToken.isNone()) {
       throw new AtAuthError("認証が必要です");
     }
     const db = await DB();
     const q: any = {};
-    if (query.self && authToken !== null) {
-      q.user = new ObjectID(authToken.user);
+    if (query.self && authToken.isSome()) {
+      q.user = new ObjectID(authToken.value.user);
     }
     if (query.id !== undefined) {
       q._id = { $in: query.id.map(id => new ObjectID(id)) };

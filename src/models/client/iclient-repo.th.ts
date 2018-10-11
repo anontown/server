@@ -1,3 +1,4 @@
+import { none, some } from "fp-ts/lib/Option";
 import {
   AtError,
   Client,
@@ -5,6 +6,7 @@ import {
   IClientRepo,
   ObjectIDGenerator,
 } from "../../";
+import { IAuthTokenMaster } from "../../auth";
 
 export function run(repoGene: () => IClientRepo, isReset: boolean) {
   const client = new Client(ObjectIDGenerator(),
@@ -62,7 +64,7 @@ export function run(repoGene: () => IClientRepo, isReset: boolean) {
 
       // 無
 
-      expect(await repo.find(null, {})).toEqual([
+      expect(await repo.find(none, {})).toEqual([
         client4,
         client2,
         client1,
@@ -71,52 +73,52 @@ export function run(repoGene: () => IClientRepo, isReset: boolean) {
 
       // id
 
-      expect(await repo.find(null, {
+      expect(await repo.find(none, {
         id: [],
       })).toEqual([]);
 
-      expect(await repo.find(null, {
+      expect(await repo.find(none, {
         id: [client1.id],
       })).toEqual([client1]);
 
-      expect(await repo.find(null, {
+      expect(await repo.find(none, {
         id: [client1.id, ObjectIDGenerator()],
       })).toEqual([client1]);
 
       // self
 
-      expect(await repo.find(null, { self: false })).toEqual([
+      expect(await repo.find(none, { self: false })).toEqual([
         client4,
         client2,
         client1,
         client3,
       ]);
 
-      expect(await repo.find({
+      expect(await repo.find(some<IAuthTokenMaster>({
         id: ObjectIDGenerator(),
         key: "key",
         user: user1,
         type: "master",
-      }, { self: true })).toEqual([
+      }), { self: true })).toEqual([
         client2,
         client1,
         client3,
       ]);
 
       // 複合
-      expect(await repo.find({
+      expect(await repo.find(some<IAuthTokenMaster>({
         id: ObjectIDGenerator(),
         key: "key",
         user: user1,
         type: "master",
-      }, { self: true, id: [client1.id, client4.id] })).toEqual([
+      }), { self: true, id: [client1.id, client4.id] })).toEqual([
         client1,
       ]);
     });
 
     describe("トークンがnullでselfがtrueの時エラーになるか", async () => {
       const repo = repoGene();
-      await expect(repo.find(null, { self: true })).rejects.toThrow(AtError);
+      await expect(repo.find(none, { self: true })).rejects.toThrow(AtError);
     });
   });
 

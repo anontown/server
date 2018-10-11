@@ -1,3 +1,4 @@
+import { none, some } from "fp-ts/lib/Option";
 import { AtAuthError } from "../at-error";
 import { Logger } from "../logger";
 import { createLoader, IRepo, Loader } from "../models";
@@ -14,7 +15,7 @@ export interface Context {
 
 async function createToken(raw: any, repo: IRepo) {
   if (typeof raw !== "string") {
-    return null;
+    return none;
   }
   const arr = raw.split(",");
   if (arr.length !== 2) {
@@ -22,7 +23,7 @@ async function createToken(raw: any, repo: IRepo) {
   }
 
   const [id, key] = arr;
-  return authFromApiParam.token(repo.token, { id, key });
+  return some(await authFromApiParam.token(repo.token, { id, key }));
 }
 
 export async function createContext(headers: any, repo: IRepo): Promise<Context> {

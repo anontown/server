@@ -1,9 +1,11 @@
+import { none, some } from "fp-ts/lib/Option";
 import * as Im from "immutable";
 import {
   History,
   TopicNormal,
   User,
 } from "../../";
+import { IAuthToken } from "../../auth";
 
 describe("History", () => {
   describe("fromDB", () => {
@@ -106,7 +108,7 @@ describe("History", () => {
 
   describe("#toAPI", () => {
     it("正常に変換できるか(tokenがnull)", () => {
-      expect(history.toAPI(null)).toEqual({
+      expect(history.toAPI(none)).toEqual({
         id: "history",
         topicID: "topic",
         title: "title",
@@ -119,12 +121,12 @@ describe("History", () => {
     });
 
     it("正常に変換できるか(tokenが投稿ユーザー)", () => {
-      expect(history.toAPI({
+      expect(history.toAPI(some<IAuthToken>({
         id: "token",
         key: "key",
         user: "user",
         type: "master",
-      })).toEqual({
+      }))).toEqual({
         id: "history",
         topicID: "topic",
         title: "title",
@@ -137,12 +139,12 @@ describe("History", () => {
     });
 
     it("正常に変換できるか(tokenが別ユーザー)", () => {
-      expect(history.toAPI({
+      expect(history.toAPI(some<IAuthToken>({
         id: "token",
         key: "key",
         user: "user2",
         type: "master",
-      })).toEqual({
+      }))).toEqual({
         id: "history",
         topicID: "topic",
         title: "title",

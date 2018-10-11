@@ -1,3 +1,4 @@
+import { some } from "fp-ts/lib/Option";
 import { ObjectIDGenerator } from "../generator";
 import {
   IRepo,
@@ -40,7 +41,7 @@ export const profileResolver = (repo: IRepo) => {
           context.now);
         await repo.profile.insert(profile);
         context.log("profiles", profile.id);
-        return profile.toAPI(context.auth.token);
+        return profile.toAPI(some(context.auth.token));
       },
       updateProfile: async (
         _obj: any,
@@ -56,7 +57,7 @@ export const profileResolver = (repo: IRepo) => {
         const newProfile = profile.changeData(context.auth.token, args.name, args.text, args.sn, context.now);
         await repo.profile.update(newProfile);
         context.log("profiles", newProfile.id);
-        return newProfile.toAPI(context.auth.token);
+        return newProfile.toAPI(some(context.auth.token));
       },
     },
   };
