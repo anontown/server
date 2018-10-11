@@ -18,7 +18,6 @@
     "strict": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
-    //"allowSyntheticDefaultImports": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedParameters": true,
