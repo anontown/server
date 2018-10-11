@@ -1,8 +1,8 @@
 import * as es from "elasticsearch";
+import lazy = require("lazy-value");
 import { MongoClient } from "mongodb";
 import { Config } from "./config";
 import { Logger } from "./logger";
-import lazy = require("lazy-value");
 
 export const DB = lazy((async () => {
     const db = await MongoClient.connect(Config.db.url);

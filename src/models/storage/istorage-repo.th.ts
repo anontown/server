@@ -1,3 +1,4 @@
+import { none, some } from "fp-ts/lib/Option";
 import {
   AtError,
   dbReset,
@@ -7,7 +8,6 @@ import {
   ObjectIDGenerator,
   Storage,
 } from "../../";
-import { some, none } from "fp-ts/lib/Option";
 
 export function run(repoGene: () => IStorageRepo, isReset: boolean) {
   beforeEach(async () => {

@@ -1,4 +1,4 @@
-import { Option, fromNullable } from "fp-ts/lib/Option";
+import { fromNullable, Option } from "fp-ts/lib/Option";
 
 export const AtErrorSymbol = Symbol("AtError");
 

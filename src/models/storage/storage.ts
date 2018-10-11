@@ -1,9 +1,9 @@
+import { fromNullable, none, Option, some } from "fp-ts/lib/Option";
 import { ObjectID } from "mongodb";
 import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { Copyable } from "../../utils";
-import { Option, some, none, fromNullable } from "fp-ts/lib/Option";
 
 export interface IStorageDB {
   client: ObjectID | null;

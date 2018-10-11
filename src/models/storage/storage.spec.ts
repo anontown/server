@@ -1,3 +1,4 @@
+import { none, some } from "fp-ts/lib/Option";
 import { ObjectID } from "mongodb";
 import {
   AtError,
@@ -6,7 +7,6 @@ import {
   ObjectIDGenerator,
   Storage,
 } from "../../";
-import { some, none } from "fp-ts/lib/Option";
 
 describe("Storage", () => {
   const cleintID = ObjectIDGenerator();
