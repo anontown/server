@@ -1,5 +1,5 @@
 import * as Im from "immutable";
-import * as moment from "moment-timezone";
+import moment = require("moment-timezone");
 import { AtPrerequisiteError, paramsErrorMaker, paramsErrorMakerData } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
