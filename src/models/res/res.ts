@@ -248,15 +248,13 @@ export class ResNormal extends Copyable<ResNormal> implements ResBase<"normal", 
     profile: Option<Profile>,
     age: boolean,
     now: Date) {
-    const bodyCheck = {
-      field: "text",
-      val: text,
-      regex: Config.res.text.regex,
-      message: Config.res.text.msg,
-    };
-
     paramsErrorMaker([
-      bodyCheck,
+      {
+        field: "text",
+        val: text,
+        regex: Config.res.text.regex,
+        message: Config.res.text.msg,
+      },
       {
         field: "name",
         val: name,

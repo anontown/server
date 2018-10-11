@@ -75,55 +75,46 @@ export type Topic = TopicNormal | TopicOne | TopicFork;
 
 export abstract class TopicBase<T extends TopicType, C extends TopicBase<T, C>> {
   static checkData({ title, tags, text }: { title?: string, tags?: string[], text?: string }) {
-    const data: paramsErrorMakerData[] = [];
-    if (title !== undefined) {
-      data.push({
-        field: "title",
-        val: title,
-        regex: Config.topic.title.regex,
-        message: Config.topic.title.msg,
-      });
-    }
-    if (tags !== undefined) {
-      data.push(() => {
-        if (tags.length !== new Set(tags).size) {
-          return {
-            field: "tags",
-            message: "タグの重複があります",
-          };
-        } else {
-          return null;
-        }
-      });
-
-      data.push(() => {
-        if (tags.length > Config.topic.tags.max) {
-          return {
-            field: "tags",
-            message: Config.topic.tags.msg,
-          };
-        } else {
-          return null;
-        }
-      });
-
-      data.push(...tags.map((x, i) => ({
-        field: `tags[${i}]`,
-        val: x,
-        regex: Config.topic.tags.regex,
-        message: Config.topic.tags.msg,
-      })));
-    }
-    if (text !== undefined) {
-      data.push({
+    paramsErrorMaker([
+      {
         field: "text",
         val: text,
         regex: Config.topic.text.regex,
         message: Config.topic.text.msg,
-      });
-    }
-
-    paramsErrorMaker(data);
+      },
+      {
+        field: "title",
+        val: title,
+        regex: Config.topic.title.regex,
+        message: Config.topic.title.msg,
+      },
+      ...tags !== undefined
+        ? [() => {
+          if (tags.length !== new Set(tags).size) {
+            return {
+              field: "tags",
+              message: "タグの重複があります",
+            };
+          } else {
+            return null;
+          }
+        }, () => {
+          if (tags.length > Config.topic.tags.max) {
+            return {
+              field: "tags",
+              message: Config.topic.tags.msg,
+            };
+          } else {
+            return null;
+          }
+        }, ...tags.map((x, i) => ({
+          field: `tags[${i}]`,
+          val: x,
+          regex: Config.topic.tags.regex,
+          message: Config.topic.tags.msg,
+        }))]
+        : []
+    ]);
   }
 
   abstract readonly id: string;
