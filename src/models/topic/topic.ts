@@ -1,6 +1,6 @@
 import * as Im from "immutable";
 import moment = require("moment-timezone");
-import { AtPrerequisiteError, paramsErrorMaker, paramsErrorMakerData } from "../../at-error";
+import { AtPrerequisiteError, paramsErrorMaker } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { IGenerator } from "../../generator";
