@@ -1,5 +1,5 @@
 import { ObjectID } from "mongodb";
-import nanoid from "nanoid";
+import nanoid = require("nanoid");
 
 export type IGenerator<T> = () => T;
 
