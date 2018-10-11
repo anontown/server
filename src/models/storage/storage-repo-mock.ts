@@ -26,7 +26,7 @@ export class StorageRepoMock implements IStorageRepo {
   }
   async save(storage: Storage): Promise<void> {
     const index = this.storages.findIndex(x => x.user.toHexString() === storage.user
-      && (x.client !== null ? x.client.toHexString() : null) === storage.client
+      && (x.client !== null ? x.client.toHexString() : null) === storage.client.toNullable()
       && x.key === storage.key);
     if (index === -1) {
       this.storages.push(storage.toDB());
@@ -36,7 +36,7 @@ export class StorageRepoMock implements IStorageRepo {
   }
   async del(storage: Storage): Promise<void> {
     const index = this.storages.findIndex(x => x.user.toHexString() === storage.user
-      && (x.client !== null ? x.client.toHexString() : null) === storage.client
+      && (x.client !== null ? x.client.toHexString() : null) === storage.client.toNullable()
       && x.key === storage.key);
     this.storages.splice(index, 1);
   }

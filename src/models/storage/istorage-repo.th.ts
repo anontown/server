@@ -7,6 +7,7 @@ import {
   ObjectIDGenerator,
   Storage,
 } from "../../";
+import { some, none } from "fp-ts/lib/Option";
 
 export function run(repoGene: () => IStorageRepo, isReset: boolean) {
   beforeEach(async () => {
@@ -18,7 +19,7 @@ export function run(repoGene: () => IStorageRepo, isReset: boolean) {
   const client = ObjectIDGenerator();
   const user = ObjectIDGenerator();
   const key = "key";
-  const storage = new Storage(client, user, key, "value");
+  const storage = new Storage(some(client), user, key, "value");
 
   describe("findOneKey", () => {
     it("正常に検索出来るか", async () => {
@@ -49,43 +50,43 @@ export function run(repoGene: () => IStorageRepo, isReset: boolean) {
       };
 
       const storage1 = storage.copy({
-        client: null,
+        client: none,
         user: user1,
         key: key1,
       });
 
       const storage2 = storage.copy({
-        client: null,
+        client: none,
         user: user1,
         key: key2,
       });
 
       const storage3 = storage.copy({
-        client: null,
+        client: none,
         user: user2,
         key: key1,
       });
 
       const storage4 = storage.copy({
-        client: client1,
+        client: some(client1),
         user: user1,
         key: key1,
       });
 
       const storage5 = storage.copy({
-        client: client1,
+        client: some(client1),
         user: user1,
         key: key2,
       });
 
       const storage6 = storage.copy({
-        client: client1,
+        client: some(client1),
         user: user2,
         key: key1,
       });
 
       const storage7 = storage.copy({
-        client: client2,
+        client: some(client2),
         user: user1,
         key: key1,
       });
@@ -133,7 +134,7 @@ export function run(repoGene: () => IStorageRepo, isReset: boolean) {
     it("正常に検索出来るか", async () => {
       const repo = repoGene();
 
-      const storage = new Storage(null, ObjectIDGenerator(), "key", "value");
+      const storage = new Storage(none, ObjectIDGenerator(), "key", "value");
 
       const client1 = ObjectIDGenerator();
       const client2 = ObjectIDGenerator();
@@ -160,43 +161,43 @@ export function run(repoGene: () => IStorageRepo, isReset: boolean) {
       };
 
       const storage1 = storage.copy({
-        client: null,
+        client: none,
         user: user1,
         key: key1,
       });
 
       const storage2 = storage.copy({
-        client: null,
+        client: none,
         user: user1,
         key: key2,
       });
 
       const storage3 = storage.copy({
-        client: null,
+        client: none,
         user: user2,
         key: key1,
       });
 
       const storage4 = storage.copy({
-        client: client1,
+        client: some(client1),
         user: user1,
         key: key1,
       });
 
       const storage5 = storage.copy({
-        client: client1,
+        client: some(client1),
         user: user1,
         key: key2,
       });
 
       const storage6 = storage.copy({
-        client: client1,
+        client: some(client1),
         user: user2,
         key: key1,
       });
 
       const storage7 = storage.copy({
-        client: client2,
+        client: some(client2),
         user: user1,
         key: key1,
       });

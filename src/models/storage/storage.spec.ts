@@ -6,6 +6,7 @@ import {
   ObjectIDGenerator,
   Storage,
 } from "../../";
+import { some, none } from "fp-ts/lib/Option";
 
 describe("Storage", () => {
   const cleintID = ObjectIDGenerator();
@@ -13,7 +14,7 @@ describe("Storage", () => {
   const authMasterID = ObjectIDGenerator();
   const authGeneralID = ObjectIDGenerator();
 
-  const storage = new Storage(cleintID,
+  const storage = new Storage(some(cleintID),
     userID,
     "key",
     "value");
@@ -47,7 +48,7 @@ describe("Storage", () => {
         user: new ObjectID(userID),
         key: "key",
         value: "value",
-      })).toEqual(storage.copy({ client: null }));
+      })).toEqual(storage.copy({ client: none }));
     });
   });
 
@@ -57,7 +58,7 @@ describe("Storage", () => {
     });
 
     it("マスタートークンで正常に変換出来るか", () => {
-      expect(storage.copy({ client: null }).toAPI(authMaster)).toEqual("value");
+      expect(storage.copy({ client: none }).toAPI(authMaster)).toEqual("value");
     });
 
     it("ユーザーが違う時エラーになるか", () => {
@@ -74,7 +75,7 @@ describe("Storage", () => {
 
     it("通常IDでクライアントがnullのものを変換する時エラーになるか", () => {
       expect(() => {
-        storage.copy({ client: null }).toAPI(authGeneral);
+        storage.copy({ client: none }).toAPI(authGeneral);
       }).toThrow(AtError);
     });
   });
@@ -82,7 +83,7 @@ describe("Storage", () => {
   describe("create", () => {
     it("正常に作成出来るか", () => {
       expect(Storage.create(authGeneral, "key", "value")).toEqual(storage);
-      expect(Storage.create(authMaster, "key", "value")).toEqual(storage.copy({ client: null }));
+      expect(Storage.create(authMaster, "key", "value")).toEqual(storage.copy({ client: none }));
     });
 
     it("keyが不正な時エラーになるか", () => {
@@ -109,7 +110,7 @@ describe("Storage", () => {
         value: "value",
       });
 
-      expect(storage.copy({ client: null }).toDB()).toEqual({
+      expect(storage.copy({ client: none }).toDB()).toEqual({
         client: null,
         user: new ObjectID(userID),
         key: "key",

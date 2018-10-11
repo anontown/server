@@ -3,6 +3,7 @@ import { AtRightError, paramsErrorMaker } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { Config } from "../../config";
 import { Copyable } from "../../utils";
+import { Option, some, none, fromNullable } from "fp-ts/lib/Option";
 
 export interface IStorageDB {
   client: ObjectID | null;
@@ -15,7 +16,7 @@ export type IStorageAPI = string;
 
 export class Storage extends Copyable<Storage> {
   static fromDB(db: IStorageDB): Storage {
-    return new Storage(db.client !== null ? db.client.toHexString() : null,
+    return new Storage(fromNullable(db.client).map(client => client.toHexString()),
       db.user.toHexString(),
       db.key,
       db.value);
@@ -40,14 +41,14 @@ export class Storage extends Copyable<Storage> {
       },
     ]);
 
-    return new Storage(authToken.type === "general" ? authToken.client : null,
+    return new Storage(authToken.type === "general" ? some(authToken.client) : none,
       authToken.user,
       key,
       value);
   }
 
   constructor(
-    readonly client: string | null,
+    readonly client: Option<string>,
     readonly user: string,
     readonly key: string,
     readonly value: string) {
@@ -56,7 +57,7 @@ export class Storage extends Copyable<Storage> {
 
   toDB(): IStorageDB {
     return {
-      client: this.client !== null ? new ObjectID(this.client) : null,
+      client: this.client.map(client => new ObjectID(client)).toNullable(),
       user: new ObjectID(this.user),
       key: this.key,
       value: this.value,
@@ -64,8 +65,8 @@ export class Storage extends Copyable<Storage> {
   }
 
   toAPI(authToken: IAuthToken): IStorageAPI {
-    if (!(authToken.user === this.user && ((authToken.type === "master" && this.client === null) ||
-      authToken.type === "general" && authToken.client === this.client))) {
+    if (authToken.user !== this.user ||
+      (authToken.type === "master" ? null : authToken.client) !== this.client.toNullable()) {
       throw new AtRightError("権限がありません");
     }
 

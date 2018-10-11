@@ -40,7 +40,7 @@ export class StorageRepo implements IStorageRepo {
     await db.collection("storages")
       .update({
         user: new ObjectID(storage.user),
-        client: storage.client !== null ? new ObjectID(storage.client) : null,
+        client: storage.client.map(client => new ObjectID(client)).toNullable(),
         key: storage.key,
       }, storage.toDB(), { upsert: true });
   }
@@ -50,7 +50,7 @@ export class StorageRepo implements IStorageRepo {
     await db.collection("storages")
       .deleteOne({
         user: new ObjectID(storage.user),
-        client: storage.client !== null ? new ObjectID(storage.client) : null,
+        client: storage.client.map(client => new ObjectID(client)).toNullable(),
         key: storage.key,
       });
   }
