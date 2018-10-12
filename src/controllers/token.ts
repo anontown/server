@@ -1,4 +1,4 @@
-import { AtPrerequisiteError } from "../at-error";
+import { AtNotFoundError } from "../at-error";
 import { ObjectIDGenerator, RandomGenerator } from "../generator";
 import {
   IRepo,
@@ -82,7 +82,7 @@ export const tokenResolver = (repo: IRepo) => {
         _info: any) => {
         const token = await repo.token.findOne(args.id);
         if (token.type !== "general") {
-          throw new AtPrerequisiteError("通常トークン以外では出来ません");
+          throw new AtNotFoundError("トークンが見つかりません");
         }
         token.authReq(args.key, context.now);
         return token.toAPI();
@@ -113,7 +113,7 @@ export const tokenResolver = (repo: IRepo) => {
         _info: any) => {
         const token = await repo.token.findOne(tokenAPI.id);
         if (token.type !== "general") {
-          throw new AtPrerequisiteError("通常トークン以外では出来ません");
+          throw new AtNotFoundError("トークンが見つかりません");
         }
         const { req, token: newToken } = token.createReq(context.now, RandomGenerator);
 

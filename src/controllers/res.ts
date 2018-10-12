@@ -1,6 +1,6 @@
 import { withFilter } from "apollo-server";
 import { fromNullable, some } from "fp-ts/lib/Option";
-import { AtPrerequisiteError } from "../at-error";
+import { AtNotFoundError } from "../at-error";
 import { ObjectIDGenerator } from "../generator";
 import {
   IRepo,
@@ -132,7 +132,7 @@ export const resResolver = (repo: IRepo) => {
         const res = await repo.res.findOne(args.id);
 
         if (res.type !== "normal") {
-          throw new AtPrerequisiteError("通常レス以外は削除出来ません");
+          throw new AtNotFoundError("レスが見つかりません");
         }
 
         // レスを書き込んだユーザー

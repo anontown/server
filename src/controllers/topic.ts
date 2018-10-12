@@ -1,4 +1,4 @@
-import { AtPrerequisiteError } from "../at-error";
+import { AtNotFoundError } from "../at-error";
 import { ObjectIDGenerator } from "../generator";
 import {
   IRepo,
@@ -110,7 +110,7 @@ export const topicResolver = (repo: IRepo) => {
         const parent = await repo.topic.findOne(args.parent);
 
         if (parent.type !== "normal") {
-          throw new AtPrerequisiteError("通常トピック以外の派生トピックは作れません");
+          throw new AtNotFoundError("トピックが見つかりません");
         }
 
         const create = TopicFork.create(ObjectIDGenerator,
@@ -150,7 +150,7 @@ export const topicResolver = (repo: IRepo) => {
         ]);
 
         if (topic.type !== "normal") {
-          throw new AtPrerequisiteError("通常トピック以外は編集出来ません");
+          throw new AtNotFoundError("トピックが見つかりません");
         }
 
         const val = topic.changeData(ObjectIDGenerator,
