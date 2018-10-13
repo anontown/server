@@ -10,3 +10,9 @@ kana:カタカナ
 hn:漢字
 */
 export type CharType = "lc" | "uc" | "d" | "ub" | "hy" | "hira" | "kana" | "hn";
+
+export interface ValidateData {
+  char: CharType,
+  min: number | null,
+  max: number | null,
+}
