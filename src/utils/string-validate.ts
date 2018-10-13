@@ -1,4 +1,4 @@
-import { Either, right, left } from "fp-ts/lib/Either";
+import { Either, left, right } from "fp-ts/lib/Either";
 
 /*
 文字の種類
@@ -14,21 +14,21 @@ han:漢字
 export type CharType = "lc" | "uc" | "d" | "ub" | "hy" | "hira" | "kana" | "han";
 
 export interface ValidateData {
-  char: CharType[] | null,
-  min: number | null,
-  max: number | null,
+  char: CharType[] | null;
+  min: number | null;
+  max: number | null;
 }
 
 export interface ValidateDataCache {
-  validate: ValidateData,
-  reg: RegExp,
+  validate: ValidateData;
+  reg: RegExp;
 }
 
 export interface ValidateError {
-  type: "validate",
+  type: "validate";
   data: {
     validate: ValidateData,
-    value: string
+    value: string,
   };
 }
 
@@ -55,8 +55,8 @@ export function validateData(char: CharType[] | null, min: number | null, max: n
   };
   return {
     validate,
-    reg: validateToReg(validate)
-  }
+    reg: validateToReg(validate),
+  };
 }
 
 function charTypeToReg(type: CharType): string {
@@ -77,7 +77,7 @@ function charTypeToReg(type: CharType): string {
       return "\\p{Script_Extensions=Katakana}";
     case "han":
       return "\\p{Script_Extensions=Han}";
-  };
+  }
 }
 
 function validateToReg(data: ValidateData): RegExp {

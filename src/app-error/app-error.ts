@@ -1,9 +1,5 @@
 export type AppErrorJSON = AppRootErrorJSON | AppServerErrorJSON | AppNotFountErrorJSON;
 
-export function fromJSON(json: AppErrorJSON): AppRootError {
-
-}
-
 export interface AppRootErrorJSON {
   code: "root";
   data: {};
@@ -33,8 +29,8 @@ export class AppServerError extends AppRootError {
 }
 
 export interface AppNotFountErrorJSON {
-  code: "not_found",
-  data: {},
+  code: "not_found";
+  data: {};
 }
 
 export class AppNotFoundError extends AppRootError {

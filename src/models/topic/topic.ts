@@ -113,7 +113,7 @@ export abstract class TopicBase<T extends TopicType, C extends TopicBase<T, C>> 
           regex: Config.topic.tags.regex,
           message: Config.topic.tags.msg,
         }))]
-        : []
+        : [],
     ]);
   }
 
