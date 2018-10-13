@@ -17,6 +17,14 @@ export interface ValidateData {
   max: number | null,
 }
 
+export function validateData(char: CharType[] | null, min: number | null, max: number | null): ValidateData {
+  return {
+    char,
+    min,
+    max,
+  };
+}
+
 function charTypeToReg(type: CharType): string {
   switch (type) {
     case "lc":
