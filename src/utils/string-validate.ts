@@ -86,3 +86,25 @@ function validateToReg(data: ValidateData): RegExp {
   const reg = `^${char}${len}$`;
   return new RegExp(reg, "us");
 }
+
+export interface ValidateRegExpError {
+  type: "validate_regexp";
+  data: {
+    regexp: string,
+    value: string,
+  };
+}
+
+export function checkRegExp(reg: RegExp, value: string): Either<ValidateRegExpError, string> {
+  if (reg.test(value)) {
+    return right(value);
+  } else {
+    return left<ValidateRegExpError, never>({
+      type: "validate_regexp";
+      data: {
+        regexp: reg.source,
+        value: value,
+      }
+    });
+  }
+}
