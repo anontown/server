@@ -103,8 +103,8 @@ export function checkRegExp(reg: RegExp, value: string): Either<ValidateRegExpEr
       type: "validate_regexp",
       data: {
         regexp: reg.source,
-        value: value,
-      }
+        value,
+      },
     });
   }
 }

@@ -3,8 +3,8 @@ import { ObjectIDGenerator } from "../generator";
 import {
   Client,
   ClientQuery,
-  IRepo,
   IClientAPI,
+  IRepo,
 } from "../models";
 import { Context } from "../server";
 

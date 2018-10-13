@@ -1,5 +1,5 @@
 import {
-  IRepo, MsgQuery, IMsgAPI,
+  IMsgAPI, IRepo, MsgQuery,
 } from "../models";
 import {
   Context,

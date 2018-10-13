@@ -3,19 +3,19 @@ import { fromNullable, some } from "fp-ts/lib/Option";
 import { AtNotFoundError } from "../at-error";
 import { ObjectIDGenerator } from "../generator";
 import {
+  IHistoryAPI,
+  IProfileAPI,
   IRepo,
   IResAPI,
+  IResDeleteAPI,
   IResForkAPI,
   IResHistoryAPI,
   IResNormalAPI,
+  ITopicAPI,
+  ITopicForkAPI,
   Res,
   ResNormal,
   ResQuery,
-  IResDeleteAPI,
-  ITopicAPI,
-  IProfileAPI,
-  IHistoryAPI,
-  ITopicForkAPI,
 } from "../models";
 import {
   Context,

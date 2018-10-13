@@ -1,8 +1,8 @@
 import { ObjectIDGenerator } from "../generator";
 import {
   IRepo,
-  User,
   IUserAPI,
+  User,
 } from "../models";
 import {
   Context,

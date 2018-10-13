@@ -1,9 +1,9 @@
 import { Storage, StorageQuery } from "../index";
+import { IStorageAPI } from "../models/index";
 import { IRepo } from "../models/irepo";
 import {
   Context,
 } from "../server";
-import { IStorageAPI } from "../models/index";
 
 export const storageResolver = (repo: IRepo) => {
   return {

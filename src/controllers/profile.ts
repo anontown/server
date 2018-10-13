@@ -1,10 +1,10 @@
 import { some } from "fp-ts/lib/Option";
 import { ObjectIDGenerator } from "../generator";
 import {
+  IProfileAPI,
   IRepo,
   Profile,
   ProfileQuery,
-  IProfileAPI,
 } from "../models";
 import {
   Context,

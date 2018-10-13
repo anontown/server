@@ -4,13 +4,13 @@ import {
   IRepo,
   ITopicAPI,
   ITopicForkAPI,
+  ITopicNormalAPI,
+  ITopicOneAPI,
+  ITopicSearchAPI,
   TopicFork,
   TopicNormal,
   TopicOne,
   TopicQuery,
-  ITopicNormalAPI,
-  ITopicOneAPI,
-  ITopicSearchAPI,
 } from "../models";
 import {
   Context,
