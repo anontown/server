@@ -3,6 +3,7 @@ import { IRepo } from "../models/irepo";
 import {
   Context,
 } from "../server";
+import { IStorageAPI } from "../models/index";
 
 export const storageResolver = (repo: IRepo) => {
   return {
@@ -13,7 +14,7 @@ export const storageResolver = (repo: IRepo) => {
           query: StorageQuery,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IStorageAPI[]> => {
         const storages = await repo.storage.find(context.auth.token, args.query);
         return storages.map(x => x.toAPI(context.auth.token));
       },
@@ -26,10 +27,10 @@ export const storageResolver = (repo: IRepo) => {
           value: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IStorageAPI> => {
         const storage = Storage.create(context.auth.token, args.key, args.value);
         await repo.storage.save(storage);
-        return null;
+        return storage.toAPI(context.auth.token);
       },
       delStorage: async (
         _obj: any,
@@ -37,9 +38,10 @@ export const storageResolver = (repo: IRepo) => {
           key: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<boolean | null> => {
         const storage = await repo.storage.findOneKey(context.auth.token, args.key);
-        return storage.toAPI(context.auth.token);
+        await repo.storage.del(storage);
+        return null;
       },
     },
   };
