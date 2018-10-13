@@ -1,3 +1,5 @@
+import { Either, right, left } from "fp-ts/lib/Either";
+
 /*
 文字の種類
 lc:小文字
@@ -20,6 +22,28 @@ export interface ValidateData {
 export interface ValidateDataCache {
   validate: ValidateData,
   reg: RegExp,
+}
+
+export interface ValidateError {
+  type: "validate",
+  data: {
+    validate: ValidateData,
+    value: string
+  };
+}
+
+export function checkString(validate: ValidateDataCache, value: string): Either<ValidateError, string> {
+  if (validate.reg.test(value)) {
+    return right(value);
+  } else {
+    return left<ValidateError, never>({
+      type: "validate",
+      data: {
+        validate: validate.validate,
+        value,
+      },
+    });
+  }
 }
 
 export function validateData(char: CharType[] | null, min: number | null, max: number | null): ValidateDataCache {
