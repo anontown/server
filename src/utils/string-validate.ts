@@ -17,12 +17,22 @@ export interface ValidateData {
   max: number | null,
 }
 
-export function validateData(char: CharType[] | null, min: number | null, max: number | null): ValidateData {
-  return {
+export interface ValidateDataCache {
+  validate: ValidateData,
+  reg: RegExp,
+}
+
+export function validateData(char: CharType[] | null, min: number | null, max: number | null): ValidateDataCache {
+  const validate = {
     char,
     min,
     max,
+
   };
+  return {
+    validate,
+    reg: validateToReg(validate)
+  }
 }
 
 function charTypeToReg(type: CharType): string {
@@ -46,7 +56,7 @@ function charTypeToReg(type: CharType): string {
   };
 }
 
-export function validateToReg(data: ValidateData): RegExp {
+function validateToReg(data: ValidateData): RegExp {
   const char = data.char !== null ? `[${data.char.map(x => charTypeToReg(x)).join()}]` : ".";
   const len = `{${data.min !== null ? data.min : 0},${data.max !== null ? data.max : ""}}`;
   const reg = `^${char}${len}$`;
