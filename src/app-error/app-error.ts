@@ -1,28 +1,47 @@
-export class AppError {
-  getCode() {
-    return "app";
-  }
+export type AppErrorJSON = AppRootErrorJSON | AppServerErrorJSON | AppNotFountErrorJSON;
 
-  getData() {
-    return {};
-  }
+export function fromJSON(json: AppErrorJSON): AppRootError {
 
-  toJSON() {
+}
+
+export interface AppRootErrorJSON {
+  code: "root";
+  data: {};
+}
+
+export class AppRootError {
+  toJSON(): AppErrorJSON {
     return {
-      code: this.getCode(),
-      data: this.getData(),
+      code: "root",
+      data: {},
     };
   }
 }
 
-export class AppServerError extends AppError {
-  getCode() {
-    return "server";
+export interface AppServerErrorJSON {
+  code: "server";
+  data: {};
+}
+
+export class AppServerError extends AppRootError {
+  toJSON(): AppErrorJSON {
+    return {
+      code: "server",
+      data: {},
+    };
   }
 }
 
-export class AppNotFoundError extends AppError {
-  getCode() {
-    return "not_found";
+export interface AppNotFountErrorJSON {
+  code: "not_found",
+  data: {},
+}
+
+export class AppNotFoundError extends AppRootError {
+  toJSON(): AppErrorJSON {
+    return {
+      code: "not_found",
+      data: {},
+    };
   }
 }
