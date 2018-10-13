@@ -4,6 +4,7 @@ import {
   IRepo,
   Profile,
   ProfileQuery,
+  IProfileAPI,
 } from "../models";
 import {
   Context,
@@ -18,7 +19,7 @@ export const profileResolver = (repo: IRepo) => {
           query: ProfileQuery,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IProfileAPI[]> => {
         const profiles = await repo.profile.find(context.auth, args.query);
         return profiles.map(p => p.toAPI(context.auth.tokenOrNull));
       },
@@ -32,7 +33,7 @@ export const profileResolver = (repo: IRepo) => {
           sn: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IProfileAPI> => {
         const profile = Profile.create(ObjectIDGenerator,
           context.auth.token,
           args.name,
@@ -52,7 +53,7 @@ export const profileResolver = (repo: IRepo) => {
           sn?: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IProfileAPI> => {
         const profile = await repo.profile.findOne(args.id);
         const newProfile = profile.changeData(context.auth.token, args.name, args.text, args.sn, context.now);
         await repo.profile.update(newProfile);

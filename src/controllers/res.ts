@@ -11,6 +11,11 @@ import {
   Res,
   ResNormal,
   ResQuery,
+  IResDeleteAPI,
+  ITopicAPI,
+  IProfileAPI,
+  IHistoryAPI,
+  ITopicForkAPI,
 } from "../models";
 import {
   Context,
@@ -31,7 +36,7 @@ export const resResolver = (repo: IRepo) => {
           limit: number,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IResAPI[]> => {
         const reses = await repo.res.find(context.auth, args.query, args.limit);
         return reses.map(x => x.toAPI(context.auth.tokenOrNull));
       },
@@ -48,7 +53,7 @@ export const resResolver = (repo: IRepo) => {
           age: boolean,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IResNormalAPI> => {
         const [topic, user, reply, profile] = await Promise.all([
           repo.topic.findOne(args.topic),
           repo.user.findOne(context.auth.token.user),
@@ -74,7 +79,11 @@ export const resResolver = (repo: IRepo) => {
         ]);
 
         context.log("reses", res.id);
-        return res.toAPI(some(context.auth.token));
+        const api = res.toAPI(some(context.auth.token));
+        if (api.type !== "normal") {
+          throw new Error();
+        }
+        return api;
       },
       voteRes: async (
         _obj: any,
@@ -83,7 +92,7 @@ export const resResolver = (repo: IRepo) => {
           vote: "uv" | "dv" | "cv",
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IResAPI> => {
         if (args.vote === "cv") {
           const [res, user] = await Promise.all([
             repo.res.findOne(args.id),
@@ -128,7 +137,7 @@ export const resResolver = (repo: IRepo) => {
           id: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IResDeleteAPI> => {
         const res = await repo.res.findOne(args.id);
 
         if (res.type !== "normal") {
@@ -145,24 +154,29 @@ export const resResolver = (repo: IRepo) => {
           repo.user.update(newResUser),
         ]);
 
-        return newRes.toAPI(some(context.auth.token));
+        const api = newRes.toAPI(some(context.auth.token));
+        if (api.type !== "delete") {
+          throw new Error();
+        }
+        return api;
       },
     },
     Subscription: {
       resAdded: {
-        resolve: (payload: { res: Res, count: number }, _args: any, context: Context, _info: any) => {
-          return { ...payload, res: payload.res.toAPI(context.auth.tokenOrNull) };
+        resolve: (payload: { res: Res, count: number }, _args: any, context: Context, _info: any)
+          : { res: IResAPI, count: number } => {
+          return { count: payload.count, res: payload.res.toAPI(context.auth.tokenOrNull) };
         },
         subscribe: () => withFilter(
           () => pubsub.asyncIterator(RES_ADDED),
-          (payload: { res: Res, count: number }, args: { topic: string }) => {
+          (payload: { res: Res, count: number }, args: { topic: string }): boolean => {
             return payload.res.topic === args.topic;
           },
         ),
       },
     },
     Res: {
-      __resolveType(obj: IResAPI) {
+      __resolveType(obj: IResAPI): "ResNormal" | "ResHistory" | "ResTopic" | "ResFork" | "ResDelete" {
         switch (obj.type) {
           case "normal":
             return "ResNormal";
@@ -180,7 +194,7 @@ export const resResolver = (repo: IRepo) => {
         res: IResAPI,
         _args: {},
         context: Context,
-        _info: any) => {
+        _info: any): Promise<ITopicAPI> => {
         const topic = await context.loader.topic.load(res.topicID);
         return topic.toAPI();
       },
@@ -190,7 +204,7 @@ export const resResolver = (repo: IRepo) => {
         res: IResNormalAPI,
         _args: {},
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IResAPI | null> => {
         if (res.replyID !== null) {
           const reply = await context.loader.res.load(res.replyID);
           return reply.toAPI(context.auth.tokenOrNull);
@@ -202,7 +216,7 @@ export const resResolver = (repo: IRepo) => {
         res: IResNormalAPI,
         _args: {},
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IProfileAPI | null> => {
         if (res.profileID !== null) {
           const profile = await context.loader.profile.load(res.profileID);
           return profile.toAPI(context.auth.tokenOrNull);
@@ -216,7 +230,7 @@ export const resResolver = (repo: IRepo) => {
         res: IResHistoryAPI,
         _args: {},
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IHistoryAPI> => {
         const history = await context.loader.history.load(res.historyID);
         return history.toAPI(context.auth.tokenOrNull);
       },
@@ -228,8 +242,11 @@ export const resResolver = (repo: IRepo) => {
         res: IResForkAPI,
         _args: {},
         context: Context,
-        _info: any) => {
+        _info: any): Promise<ITopicForkAPI> => {
         const fork = await context.loader.topic.load(res.forkID);
+        if (fork.type !== "fork") {
+          throw new Error();
+        }
         return fork.toAPI();
       },
     },

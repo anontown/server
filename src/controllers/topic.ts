@@ -8,6 +8,9 @@ import {
   TopicNormal,
   TopicOne,
   TopicQuery,
+  ITopicNormalAPI,
+  ITopicOneAPI,
+  ITopicSearchAPI,
 } from "../models";
 import {
   Context,
@@ -24,7 +27,7 @@ export const topicResolver = (repo: IRepo) => {
           limit: number,
         },
         _context: Context,
-        _info: any) => {
+        _info: any): Promise<ITopicAPI[]> => {
         const topic = await repo.topic
           .find(args.query, args.skip, args.limit);
         return topic.map(t => t.toAPI());
@@ -35,7 +38,10 @@ export const topicResolver = (repo: IRepo) => {
           limit: number,
         },
         _context: Context,
-        _info: any) => {
+        _info: any): Promise<{
+          name: string;
+          count: number;
+        }[]> => {
         return await repo.topic.findTags(args.limit);
       },
     },
@@ -48,7 +54,7 @@ export const topicResolver = (repo: IRepo) => {
           text: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<ITopicNormalAPI> => {
         const user = await repo.user.findOne(context.auth.token.user);
         const create = TopicNormal.create(ObjectIDGenerator,
           args.title,
@@ -77,7 +83,7 @@ export const topicResolver = (repo: IRepo) => {
           text: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<ITopicOneAPI> => {
         const user = await repo.user.findOne(context.auth.token.user);
         const create = TopicOne.create(ObjectIDGenerator,
           args.title,
@@ -105,7 +111,7 @@ export const topicResolver = (repo: IRepo) => {
           parent: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<ITopicForkAPI> => {
         const user = await repo.user.findOne(context.auth.token.user);
         const parent = await repo.topic.findOne(args.parent);
 
@@ -143,7 +149,7 @@ export const topicResolver = (repo: IRepo) => {
           text?: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<ITopicNormalAPI> => {
         const [topic, user] = await Promise.all([
           repo.topic.findOne(args.id),
           repo.user.findOne(context.auth.token.user),
@@ -174,7 +180,7 @@ export const topicResolver = (repo: IRepo) => {
       },
     },
     Topic: {
-      __resolveType(obj: ITopicAPI) {
+      __resolveType(obj: ITopicAPI): "TopicNormal" | "TopicOne" | "TopicFork" {
         switch (obj.type) {
           case "normal":
             return "TopicNormal";
@@ -186,14 +192,12 @@ export const topicResolver = (repo: IRepo) => {
       },
     },
     TopicSearch: {
-      __resolveType(obj: ITopicAPI) {
+      __resolveType(obj: ITopicSearchAPI): "TopicNormal" | "TopicOne" {
         switch (obj.type) {
           case "normal":
             return "TopicNormal";
           case "one":
             return "TopicOne";
-          case "fork":
-            return "TopicFork";
         }
       },
     },
@@ -202,8 +206,11 @@ export const topicResolver = (repo: IRepo) => {
         token: ITopicForkAPI,
         _args: {},
         context: Context,
-        _info: any) => {
+        _info: any): Promise<ITopicNormalAPI> => {
         const parent = await context.loader.topic.load(token.parentID);
+        if (parent.type !== "normal") {
+          throw new Error();
+        }
         return parent.toAPI();
       },
     },

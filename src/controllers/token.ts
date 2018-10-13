@@ -6,6 +6,9 @@ import {
   ITokenGeneralAPI,
   TokenGeneral,
   TokenMaster,
+  ITokenMasterAPI,
+  IClientAPI,
+  ITokenReqAPI,
 } from "../models";
 import {
   Context,
@@ -18,14 +21,14 @@ export const tokenResolver = (repo: IRepo) => {
       token: async (
         _obj: any,
         _args: {}, context: Context,
-        _info: any) => {
+        _info: any): Promise<ITokenAPI> => {
         const token = await repo.token.findOne(context.auth.token.id);
         return token.toAPI();
       },
       tokens: async (
         _obj: any,
         _args: {}, context: Context,
-        _info: any) => {
+        _info: any): Promise<ITokenAPI[]> => {
         const tokens = await repo.token.findAll(context.auth.tokenMaster);
         return tokens.map(t => t.toAPI());
       },
@@ -37,7 +40,7 @@ export const tokenResolver = (repo: IRepo) => {
           client: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<boolean | null> => {
         const client = await repo.client.findOne(args.client);
         await repo.token.delClientToken(context.auth.tokenMaster, client.id);
         return null;
@@ -48,7 +51,7 @@ export const tokenResolver = (repo: IRepo) => {
           client: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<ITokenGeneralAPI> => {
         const client = await repo.client.findOne(args.client);
         const token = TokenGeneral.create(ObjectIDGenerator,
           context.auth.tokenMaster,
@@ -65,7 +68,7 @@ export const tokenResolver = (repo: IRepo) => {
           auth: { id: string, pass: string },
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<ITokenMasterAPI> => {
         const authUser = await authFromApiParam.user(repo.user, args.auth);
         const token = TokenMaster.create(ObjectIDGenerator, authUser, context.now, RandomGenerator);
         await repo.token.insert(token);
@@ -79,7 +82,7 @@ export const tokenResolver = (repo: IRepo) => {
           key: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<ITokenGeneralAPI> => {
         const token = await repo.token.findOne(args.id);
         if (token.type !== "general") {
           throw new AtNotFoundError("トークンが見つかりません");
@@ -89,7 +92,7 @@ export const tokenResolver = (repo: IRepo) => {
       },
     },
     Token: {
-      __resolveType(obj: ITokenAPI) {
+      __resolveType(obj: ITokenAPI): "TokenGeneral" | "TokenMaster" {
         switch (obj.type) {
           case "general":
             return "TokenGeneral";
@@ -103,14 +106,14 @@ export const tokenResolver = (repo: IRepo) => {
         token: ITokenGeneralAPI,
         _args: {},
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IClientAPI> => {
         const client = await context.loader.client.load(token.clientID);
         return client.toAPI(context.auth.TokenMasterOrNull);
       },
       createReq: async (
         tokenAPI: ITokenGeneralAPI,
         _args: {}, context: Context,
-        _info: any) => {
+        _info: any): Promise<ITokenReqAPI> => {
         const token = await repo.token.findOne(tokenAPI.id);
         if (token.type !== "general") {
           throw new AtNotFoundError("トークンが見つかりません");

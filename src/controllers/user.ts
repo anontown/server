@@ -2,6 +2,7 @@ import { ObjectIDGenerator } from "../generator";
 import {
   IRepo,
   User,
+  IUserAPI,
 } from "../models";
 import {
   Context,
@@ -17,7 +18,7 @@ export const userResolver = (repo: IRepo) => {
           sn: string,
         },
         _context: Context,
-        _info: any) => {
+        _info: any): Promise<string> => {
         return await repo.user.findID(args.sn);
       },
       userSN: async (
@@ -26,14 +27,14 @@ export const userResolver = (repo: IRepo) => {
           id: string,
         },
         _context: Context,
-        _info: any) => {
+        _info: any): Promise<string> => {
         return (await repo.user.findOne(args.id)).sn;
       },
       user: async (
         _obj: any,
         _args: {},
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IUserAPI> => {
         return (await repo.user.findOne(context.auth.token.user)).toAPI();
       },
     },
@@ -46,7 +47,7 @@ export const userResolver = (repo: IRepo) => {
           recaptcha: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IUserAPI> => {
         await authFromApiParam.recaptcha(args.recaptcha);
         const user = User.create(ObjectIDGenerator, args.sn, args.pass, context.now);
         await repo.user.insert(user);
@@ -63,7 +64,7 @@ export const userResolver = (repo: IRepo) => {
           },
         },
         _context: Context,
-        _info: any) => {
+        _info: any): Promise<IUserAPI> => {
         const authUser = await authFromApiParam.user(repo.user, args.auth);
         const user = await repo.user.findOne(authUser.id);
         const newUser = user.change(authUser, args.pass, args.sn);

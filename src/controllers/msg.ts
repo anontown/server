@@ -1,5 +1,5 @@
 import {
-  IRepo, MsgQuery,
+  IRepo, MsgQuery, IMsgAPI,
 } from "../models";
 import {
   Context,
@@ -15,7 +15,7 @@ export const msgResolver = (repo: IRepo) => {
           limit: number,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IMsgAPI[]> => {
         const msgs = await repo.msg.find(context.auth.token, args.query, args.limit);
         return msgs.map(x => x.toAPI(context.auth.token));
       },

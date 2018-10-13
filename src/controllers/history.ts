@@ -1,5 +1,5 @@
 import {
-  HistoryQuery, IHistoryAPI, IRepo,
+  HistoryQuery, IHistoryAPI, IRepo, ITopicNormalAPI,
 } from "../models";
 import {
   Context,
@@ -15,7 +15,7 @@ export const historyResolver = (repo: IRepo) => {
           limit: number,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IHistoryAPI[]> => {
         const histories = await repo.history.find(args.query, args.limit);
         return histories.map(x => x.toAPI(context.auth.tokenOrNull));
       },
@@ -25,8 +25,11 @@ export const historyResolver = (repo: IRepo) => {
         history: IHistoryAPI,
         _args: {},
         context: Context,
-        _info: any) => {
+        _info: any): Promise<ITopicNormalAPI> => {
         const topic = await context.loader.topic.load(history.topicID);
+        if (topic.type !== "normal") {
+          throw new Error();
+        }
         return topic.toAPI();
       },
     },

@@ -4,6 +4,7 @@ import {
   Client,
   ClientQuery,
   IRepo,
+  IClientAPI,
 } from "../models";
 import { Context } from "../server";
 
@@ -16,7 +17,7 @@ export const clientResolver = (repo: IRepo) => {
           query: ClientQuery,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IClientAPI[]> => {
         const clients = await repo.client.find(context.auth.TokenMasterOrNull, args.query);
         return clients.map(c => c.toAPI(context.auth.TokenMasterOrNull));
       },
@@ -29,7 +30,7 @@ export const clientResolver = (repo: IRepo) => {
           url: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IClientAPI> => {
         const client = Client.create(ObjectIDGenerator, context.auth.tokenMaster, args.name, args.url, context.now);
         await repo.client.insert(client);
         context.log("clients", client.id);
@@ -43,7 +44,7 @@ export const clientResolver = (repo: IRepo) => {
           url?: string,
         },
         context: Context,
-        _info: any) => {
+        _info: any): Promise<IClientAPI> => {
         const client = await repo.client.findOne(args.id);
         const newClient = client.changeData(context.auth.tokenMaster, args.name, args.url, context.now);
         await repo.client.update(newClient);

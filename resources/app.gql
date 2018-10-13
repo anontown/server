@@ -420,10 +420,10 @@ type Mutation {
   updateClient(id:ID!,name:String,url:String):Client!
   createProfile(name:String!,text:String!,sn:String!):Profile!
   updateProfile(id:ID!,name:String,text:String,sn:String):Profile!
-  createRes(topic:String!,name:String,text:String!,reply:String,profile:String,age:Boolean!):Res!
+  createRes(topic:String!,name:String,text:String!,reply:String,profile:String,age:Boolean!):ResNormal!
   voteRes(res:ID!,type:VoteType!):Res!
-  delRes(res:ID!):Res!
-  setStorage(key:String!,value:String!):Boolean
+  delRes(res:ID!):ResDelete!
+  setStorage(key:String!,value:String!):Storage
   delStorage(key:String!):Boolean
   delTokenClient(client:ID!):Boolean
   createTokenGeneral(client:ID!):TokenGeneral!

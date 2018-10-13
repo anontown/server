@@ -42,6 +42,7 @@ export type ITopicForkDB = ITopicBaseDB<"fork", {
 }>;
 
 export type ITopicAPI = ITopicOneAPI | ITopicNormalAPI | ITopicForkAPI;
+export type ITopicSearchAPI = ITopicOneAPI | ITopicNormalAPI;
 
 export interface ITopicBaseAPI<T extends TopicType> {
   readonly id: string;
