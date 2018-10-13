@@ -12,7 +12,7 @@ han:漢字
 export type CharType = "lc" | "uc" | "d" | "ub" | "hy" | "hira" | "kana" | "han";
 
 export interface ValidateData {
-  char: CharType,
+  char: CharType | null,
   min: number | null,
   max: number | null,
 }
@@ -38,6 +38,9 @@ function charTypeToReg(type: CharType): string {
   };
 }
 
-function validateToReg(data: ValidateData): RegExp {
-
+export function validateToReg(data: ValidateData): RegExp {
+  const char = data.char !== null ? `[${charTypeToReg(data.char)}]` : ".";
+  const len = `{${data.min !== null ? data.min : 0},${data.max !== null ? data.max : ""}}`;
+  const reg = `^${char}${len}$`;
+  return new RegExp(reg, "us");
 }
