@@ -100,7 +100,7 @@ export function checkRegExp(reg: RegExp, value: string): Either<ValidateRegExpEr
     return right(value);
   } else {
     return left<ValidateRegExpError, never>({
-      type: "validate_regexp";
+      type: "validate_regexp",
       data: {
         regexp: reg.source,
         value: value,
