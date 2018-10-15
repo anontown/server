@@ -416,7 +416,7 @@ enum VoteType{
   cv
 }
 
-type CreateTokenGeneralResponse{
+type UpdateUserResponse{
   user:User!
   token:TokenMaster!
 }
@@ -439,8 +439,8 @@ type Mutation {
   createTopicOne(title:String!,tags:[String!]!,text:String!):TopicOne!
   createTopicFork(title:String!,parent:ID!):TopicFork!
   updateTopic(id:ID!,title:String,tags:[String!],text:String):TopicNormal!
-  createUser(sn:String!,pass:String!,recaptcha:String!):CreateTokenGeneralResponse!
-  updateUser(sn:String,pass:String,auth:AuthUser!):User!
+  createUser(sn:String!,pass:String!,recaptcha:String!):User!
+  updateUser(sn:String,pass:String,auth:AuthUser!):UpdateUserResponse!
 }
 
 type ResSubscript{
