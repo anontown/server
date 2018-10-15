@@ -1,8 +1,10 @@
-import { ObjectIDGenerator } from "../generator";
+import { ObjectIDGenerator, RandomGenerator } from "../generator";
 import {
   IRepo,
   IUserAPI,
   User,
+  TokenMaster,
+  ITokenMasterAPI,
 } from "../models";
 import {
   Context,
@@ -64,14 +66,17 @@ export const userResolver = (repo: IRepo) => {
             pass: string,
           },
         },
-        _context: Context,
-        _info: any): Promise<IUserAPI> => {
+        context: Context,
+        _info: any): Promise<{ user: IUserAPI, token: ITokenMasterAPI }> => {
         const authUser = await authFromApiParam.user(repo.user, args.auth);
         const user = await repo.user.findOne(authUser.id);
         const newUser = user.change(authUser, args.pass, args.sn);
         await repo.user.update(newUser);
         await repo.token.delMasterToken(authUser);
-        return newUser.toAPI();
+
+        const token = TokenMaster.create(ObjectIDGenerator, authUser, context.now, RandomGenerator);
+        await repo.token.insert(token);
+        return { user: newUser.toAPI(), token: token.toAPI() };
       },
     },
   };
