@@ -421,6 +421,11 @@ type UpdateUserResponse{
   token:TokenMaster!
 }
 
+type CreateUserResponse{
+  user:User!
+  token:TokenMaster!
+}
+
 type Mutation {
   createClient(name:String!,url:String!):Client!
   updateClient(id:ID!,name:String,url:String):Client!
@@ -439,7 +444,7 @@ type Mutation {
   createTopicOne(title:String!,tags:[String!]!,text:String!):TopicOne!
   createTopicFork(title:String!,parent:ID!):TopicFork!
   updateTopic(id:ID!,title:String,tags:[String!],text:String):TopicNormal!
-  createUser(sn:String!,pass:String!,recaptcha:String!):User!
+  createUser(sn:String!,pass:String!,recaptcha:String!):CreateUserResponse!
   updateUser(sn:String,pass:String,auth:AuthUser!):UpdateUserResponse!
 }
 

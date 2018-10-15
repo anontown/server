@@ -49,11 +49,16 @@ export const userResolver = (repo: IRepo) => {
           recaptcha: string,
         },
         context: Context,
-        _info: any): Promise<IUserAPI> => {
+        _info: any): Promise<{ user: IUserAPI, token: ITokenMasterAPI }> => {
         await authFromApiParam.recaptcha(args.recaptcha);
+
         const user = User.create(ObjectIDGenerator, args.sn, args.pass, context.now);
         await repo.user.insert(user);
-        return user.toAPI();
+
+        const token = TokenMaster.create(ObjectIDGenerator, user.auth(args.pass), context.now, RandomGenerator);
+        await repo.token.insert(token);
+
+        return { user: user.toAPI(), token: token.toAPI() };
       },
       updateUser: async (
         _obj: any,
