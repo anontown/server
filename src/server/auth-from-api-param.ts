@@ -11,7 +11,7 @@ import {
 } from "../models";
 
 import {
-  AtCaptchaError,
+  AtCaptchaError, AtAuthError,
 } from "../at-error";
 
 import { Config } from "../config";
@@ -28,8 +28,16 @@ export async function token(
 
 export async function user(
   userRepo: IUserRepo,
-  apiParamUser: { id: string, pass: string }): Promise<IAuthUser> {
-  const user = await userRepo.findOne(apiParamUser.id);
+  apiParamUser: { id?: string, sn?: string, pass: string }): Promise<IAuthUser> {
+  let id;
+  if (apiParamUser.id !== undefined && apiParamUser.sn === undefined) {
+    id = apiParamUser.id;
+  } else if (apiParamUser.id === undefined && apiParamUser.sn !== undefined) {
+    id = await userRepo.findID(apiParamUser.sn);
+  } else {
+    throw new AtAuthError("AuthUserはidかsnのどちらか片方を指定して下さい");
+  }
+  const user = await userRepo.findOne(id);
   const authUser = user.auth(apiParamUser.pass);
 
   return authUser;

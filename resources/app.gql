@@ -377,7 +377,8 @@ input ResQuery{
 }
 
 input AuthUser{
-  id:String!
+  id:String
+  sn:String
   pass:String!
 }
 

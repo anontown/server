@@ -59,7 +59,8 @@ export const userResolver = (repo: IRepo) => {
           sn?: string,
           pass?: string,
           auth: {
-            id: string,
+            id?: string,
+            sn?: string,
             pass: string,
           },
         },
