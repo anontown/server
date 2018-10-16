@@ -1,5 +1,6 @@
 {
-  "name": "anontown-server",
+  "private": true,
+  "name": "@anontown/server",
   "version": "1.0.0",
   "dependencies": {
     "@types/nanoid": "^1.2.0",
