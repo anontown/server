@@ -257,7 +257,6 @@ type TokenGeneral implements Token{
   date: DateTime!
 
   client:Client!
-  createReq:TokenReq!
 }
 
 interface Topic{
@@ -438,6 +437,7 @@ type Mutation {
   delStorage(key:String!):Boolean
   delTokenClient(client:ID!):Boolean
   createTokenGeneral(client:ID!):TokenGeneral!
+  createTokenReq():TokenReq!
   createTokenMaster(auth:AuthUser!):TokenMaster!
   authTokenReq(id:ID!,key:String!):TokenGeneral!
   createTopicNormal(title:String!,tags:[String!]!,text:String!):TopicNormal!

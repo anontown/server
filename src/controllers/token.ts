@@ -94,6 +94,21 @@ export const tokenResolver = (repo: IRepo) => {
         token.authReq(args.key, context.now);
         return token.toAPI();
       },
+      createTokenReq: async (
+        _obj: any,
+        _args: {},
+        context: Context,
+        _info: any): Promise<ITokenReqAPI> => {
+        const token = await repo.token.findOne(context.auth.token.id);
+        if (token.type !== "general") {
+          throw new AtNotFoundError("トークンが見つかりません");
+        }
+        const { req, token: newToken } = token.createReq(context.now, RandomGenerator);
+
+        await repo.token.update(newToken);
+
+        return req;
+      },
     },
     Token: {
       __resolveType(obj: ITokenAPI): "TokenGeneral" | "TokenMaster" {
@@ -113,20 +128,6 @@ export const tokenResolver = (repo: IRepo) => {
         _info: any): Promise<IClientAPI> => {
         const client = await context.loader.client.load(token.clientID);
         return client.toAPI(context.auth.TokenMasterOrNull);
-      },
-      createReq: async (
-        tokenAPI: ITokenGeneralAPI,
-        _args: {}, context: Context,
-        _info: any): Promise<ITokenReqAPI> => {
-        const token = await repo.token.findOne(tokenAPI.id);
-        if (token.type !== "general") {
-          throw new AtNotFoundError("トークンが見つかりません");
-        }
-        const { req, token: newToken } = token.createReq(context.now, RandomGenerator);
-
-        await repo.token.update(newToken);
-
-        return req;
       },
     },
   };
