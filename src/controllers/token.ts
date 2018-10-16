@@ -51,16 +51,22 @@ export const tokenResolver = (repo: IRepo) => {
           client: string,
         },
         context: Context,
-        _info: any): Promise<ITokenGeneralAPI> => {
+        _info: any): Promise<{ token: ITokenGeneralAPI, req: ITokenReqAPI }> => {
         const client = await repo.client.findOne(args.client);
         const token = TokenGeneral.create(ObjectIDGenerator,
           context.auth.tokenMaster,
           client,
           context.now,
           RandomGenerator);
-        await repo.token.insert(token);
 
-        return token.toAPI();
+        const { req, token: newToken } = token.createReq(context.now, RandomGenerator);
+
+        await repo.token.insert(newToken);
+
+        return {
+          token: token.toAPI(),
+          req
+        };
       },
       createTokenMaster: async (
         _obj: any,
