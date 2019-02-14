@@ -5,7 +5,7 @@
   "dependencies": {
     "@types/nanoid": "^1.2.0",
     "apollo-resolvers": "^1.4.1",
-    "apollo-server": "^2.0.0",
+    "apollo-server": "^2.4.1",
     "array-range": "^1.0.1",
     "cron": "^1.2.1",
     "crypto-js": "^3.1.9-1",
@@ -14,7 +14,7 @@
     "fp-ts": "^1.9.0",
     "fs-extra": "^7.0.0",
     "fs-promise": "^1.0.0",
-    "graphql": "^0.13.2",
+    "graphql": "^14.1.1",
     "graphql-iso-date": "^3.5.0",
     "immutable": "^4.0.0-rc.9",
     "jsonwebtoken": "^7.4.1",
@@ -46,7 +46,7 @@
     "@types/node": "^6.0.51",
     "@types/ramda": "^0.25.36",
     "@types/request": "0.0.39",
-    "apollo": "^1.9.2",
+    "apollo": "^2.5.0",
     "jest": "^23.6.0",
     "sloc": "^0.2.0",
     "ts-jest": "^23.10.4",
@@ -61,6 +61,6 @@
     "lint": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts'",
     "lint:fix": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts' --fix",
     "loc": "sloc --format cli-table ./src",
-    "schema:generate": "apollo schema:download --endpoint ./resources/app.gql ./schema/schema.json"
+    "schema:push": "apollo service:push --localSchemaFile ./resources/app.gql"
   }
 }

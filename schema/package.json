@@ -1,9 +1,0 @@
-{
-  "name": "@anontown/graphql",
-  "version": "1.0.4",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
-  "author": "kgtkr",
-  "license": "MIT"
-}
