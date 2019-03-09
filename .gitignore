@@ -6,3 +6,4 @@
 /dist
 /coverage
 /logs
+*.gen.ts

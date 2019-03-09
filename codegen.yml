@@ -1,0 +1,7 @@
+overwrite: true
+schema: "resources/app.gql"
+documents: null
+generates:
+  src/graphql.gen.ts:
+    plugins:
+      - "typescript-common"
