@@ -7,3 +7,6 @@ generates:
       - "typescript-common"
       - "typescript-server"
       - "typescript-resolvers"
+config:
+    scalars:
+      DateTime: string
