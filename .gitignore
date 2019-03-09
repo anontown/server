@@ -6,4 +6,5 @@
 /dist
 /coverage
 /logs
-*.gen.ts
+generated/*
+!.gitkeep
