@@ -395,15 +395,15 @@ input TopicQuery{
 
 type Query{
   clients(query:ClientQuery!):[Client!]!
-  histories(query:HistoryQuery!,limit:Int!=100):[History!]!
-  msgs(query:MsgQuery!,limit:Int!=100):[Msg!]!
+  histories(query:HistoryQuery!,limit:Int=100):[History!]!
+  msgs(query:MsgQuery!,limit:Int=100):[Msg!]!
   profiles(query:ProfileQuery!):[Profile!]!
-  reses(query:ResQuery!,limit:Int!=100):[Res!]!
+  reses(query:ResQuery!,limit:Int=100):[Res!]!
   storages(query:StorageQuery!):[Storage!]!
   token:Token!
   tokens:[Token!]!
-  topics(query:TopicQuery!,skip:Int!=0,limit:Int!=100):[Topic!]!
-  topicTags(limit:Int!=100):[Tags!]!
+  topics(query:TopicQuery!,skip:Int=0,limit:Int=100):[Topic!]!
+  topicTags(limit:Int=100):[Tags!]!
   userID(sn:String!):ID!
   userSN(id:ID!):String!
   user:User!
