@@ -81,7 +81,7 @@ function charTypeToReg(type: CharType): string {
 }
 
 function validateToReg(data: ValidateData): RegExp {
-  const char = data.char !== null ? `[${data.char.map(x => charTypeToReg(x)).join()}]` : ".";
+  const char = data.char !== null ? `[${data.char.map(x => charTypeToReg(x)).join("")}]` : ".";
   const len = `{${data.min !== null ? data.min : 0},${data.max !== null ? data.max : ""}}`;
   const reg = `^${char}${len}$`;
   return new RegExp(reg, "us");
