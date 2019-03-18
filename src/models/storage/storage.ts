@@ -12,7 +12,10 @@ export interface IStorageDB {
   value: string;
 }
 
-export type IStorageAPI = string;
+export interface IStorageAPI {
+  key: string;
+  value: string;
+}
 
 export class Storage extends Copyable<Storage> {
   static fromDB(db: IStorageDB): Storage {
@@ -70,6 +73,9 @@ export class Storage extends Copyable<Storage> {
       throw new AtRightError("権限がありません");
     }
 
-    return this.value;
+    return {
+      key: this.key,
+      value: this.value,
+    };
   }
 }
