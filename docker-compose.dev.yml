@@ -1,0 +1,50 @@
+version: '2'
+
+services:
+  mongo:
+    restart: always
+    image: "mongo:3.6.3"
+    volumes:
+      - ./data/db:/data/db
+#  mongo-express:
+#    restart: always
+#    image: "mongo-express:0.40.0"
+#    ports:
+#      - "8081:8081"
+#    depends_on:
+#      - mongo
+  app:
+    build: .
+    restart: always
+    environment:
+      SERVER_PORT: "8080"
+      DB_URL: "mongodb://mongo:27017/anontown"
+      ES_HOST: "es:9200"
+      AT_MODE: "${AT_MODE}"
+    env_file: .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+      - es
+    volumes:
+      - ./data/app/logs:/home/app/.anontown/logs
+      - ./data/app/data:/home/app/.anontown/data
+      - ./data/app/coverage:/home/app/.anontown/coverage
+  es:
+    build: es/.
+    restart: always
+    env_file: es/.env
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - ./data/es:/usr/share/elasticsearch/data
+#  es-head:
+#    image: "mobz/elasticsearch-head:5"
+#    restart: always
+#    ports:
+#      - "9100:9100"
+#    depends_on:
+#      - es
