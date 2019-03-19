@@ -30,7 +30,7 @@ export async function serverRun(repo: IRepo) {
     typeDefs,
     resolvers,
     context: ({ req }: any): Promise<Context> => {
-      return createContext(req.headers, repo);
+      return createContext(req !== undefined ? req.headers : {}, repo);
     },
     subscriptions: {
       onConnect: (connectionParams, _webSocket): Promise<Context> => {
