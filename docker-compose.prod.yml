@@ -6,13 +6,6 @@ services:
     image: "mongo:3.6.3"
     volumes:
       - ./data/db:/data/db
-#  mongo-express:
-#    restart: always
-#    image: "mongo-express:0.40.0"
-#    ports:
-#      - "8081:8081"
-#    depends_on:
-#      - mongo
   app:
     build: .
     restart: always
@@ -41,10 +34,3 @@ services:
         hard: 65536
     volumes:
       - ./data/es:/usr/share/elasticsearch/data
-#  es-head:
-#    image: "mobz/elasticsearch-head:5"
-#    restart: always
-#    ports:
-#      - "9100:9100"
-#    depends_on:
-#      - es
