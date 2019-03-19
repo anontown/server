@@ -67,6 +67,7 @@
     "loc": "sloc --format cli-table ./src",
     "schema:push": "apollo service:push --localSchemaFile ./resources/app.gql",
     "codegen": "gql-gen --config codegen.yml",
-    "postinstall": "npm run codegen"
+    "postinstall": "npm run codegen",
+    "start:dev": "./start-dev.sh"
   }
 }
