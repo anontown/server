@@ -1,4 +1,6 @@
 import * as log4js from "log4js";
+import * as path from "path";
+import { Config } from "./config";
 
 // log
 log4js.configure({
@@ -6,25 +8,25 @@ log4js.configure({
         {
             type: "dateFile",
             category: "system",
-            filename: "logs/system.log",
+            filename: path.join(Config.saveDir, "logs/system.log"),
             pattern: "-yyyy-MM-dd",
         },
         {
             type: "dateFile",
             category: "access",
-            filename: "logs/access.log",
+            filename: path.join(Config.saveDir, "logs/access.log"),
             pattern: "-yyyy-MM-dd",
         },
         {
             type: "dateFile",
             category: "error",
-            filename: "logs/error.log",
+            filename: path.join(Config.saveDir, "logs/error.log"),
             pattern: "-yyyy-MM-dd",
         },
         {
             type: "dateFile",
             category: "app",
-            filename: "logs/app.log",
+            filename: path.join(Config.saveDir, "logs/app.log"),
             pattern: "-yyyy-MM-dd",
         },
         ...process.env.AT_MODE === "TEST"

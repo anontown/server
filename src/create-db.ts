@@ -6,6 +6,7 @@ import { DB, ESClient } from "./db";
 import { Logger } from "./logger";
 import { IProfileDB } from "./models/profile";
 import { hash } from "./utils";
+import * as path from "path";
 
 const updateFunc: (() => Promise<void>)[] = [];
 
@@ -720,13 +721,13 @@ export async function createDBVer(ver: number): Promise<number> {
 export async function createDB() {
   let ver: number;
   try {
-    ver = JSON.parse(fs.readFileSync("./data/db-version.json", "utf8"));
+    ver = JSON.parse(fs.readFileSync(path.join(Config.saveDir, "./data/db-version.json"), "utf8"));
   } catch (e) {
     // ファイルがなければ0
     ver = 0;
   }
   const newVer = await createDBVer(ver);
-  fs.writeFileSync("./data/db-version.json", JSON.stringify(newVer), {
+  fs.writeFileSync(path.join(Config.saveDir, "./data/db-version.json"), JSON.stringify(newVer), {
     encoding: "utf8",
   });
 }

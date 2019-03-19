@@ -7,18 +7,20 @@ import {
   Repo,
 } from "./models";
 import { serverRun } from "./server";
+import * as path from "path";
+import { Config } from "./config";
 
 /* tslint:disable:no-floating-promises */
 (async () => {
   // フォルダ作成
   try {
-    await fs.mkdir("logs");
+    await fs.mkdir(path.join(Config.saveDir, "logs"));
   } catch {
     /* tslint:disable:no-empty */
   }
 
   try {
-    await fs.mkdir("data");
+    await fs.mkdir(path.join(Config.saveDir, "data"));
   } catch {
     /* tslint:disable:no-empty */
   }
