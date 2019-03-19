@@ -27,6 +27,17 @@ export const resResolver = (repo: IRepo) => {
     pubsub.publish(RES_ADDED, data);
   });
 
+  const resBase = {
+    topic: async (
+      res: IResAPI,
+      _args: {},
+      context: Context,
+      _info: any): Promise<ITopicAPI> => {
+      const topic = await context.loader.topic.load(res.topicID);
+      return topic.toAPI();
+    },
+  };
+
   return {
     Query: {
       reses: async (
@@ -189,17 +200,10 @@ export const resResolver = (repo: IRepo) => {
           case "delete":
             return "ResDelete";
         }
-      },
-      topic: async (
-        res: IResAPI,
-        _args: {},
-        context: Context,
-        _info: any): Promise<ITopicAPI> => {
-        const topic = await context.loader.topic.load(res.topicID);
-        return topic.toAPI();
-      },
+      }
     },
     ResNormal: {
+      ...resBase,
       reply: async (
         res: IResNormalAPI,
         _args: {},
@@ -226,6 +230,7 @@ export const resResolver = (repo: IRepo) => {
       },
     },
     ResHistory: {
+      ...resBase,
       history: async (
         res: IResHistoryAPI,
         _args: {},
@@ -236,8 +241,10 @@ export const resResolver = (repo: IRepo) => {
       },
     },
     ResTopic: {
+      ...resBase,
     },
     ResFork: {
+      ...resBase,
       fork: async (
         res: IResForkAPI,
         _args: {},
@@ -251,6 +258,7 @@ export const resResolver = (repo: IRepo) => {
       },
     },
     ResDelete: {
+      ...resBase,
     },
   };
 };
