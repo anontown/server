@@ -2,7 +2,9 @@ import { Option } from "fp-ts/lib/Option";
 import { AtAuthError, AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { Client, IClientDB } from "./client";
-import { ClientQuery, IClientRepo } from "./iclient-repo";
+import { IClientRepo } from "./iclient-repo";
+import * as G from "../../generated/graphql";
+import { isNullOrUndefined } from "../../utils/index";
 
 export class ClientRepoMock implements IClientRepo {
   private clients: IClientDB[] = [];
@@ -24,14 +26,14 @@ export class ClientRepoMock implements IClientRepo {
     this.clients[this.clients.findIndex(c => c._id.toHexString() === client.id)] = client.toDB();
   }
 
-  async find(authToken: Option<IAuthTokenMaster>, query: ClientQuery): Promise<Client[]> {
+  async find(authToken: Option<IAuthTokenMaster>, query: G.ClientQuery): Promise<Client[]> {
     if (query.self && authToken.isNone()) {
       throw new AtAuthError("認証が必要です");
     }
 
     const clients = this.clients
       .filter(c => !query.self || authToken.isNone() || c.user.toHexString() === authToken.value.user)
-      .filter(x => query.id === undefined || query.id.includes(x._id.toHexString()))
+      .filter(x => isNullOrUndefined(query.id) || query.id.includes(x._id.toHexString()))
       .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
     return clients.map(c => Client.fromDB(c));

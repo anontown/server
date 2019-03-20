@@ -2,20 +2,19 @@ import { some } from "fp-ts/lib/Option";
 import { ObjectIDGenerator } from "../generator";
 import {
   Client,
-  ClientQuery,
   IClientAPI,
   IRepo,
 } from "../models";
 import { Context } from "../server";
+import * as G from "../generated/graphql";
+import { nullToUndefined } from "../utils/index";
 
 export const clientResolver = (repo: IRepo) => {
   return {
     Query: {
       clients: async (
         _obj: any,
-        args: {
-          query: ClientQuery,
-        },
+        args: G.ClientsQueryArgs,
         context: Context,
         _info: any): Promise<IClientAPI[]> => {
         const clients = await repo.client.find(context.auth.TokenMasterOrNull, args.query);
@@ -25,10 +24,7 @@ export const clientResolver = (repo: IRepo) => {
     Mutation: {
       createClient: async (
         _obj: any,
-        args: {
-          name: string,
-          url: string,
-        },
+        args: G.CreateClientMutationArgs,
         context: Context,
         _info: any): Promise<IClientAPI> => {
         const client = Client.create(ObjectIDGenerator, context.auth.tokenMaster, args.name, args.url, context.now);
@@ -38,15 +34,11 @@ export const clientResolver = (repo: IRepo) => {
       },
       updateClient: async (
         _obj: any,
-        args: {
-          id: string,
-          name?: string,
-          url?: string,
-        },
+        args: G.UpdateClientMutationArgs,
         context: Context,
         _info: any): Promise<IClientAPI> => {
         const client = await repo.client.findOne(args.id);
-        const newClient = client.changeData(context.auth.tokenMaster, args.name, args.url, context.now);
+        const newClient = client.changeData(context.auth.tokenMaster, nullToUndefined(args.name), nullToUndefined(args.url), context.now);
         await repo.client.update(newClient);
         context.log("clients", newClient.id);
         return newClient.toAPI(some(context.auth.tokenMaster));

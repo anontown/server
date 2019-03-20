@@ -4,7 +4,9 @@ import { AtAuthError, AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { DB } from "../../db";
 import { Client, IClientDB } from "./client";
-import { ClientQuery, IClientRepo } from "./iclient-repo";
+import { IClientRepo } from "./iclient-repo";
+import * as G from "../../generated/graphql";
+import { isNullOrUndefined } from "../../utils/index";
 
 export class ClientRepo implements IClientRepo {
   async findOne(id: string): Promise<Client> {
@@ -18,7 +20,7 @@ export class ClientRepo implements IClientRepo {
     return Client.fromDB(client);
   }
 
-  async find(authToken: Option<IAuthTokenMaster>, query: ClientQuery): Promise<Client[]> {
+  async find(authToken: Option<IAuthTokenMaster>, query: G.ClientQuery): Promise<Client[]> {
     if (query.self && authToken.isNone()) {
       throw new AtAuthError("認証が必要です");
     }
@@ -27,7 +29,7 @@ export class ClientRepo implements IClientRepo {
     if (query.self && authToken.isSome()) {
       q.user = new ObjectID(authToken.value.user);
     }
-    if (query.id !== undefined) {
+    if (!isNullOrUndefined(query.id)) {
       q._id = { $in: query.id.map(id => new ObjectID(id)) };
     }
     const clients: IClientDB[] = await db.collection("clients")
