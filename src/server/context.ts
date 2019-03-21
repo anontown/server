@@ -11,6 +11,7 @@ export interface AppContext {
   now: Date;
   log: (name: string, id: string) => void;
   loader: Loader;
+  repo: IRepo
 }
 
 async function createToken(raw: any, repo: IRepo) {
@@ -39,5 +40,6 @@ export async function createContext(headers: any, repo: IRepo): Promise<AppConte
     now: new Date(),
     log: (name, id) => Logger.app.info(ip, name, id),
     loader: createLoader(repo, auth),
+    repo,
   };
 }

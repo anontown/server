@@ -16,203 +16,201 @@ import {
   AppContext,
 } from "../server";
 
-export const topicResolver = (repo: IRepo) => {
-  return {
-    Query: {
-      topics: async (
-        _obj: any,
-        args: {
-          query: TopicQuery,
-          skip: number,
-          limit: number,
-        },
-        _context: AppContext,
-        _info: any): Promise<ITopicAPI[]> => {
-        const topic = await repo.topic
-          .find(args.query, args.skip, args.limit);
-        return topic.map(t => t.toAPI());
+export const topicResolver = {
+  Query: {
+    topics: async (
+      _obj: any,
+      args: {
+        query: TopicQuery,
+        skip: number,
+        limit: number,
       },
-      topicTags: async (
-        _obj: any,
-        args: {
-          limit: number,
-        },
-        _context: AppContext,
-        _info: any): Promise<{
-          name: string;
-          count: number;
-        }[]> => {
-        return await repo.topic.findTags(args.limit);
-      },
+      context: AppContext,
+      _info: any): Promise<ITopicAPI[]> => {
+      const topic = await context.repo.topic
+        .find(args.query, args.skip, args.limit);
+      return topic.map(t => t.toAPI());
     },
-    Mutation: {
-      createTopicNormal: async (
-        _obj: any,
-        args: {
-          title: string,
-          tags: string[],
-          text: string,
-        },
-        context: AppContext,
-        _info: any): Promise<ITopicNormalAPI> => {
-        const user = await repo.user.findOne(context.auth.token.user);
-        const create = TopicNormal.create(ObjectIDGenerator,
-          args.title,
-          args.tags,
-          args.text,
-          user,
-          context.auth.token,
-          context.now);
-
-        await repo.topic.insert(create.topic);
-        await Promise.all([
-          repo.user.update(create.user),
-          repo.res.insert(create.res),
-          repo.history.insert(create.history),
-        ]);
-        context.log("topics", create.topic.id);
-        context.log("reses", create.res.id);
-        context.log("histories", create.history.id);
-        return create.topic.toAPI();
+    topicTags: async (
+      _obj: any,
+      args: {
+        limit: number,
       },
-      createTopicOne: async (
-        _obj: any,
-        args: {
-          title: string,
-          tags: string[],
-          text: string,
-        },
-        context: AppContext,
-        _info: any): Promise<ITopicOneAPI> => {
-        const user = await repo.user.findOne(context.auth.token.user);
-        const create = TopicOne.create(ObjectIDGenerator,
-          args.title,
-          args.tags,
-          args.text,
-          user,
-          context.auth.token,
-          context.now);
-
-        await repo.topic.insert(create.topic);
-        await Promise.all([
-          repo.user.update(create.user),
-          repo.res.insert(create.res),
-        ]);
-
-        context.log("topics", create.topic.id);
-        context.log("reses", create.res.id);
-
-        return create.topic.toAPI();
-      },
-      createTopicFork: async (
-        _obj: any,
-        args: {
-          title: string,
-          parent: string,
-        },
-        context: AppContext,
-        _info: any): Promise<ITopicForkAPI> => {
-        const user = await repo.user.findOne(context.auth.token.user);
-        const parent = await repo.topic.findOne(args.parent);
-
-        if (parent.type !== "normal") {
-          throw new AtNotFoundError("トピックが見つかりません");
-        }
-
-        const create = TopicFork.create(ObjectIDGenerator,
-          args.title,
-          parent,
-          user,
-          context.auth.token,
-          context.now);
-
-        await repo.topic.insert(create.topic);
-        await repo.topic.update(create.parent);
-        await Promise.all([
-          repo.user.update(create.user),
-          repo.res.insert(create.res),
-          repo.res.insert(create.resParent),
-        ]);
-
-        context.log("topics", create.topic.id);
-        context.log("reses", create.res.id);
-        context.log("reses", create.resParent.id);
-
-        return create.topic.toAPI();
-      },
-      updateTopic: async (
-        _obj: any,
-        args: {
-          id: string,
-          title?: string,
-          tags?: string[],
-          text?: string,
-        },
-        context: AppContext,
-        _info: any): Promise<ITopicNormalAPI> => {
-        const [topic, user] = await Promise.all([
-          repo.topic.findOne(args.id),
-          repo.user.findOne(context.auth.token.user),
-        ]);
-
-        if (topic.type !== "normal") {
-          throw new AtNotFoundError("トピックが見つかりません");
-        }
-
-        const val = topic.changeData(ObjectIDGenerator,
-          user,
-          context.auth.token,
-          args.title,
-          args.tags,
-          args.text,
-          context.now);
-
-        await Promise.all([
-          repo.res.insert(val.res),
-          repo.history.insert(val.history),
-          repo.topic.update(val.topic),
-          repo.user.update(val.user),
-        ]);
-
-        context.log("reses", val.res.id);
-        context.log("histories", val.history.id);
-        return topic.toAPI();
-      },
+      context: AppContext,
+      _info: any): Promise<{
+        name: string;
+        count: number;
+      }[]> => {
+      return await context.repo.topic.findTags(args.limit);
     },
-    Topic: {
-      __resolveType(obj: ITopicAPI): "TopicNormal" | "TopicOne" | "TopicFork" {
-        switch (obj.type) {
-          case "normal":
-            return "TopicNormal";
-          case "one":
-            return "TopicOne";
-          case "fork":
-            return "TopicFork";
-        }
+  },
+  Mutation: {
+    createTopicNormal: async (
+      _obj: any,
+      args: {
+        title: string,
+        tags: string[],
+        text: string,
       },
+      context: AppContext,
+      _info: any): Promise<ITopicNormalAPI> => {
+      const user = await context.repo.user.findOne(context.auth.token.user);
+      const create = TopicNormal.create(ObjectIDGenerator,
+        args.title,
+        args.tags,
+        args.text,
+        user,
+        context.auth.token,
+        context.now);
+
+      await context.repo.topic.insert(create.topic);
+      await Promise.all([
+        context.repo.user.update(create.user),
+        context.repo.res.insert(create.res),
+        context.repo.history.insert(create.history),
+      ]);
+      context.log("topics", create.topic.id);
+      context.log("reses", create.res.id);
+      context.log("histories", create.history.id);
+      return create.topic.toAPI();
     },
-    TopicSearch: {
-      __resolveType(obj: ITopicSearchAPI): "TopicNormal" | "TopicOne" {
-        switch (obj.type) {
-          case "normal":
-            return "TopicNormal";
-          case "one":
-            return "TopicOne";
-        }
+    createTopicOne: async (
+      _obj: any,
+      args: {
+        title: string,
+        tags: string[],
+        text: string,
       },
+      context: AppContext,
+      _info: any): Promise<ITopicOneAPI> => {
+      const user = await context.repo.user.findOne(context.auth.token.user);
+      const create = TopicOne.create(ObjectIDGenerator,
+        args.title,
+        args.tags,
+        args.text,
+        user,
+        context.auth.token,
+        context.now);
+
+      await context.repo.topic.insert(create.topic);
+      await Promise.all([
+        context.repo.user.update(create.user),
+        context.repo.res.insert(create.res),
+      ]);
+
+      context.log("topics", create.topic.id);
+      context.log("reses", create.res.id);
+
+      return create.topic.toAPI();
     },
-    TopicFork: {
-      parent: async (
-        token: ITopicForkAPI,
-        _args: {},
-        context: AppContext,
-        _info: any): Promise<ITopicNormalAPI> => {
-        const parent = await context.loader.topic.load(token.parentID);
-        if (parent.type !== "normal") {
-          throw new Error();
-        }
-        return parent.toAPI();
+    createTopicFork: async (
+      _obj: any,
+      args: {
+        title: string,
+        parent: string,
       },
+      context: AppContext,
+      _info: any): Promise<ITopicForkAPI> => {
+      const user = await context.repo.user.findOne(context.auth.token.user);
+      const parent = await context.repo.topic.findOne(args.parent);
+
+      if (parent.type !== "normal") {
+        throw new AtNotFoundError("トピックが見つかりません");
+      }
+
+      const create = TopicFork.create(ObjectIDGenerator,
+        args.title,
+        parent,
+        user,
+        context.auth.token,
+        context.now);
+
+      await context.repo.topic.insert(create.topic);
+      await context.repo.topic.update(create.parent);
+      await Promise.all([
+        context.repo.user.update(create.user),
+        context.repo.res.insert(create.res),
+        context.repo.res.insert(create.resParent),
+      ]);
+
+      context.log("topics", create.topic.id);
+      context.log("reses", create.res.id);
+      context.log("reses", create.resParent.id);
+
+      return create.topic.toAPI();
     },
-  };
+    updateTopic: async (
+      _obj: any,
+      args: {
+        id: string,
+        title?: string,
+        tags?: string[],
+        text?: string,
+      },
+      context: AppContext,
+      _info: any): Promise<ITopicNormalAPI> => {
+      const [topic, user] = await Promise.all([
+        context.repo.topic.findOne(args.id),
+        context.repo.user.findOne(context.auth.token.user),
+      ]);
+
+      if (topic.type !== "normal") {
+        throw new AtNotFoundError("トピックが見つかりません");
+      }
+
+      const val = topic.changeData(ObjectIDGenerator,
+        user,
+        context.auth.token,
+        args.title,
+        args.tags,
+        args.text,
+        context.now);
+
+      await Promise.all([
+        context.repo.res.insert(val.res),
+        context.repo.history.insert(val.history),
+        context.repo.topic.update(val.topic),
+        context.repo.user.update(val.user),
+      ]);
+
+      context.log("reses", val.res.id);
+      context.log("histories", val.history.id);
+      return topic.toAPI();
+    },
+  },
+  Topic: {
+    __resolveType(obj: ITopicAPI): "TopicNormal" | "TopicOne" | "TopicFork" {
+      switch (obj.type) {
+        case "normal":
+          return "TopicNormal";
+        case "one":
+          return "TopicOne";
+        case "fork":
+          return "TopicFork";
+      }
+    },
+  },
+  TopicSearch: {
+    __resolveType(obj: ITopicSearchAPI): "TopicNormal" | "TopicOne" {
+      switch (obj.type) {
+        case "normal":
+          return "TopicNormal";
+        case "one":
+          return "TopicOne";
+      }
+    },
+  },
+  TopicFork: {
+    parent: async (
+      token: ITopicForkAPI,
+      _args: {},
+      context: AppContext,
+      _info: any): Promise<ITopicNormalAPI> => {
+      const parent = await context.loader.topic.load(token.parentID);
+      if (parent.type !== "normal") {
+        throw new Error();
+      }
+      return parent.toAPI();
+    },
+  },
 };
