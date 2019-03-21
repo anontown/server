@@ -14,7 +14,7 @@ export const clientResolver = (repo: IRepo) => {
     Query: {
       clients: async (
         _obj: any,
-        args: G.ClientsQueryArgs,
+        args: G.QueryClientsArgs,
         context: Context,
         _info: any): Promise<IClientAPI[]> => {
         const clients = await repo.client.find(context.auth.TokenMasterOrNull, args.query);
@@ -24,7 +24,7 @@ export const clientResolver = (repo: IRepo) => {
     Mutation: {
       createClient: async (
         _obj: any,
-        args: G.CreateClientMutationArgs,
+        args: G.MutationCreateClientArgs,
         context: Context,
         _info: any): Promise<IClientAPI> => {
         const client = Client.create(ObjectIDGenerator, context.auth.tokenMaster, args.name, args.url, context.now);
@@ -34,7 +34,7 @@ export const clientResolver = (repo: IRepo) => {
       },
       updateClient: async (
         _obj: any,
-        args: G.UpdateClientMutationArgs,
+        args: G.MutationUpdateClientArgs,
         context: Context,
         _info: any): Promise<IClientAPI> => {
         const client = await repo.client.findOne(args.id);
