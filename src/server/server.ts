@@ -8,7 +8,7 @@ import { AtErrorSymbol, AtServerError } from "../at-error";
 import { Config } from "../config";
 import * as controllers from "../controllers";
 import { IRepo } from "../models";
-import { Context, createContext } from "./context";
+import { AppContext, createContext } from "./context";
 
 export async function serverRun(repo: IRepo) {
   const typeDefs = gql(fs.readFileSync("resources/app.gql", "utf8"));
@@ -29,11 +29,11 @@ export async function serverRun(repo: IRepo) {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: ({ req }: any): Promise<Context> => {
+    context: ({ req }: any): Promise<AppContext> => {
       return createContext(req !== undefined ? req.headers : {}, repo);
     },
     subscriptions: {
-      onConnect: (connectionParams, _webSocket): Promise<Context> => {
+      onConnect: (connectionParams, _webSocket): Promise<AppContext> => {
         return createContext(connectionParams, repo);
       },
     },

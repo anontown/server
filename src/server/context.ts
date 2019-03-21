@@ -5,7 +5,7 @@ import { createLoader, IRepo, Loader } from "../models";
 import { AuthContainer } from "./auth-container";
 import * as authFromApiParam from "./auth-from-api-param";
 
-export interface Context {
+export interface AppContext {
   auth: AuthContainer;
   ip: string;
   now: Date;
@@ -26,7 +26,7 @@ async function createToken(raw: any, repo: IRepo) {
   return some(await authFromApiParam.token(repo.token, { id, key }));
 }
 
-export async function createContext(headers: any, repo: IRepo): Promise<Context> {
+export async function createContext(headers: any, repo: IRepo): Promise<AppContext> {
   const ip = headers["x-real-ip"] || "<unknown_ip>";
 
   const token = await createToken(headers["x-token"], repo);

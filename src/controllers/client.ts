@@ -5,7 +5,7 @@ import {
   IClientAPI,
   IRepo,
 } from "../models";
-import { Context } from "../server";
+import { AppContext } from "../server";
 import * as G from "../generated/graphql";
 import { nullToUndefined } from "../utils/index";
 
@@ -15,7 +15,7 @@ export const clientResolver = (repo: IRepo) => {
       clients: async (
         _obj: any,
         args: G.QueryClientsArgs,
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IClientAPI[]> => {
         const clients = await repo.client.find(context.auth.TokenMasterOrNull, args.query);
         return clients.map(c => c.toAPI(context.auth.TokenMasterOrNull));
@@ -25,7 +25,7 @@ export const clientResolver = (repo: IRepo) => {
       createClient: async (
         _obj: any,
         args: G.MutationCreateClientArgs,
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IClientAPI> => {
         const client = Client.create(ObjectIDGenerator, context.auth.tokenMaster, args.name, args.url, context.now);
         await repo.client.insert(client);
@@ -35,7 +35,7 @@ export const clientResolver = (repo: IRepo) => {
       updateClient: async (
         _obj: any,
         args: G.MutationUpdateClientArgs,
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IClientAPI> => {
         const client = await repo.client.findOne(args.id);
         const newClient = client.changeData(context.auth.tokenMaster, nullToUndefined(args.name), nullToUndefined(args.url), context.now);

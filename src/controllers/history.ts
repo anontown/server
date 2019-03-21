@@ -2,7 +2,7 @@ import {
   HistoryQuery, IHistoryAPI, IRepo, ITopicNormalAPI,
 } from "../models";
 import {
-  Context,
+  AppContext,
 } from "../server";
 
 export const historyResolver = (repo: IRepo) => {
@@ -14,7 +14,7 @@ export const historyResolver = (repo: IRepo) => {
           query: HistoryQuery,
           limit: number,
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IHistoryAPI[]> => {
         const histories = await repo.history.find(args.query, args.limit);
         return histories.map(x => x.toAPI(context.auth.tokenOrNull));
@@ -24,7 +24,7 @@ export const historyResolver = (repo: IRepo) => {
       topic: async (
         history: IHistoryAPI,
         _args: {},
-        context: Context,
+        context: AppContext,
         _info: any): Promise<ITopicNormalAPI> => {
         const topic = await context.loader.topic.load(history.topicID);
         if (topic.type !== "normal") {

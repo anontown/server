@@ -2,7 +2,7 @@ import {
   IMsgAPI, IRepo, MsgQuery,
 } from "../models";
 import {
-  Context,
+  AppContext,
 } from "../server";
 
 export const msgResolver = (repo: IRepo) => {
@@ -14,7 +14,7 @@ export const msgResolver = (repo: IRepo) => {
           query: MsgQuery
           limit: number,
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IMsgAPI[]> => {
         const msgs = await repo.msg.find(context.auth.token, args.query, args.limit);
         return msgs.map(x => x.toAPI(context.auth.token));

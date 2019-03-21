@@ -18,7 +18,7 @@ import {
   ResQuery,
 } from "../models";
 import {
-  Context,
+  AppContext,
 } from "../server";
 import { pubsub, RES_ADDED } from "../server/pubsub";
 
@@ -31,7 +31,7 @@ export const resResolver = (repo: IRepo) => {
     topic: async (
       res: IResAPI,
       _args: {},
-      context: Context,
+      context: AppContext,
       _info: any): Promise<ITopicAPI> => {
       const topic = await context.loader.topic.load(res.topicID);
       return topic.toAPI();
@@ -46,7 +46,7 @@ export const resResolver = (repo: IRepo) => {
           query: ResQuery,
           limit: number,
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IResAPI[]> => {
         const reses = await repo.res.find(context.auth, args.query, args.limit);
         return reses.map(x => x.toAPI(context.auth.tokenOrNull));
@@ -63,7 +63,7 @@ export const resResolver = (repo: IRepo) => {
           profile?: string,
           age: boolean,
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IResNormalAPI> => {
         const [topic, user, reply, profile] = await Promise.all([
           repo.topic.findOne(args.topic),
@@ -102,7 +102,7 @@ export const resResolver = (repo: IRepo) => {
           id: string,
           vote: "uv" | "dv" | "cv",
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IResAPI> => {
         if (args.vote === "cv") {
           const [res, user] = await Promise.all([
@@ -147,7 +147,7 @@ export const resResolver = (repo: IRepo) => {
         args: {
           id: string,
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IResDeleteAPI> => {
         const res = await repo.res.findOne(args.id);
 
@@ -174,7 +174,7 @@ export const resResolver = (repo: IRepo) => {
     },
     Subscription: {
       resAdded: {
-        resolve: (payload: { res: Res, count: number }, _args: any, context: Context, _info: any)
+        resolve: (payload: { res: Res, count: number }, _args: any, context: AppContext, _info: any)
           : { res: IResAPI, count: number } => {
           return { count: payload.count, res: payload.res.toAPI(context.auth.tokenOrNull) };
         },
@@ -207,7 +207,7 @@ export const resResolver = (repo: IRepo) => {
       reply: async (
         res: IResNormalAPI,
         _args: {},
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IResAPI | null> => {
         if (res.replyID !== null) {
           const reply = await context.loader.res.load(res.replyID);
@@ -219,7 +219,7 @@ export const resResolver = (repo: IRepo) => {
       profile: async (
         res: IResNormalAPI,
         _args: {},
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IProfileAPI | null> => {
         if (res.profileID !== null) {
           const profile = await context.loader.profile.load(res.profileID);
@@ -234,7 +234,7 @@ export const resResolver = (repo: IRepo) => {
       history: async (
         res: IResHistoryAPI,
         _args: {},
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IHistoryAPI> => {
         const history = await context.loader.history.load(res.historyID);
         return history.toAPI(context.auth.tokenOrNull);
@@ -248,7 +248,7 @@ export const resResolver = (repo: IRepo) => {
       fork: async (
         res: IResForkAPI,
         _args: {},
-        context: Context,
+        context: AppContext,
         _info: any): Promise<ITopicForkAPI> => {
         const fork = await context.loader.topic.load(res.forkID);
         if (fork.type !== "fork") {

@@ -7,7 +7,7 @@ import {
   ProfileQuery,
 } from "../models";
 import {
-  Context,
+  AppContext,
 } from "../server";
 
 export const profileResolver = (repo: IRepo) => {
@@ -18,7 +18,7 @@ export const profileResolver = (repo: IRepo) => {
         args: {
           query: ProfileQuery,
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IProfileAPI[]> => {
         const profiles = await repo.profile.find(context.auth, args.query);
         return profiles.map(p => p.toAPI(context.auth.tokenOrNull));
@@ -32,7 +32,7 @@ export const profileResolver = (repo: IRepo) => {
           text: string,
           sn: string,
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IProfileAPI> => {
         const profile = Profile.create(ObjectIDGenerator,
           context.auth.token,
@@ -52,7 +52,7 @@ export const profileResolver = (repo: IRepo) => {
           text?: string,
           sn?: string,
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IProfileAPI> => {
         const profile = await repo.profile.findOne(args.id);
         const newProfile = profile.changeData(context.auth.token, args.name, args.text, args.sn, context.now);

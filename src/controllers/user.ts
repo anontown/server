@@ -7,7 +7,7 @@ import {
   ITokenMasterAPI,
 } from "../models";
 import {
-  Context,
+  AppContext,
 } from "../server";
 import * as authFromApiParam from "../server/auth-from-api-param";
 
@@ -19,7 +19,7 @@ export const userResolver = (repo: IRepo) => {
         args: {
           sn: string,
         },
-        _context: Context,
+        _context: AppContext,
         _info: any): Promise<string> => {
         return await repo.user.findID(args.sn);
       },
@@ -28,14 +28,14 @@ export const userResolver = (repo: IRepo) => {
         args: {
           id: string,
         },
-        _context: Context,
+        _context: AppContext,
         _info: any): Promise<string> => {
         return (await repo.user.findOne(args.id)).sn;
       },
       user: async (
         _obj: any,
         _args: {},
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IUserAPI> => {
         return (await repo.user.findOne(context.auth.token.user)).toAPI();
       },
@@ -48,7 +48,7 @@ export const userResolver = (repo: IRepo) => {
           pass: string,
           recaptcha: string,
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<{ user: IUserAPI, token: ITokenMasterAPI }> => {
         await authFromApiParam.recaptcha(args.recaptcha);
 
@@ -71,7 +71,7 @@ export const userResolver = (repo: IRepo) => {
             pass: string,
           },
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<{ user: IUserAPI, token: ITokenMasterAPI }> => {
         const authUser = await authFromApiParam.user(repo.user, args.auth);
         const user = await repo.user.findOne(authUser.id);

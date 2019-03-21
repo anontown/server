@@ -11,7 +11,7 @@ import {
   TokenMaster,
 } from "../models";
 import {
-  Context,
+  AppContext,
 } from "../server";
 import * as authFromApiParam from "../server/auth-from-api-param";
 
@@ -20,14 +20,14 @@ export const tokenResolver = (repo: IRepo) => {
     Query: {
       token: async (
         _obj: any,
-        _args: {}, context: Context,
+        _args: {}, context: AppContext,
         _info: any): Promise<ITokenAPI> => {
         const token = await repo.token.findOne(context.auth.token.id);
         return token.toAPI();
       },
       tokens: async (
         _obj: any,
-        _args: {}, context: Context,
+        _args: {}, context: AppContext,
         _info: any): Promise<ITokenAPI[]> => {
         const tokens = await repo.token.findAll(context.auth.tokenMaster);
         return tokens.map(t => t.toAPI());
@@ -39,7 +39,7 @@ export const tokenResolver = (repo: IRepo) => {
         args: {
           client: string,
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<boolean | null> => {
         const client = await repo.client.findOne(args.client);
         await repo.token.delClientToken(context.auth.tokenMaster, client.id);
@@ -50,7 +50,7 @@ export const tokenResolver = (repo: IRepo) => {
         args: {
           client: string,
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<{ token: ITokenGeneralAPI, req: ITokenReqAPI }> => {
         const client = await repo.client.findOne(args.client);
         const token = TokenGeneral.create(ObjectIDGenerator,
@@ -77,7 +77,7 @@ export const tokenResolver = (repo: IRepo) => {
             pass: string
           },
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<ITokenMasterAPI> => {
         const authUser = await authFromApiParam.user(repo.user, args.auth);
         const token = TokenMaster.create(ObjectIDGenerator, authUser, context.now, RandomGenerator);
@@ -91,7 +91,7 @@ export const tokenResolver = (repo: IRepo) => {
           id: string,
           key: string,
         },
-        context: Context,
+        context: AppContext,
         _info: any): Promise<ITokenGeneralAPI> => {
         const token = await repo.token.findOne(args.id);
         if (token.type !== "general") {
@@ -103,7 +103,7 @@ export const tokenResolver = (repo: IRepo) => {
       createTokenReq: async (
         _obj: any,
         _args: {},
-        context: Context,
+        context: AppContext,
         _info: any): Promise<ITokenReqAPI> => {
         const token = await repo.token.findOne(context.auth.token.id);
         if (token.type !== "general") {
@@ -130,7 +130,7 @@ export const tokenResolver = (repo: IRepo) => {
       client: async (
         token: ITokenGeneralAPI,
         _args: {},
-        context: Context,
+        context: AppContext,
         _info: any): Promise<IClientAPI> => {
         const client = await context.loader.client.load(token.clientID);
         return client.toAPI(context.auth.TokenMasterOrNull);
