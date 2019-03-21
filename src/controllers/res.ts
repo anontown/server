@@ -20,13 +20,9 @@ import {
 import {
   AppContext,
 } from "../server";
-import { pubsub, RES_ADDED } from "../server/pubsub";
+import { observableAsyncIterator } from "../utils/index";
 
 export const resResolver = (repo: IRepo) => {
-  repo.res.insertEvent.subscribe(data => {
-    pubsub.publish(RES_ADDED, data);
-  });
-
   const resBase = {
     topic: async (
       res: IResAPI,
@@ -174,16 +170,11 @@ export const resResolver = (repo: IRepo) => {
     },
     Subscription: {
       resAdded: {
-        resolve: (payload: { res: Res, count: number }, _args: any, context: AppContext, _info: any)
-          : { res: IResAPI, count: number } => {
-          return { count: payload.count, res: payload.res.toAPI(context.auth.tokenOrNull) };
-        },
-        subscribe: () => withFilter(
-          () => pubsub.asyncIterator(RES_ADDED),
-          (payload: { res: Res, count: number }, args: { topic: string }): boolean => {
-            return payload.res.topic === args.topic;
-          },
-        ),
+        subscribe: (_parent: any, args: { topic: string }, context: AppContext, _info: any)
+          : AsyncIterator<{ res: IResAPI, count: number }> =>
+          observableAsyncIterator(repo.res.insertEvent
+            .filter(x => x.res.topic === args.topic)
+            .map(x => ({ count: x.count, res: x.res.toAPI(context.auth.tokenOrNull) }))),
       },
     },
     Res: {
