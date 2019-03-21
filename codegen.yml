@@ -9,3 +9,4 @@ generates:
 config:
     scalars:
       DateTime: string
+    contextType: ../server#AppContext
