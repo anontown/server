@@ -10,3 +10,25 @@ config:
     scalars:
       DateTime: string
     contextType: ../server#AppContext
+    mappers:
+      Client: ../models#IClientAPI
+      History: ../models#IHistoryAPI
+      Msg: ../models#IMsgAPI
+      Res: ../models#IResAPI
+      ResNormal: ../models#IResNormalAPI
+      ResHistory: ../models#IResHistoryAPI
+      ResTopic: ../models#IResTopicAPI
+      ResFork: ../models#IResForkAPI
+      ResDelete: ../models#IResDeleteAPI
+      TokenReq: ../models#ITokenReqAPI
+      Token: ../models#ITokenAPI
+      TokenMaster: ../models#ITokenMasterAPI
+      TokenGeneral: ../models#ITokenGeneralAPI
+      Topic: ../models#ITopicAPI
+      TopicSearch: ../models#ITopicSearchAPI
+      TopicNormal: ../models#ITopicNormalAPI
+      TopicOne: ../models#ITopicOneAPI
+      TopicFork: ../models#ITopicForkAPI
+      Storage: ../models#IStorageAPI
+      User: ../models#IUserAPI
+      Tags: ../models#ITagsAPI

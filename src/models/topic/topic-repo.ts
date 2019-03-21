@@ -11,6 +11,11 @@ import {
   TopicOne,
 } from "./topic";
 
+export interface ITagsAPI {
+  name: string,
+  count: number
+}
+
 export class TopicRepo implements ITopicRepo {
   constructor(public resRepo: IResRepo, private refresh?: boolean) { }
 
@@ -28,7 +33,7 @@ export class TopicRepo implements ITopicRepo {
     return (await this.aggregate([{ id: topic._id, body: topic._source } as ITopicDB]))[0];
   }
 
-  async findTags(limit: number): Promise<{ name: string, count: number }[]> {
+  async findTags(limit: number): Promise<ITagsAPI[]> {
     if (limit === 0) {
       return [];
     }
