@@ -54,11 +54,11 @@ describe("Storage", () => {
 
   describe("toAPI", () => {
     it("通常トークンで正常に変換出来るか", () => {
-      expect(storage.toAPI(authGeneral)).toEqual("value");
+      expect(storage.toAPI(authGeneral)).toEqual({ key: "key", value: "value" });
     });
 
     it("マスタートークンで正常に変換出来るか", () => {
-      expect(storage.copy({ client: none }).toAPI(authMaster)).toEqual("value");
+      expect(storage.copy({ client: none }).toAPI(authMaster)).toEqual({ key: "key", value: "value" });
     });
 
     it("ユーザーが違う時エラーになるか", () => {
