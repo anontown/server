@@ -6,7 +6,7 @@ import { DB } from "../../db";
 import { Client, IClientDB } from "./client";
 import { IClientRepo } from "./iclient-repo";
 import * as G from "../../generated/graphql";
-import { isNullOrUndefined } from "../../utils/index";
+import { isNullish } from "@kgtkr/utils";
 
 export class ClientRepo implements IClientRepo {
   async findOne(id: string): Promise<Client> {
@@ -29,7 +29,7 @@ export class ClientRepo implements IClientRepo {
     if (query.self && authToken.isSome()) {
       q.user = new ObjectID(authToken.value.user);
     }
-    if (!isNullOrUndefined(query.id)) {
+    if (!isNullish(query.id)) {
       q._id = { $in: query.id.map(id => new ObjectID(id)) };
     }
     const clients: IClientDB[] = await db.collection("clients")

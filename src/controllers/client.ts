@@ -7,7 +7,7 @@ import {
 } from "../models";
 import { AppContext } from "../server";
 import * as G from "../generated/graphql";
-import { nullToUndefined } from "../utils/index";
+import { nullToUndefined } from "@kgtkr/utils";
 
 export const clientResolver = {
   Query: {

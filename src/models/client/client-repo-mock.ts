@@ -4,7 +4,7 @@ import { IAuthTokenMaster } from "../../auth";
 import { Client, IClientDB } from "./client";
 import { IClientRepo } from "./iclient-repo";
 import * as G from "../../generated/graphql";
-import { isNullOrUndefined } from "../../utils/index";
+import { isNullish } from "@kgtkr/utils";
 
 export class ClientRepoMock implements IClientRepo {
   private clients: IClientDB[] = [];
@@ -33,7 +33,7 @@ export class ClientRepoMock implements IClientRepo {
 
     const clients = this.clients
       .filter(c => !query.self || authToken.isNone() || c.user.toHexString() === authToken.value.user)
-      .filter(x => isNullOrUndefined(query.id) || query.id.includes(x._id.toHexString()))
+      .filter(x => isNullish(query.id) || query.id.includes(x._id.toHexString()))
       .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
     return clients.map(c => Client.fromDB(c));
