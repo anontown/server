@@ -1,5 +1,3 @@
-import { from } from "rxjs/observable/from";
-
 export * from "./hash";
 export * from "./mixin";
 export * from "./id-entity";

@@ -102,7 +102,7 @@ export class MsgRepo implements IMsgRepo {
       type: "doc",
       id: mDB.id,
       body: mDB.body,
-      refresh: this.refresh !== undefined ? this.refresh.toString() : undefined,
+      refresh: this.refresh !== undefined ? this.refresh.toString() as "true" | "false" : undefined,
     });
   }
 }

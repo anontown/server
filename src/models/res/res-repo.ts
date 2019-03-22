@@ -46,7 +46,7 @@ export class ResRepo implements IResRepo {
       type: "doc",
       id: rDB.id,
       body: rDB.body,
-      refresh: this.refresh !== undefined ? this.refresh.toString() : undefined,
+      refresh: this.refresh !== undefined ? this.refresh.toString() as "true" | "false" : undefined,
     });
   }
 

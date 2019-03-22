@@ -7,7 +7,7 @@ import { Logger } from "./logger";
 export const DB = lazy((async () => {
     const db = await MongoClient.connect(Config.db.url);
     Logger.system.info("db:connect");
-    return db;
+    return db.db();
 }));
 
 export const ESClient = lazy(() => new es.Client({ host: "http://" + Config.es.host, log: "error" }));

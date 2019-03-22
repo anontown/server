@@ -24,7 +24,7 @@ export class HistoryRepo implements IHistoryRepo {
       type: "doc",
       id: hDB.id,
       body: hDB.body,
-      refresh: this.refresh !== undefined ? this.refresh.toString() : undefined,
+      refresh: this.refresh !== undefined ? this.refresh.toString() as | "true" | "false" : undefined,
     });
   }
 
