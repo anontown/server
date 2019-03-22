@@ -21,6 +21,8 @@ import {
   AppContext,
 } from "../server";
 import { observableAsyncIterator } from "../utils/index";
+import * as rx from "rxjs";
+import * as op from "rxjs/operators";
 
 const resBase = {
   topic: async (
@@ -172,8 +174,10 @@ export const resResolver = {
       subscribe: (_parent: any, args: { topic: string }, context: AppContext, _info: any)
         : AsyncIterator<{ res: IResAPI, count: number }> =>
         observableAsyncIterator(context.repo.res.insertEvent
-          .filter(x => x.res.topic === args.topic)
-          .map(x => ({ count: x.count, res: x.res.toAPI(context.auth.tokenOrNull) }))),
+          .pipe(
+            op.filter(x => x.res.topic === args.topic),
+            op.map(x => ({ count: x.count, res: x.res.toAPI(context.auth.tokenOrNull) }))
+          )),
     },
   },
   Res: {

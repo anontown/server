@@ -4,38 +4,29 @@ import { Config } from "./config";
 
 // log
 log4js.configure({
-    appenders: [
-        {
+    appenders: {
+        system: {
             type: "dateFile",
-            category: "system",
             filename: path.join(Config.saveDir, "logs/system.log"),
             pattern: "-yyyy-MM-dd",
         },
-        {
+        access: {
             type: "dateFile",
-            category: "access",
             filename: path.join(Config.saveDir, "logs/access.log"),
             pattern: "-yyyy-MM-dd",
         },
-        {
+        error: {
             type: "dateFile",
-            category: "error",
             filename: path.join(Config.saveDir, "logs/error.log"),
             pattern: "-yyyy-MM-dd",
         },
-        {
+        app: {
             type: "dateFile",
-            category: "app",
             filename: path.join(Config.saveDir, "logs/app.log"),
             pattern: "-yyyy-MM-dd",
         },
-        ...process.env.AT_MODE === "TEST"
-            ? []
-            : [{
-                type: "console",
-            }],
-
-    ],
+    },
+    categories: { default: { appenders: ["system", "access", "error", "app"], level: "info" } }
 });
 
 export class Logger {
@@ -43,5 +34,5 @@ export class Logger {
     static access = log4js.getLogger("access");
     static error = log4js.getLogger("error");
     static app = log4js.getLogger("app");
-    static express = log4js.connectLogger(log4js.getLogger("access"), { level: log4js.levels.INFO });
+    static express = log4js.connectLogger(log4js.getLogger("access"), { level: "info" });
 }
