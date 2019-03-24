@@ -2,8 +2,10 @@ import { ObjectID, WriteError } from "mongodb";
 import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { DB } from "../../db";
 import { AuthContainer } from "../../server/auth-container";
-import { IProfileRepo, ProfileQuery } from "./iprofile-repo";
+import { IProfileRepo, } from "./iprofile-repo";
 import { IProfileDB, Profile } from "./profile";
+import * as G from "../../generated/graphql";
+import { isNullish } from "@kgtkr/utils";
 
 export class ProfileRepo implements IProfileRepo {
   async findOne(id: string): Promise<Profile> {
@@ -18,12 +20,12 @@ export class ProfileRepo implements IProfileRepo {
     return Profile.fromDB(profile);
   }
 
-  async find(auth: AuthContainer, query: ProfileQuery): Promise<Profile[]> {
+  async find(auth: AuthContainer, query: G.ProfileQuery): Promise<Profile[]> {
     const q: any = {};
     if (query.self) {
       q.user = new ObjectID(auth.token.user);
     }
-    if (query.id !== undefined) {
+    if (!isNullish(query.id)) {
       q._id = { $in: query.id.map(x => new ObjectID(x)) };
     }
     const db = await DB();

@@ -1,7 +1,9 @@
 import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { AuthContainer } from "../../server/auth-container";
-import { IProfileRepo, ProfileQuery } from "./iprofile-repo";
+import { IProfileRepo } from "./iprofile-repo";
 import { IProfileDB, Profile } from "./profile";
+import * as G from "../../generated/graphql";
+import { isNullish } from "@kgtkr/utils";
 
 export class ProfileRepoMock implements IProfileRepo {
   private profiles: IProfileDB[] = [];
@@ -16,11 +18,11 @@ export class ProfileRepoMock implements IProfileRepo {
     return Profile.fromDB(profile);
   }
 
-  async find(auth: AuthContainer, query: ProfileQuery): Promise<Profile[]> {
+  async find(auth: AuthContainer, query: G.ProfileQuery): Promise<Profile[]> {
     const self = query.self ? auth.token.user : null;
     const profiles = this.profiles
       .filter(x => self === null || x.user.toHexString() === self)
-      .filter(x => query.id === undefined || query.id.includes(x._id.toHexString()))
+      .filter(x => isNullish(query.id) || query.id.includes(x._id.toHexString()))
       .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 
     return profiles.map(p => Profile.fromDB(p));
