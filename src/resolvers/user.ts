@@ -10,23 +10,21 @@ import {
   AppContext,
 } from "../server";
 import * as authFromApiParam from "../server/auth-from-api-param";
+import * as G from "../generated/graphql";
+import { nullToUndefined } from "@kgtkr/utils";
 
 export const userResolver = {
   Query: {
     userID: async (
       _obj: any,
-      args: {
-        sn: string,
-      },
+      args: G.QueryUserIdArgs,
       context: AppContext,
       _info: any): Promise<string> => {
       return await context.repo.user.findID(args.sn);
     },
     userSN: async (
       _obj: any,
-      args: {
-        id: string,
-      },
+      args: G.QueryUserSnArgs,
       context: AppContext,
       _info: any): Promise<string> => {
       return (await context.repo.user.findOne(args.id)).sn;
@@ -42,11 +40,7 @@ export const userResolver = {
   Mutation: {
     createUser: async (
       _obj: any,
-      args: {
-        sn: string,
-        pass: string,
-        recaptcha: string,
-      },
+      args: G.MutationCreateUserArgs,
       context: AppContext,
       _info: any): Promise<{ user: IUserAPI, token: ITokenMasterAPI }> => {
       await authFromApiParam.recaptcha(args.recaptcha);
@@ -61,20 +55,12 @@ export const userResolver = {
     },
     updateUser: async (
       _obj: any,
-      args: {
-        sn?: string,
-        pass?: string,
-        auth: {
-          id?: string,
-          sn?: string,
-          pass: string,
-        },
-      },
+      args: G.MutationUpdateUserArgs,
       context: AppContext,
       _info: any): Promise<{ user: IUserAPI, token: ITokenMasterAPI }> => {
       const authUser = await authFromApiParam.user(context.repo.user, args.auth);
       const user = await context.repo.user.findOne(authUser.id);
-      const newUser = user.change(authUser, args.pass, args.sn);
+      const newUser = user.change(authUser, nullToUndefined(args.pass), nullToUndefined(args.sn));
       await context.repo.user.update(newUser);
       await context.repo.token.delMasterToken(authUser);
 
