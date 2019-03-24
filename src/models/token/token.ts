@@ -49,6 +49,11 @@ export interface ITokenBaseAPI<T extends TokenType> {
   readonly type: T;
 }
 
+export interface CreateTokenGeneralResponseAPI {
+  token: ITokenGeneralAPI,
+  req: ITokenReqAPI
+}
+
 export interface ITokenMasterAPI extends ITokenBaseAPI<"master"> {
 }
 

@@ -20,6 +20,11 @@ export interface IVote {
   readonly value: number;
 }
 
+export interface IResAddedAPI {
+  res: IResAPI,
+  count: number
+}
+
 export type ResType = "normal" | "history" | "topic" | "fork";
 
 export interface IResDB {

@@ -33,3 +33,5 @@ config:
       Storage: ../models#IStorageAPI
       User: ../models#IUserAPI
       Tags: ../models#ITagsAPI
+      ResSubscript: ../models#IResAddedAPI
+      CreateTokenGeneralResponse: ../models#CreateTokenGeneralResponseAPI
