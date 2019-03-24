@@ -5,7 +5,6 @@ import { ObjectIDGenerator } from "../generator";
 import {
   IHistoryAPI,
   IProfileAPI,
-  IRepo,
   IResAPI,
   IResDeleteAPI,
   IResForkAPI,
@@ -13,16 +12,15 @@ import {
   IResNormalAPI,
   ITopicAPI,
   ITopicForkAPI,
-  Res,
   ResNormal,
-  ResQuery,
 } from "../models";
 import {
   AppContext,
 } from "../server";
 import { observableAsyncIterator } from "../utils/index";
-import * as rx from "rxjs";
 import * as op from "rxjs/operators";
+import * as G from "../generated/graphql";
+import { isNullish } from "@kgtkr/utils";
 
 const resBase = {
   topic: async (
@@ -39,10 +37,7 @@ export const resResolver = {
   Query: {
     reses: async (
       _obj: any,
-      args: {
-        query: ResQuery,
-        limit: number,
-      },
+      args: G.QueryResesArgs,
       context: AppContext,
       _info: any): Promise<IResAPI[]> => {
       const reses = await context.repo.res.find(context.auth, args.query, args.limit);
@@ -52,21 +47,14 @@ export const resResolver = {
   Mutation: {
     createRes: async (
       _obj: any,
-      args: {
-        topic: string,
-        name?: string,
-        text: string,
-        reply?: string,
-        profile?: string,
-        age: boolean,
-      },
+      args: G.MutationCreateResArgs,
       context: AppContext,
       _info: any): Promise<IResNormalAPI> => {
       const [topic, user, reply, profile] = await Promise.all([
         context.repo.topic.findOne(args.topic),
         context.repo.user.findOne(context.auth.token.user),
-        args.reply !== undefined ? context.repo.res.findOne(args.reply) : Promise.resolve(null),
-        args.profile !== undefined ? context.repo.profile.findOne(args.profile) : Promise.resolve(null),
+        !isNullish(args.reply) ? context.repo.res.findOne(args.reply) : Promise.resolve(null),
+        !isNullish(args.profile) ? context.repo.profile.findOne(args.profile) : Promise.resolve(null),
       ]);
 
       const { res, user: newUser, topic: newTopic } = ResNormal.create(ObjectIDGenerator,
@@ -95,15 +83,12 @@ export const resResolver = {
     },
     voteRes: async (
       _obj: any,
-      args: {
-        id: string,
-        vote: "uv" | "dv" | "cv",
-      },
+      args: G.MutationVoteResArgs,
       context: AppContext,
       _info: any): Promise<IResAPI> => {
-      if (args.vote === "cv") {
+      if (args.type === "cv") {
         const [res, user] = await Promise.all([
-          context.repo.res.findOne(args.id),
+          context.repo.res.findOne(args.res),
           context.repo.user.findOne(context.auth.token.user),
         ]);
 
@@ -121,14 +106,14 @@ export const resResolver = {
         return newRes.toAPI(some(context.auth.token));
       } else {
         const [res, user] = await Promise.all([
-          context.repo.res.findOne(args.id),
+          context.repo.res.findOne(args.res),
           context.repo.user.findOne(context.auth.token.user),
         ]);
 
         // レスを書き込んだユーザー
         const resUser = await context.repo.user.findOne(res.user);
 
-        const { res: newRes, resUser: newResUser } = res.v(resUser, user, args.vote, context.auth.token);
+        const { res: newRes, resUser: newResUser } = res.v(resUser, user, args.type, context.auth.token);
 
         await Promise.all([
           context.repo.res.update(newRes),
@@ -141,12 +126,10 @@ export const resResolver = {
     },
     delRes: async (
       _obj: any,
-      args: {
-        id: string,
-      },
+      args: G.MutationDelResArgs,
       context: AppContext,
       _info: any): Promise<IResDeleteAPI> => {
-      const res = await context.repo.res.findOne(args.id);
+      const res = await context.repo.res.findOne(args.res);
 
       if (res.type !== "normal") {
         throw new AtNotFoundError("レスが見つかりません");
@@ -171,7 +154,7 @@ export const resResolver = {
   },
   Subscription: {
     resAdded: {
-      subscribe: (_parent: any, args: { topic: string }, context: AppContext, _info: any)
+      subscribe: (_parent: any, args: G.SubscriptionResAddedArgs, context: AppContext, _info: any)
         : AsyncIterator<{ res: IResAPI, count: number }> =>
         observableAsyncIterator(context.repo.res.insertEvent
           .pipe(

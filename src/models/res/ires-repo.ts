@@ -1,19 +1,7 @@
 import { Subject } from "rxjs";
 import { AuthContainer } from "../../server/auth-container";
-import { DateType } from "../../server/index";
 import { Res } from "./res";
-
-export interface ResQuery {
-  id?: string[];
-  topic?: string;
-  notice?: boolean;
-  hash?: string;
-  reply?: string;
-  profile?: string;
-  text?: string;
-  self?: boolean;
-  date?: DateType;
-}
+import * as G from "../../generated/graphql";
 
 export interface IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }>;
@@ -30,6 +18,6 @@ export interface IResRepo {
 
   find(
     auth: AuthContainer,
-    query: ResQuery,
+    query: G.ResQuery,
     limit: number): Promise<Res[]>;
 }

@@ -9,6 +9,7 @@ generates:
 config:
     scalars:
       DateTime: string
+    enumsAsTypes: true
     contextType: ../server#AppContext
     mappers:
       Client: ../models#IClientAPI

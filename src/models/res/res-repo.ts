@@ -2,8 +2,10 @@ import { Subject } from "rxjs";
 import { AtNotFoundError } from "../../at-error";
 import { ESClient } from "../../db";
 import { AuthContainer } from "../../server/auth-container";
-import { IResRepo, ResQuery } from "./ires-repo";
+import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
+import * as G from "../../generated/graphql";
+import { isNullish } from "@kgtkr/utils";
 
 export class ResRepo implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
@@ -121,11 +123,11 @@ export class ResRepo implements IResRepo {
 
   async find(
     auth: AuthContainer,
-    query: ResQuery,
+    query: G.ResQuery,
     limit: number): Promise<Res[]> {
     const filter: object[] = [];
 
-    if (query.date !== undefined) {
+    if (!isNullish(query.date)) {
       filter.push({
         range: {
           date: {
@@ -135,7 +137,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.id !== undefined) {
+    if (!isNullish(query.id)) {
       filter.push({
         terms: {
           _id: query.id,
@@ -143,7 +145,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.topic !== undefined) {
+    if (!isNullish(query.topic)) {
       filter.push({
         term: {
           topic: query.topic,
@@ -164,7 +166,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.hash !== undefined) {
+    if (!isNullish(query.hash)) {
       filter.push({
         term: {
           hash: query.hash,
@@ -172,7 +174,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.reply !== undefined) {
+    if (!isNullish(query.reply)) {
       filter.push({
         nested: {
           path: "reply",
@@ -185,7 +187,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.profile !== undefined) {
+    if (!isNullish(query.profile)) {
       filter.push({
         term: {
           profile: query.profile,
@@ -201,7 +203,7 @@ export class ResRepo implements IResRepo {
       });
     }
 
-    if (query.text !== undefined) {
+    if (!isNullish(query.text)) {
       filter.push({
         match: {
           text: {
@@ -224,7 +226,7 @@ export class ResRepo implements IResRepo {
         },
         sort: {
           date: {
-            order: query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")
+            order: !isNullish(query.date) && (query.date.type === "gt" || query.date.type === "gte")
               ? "asc"
               : "desc",
           },
@@ -233,7 +235,7 @@ export class ResRepo implements IResRepo {
     });
 
     const result = await this.aggregate(reses.hits.hits.map(r => ({ id: r._id, body: r._source })));
-    if (query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")) {
+    if (!isNullish(query.date) && (query.date.type === "gt" || query.date.type === "gte")) {
       result.reverse();
     }
     return result;

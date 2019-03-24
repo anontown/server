@@ -1,8 +1,10 @@
 import { Subject } from "rxjs";
 import { AtNotFoundError } from "../../at-error";
 import { AuthContainer } from "../../server/auth-container";
-import { IResRepo, ResQuery } from "./ires-repo";
+import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
+import * as G from "../../generated/graphql";
+import { isNullish } from "@kgtkr/utils";
 
 export class ResRepoMock implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
@@ -44,30 +46,30 @@ export class ResRepoMock implements IResRepo {
 
   async find(
     auth: AuthContainer,
-    query: ResQuery,
+    query: G.ResQuery,
     limit: number): Promise<Res[]> {
     const notice = query.notice ? auth.token.user : null;
     const self = query.self ? auth.token.user : null;
-    const texts = query.text !== undefined
+    const texts = !isNullish(query.text)
       ? query.text
         .split(/\s/)
         .filter(x => x.length !== 0)
       : null;
 
     const reses = this.reses
-      .filter(x => query.id === undefined || query.id.includes(x.id))
-      .filter(x => query.topic === undefined || x.body.topic === query.topic)
+      .filter(x => isNullish(query.id) || query.id.includes(x.id))
+      .filter(x => isNullish(query.topic) || x.body.topic === query.topic)
       .filter(x => notice === null ||
         x.body.type === "normal" && x.body.reply !== null && x.body.reply.user === notice)
-      .filter(x => query.hash === undefined || x.body.hash === query.hash)
-      .filter(x => query.reply === undefined ||
+      .filter(x => isNullish(query.hash) || x.body.hash === query.hash)
+      .filter(x => isNullish(query.reply) ||
         x.body.type === "normal" && x.body.reply !== null && x.body.reply.res === query.reply)
-      .filter(x => query.profile === undefined ||
+      .filter(x => isNullish(query.profile) ||
         x.body.type === "normal" && x.body.profile !== null && x.body.profile === query.profile)
       .filter(x => self === null || x.body.user === self)
       .filter(x => texts === null || texts.every(t => x.body.type === "normal" && x.body.text.includes(t)))
       .filter(x => {
-        if (query.date === undefined) {
+        if (isNullish(query.date)) {
           return true;
         }
         const dateV = new Date(query.date.date).valueOf();
@@ -86,12 +88,12 @@ export class ResRepoMock implements IResRepo {
       .sort((a, b) => {
         const av = new Date(a.body.date).valueOf();
         const bv = new Date(b.body.date).valueOf();
-        return query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte") ? av - bv : bv - av;
+        return !isNullish(query.date) && (query.date.type === "gt" || query.date.type === "gte") ? av - bv : bv - av;
       })
       .slice(0, limit);
 
     const result = await this.aggregate(reses);
-    if (query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")) {
+    if (!isNullish(query.date) && (query.date.type === "gt" || query.date.type === "gte")) {
       result.reverse();
     }
     return result;
