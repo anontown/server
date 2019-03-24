@@ -1,8 +1,9 @@
 import { AtNotFoundError } from "../../at-error";
 import { ESClient } from "../../db";
 import { History, IHistoryDB } from "./history";
-import { HistoryQuery, IHistoryRepo } from "./ihistory-repo";
-
+import { IHistoryRepo } from "./ihistory-repo";
+import * as G from "../../generated/graphql";
+import { isNullish } from "@kgtkr/utils";
 export class HistoryRepo implements IHistoryRepo {
   constructor(private refresh?: boolean) { }
 
@@ -43,9 +44,9 @@ export class HistoryRepo implements IHistoryRepo {
     return History.fromDB(({ id: history._id, body: history._source }));
   }
 
-  async find(query: HistoryQuery, limit: number): Promise<History[]> {
+  async find(query: G.HistoryQuery, limit: number): Promise<History[]> {
     const filter: any[] = [];
-    if (query.id !== undefined) {
+    if (!isNullish(query.id)) {
       filter.push({
         terms: {
           _id: query.id,
@@ -53,7 +54,7 @@ export class HistoryRepo implements IHistoryRepo {
       });
     }
 
-    if (query.date !== undefined) {
+    if (!isNullish(query.date)) {
       filter.push({
         range: {
           date: {
@@ -63,7 +64,7 @@ export class HistoryRepo implements IHistoryRepo {
       });
     }
 
-    if (query.topic !== undefined) {
+    if (!isNullish(query.topic)) {
       filter.push({
         terms: {
           topic: query.topic,
@@ -82,7 +83,7 @@ export class HistoryRepo implements IHistoryRepo {
         },
         sort: {
           date: {
-            order: query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")
+            order: !isNullish(query.date) && (query.date.type === "gt" || query.date.type === "gte")
               ? "asc"
               : "desc",
           },
@@ -91,7 +92,7 @@ export class HistoryRepo implements IHistoryRepo {
     });
 
     const result = histories.hits.hits.map(h => History.fromDB({ id: h._id, body: h._source }));
-    if (query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")) {
+    if (!isNullish(query.date) && (query.date.type === "gt" || query.date.type === "gte")) {
       result.reverse();
     }
     return result;

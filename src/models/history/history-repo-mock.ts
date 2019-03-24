@@ -1,6 +1,8 @@
 import { AtNotFoundError } from "../../at-error";
 import { History, IHistoryDB } from "./history";
-import { HistoryQuery, IHistoryRepo } from "./ihistory-repo";
+import { IHistoryRepo } from "./ihistory-repo";
+import * as G from "../../generated/graphql";
+import { isNullish } from "@kgtkr/utils";
 
 export class HistoryRepoMock implements IHistoryRepo {
   private histories: IHistoryDB[] = [];
@@ -23,12 +25,12 @@ export class HistoryRepoMock implements IHistoryRepo {
     return History.fromDB(history);
   }
 
-  async find(query: HistoryQuery, limit: number): Promise<History[]> {
+  async find(query: G.HistoryQuery, limit: number): Promise<History[]> {
     const histories = this.histories
-      .filter(x => query.id === undefined || query.id.includes(x.id))
-      .filter(x => query.topic === undefined || query.topic.includes(x.body.topic))
+      .filter(x => isNullish(query.id) || query.id.includes(x.id))
+      .filter(x => isNullish(query.topic) || query.topic.includes(x.body.topic))
       .filter(x => {
-        if (query.date === undefined) {
+        if (isNullish(query.date)) {
           return true;
         }
         const dateV = new Date(query.date.date).valueOf();
@@ -47,12 +49,12 @@ export class HistoryRepoMock implements IHistoryRepo {
       .sort((a, b) => {
         const av = new Date(a.body.date).valueOf();
         const bv = new Date(b.body.date).valueOf();
-        return query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte") ? av - bv : bv - av;
+        return !isNullish(query.date) && (query.date.type === "gt" || query.date.type === "gte") ? av - bv : bv - av;
       })
       .slice(0, limit);
 
     const result = histories.map(h => History.fromDB(h));
-    if (query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")) {
+    if (!isNullish(query.date) && (query.date.type === "gt" || query.date.type === "gte")) {
       result.reverse();
     }
     return result;

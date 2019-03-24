@@ -1,18 +1,16 @@
 import {
-  HistoryQuery, IHistoryAPI, IRepo, ITopicNormalAPI,
+  IHistoryAPI, IRepo, ITopicNormalAPI,
 } from "../models";
 import {
   AppContext,
 } from "../server";
+import * as G from "../generated/graphql";
 
 export const historyResolver = {
   Query: {
     histories: async (
       _obj: any,
-      args: {
-        query: HistoryQuery,
-        limit: number,
-      },
+      args: G.QueryHistoriesArgs,
       context: AppContext,
       _info: any): Promise<IHistoryAPI[]> => {
       const histories = await context.repo.history.find(args.query, args.limit);
