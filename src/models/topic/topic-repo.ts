@@ -2,7 +2,7 @@ import { CronJob } from "cron";
 import { AtNotFoundError } from "../../at-error";
 import { ESClient } from "../../db";
 import { IResRepo } from "../res";
-import { ITopicRepo, TopicQuery } from "./itopic-repo";
+import { ITopicRepo, } from "./itopic-repo";
 import {
   ITopicDB,
   Topic,
@@ -10,6 +10,8 @@ import {
   TopicNormal,
   TopicOne,
 } from "./topic";
+import * as G from "../../generated/graphql";
+import { isNullish } from "@kgtkr/utils";
 
 export interface ITagsAPI {
   name: string,
@@ -59,11 +61,11 @@ export class TopicRepo implements ITopicRepo {
   }
 
   async find(
-    query: TopicQuery,
+    query: G.TopicQuery,
     skip: number,
     limit: number): Promise<Topic[]> {
     const filter: any[] = [];
-    if (query.id !== undefined) {
+    if (!isNullish(query.id)) {
       filter.push({
         terms: {
           _id: query.id,
@@ -71,7 +73,7 @@ export class TopicRepo implements ITopicRepo {
       });
     }
 
-    if (query.title !== undefined) {
+    if (!isNullish(query.title)) {
       filter.push({
         match: {
           title: {
@@ -83,7 +85,7 @@ export class TopicRepo implements ITopicRepo {
       });
     }
 
-    if (query.tags !== undefined) {
+    if (!isNullish(query.tags)) {
       filter.push(...query.tags.map(t => ({
         term: {
           tags: t,
@@ -97,7 +99,7 @@ export class TopicRepo implements ITopicRepo {
       });
     }
 
-    if (query.parent !== undefined) {
+    if (!isNullish(query.parent)) {
       filter.push({
         match: {
           parent: query.parent,

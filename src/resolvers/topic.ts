@@ -10,21 +10,18 @@ import {
   TopicFork,
   TopicNormal,
   TopicOne,
-  TopicQuery,
 } from "../models";
 import {
   AppContext,
 } from "../server";
+import * as G from "../generated/graphql";
+import { nullToUndefined } from "@kgtkr/utils";
 
 export const topicResolver = {
   Query: {
     topics: async (
       _obj: any,
-      args: {
-        query: TopicQuery,
-        skip: number,
-        limit: number,
-      },
+      args: G.QueryTopicsArgs,
       context: AppContext,
       _info: any): Promise<ITopicAPI[]> => {
       const topic = await context.repo.topic
@@ -33,9 +30,7 @@ export const topicResolver = {
     },
     topicTags: async (
       _obj: any,
-      args: {
-        limit: number,
-      },
+      args: G.QueryTopicTagsArgs,
       context: AppContext,
       _info: any): Promise<{
         name: string;
@@ -47,11 +42,7 @@ export const topicResolver = {
   Mutation: {
     createTopicNormal: async (
       _obj: any,
-      args: {
-        title: string,
-        tags: string[],
-        text: string,
-      },
+      args: G.MutationCreateTopicNormalArgs,
       context: AppContext,
       _info: any): Promise<ITopicNormalAPI> => {
       const user = await context.repo.user.findOne(context.auth.token.user);
@@ -76,11 +67,7 @@ export const topicResolver = {
     },
     createTopicOne: async (
       _obj: any,
-      args: {
-        title: string,
-        tags: string[],
-        text: string,
-      },
+      args: G.MutationCreateTopicOneArgs,
       context: AppContext,
       _info: any): Promise<ITopicOneAPI> => {
       const user = await context.repo.user.findOne(context.auth.token.user);
@@ -105,10 +92,7 @@ export const topicResolver = {
     },
     createTopicFork: async (
       _obj: any,
-      args: {
-        title: string,
-        parent: string,
-      },
+      args: G.MutationCreateTopicForkArgs,
       context: AppContext,
       _info: any): Promise<ITopicForkAPI> => {
       const user = await context.repo.user.findOne(context.auth.token.user);
@@ -141,12 +125,7 @@ export const topicResolver = {
     },
     updateTopic: async (
       _obj: any,
-      args: {
-        id: string,
-        title?: string,
-        tags?: string[],
-        text?: string,
-      },
+      args: G.MutationUpdateTopicArgs,
       context: AppContext,
       _info: any): Promise<ITopicNormalAPI> => {
       const [topic, user] = await Promise.all([
@@ -161,9 +140,9 @@ export const topicResolver = {
       const val = topic.changeData(ObjectIDGenerator,
         user,
         context.auth.token,
-        args.title,
-        args.tags,
-        args.text,
+        nullToUndefined(args.title),
+        nullToUndefined(args.tags),
+        nullToUndefined(args.text),
         context.now);
 
       await Promise.all([

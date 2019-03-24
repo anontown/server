@@ -1,13 +1,6 @@
 import { IResRepo } from "../res";
 import { Topic } from "./topic";
-
-export interface TopicQuery {
-  id?: string[];
-  title?: string;
-  tags?: string[];
-  activeOnly?: boolean;
-  parent?: string;
-}
+import * as G from "../../generated/graphql";
 
 export interface ITopicRepo {
   resRepo: IResRepo;
@@ -25,7 +18,7 @@ export interface ITopicRepo {
   cronTopicCheck(now: Date): Promise<void>;
 
   find(
-    query: TopicQuery,
+    query: G.TopicQuery,
     skip: number,
     limit: number): Promise<Topic[]>;
 }

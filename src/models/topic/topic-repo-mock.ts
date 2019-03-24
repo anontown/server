@@ -1,7 +1,7 @@
 import { CronJob } from "cron";
 import { AtNotFoundError } from "../../at-error";
 import { IResRepo } from "../res";
-import { ITopicRepo, TopicQuery } from "./itopic-repo";
+import { ITopicRepo, } from "./itopic-repo";
 import {
   ITopicDB,
   ITopicForkDB,
@@ -11,6 +11,9 @@ import {
   TopicNormal,
   TopicOne,
 } from "./topic";
+import * as G from "../../generated/graphql";
+import { isNullish } from "@kgtkr/utils";
+
 export class TopicRepoMock implements ITopicRepo {
   private topics: ITopicDB[] = [];
 
@@ -37,19 +40,19 @@ export class TopicRepoMock implements ITopicRepo {
   }
 
   async find(
-    query: TopicQuery,
+    query: G.TopicQuery,
     skip: number,
     limit: number): Promise<Topic[]> {
-    const titles = query.title !== undefined ? query.title
+    const titles = !isNullish(query.title) ? query.title
       .split(/\s/)
       .filter(x => x.length !== 0) : null;
 
     return this.aggregate(this.topics
-      .filter(x => query.id === undefined || query.id.includes(x.id))
+      .filter(x => isNullish(query.id) || query.id.includes(x.id))
       .filter(x => titles === null || titles.every(t => x.body.title.includes(t)))
-      .filter(x => query.tags === undefined || (query.tags.every(t => "tags" in x.body && x.body.tags.includes(t))))
+      .filter(x => isNullish(query.tags) || (query.tags.every(t => "tags" in x.body && x.body.tags.includes(t))))
       .filter(x => !query.activeOnly || x.body.active)
-      .filter(x => query.parent === undefined || ("parent" in x.body && x.body.parent === query.parent))
+      .filter(x => isNullish(query.parent) || ("parent" in x.body && x.body.parent === query.parent))
       .sort((a, b) => new Date(b.body.ageUpdate).valueOf() - new Date(a.body.ageUpdate).valueOf())
       .slice(skip)
       .slice(0, limit));
