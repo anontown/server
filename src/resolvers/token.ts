@@ -14,6 +14,7 @@ import {
   AppContext,
 } from "../server";
 import * as authFromApiParam from "../server/auth-from-api-param";
+import * as G from "../generated/graphql";
 
 export const tokenResolver = {
   Query: {
@@ -35,9 +36,7 @@ export const tokenResolver = {
   Mutation: {
     delTokenClient: async (
       _obj: any,
-      args: {
-        client: string,
-      },
+      args: G.MutationDelTokenClientArgs,
       context: AppContext,
       _info: any): Promise<boolean | null> => {
       const client = await context.repo.client.findOne(args.client);
@@ -46,9 +45,7 @@ export const tokenResolver = {
     },
     createTokenGeneral: async (
       _obj: any,
-      args: {
-        client: string,
-      },
+      args: G.MutationCreateTokenGeneralArgs,
       context: AppContext,
       _info: any): Promise<{ token: ITokenGeneralAPI, req: ITokenReqAPI }> => {
       const client = await context.repo.client.findOne(args.client);
@@ -69,13 +66,7 @@ export const tokenResolver = {
     },
     createTokenMaster: async (
       _obj: any,
-      args: {
-        auth: {
-          id?: string,
-          sn?: string,
-          pass: string
-        },
-      },
+      args: G.MutationCreateTokenMasterArgs,
       context: AppContext,
       _info: any): Promise<ITokenMasterAPI> => {
       const authUser = await authFromApiParam.user(context.repo.user, args.auth);
@@ -86,10 +77,7 @@ export const tokenResolver = {
     },
     authTokenReq: async (
       _obj: any,
-      args: {
-        id: string,
-        key: string,
-      },
+      args: G.MutationAuthTokenReqArgs,
       context: AppContext,
       _info: any): Promise<ITokenGeneralAPI> => {
       const token = await context.repo.token.findOne(args.id);

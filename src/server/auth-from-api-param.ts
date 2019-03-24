@@ -15,6 +15,9 @@ import {
 } from "../at-error";
 
 import { Config } from "../config";
+import * as G from "../generated/graphql";
+import { isNull } from "util";
+import { isNullish } from "@kgtkr/utils";
 
 export async function token(
   tokenRepo: ITokenRepo,
@@ -28,11 +31,11 @@ export async function token(
 
 export async function user(
   userRepo: IUserRepo,
-  apiParamUser: { id?: string, sn?: string, pass: string }): Promise<IAuthUser> {
+  apiParamUser: G.AuthUser): Promise<IAuthUser> {
   let id;
-  if (apiParamUser.id !== undefined && apiParamUser.sn === undefined) {
+  if (!isNullish(apiParamUser.id) && isNullish(apiParamUser.sn)) {
     id = apiParamUser.id;
-  } else if (apiParamUser.id === undefined && apiParamUser.sn !== undefined) {
+  } else if (isNullish(apiParamUser.id) && !isNullish(apiParamUser.sn)) {
     id = await userRepo.findID(apiParamUser.sn);
   } else {
     throw new AtAuthError("AuthUserはidかsnのどちらか片方を指定して下さい");
