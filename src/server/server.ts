@@ -6,7 +6,7 @@ import {
 } from "graphql-iso-date";
 import { AtErrorSymbol, AtServerError } from "../at-error";
 import { Config } from "../config";
-import * as controllers from "../controllers";
+import * as controllers from "../resolvers";
 import { IRepo } from "../models";
 import { AppContext, createContext } from "./context";
 
