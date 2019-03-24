@@ -2,17 +2,19 @@ import { ObjectID } from "mongodb";
 import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { DB } from "../../db";
-import { IStorageRepo, StorageQuery } from "./istorage-repo";
+import { IStorageRepo } from "./istorage-repo";
 import { IStorageDB, Storage } from "./storage";
+import * as G from "../../generated/graphql";
+import { isNullish } from "@kgtkr/utils";
 
 export class StorageRepo implements IStorageRepo {
-  async find(token: IAuthToken, query: StorageQuery): Promise<Storage[]> {
+  async find(token: IAuthToken, query: G.StorageQuery): Promise<Storage[]> {
     const db = await DB();
     const q: any = {
       user: new ObjectID(token.user),
       client: token.type === "general" ? new ObjectID(token.client) : null,
     };
-    if (query.key !== undefined) {
+    if (!isNullish(query.key)) {
       q.key = { $in: query.key };
     }
     const storages: IStorageDB[] = await db.collection("storages")

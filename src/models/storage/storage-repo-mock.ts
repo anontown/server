@@ -1,15 +1,17 @@
 import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
-import { IStorageRepo, StorageQuery } from "./istorage-repo";
+import { IStorageRepo } from "./istorage-repo";
 import { IStorageDB, Storage } from "./storage";
+import * as G from "../../generated/graphql";
+import { isNullish } from "@kgtkr/utils";
 
 export class StorageRepoMock implements IStorageRepo {
   private storages: IStorageDB[] = [];
 
-  async find(token: IAuthToken, query: StorageQuery): Promise<Storage[]> {
+  async find(token: IAuthToken, query: G.StorageQuery): Promise<Storage[]> {
     const storages = this.storages.filter(x => x.user.toHexString() === token.user
       && (x.client !== null ? x.client.toHexString() : null) === (token.type === "general" ? token.client : null))
-      .filter(x => query.key === undefined || query.key.includes(x.key));
+      .filter(x => isNullish(query.key) || query.key.includes(x.key));
 
     return storages.map(x => Storage.fromDB(x));
   }

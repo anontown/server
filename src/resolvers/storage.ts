@@ -1,17 +1,16 @@
-import { Storage, StorageQuery } from "../index";
+import { Storage } from "../index";
 import { IStorageAPI } from "../models/index";
 import { IRepo } from "../models/irepo";
 import {
   AppContext,
 } from "../server";
+import * as G from "../generated/graphql";
 
 export const storageResolver = {
   Query: {
     storages: async (
       _obj: any,
-      args: {
-        query: StorageQuery,
-      },
+      args: G.QueryStoragesArgs,
       context: AppContext,
       _info: any): Promise<IStorageAPI[]> => {
       const storages = await context.repo.storage.find(context.auth.token, args.query);
@@ -21,10 +20,7 @@ export const storageResolver = {
   Mutation: {
     setStorage: async (
       _obj: any,
-      args: {
-        key: string,
-        value: string,
-      },
+      args: G.MutationSetStorageArgs,
       context: AppContext,
       _info: any): Promise<IStorageAPI> => {
       const storage = Storage.create(context.auth.token, args.key, args.value);
@@ -33,9 +29,7 @@ export const storageResolver = {
     },
     delStorage: async (
       _obj: any,
-      args: {
-        key: string,
-      },
+      args: G.MutationDelStorageArgs,
       context: AppContext,
       _info: any): Promise<boolean | null> => {
       const storage = await context.repo.storage.findOneKey(context.auth.token, args.key);
