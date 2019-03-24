@@ -1,7 +1,9 @@
 import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
-import { IMsgRepo, MsgQuery } from "./imsg-repo";
+import { IMsgRepo } from "./imsg-repo";
 import { IMsgDB, Msg } from "./msg";
+import * as G from "../../generated/graphql";
+import { isNullish } from "@kgtkr/utils";
 
 export class MsgRepoMock implements IMsgRepo {
   private msgs: IMsgDB[] = [];
@@ -18,13 +20,13 @@ export class MsgRepoMock implements IMsgRepo {
 
   async find(
     authToken: IAuthToken,
-    query: MsgQuery,
+    query: G.MsgQuery,
     limit: number): Promise<Msg[]> {
     const msgs = this.msgs
       .filter(x => x.body.receiver === null || x.body.receiver === authToken.user)
-      .filter(x => query.id === undefined || query.id.includes(x.id))
+      .filter(x => isNullish(query.id) || query.id.includes(x.id))
       .filter(x => {
-        if (query.date === undefined) {
+        if (isNullish(query.date)) {
           return true;
         }
         const dateV = new Date(query.date.date).valueOf();
@@ -43,12 +45,12 @@ export class MsgRepoMock implements IMsgRepo {
       .sort((a, b) => {
         const av = new Date(a.body.date).valueOf();
         const bv = new Date(b.body.date).valueOf();
-        return query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte") ? av - bv : bv - av;
+        return !isNullish(query.date) && (query.date.type === "gt" || query.date.type === "gte") ? av - bv : bv - av;
       })
       .slice(0, limit);
 
     const result = msgs.map(x => Msg.fromDB(x));
-    if (query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")) {
+    if (!isNullish(query.date) && (query.date.type === "gt" || query.date.type === "gte")) {
       result.reverse();
     }
     return result;

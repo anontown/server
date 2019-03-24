@@ -1,8 +1,10 @@
 import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
-import { IMsgRepo, MsgQuery } from "./imsg-repo";
+import { IMsgRepo, } from "./imsg-repo";
 import { IMsgDB, Msg } from "./msg";
+import { isNullish } from "@kgtkr/utils";
+import * as G from "../../generated/graphql";
 
 export class MsgRepo implements IMsgRepo {
   constructor(private refresh?: boolean) { }
@@ -24,7 +26,7 @@ export class MsgRepo implements IMsgRepo {
 
   async find(
     authToken: IAuthToken,
-    query: MsgQuery,
+    query: G.MsgQuery,
     limit: number): Promise<Msg[]> {
     const filter: any[] = [{
       bool: {
@@ -42,7 +44,7 @@ export class MsgRepo implements IMsgRepo {
         ],
       },
     }];
-    if (query.date !== undefined) {
+    if (!isNullish(query.date)) {
       filter.push({
         range: {
           date: {
@@ -51,7 +53,7 @@ export class MsgRepo implements IMsgRepo {
         },
       });
     }
-    if (query.id !== undefined) {
+    if (!isNullish(query.id)) {
       filter.push({
         terms: {
           _id: query.id,
@@ -69,7 +71,7 @@ export class MsgRepo implements IMsgRepo {
         },
         sort: {
           date: {
-            order: query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")
+            order: !isNullish(query.date) && (query.date.type === "gt" || query.date.type === "gte")
               ? "asc"
               : "desc",
           },
@@ -78,7 +80,7 @@ export class MsgRepo implements IMsgRepo {
     });
 
     const result = msgs.hits.hits.map(m => Msg.fromDB({ id: m._id, body: m._source }));
-    if (query.date !== undefined && (query.date.type === "gt" || query.date.type === "gte")) {
+    if (!isNullish(query.date) && (query.date.type === "gt" || query.date.type === "gte")) {
       result.reverse();
     }
     return result;

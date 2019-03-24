@@ -4,15 +4,13 @@ import {
 import {
   AppContext,
 } from "../server";
+import * as G from "../generated/graphql";
 
 export const msgResolver = {
   Query: {
     msgs: async (
       _obj: any,
-      args: {
-        query: MsgQuery
-        limit: number,
-      },
+      args: G.QueryMsgsArgs,
       context: AppContext,
       _info: any): Promise<IMsgAPI[]> => {
       const msgs = await context.repo.msg.find(context.auth.token, args.query, args.limit);
