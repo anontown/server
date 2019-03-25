@@ -53,7 +53,7 @@ export class ProfileRepo implements IProfileRepo {
   async update(profile: Profile): Promise<void> {
     const db = await DB();
     try {
-      await db.collection("profiles").update({ _id: new ObjectID(profile.id) }, profile.toDB());
+      await db.collection("profiles").updateOne({ _id: new ObjectID(profile.id) }, profile.toDB());
     } catch (ex) {
       const e: WriteError = ex;
       if (e.code === 11000) {

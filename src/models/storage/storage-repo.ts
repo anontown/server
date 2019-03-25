@@ -40,7 +40,7 @@ export class StorageRepo implements IStorageRepo {
     const db = await DB();
 
     await db.collection("storages")
-      .update({
+      .updateOne({
         user: new ObjectID(storage.user),
         client: storage.client.map(client => new ObjectID(client)).toNullable(),
         key: storage.key,
