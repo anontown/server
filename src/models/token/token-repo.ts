@@ -45,7 +45,7 @@ export class TokenRepo implements ITokenRepo {
 
   async update(token: Token): Promise<void> {
     const db = await DB();
-    await db.collection("tokens").updateOne({ _id: new ObjectID(token.id) }, token.toDB());
+    await db.collection("tokens").replaceOne({ _id: new ObjectID(token.id) }, token.toDB());
   }
 
   async delClientToken(token: IAuthTokenMaster, clientID: string): Promise<void> {

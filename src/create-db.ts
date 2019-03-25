@@ -289,7 +289,7 @@ updateFunc.push((async () => {
         type: "topic",
       };
 
-      await resesCol.updateOne({ _id: res._id }, db);
+      await resesCol.replaceOne({ _id: res._id }, db);
     }
   }
 
@@ -321,7 +321,7 @@ updateFunc.push((async () => {
         history: history._id,
       };
 
-      await resesCol.updateOne({ _id: res._id }, db);
+      await resesCol.replaceOne({ _id: res._id }, db);
     }
   }
 
@@ -353,7 +353,7 @@ updateFunc.push((async () => {
         fork: topic._id,
       };
 
-      await resesCol.updateOne({ _id: res._id }, db);
+      await resesCol.replaceOne({ _id: res._id }, db);
     }
   }
 

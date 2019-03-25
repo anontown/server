@@ -46,7 +46,7 @@ export class UserRepo implements IUserRepo {
   async update(user: User): Promise<void> {
     const db = await DB();
     try {
-      await db.collection("users").updateOne({ _id: new ObjectID(user.id) }, user.toDB());
+      await db.collection("users").replaceOne({ _id: new ObjectID(user.id) }, user.toDB());
     } catch (ex) {
       const e: WriteError = ex;
       if (e.code === 11000) {

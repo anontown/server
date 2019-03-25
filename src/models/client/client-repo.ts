@@ -48,6 +48,6 @@ export class ClientRepo implements IClientRepo {
 
   async update(client: Client): Promise<void> {
     const db = await DB();
-    await db.collection("clients").updateOne({ _id: new ObjectID(client.id) }, client.toDB());
+    await db.collection("clients").replaceOne({ _id: new ObjectID(client.id) }, client.toDB());
   }
 }
