@@ -35,7 +35,7 @@ updateFunc.push((async () => {
 updateFunc.push((async () => {
   const db = await DB();
 
-  await db.collection("users").update({}, { $set: { point: 0 } }, { multi: true });
+  await db.collection("users").updateMany({}, { $set: { point: 0 } });
 }));
 
 updateFunc.push((async () => {
@@ -43,7 +43,7 @@ updateFunc.push((async () => {
 
   const board = await db.createCollection("boards");
   await board.createIndex({ category: 1 }, { unique: true });
-  await db.collection("topics").update({}, { $set: { type: "normal" } }, { multi: true });
+  await db.collection("topics").updateMany({}, { $set: { type: "normal" } });
 }));
 
 updateFunc.push((async () => {
@@ -64,10 +64,9 @@ updateFunc.push((async () => {
       .toArray();
 
   // 更新
-  const promises: Promise<any>[] = [];
-  targetReses.forEach(x => {
-    promises.push(db.collection("reses")
-      .update(
+  await Promise.all(targetReses.map(x =>
+    db.collection("reses")
+      .updateOne(
         {
           _id: x._id,
         },
@@ -78,28 +77,23 @@ updateFunc.push((async () => {
             },
           },
         },
-      ));
-  });
-
-  await Promise.all(promises);
+      )
+  ));
 }));
 
 updateFunc.push((async () => {
   // HASHのイコール削除
   const db = await DB();
-  const promises: Promise<any>[] = [];
 
   const reses: { _id: ObjectID, hash: string }[] = await db.collection("reses").find().toArray();
-  reses.forEach(r => {
-    promises.push(db.collection("reses").update({ _id: r._id }, { $set: { hash: r.hash.replace(/=/, "") } }));
-  });
+  await Promise.all(reses.map(r =>
+    db.collection("reses").updateOne({ _id: r._id }, { $set: { hash: r.hash.replace(/=/, "") } })
+  ));
 
   const histories: { _id: ObjectID, hash: string }[] = await db.collection("histories").find().toArray();
-  histories.forEach(h => {
-    promises.push(db.collection("histories").update({ _id: h._id }, { $set: { hash: h.hash.replace(/=/, "") } }));
-  });
-
-  await Promise.all(promises);
+  await Promise.all(histories.map(h =>
+    db.collection("histories").updateOne({ _id: h._id }, { $set: { hash: h.hash.replace(/=/, "") } })
+  ));
 }));
 updateFunc.push((async () => {
   // ハッシュをmd5→sha256に
@@ -126,64 +120,55 @@ updateFunc.push((async () => {
   const reses = await rdb.find().toArray();
   const histories = await hdb.find().toArray();
 
-  const promises: Promise<any>[] = [];
-  reses.forEach(r => {
-    promises.push(rdb.update({ _id: r._id }, { $set: { hash: hashFunc(r.user, r.topic, r.date) } }));
-  });
-  histories.forEach(h => {
-    promises.push(hdb.update({ _id: h._id }, { $set: { hash: hashFunc(h.user, h.topic, h.date) } }));
-  });
-
-  await Promise.all(promises);
+  await Promise.all(reses.map(r => {
+    rdb.updateOne({ _id: r._id }, { $set: { hash: hashFunc(r.user, r.topic, r.date) } })
+  }));
+  await Promise.all(histories.map(h => {
+    hdb.updateOne({ _id: h._id }, { $set: { hash: hashFunc(h.user, h.topic, h.date) } })
+  }));
 }));
 
 updateFunc.push((async () => {
   // topicにsage機能を実装するための修正
   const db = await DB();
-  const promises: Promise<any>[] = [];
 
   const topics = await db.collection("topics").find().toArray();
-  topics.forEach(t => {
-    promises.push(db.collection("topics").update({ _id: t._id }, { $set: { ageUpdate: t.update } }));
-  });
-  promises.push(db.collection("reses").update({}, { $set: { age: true } }, { multi: true }));
-
-  await Promise.all(promises);
+  await Promise.all(topics.map(t =>
+    db.collection("topics").updateOne({ _id: t._id }, { $set: { ageUpdate: t.update } })
+  ));
+  await db.collection("reses").updateMany({}, { $set: { age: true } });
 }));
 
 updateFunc.push((async () => {
   const db = await DB();
-  const promises: Promise<any>[] = [];
 
   const profiles: IProfileDB[] = await db.collection("profiles").find().toArray();
-  profiles.forEach(p => {
-    promises.push(db.collection("profiles").update({ _id: p._id }, { $set: { sn: p._id.toString() } }));
-  });
+  await Promise.all(profiles.map(p =>
+    db.collection("profiles").updateOne({ _id: p._id }, { $set: { sn: p._id.toString() } })
+  ));
   await db.collection("profiles").createIndex({ sn: 1 }, { unique: true });
-
-  await Promise.all(promises);
 }));
 
 updateFunc.push((async () => {
   const db = await DB();
 
-  await db.collection("reses").update({}, { $set: { vote: [] }, $unset: { voteUser: 1 } }, { multi: true });
+  await db.collection("reses").updateMany({}, { $set: { vote: [] }, $unset: { voteUser: 1 } });
 }));
 
 updateFunc.push((async () => {
   const db = await DB();
 
-  await db.collection("users").update({}, { $set: { lastOneTopic: new Date() } }, { multi: true });
-  await db.collection("topics").update({}, { $set: { active: true } }, { multi: true });
+  await db.collection("users").updateMany({}, { $set: { lastOneTopic: new Date() } });
+  await db.collection("topics").updateMany({}, { $set: { active: true } });
 }));
 
 updateFunc.push((async () => {
   const db = await DB();
 
   await db.dropCollection("boards");
-  await db.collection("topics").update({ type: "board" }, { $set: { type: "normal", active: false } }, { multi: true });
-  await db.collection("topics").update({}, { $rename: { category: "tags" } }, { multi: true });
-  await db.collection("histories").update({}, { $rename: { category: "tags" } }, { multi: true });
+  await db.collection("topics").updateMany({ type: "board" }, { $set: { type: "normal", active: false } });
+  await db.collection("topics").updateMany({}, { $rename: { category: "tags" } });
+  await db.collection("histories").updateMany({}, { $rename: { category: "tags" } });
 }));
 
 updateFunc.push((async () => {
@@ -201,13 +186,13 @@ updateFunc.push((async () => {
   });
   await Promise.all(ps);
 
-  await db.collection("tokens").update({}, { $unset: { storage: 1 } }, { multi: true });
+  await db.collection("tokens").updateMany({}, { $unset: { storage: 1 } });
 }));
 
 updateFunc.push((async () => {
   const db = await DB();
 
-  await db.collection("tokens").update({}, { $set: { type: "general" } }, { multi: true });
+  await db.collection("tokens").updateMany({}, { $set: { type: "general" } });
 }));
 
 updateFunc.push((async () => {
@@ -258,19 +243,19 @@ updateFunc.push((async () => {
 
   // mdtext削除
   for (const col of ["topics", "reses", "profiles", "msgs", "histories"]) {
-    await db.collection(col).update({}, { $unset: { mdtext: 1 } }, { multi: true });
+    await db.collection(col).updateMany({}, { $unset: { mdtext: 1 } });
   }
 
   const resesCol = db.collection("reses");
 
   // 投票による削除→active
-  await resesCol.update({ deleteFlag: "vote" }, { $set: { deleteFlag: "active" } }, { multi: true });
+  await resesCol.updateMany({ deleteFlag: "vote" }, { $set: { deleteFlag: "active" } });
 
   // msgs削除
   await db.collection("msgs").remove({});
 
   // 名無し→null
-  await resesCol.update({ name: "anonymous" }, { $set: { name: null } }, { multi: true });
+  await resesCol.updateMany({ name: "anonymous" }, { $set: { name: null } });
 
   // 名前の●プロフィール削除
   {
@@ -279,7 +264,7 @@ updateFunc.push((async () => {
       await resesCol.find({ name: /●/ }).toArray();
     for (const res of reses) {
       const [name] = res.name.split("●");
-      await resesCol.update({ _id: res._id }, { $set: { name: name.length === 0 ? null : name } });
+      await resesCol.updateOne({ _id: res._id }, { $set: { name: name.length === 0 ? null : name } });
     }
   }
 
@@ -304,7 +289,7 @@ updateFunc.push((async () => {
         type: "topic",
       };
 
-      await resesCol.update({ _id: res._id }, db);
+      await resesCol.updateOne({ _id: res._id }, db);
     }
   }
 
@@ -336,7 +321,7 @@ updateFunc.push((async () => {
         history: history._id,
       };
 
-      await resesCol.update({ _id: res._id }, db);
+      await resesCol.updateOne({ _id: res._id }, db);
     }
   }
 
@@ -368,21 +353,21 @@ updateFunc.push((async () => {
         fork: topic._id,
       };
 
-      await resesCol.update({ _id: res._id }, db);
+      await resesCol.updateOne({ _id: res._id }, db);
     }
   }
 
   // type normalをセット
   {
-    await resesCol.update({ type: { $exists: false } }, { $set: { type: "normal" } }, { multi: true });
+    await resesCol.updateMany({ type: { $exists: false } }, { $set: { type: "normal" } });
   }
 }));
 
 updateFunc.push(async () => {
   const db = await DB();
 
-  await db.collection("reses").update({}, { $unset: { "vote.lv": 1 } }, { multi: true });
-  await db.collection("reses").update({}, { $rename: { vote: "votes" } }, { multi: true });
+  await db.collection("reses").updateMany({}, { $unset: { "vote.lv": 1 } });
+  await db.collection("reses").updateMany({}, { $rename: { vote: "votes" } });
 
   await ESClient().putTemplate({
     id: "template",
