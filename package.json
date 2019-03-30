@@ -56,7 +56,7 @@
     "typescript": "^3.3.4000"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "npm run codegen&&tsc",
     "start": "node ./dist/app.js",
     "test": "jest",
     "test:io": "TEST_MODE=IO jest -w 1 --forceExit",
@@ -64,7 +64,6 @@
     "lint:fix": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts' --fix",
     "loc": "sloc --format cli-table ./src",
     "codegen": "gql-gen --config codegen.yml",
-    "postinstall": "npm run codegen",
     "start:dev": "./start-dev.sh"
   }
 }
