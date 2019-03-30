@@ -1,5 +1,5 @@
 overwrite: true
-schema: "resources/app.gql"
+schema: "node_modules/@anontown/schema/app.gql"
 documents: null
 generates:
   src/generated/graphql.ts:

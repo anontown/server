@@ -11,7 +11,7 @@ import { IRepo } from "../models";
 import { AppContext, createContext } from "./context";
 
 export async function serverRun(repo: IRepo) {
-  const typeDefs = gql(fs.readFileSync("resources/app.gql", "utf8"));
+  const typeDefs = gql(fs.readFileSync("node_modules/@anontown/schema/app.gql", "utf8"));
   const resolvers: IResolvers = combineResolvers([
     {
       DateTime: GraphQLDateTime,

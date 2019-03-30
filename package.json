@@ -3,6 +3,7 @@
   "name": "@anontown/server",
   "version": "1.0.0",
   "dependencies": {
+    "@anontown/schema": "^1.0.0",
     "@kgtkr/utils": "^1.0.0",
     "@types/nanoid": "^1.2.1",
     "apollo-resolvers": "^1.4.1",
