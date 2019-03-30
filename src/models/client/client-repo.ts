@@ -1,12 +1,12 @@
+import { isNullish } from "@kgtkr/utils";
 import { Option } from "fp-ts/lib/Option";
 import { ObjectID } from "mongodb";
 import { AtAuthError, AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
 import { DB } from "../../db";
+import * as G from "../../generated/graphql";
 import { Client, IClientDB } from "./client";
 import { IClientRepo } from "./iclient-repo";
-import * as G from "../../generated/graphql";
-import { isNullish } from "@kgtkr/utils";
 
 export class ClientRepo implements IClientRepo {
   async findOne(id: string): Promise<Client> {

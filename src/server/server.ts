@@ -6,8 +6,8 @@ import {
 } from "graphql-iso-date";
 import { AtErrorSymbol, AtServerError } from "../at-error";
 import { Config } from "../config";
-import { resolvers as appResolvers } from "../resolvers";
 import { IRepo } from "../models";
+import { resolvers as appResolvers } from "../resolvers";
 import { AppContext, createContext } from "./context";
 
 export async function serverRun(repo: IRepo) {
@@ -16,7 +16,7 @@ export async function serverRun(repo: IRepo) {
     {
       DateTime: GraphQLDateTime,
     },
-    appResolvers
+    appResolvers,
   ]);
   const server = new ApolloServer({
     typeDefs,

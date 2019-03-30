@@ -11,7 +11,7 @@ export interface AppContext {
   now: Date;
   log: (name: string, id: string) => void;
   loader: Loader;
-  repo: IRepo
+  repo: IRepo;
 }
 
 async function createToken(raw: any, repo: IRepo) {

@@ -1,10 +1,10 @@
+import { isNullish } from "@kgtkr/utils";
 import { Subject } from "rxjs";
 import { AtNotFoundError } from "../../at-error";
+import * as G from "../../generated/graphql";
 import { AuthContainer } from "../../server/auth-container";
 import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res } from "./res";
-import * as G from "../../generated/graphql";
-import { isNullish } from "@kgtkr/utils";
 
 export class ResRepoMock implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();

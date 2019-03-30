@@ -1,5 +1,5 @@
-import { $$asyncIterator } from 'iterall';
-import { Observable, Subscription } from 'rxjs';
+import { $$asyncIterator } from "iterall";
+import { Observable, Subscription } from "rxjs";
 // https://github.com/apollographql/graphql-subscriptions/blob/master/src/event-emitter-to-async-iterator.ts
 export function observableAsyncIterator<T>(obs: Observable<T>): AsyncIterator<T> {
   const pullQueue: ((value?: IteratorResult<T> | PromiseLike<IteratorResult<T>> | undefined) => void)[] = [];

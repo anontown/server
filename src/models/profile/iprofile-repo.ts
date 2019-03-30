@@ -1,7 +1,6 @@
+import * as G from "../../generated/graphql";
 import { AuthContainer } from "../../server/auth-container";
 import { Profile } from "./profile";
-import * as G from "../../generated/graphql";
-
 
 export interface IProfileRepo {
   findOne(id: string): Promise<Profile>;

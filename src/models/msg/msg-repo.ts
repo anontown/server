@@ -1,10 +1,10 @@
+import { isNullish } from "@kgtkr/utils";
 import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
 import { ESClient } from "../../db";
-import { IMsgRepo, } from "./imsg-repo";
-import { IMsgDB, Msg } from "./msg";
-import { isNullish } from "@kgtkr/utils";
 import * as G from "../../generated/graphql";
+import { IMsgRepo } from "./imsg-repo";
+import { IMsgDB, Msg } from "./msg";
 
 export class MsgRepo implements IMsgRepo {
   constructor(private refresh?: boolean) { }

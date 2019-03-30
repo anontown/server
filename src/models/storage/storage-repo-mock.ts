@@ -1,9 +1,9 @@
+import { isNullish } from "@kgtkr/utils";
 import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
+import * as G from "../../generated/graphql";
 import { IStorageRepo } from "./istorage-repo";
 import { IStorageDB, Storage } from "./storage";
-import * as G from "../../generated/graphql";
-import { isNullish } from "@kgtkr/utils";
 
 export class StorageRepoMock implements IStorageRepo {
   private storages: IStorageDB[] = [];

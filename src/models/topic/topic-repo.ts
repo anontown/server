@@ -1,8 +1,10 @@
+import { isNullish } from "@kgtkr/utils";
 import { CronJob } from "cron";
 import { AtNotFoundError } from "../../at-error";
 import { ESClient } from "../../db";
+import * as G from "../../generated/graphql";
 import { IResRepo } from "../res";
-import { ITopicRepo, } from "./itopic-repo";
+import { ITopicRepo } from "./itopic-repo";
 import {
   ITopicDB,
   Topic,
@@ -10,12 +12,10 @@ import {
   TopicNormal,
   TopicOne,
 } from "./topic";
-import * as G from "../../generated/graphql";
-import { isNullish } from "@kgtkr/utils";
 
 export interface ITagsAPI {
-  name: string,
-  count: number
+  name: string;
+  count: number;
 }
 
 export class TopicRepo implements ITopicRepo {

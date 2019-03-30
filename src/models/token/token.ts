@@ -50,8 +50,8 @@ export interface ITokenBaseAPI<T extends TokenType> {
 }
 
 export interface CreateTokenGeneralResponseAPI {
-  token: ITokenGeneralAPI,
-  req: ITokenReqAPI
+  token: ITokenGeneralAPI;
+  req: ITokenReqAPI;
 }
 
 export interface ITokenMasterAPI extends ITokenBaseAPI<"master"> {

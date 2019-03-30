@@ -1,9 +1,9 @@
+import { isNullish } from "@kgtkr/utils";
 import { AtNotFoundError } from "../../at-error";
 import { IAuthToken } from "../../auth";
+import * as G from "../../generated/graphql";
 import { IMsgRepo } from "./imsg-repo";
 import { IMsgDB, Msg } from "./msg";
-import * as G from "../../generated/graphql";
-import { isNullish } from "@kgtkr/utils";
 
 export class MsgRepoMock implements IMsgRepo {
   private msgs: IMsgDB[] = [];

@@ -1,21 +1,21 @@
+import { isNullish, nullToUndefined } from "@kgtkr/utils";
+import { fromNullable, some } from "fp-ts/lib/Option";
+import { AtNotFoundError } from "../at-error";
 import * as G from "../generated/graphql";
-import * as authFromApiParam from "../server/auth-from-api-param";
 import { ObjectIDGenerator, RandomGenerator } from "../generator";
 import {
-  User,
-  TokenMaster,
   Client,
   Profile,
   ResNormal,
   Storage,
   TokenGeneral,
+  TokenMaster,
+  TopicFork,
   TopicNormal,
   TopicOne,
-  TopicFork,
+  User,
 } from "../models";
-import { nullToUndefined, isNullish } from "@kgtkr/utils";
-import { some, fromNullable } from "fp-ts/lib/Option";
-import { AtNotFoundError } from "../at-error";
+import * as authFromApiParam from "../server/auth-from-api-param";
 
 export const mutation: G.MutationResolvers = {
   createUser: async (
@@ -64,7 +64,11 @@ export const mutation: G.MutationResolvers = {
     context,
     _info) => {
     const client = await context.repo.client.findOne(args.id);
-    const newClient = client.changeData(context.auth.tokenMaster, nullToUndefined(args.name), nullToUndefined(args.url), context.now);
+    const newClient = client.changeData(
+      context.auth.tokenMaster,
+      nullToUndefined(args.name),
+      nullToUndefined(args.url),
+      context.now);
     await context.repo.client.update(newClient);
     context.log("clients", newClient.id);
     return newClient.toAPI(some(context.auth.tokenMaster));
@@ -90,7 +94,12 @@ export const mutation: G.MutationResolvers = {
     context,
     _info: any) => {
     const profile = await context.repo.profile.findOne(args.id);
-    const newProfile = profile.changeData(context.auth.token, nullToUndefined(args.name), nullToUndefined(args.text), nullToUndefined(args.sn), context.now);
+    const newProfile = profile.changeData(
+      context.auth.token,
+      nullToUndefined(args.name),
+      nullToUndefined(args.text),
+      nullToUndefined(args.sn),
+      context.now);
     await context.repo.profile.update(newProfile);
     context.log("profiles", newProfile.id);
     return newProfile.toAPI(some(context.auth.token));
@@ -246,7 +255,7 @@ export const mutation: G.MutationResolvers = {
 
     return {
       token: token.toAPI(),
-      req
+      req,
     };
   },
   createTokenMaster: async (

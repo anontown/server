@@ -1,11 +1,11 @@
+import { isNullish } from "@kgtkr/utils";
 import { ObjectID, WriteError } from "mongodb";
 import { AtConflictError, AtNotFoundError } from "../../at-error";
 import { DB } from "../../db";
-import { AuthContainer } from "../../server/auth-container";
-import { IProfileRepo, } from "./iprofile-repo";
-import { IProfileDB, Profile } from "./profile";
 import * as G from "../../generated/graphql";
-import { isNullish } from "@kgtkr/utils";
+import { AuthContainer } from "../../server/auth-container";
+import { IProfileRepo } from "./iprofile-repo";
+import { IProfileDB, Profile } from "./profile";
 
 export class ProfileRepo implements IProfileRepo {
   async findOne(id: string): Promise<Profile> {

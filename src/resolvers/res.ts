@@ -25,7 +25,7 @@ export const res: G.ResResolvers = {
       case "delete":
         return "ResDelete";
     }
-  }
+  },
 };
 
 export const resNormal: G.ResNormalResolvers = {
@@ -69,7 +69,7 @@ export const resHistory: G.ResHistoryResolvers = {
 };
 
 export const resTopic: G.ResTopicResolvers = {
-  ...resBase
+  ...resBase,
 };
 
 export const resFork: G.ResForkResolvers = {
@@ -88,5 +88,5 @@ export const resFork: G.ResForkResolvers = {
 };
 
 export const resDelete: G.ResDeleteResolvers = {
-  ...resBase
+  ...resBase,
 };

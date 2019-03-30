@@ -1,9 +1,9 @@
+import { isNullish } from "@kgtkr/utils";
 import { AtConflictError, AtNotFoundError } from "../../at-error";
+import * as G from "../../generated/graphql";
 import { AuthContainer } from "../../server/auth-container";
 import { IProfileRepo } from "./iprofile-repo";
 import { IProfileDB, Profile } from "./profile";
-import * as G from "../../generated/graphql";
-import { isNullish } from "@kgtkr/utils";
 
 export class ProfileRepoMock implements IProfileRepo {
   private profiles: IProfileDB[] = [];

@@ -1,7 +1,7 @@
 import { Subject } from "rxjs";
+import * as G from "../../generated/graphql";
 import { AuthContainer } from "../../server/auth-container";
 import { Res } from "./res";
-import * as G from "../../generated/graphql";
 
 export interface IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }>;

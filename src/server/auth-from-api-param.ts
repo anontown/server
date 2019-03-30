@@ -11,13 +11,13 @@ import {
 } from "../models";
 
 import {
-  AtCaptchaError, AtAuthError,
+  AtAuthError, AtCaptchaError,
 } from "../at-error";
 
+import { isNullish } from "@kgtkr/utils";
+import { isNull } from "util";
 import { Config } from "../config";
 import * as G from "../generated/graphql";
-import { isNull } from "util";
-import { isNullish } from "@kgtkr/utils";
 
 export async function token(
   tokenRepo: ITokenRepo,

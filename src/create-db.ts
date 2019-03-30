@@ -1,12 +1,12 @@
 import * as fsExtra from "fs-extra";
 import * as fs from "fs-promise";
 import { ObjectID } from "mongodb";
+import * as path from "path";
 import { Config } from "./config";
 import { DB, ESClient } from "./db";
 import { Logger } from "./logger";
 import { IProfileDB } from "./models/profile";
 import { hash } from "./utils";
-import * as path from "path";
 
 const updateFunc: (() => Promise<void>)[] = [];
 
@@ -77,7 +77,7 @@ updateFunc.push((async () => {
             },
           },
         },
-      )
+      ),
   ));
 }));
 
@@ -87,12 +87,12 @@ updateFunc.push((async () => {
 
   const reses: { _id: ObjectID, hash: string }[] = await db.collection("reses").find().toArray();
   await Promise.all(reses.map(r =>
-    db.collection("reses").updateOne({ _id: r._id }, { $set: { hash: r.hash.replace(/=/, "") } })
+    db.collection("reses").updateOne({ _id: r._id }, { $set: { hash: r.hash.replace(/=/, "") } }),
   ));
 
   const histories: { _id: ObjectID, hash: string }[] = await db.collection("histories").find().toArray();
   await Promise.all(histories.map(h =>
-    db.collection("histories").updateOne({ _id: h._id }, { $set: { hash: h.hash.replace(/=/, "") } })
+    db.collection("histories").updateOne({ _id: h._id }, { $set: { hash: h.hash.replace(/=/, "") } }),
   ));
 }));
 updateFunc.push((async () => {
@@ -120,12 +120,12 @@ updateFunc.push((async () => {
   const reses = await rdb.find().toArray();
   const histories = await hdb.find().toArray();
 
-  await Promise.all(reses.map(r => {
-    rdb.updateOne({ _id: r._id }, { $set: { hash: hashFunc(r.user, r.topic, r.date) } })
-  }));
-  await Promise.all(histories.map(h => {
-    hdb.updateOne({ _id: h._id }, { $set: { hash: hashFunc(h.user, h.topic, h.date) } })
-  }));
+  await Promise.all(reses.map(r => rdb.updateOne({ _id: r._id }, {
+    $set: { hash: hashFunc(r.user, r.topic, r.date) },
+  })));
+  await Promise.all(histories.map(h => hdb.updateOne({ _id: h._id }, {
+    $set: { hash: hashFunc(h.user, h.topic, h.date) },
+  })));
 }));
 
 updateFunc.push((async () => {
@@ -134,7 +134,7 @@ updateFunc.push((async () => {
 
   const topics = await db.collection("topics").find().toArray();
   await Promise.all(topics.map(t =>
-    db.collection("topics").updateOne({ _id: t._id }, { $set: { ageUpdate: t.update } })
+    db.collection("topics").updateOne({ _id: t._id }, { $set: { ageUpdate: t.update } }),
   ));
   await db.collection("reses").updateMany({}, { $set: { age: true } });
 }));
@@ -144,7 +144,7 @@ updateFunc.push((async () => {
 
   const profiles: IProfileDB[] = await db.collection("profiles").find().toArray();
   await Promise.all(profiles.map(p =>
-    db.collection("profiles").updateOne({ _id: p._id }, { $set: { sn: p._id.toString() } })
+    db.collection("profiles").updateOne({ _id: p._id }, { $set: { sn: p._id.toString() } }),
   ));
   await db.collection("profiles").createIndex({ sn: 1 }, { unique: true });
 }));

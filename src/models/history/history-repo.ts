@@ -1,9 +1,9 @@
+import { isNullish } from "@kgtkr/utils";
 import { AtNotFoundError } from "../../at-error";
 import { ESClient } from "../../db";
+import * as G from "../../generated/graphql";
 import { History, IHistoryDB } from "./history";
 import { IHistoryRepo } from "./ihistory-repo";
-import * as G from "../../generated/graphql";
-import { isNullish } from "@kgtkr/utils";
 export class HistoryRepo implements IHistoryRepo {
   constructor(private refresh?: boolean) { }
 

@@ -1,10 +1,10 @@
+import { isNullish } from "@kgtkr/utils";
 import { Option } from "fp-ts/lib/Option";
 import { AtAuthError, AtNotFoundError } from "../../at-error";
 import { IAuthTokenMaster } from "../../auth";
+import * as G from "../../generated/graphql";
 import { Client, IClientDB } from "./client";
 import { IClientRepo } from "./iclient-repo";
-import * as G from "../../generated/graphql";
-import { isNullish } from "@kgtkr/utils";
 
 export class ClientRepoMock implements IClientRepo {
   private clients: IClientDB[] = [];

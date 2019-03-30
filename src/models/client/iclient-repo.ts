@@ -1,7 +1,7 @@
 import { Option } from "fp-ts/lib/Option";
 import { IAuthTokenMaster } from "../../auth";
-import { Client } from "./client";
 import * as G from "../../generated/graphql";
+import { Client } from "./client";
 
 export interface IClientRepo {
   findOne(id: string): Promise<Client>;

@@ -26,7 +26,7 @@ log4js.configure({
             pattern: "-yyyy-MM-dd",
         },
     },
-    categories: { default: { appenders: ["system", "access", "error", "app"], level: "info" } }
+    categories: { default: { appenders: ["system", "access", "error", "app"], level: "info" } },
 });
 
 export class Logger {

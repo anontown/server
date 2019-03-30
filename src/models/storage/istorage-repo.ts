@@ -1,6 +1,6 @@
 import { IAuthToken } from "../../auth";
-import { Storage } from "./storage";
 import * as G from "../../generated/graphql";
+import { Storage } from "./storage";
 
 export interface IStorageRepo {
   findOneKey(token: IAuthToken, key: string): Promise<Storage>;

@@ -1,7 +1,6 @@
+import * as G from "../../generated/graphql";
 import { DateType } from "../../server";
 import { History } from "./history";
-import * as G from "../../generated/graphql";
-
 
 export interface IHistoryRepo {
   insert(history: History): Promise<void>;

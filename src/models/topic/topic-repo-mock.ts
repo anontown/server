@@ -1,7 +1,9 @@
+import { isNullish } from "@kgtkr/utils";
 import { CronJob } from "cron";
 import { AtNotFoundError } from "../../at-error";
+import * as G from "../../generated/graphql";
 import { IResRepo } from "../res";
-import { ITopicRepo, } from "./itopic-repo";
+import { ITopicRepo } from "./itopic-repo";
 import {
   ITopicDB,
   ITopicForkDB,
@@ -11,8 +13,6 @@ import {
   TopicNormal,
   TopicOne,
 } from "./topic";
-import * as G from "../../generated/graphql";
-import { isNullish } from "@kgtkr/utils";
 
 export class TopicRepoMock implements ITopicRepo {
   private topics: ITopicDB[] = [];

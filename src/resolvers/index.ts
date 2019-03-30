@@ -2,10 +2,10 @@ import * as G from "../generated/graphql";
 import { history } from "./history";
 import { mutation } from "./mutation";
 import { query } from "./query";
-import { res, resNormal, resHistory, resTopic, resDelete, resFork } from "./res";
+import { res, resDelete, resFork, resHistory, resNormal, resTopic } from "./res";
 import { subscription } from "./subscription";
 import { token, tokenGeneral } from "./token";
-import { topic, topicSearch, topicFork } from "./topic";
+import { topic, topicFork, topicSearch } from "./topic";
 
 export const resolvers: G.Resolvers = {
   History: history,
@@ -22,5 +22,5 @@ export const resolvers: G.Resolvers = {
   TokenGeneral: tokenGeneral,
   Topic: topic,
   TopicSearch: topicSearch,
-  TopicFork: topicFork
+  TopicFork: topicFork,
 };
