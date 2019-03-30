@@ -11,6 +11,6 @@ before_install:
  - sudo mv docker-compose /usr/local/bin
  - cp .env.sample .env
  - cp es/.env.sample es/.env
- - AT_MODE=TEST docker-compose -f docker-compose.prod.yml up -d
+ - AT_MODE=TEST docker-compose up -d
 script:
-  - AT_MODE=TEST docker-compose -f docker-compose.prod.yml run app npm run test:io
+  - AT_MODE=TEST docker-compose run app npm run test:io
