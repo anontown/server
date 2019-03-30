@@ -5,10 +5,10 @@ ENV APP_HOME=$HOME/.anontown
 
 WORKDIR $APP_HOME
 
-COPY package.json package-lock.json codegen.yml $APP_HOME/
+COPY package.json package-lock.json $APP_HOME/
 RUN npm i --no-progress
 COPY src/ $APP_HOME/src/
-COPY tsconfig.json $APP_HOME/
+COPY tsconfig.json codegen.yml $APP_HOME/
 
 RUN npm run build
 
