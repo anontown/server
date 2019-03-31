@@ -30,7 +30,7 @@ export class TopicRepo implements ITopicRepo {
         id,
       });
     } catch {
-      throw new AtNotFoundError("レスが存在しません");
+      throw new AtNotFoundError("トピックが存在しません");
     }
     return (await this.aggregate([{ id: topic._id, body: topic._source } as ITopicDB]))[0];
   }
