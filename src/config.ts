@@ -12,6 +12,9 @@ export const Config = {
     es: {
         host: process.env.ES_HOST as string,
     },
+    redis: {
+        url: process.env.REDIS_URL as string,
+    },
     salt: {
         pass: process.env.SALT_PASS as string,
         hash: process.env.SALT_HASH as string,

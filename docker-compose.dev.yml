@@ -34,3 +34,11 @@ services:
 #      - "9100:9100"
 #    depends_on:
 #      - es
+  redis:
+    restart: always
+    image: "redis:5.0.4"
+    volumes:
+      - ./data/redis:/data
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"

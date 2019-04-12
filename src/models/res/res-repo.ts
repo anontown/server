@@ -1,16 +1,29 @@
 import { isNullish } from "@kgtkr/utils";
 import { Subject } from "rxjs";
 import { AtNotFoundError } from "../../at-error";
-import { ESClient } from "../../db";
+import { ESClient, RedisClient, createRedisClient } from "../../db";
 import * as G from "../../generated/graphql";
 import { AuthContainer } from "../../server/auth-container";
 import { IResRepo } from "./ires-repo";
-import { fromDBToRes, IResDB, Res } from "./res";
+import { fromDBToRes, IResDB, Res, ResNormal } from "./res";
+
+interface ResPubSub {
+  res: IResDB,
+  count: number,
+  replyCount: number,
+}
 
 export class ResRepo implements IResRepo {
   readonly insertEvent: Subject<{ res: Res, count: number }> = new Subject<{ res: Res, count: number }>();
+  private subRedis = createRedisClient();
 
-  constructor(private refresh?: boolean) { }
+  constructor(private refresh?: boolean) {
+    this.subRedis.subscribe("res/add");
+    this.subRedis.on("message", (_channel, message) => {
+      const data: ResPubSub = JSON.parse(message);
+      this.insertEvent.next({ res: fromDBToRes(data.res, data.replyCount), count: data.count });
+    });
+  }
 
   async findOne(id: string): Promise<Res> {
     let res;
@@ -38,7 +51,12 @@ export class ResRepo implements IResRepo {
     // TODO:refresh:trueじゃなくても動くようにしたいけどとりあえず
 
     const resCount = (await this.resCount([res.topic])).get(res.topic) || 0;
-    this.insertEvent.next({ res, count: resCount });
+    const data: ResPubSub = {
+      res: res.toDB(),
+      replyCount: res.replyCount,
+      count: resCount
+    };
+    RedisClient.publish("res/add", JSON.stringify(data));
   }
 
   async update(res: Res): Promise<void> {

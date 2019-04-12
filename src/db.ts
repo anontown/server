@@ -3,6 +3,7 @@ import lazy = require("lazy-value");
 import { MongoClient } from "mongodb";
 import { Config } from "./config";
 import { Logger } from "./logger";
+import * as Redis from "ioredis";
 
 export const DB = lazy((async () => {
     const db = await MongoClient.connect(Config.db.url, { useNewUrlParser: true });
@@ -11,3 +12,9 @@ export const DB = lazy((async () => {
 }));
 
 export const ESClient = lazy(() => new es.Client({ host: "http://" + Config.es.host, log: "error" }));
+
+export function createRedisClient() {
+    return new Redis(Config.redis.url);
+}
+
+export const RedisClient = createRedisClient();
