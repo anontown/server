@@ -31,4 +31,9 @@ export class RepoMock implements IRepo {
     this.user = new UserRepoMock();
     this.storage = new StorageRepoMock();
   }
+
+  cron() {
+    this.topic.cron();
+    this.user.cron();
+  }
 }

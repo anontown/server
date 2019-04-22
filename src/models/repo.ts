@@ -31,4 +31,9 @@ export class Repo implements IRepo {
     this.user = new UserRepo();
     this.storage = new StorageRepo();
   }
+
+  cron() {
+    this.topic.cron();
+    this.user.cron();
+  }
 }

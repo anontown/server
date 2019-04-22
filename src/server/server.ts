@@ -52,6 +52,8 @@ export async function serverRun(repo: IRepo) {
     },
   });
 
+  repo.cron();
+
   await server.listen(Config.server.port).then(({ url, subscriptionsUrl }) => {
     console.log(`Server ready at ${url} ${subscriptionsUrl}`);
   });
