@@ -58,9 +58,8 @@ export async function serverRun(repo: IRepo) {
   repo.cron();
 
   const app = express();
-  server.applyMiddleware({ app, path: "/" });
-
   app.get("/ping", cors(), (_req, res) => res.send("OK"));
+  server.applyMiddleware({ app, path: "/" });
 
   app.listen({ port: Config.server.port }, () => {
     console.log(`Server ready at ${server.graphqlPath}, ${server.subscriptionsPath}`);
