@@ -30,6 +30,7 @@ export async function serverRun(repo: IRepo) {
       onConnect: (connectionParams, _webSocket): Promise<AppContext> => {
         return createContext(connectionParams, repo);
       },
+      path: "/",
     },
     introspection: true,
     playground: {
@@ -49,7 +50,7 @@ export async function serverRun(repo: IRepo) {
       if (error.extensions.exception[AtErrorSymbol]) {
         return error.extensions.exception.data;
       } else {
-        return new AtServerError().data; cors
+        return new AtServerError().data;
       }
     },
   });
@@ -57,7 +58,7 @@ export async function serverRun(repo: IRepo) {
   repo.cron();
 
   const app = express();
-  server.applyMiddleware({ app });
+  server.applyMiddleware({ app, path: "/" });
 
   app.get("/ping", cors(), (_req, res) => res.send("OK"));
 
