@@ -10,6 +10,7 @@ import { IRepo } from "../models";
 import { resolvers as appResolvers } from "../resolvers";
 import { AppContext, createContext } from "./context";
 import * as express from "express";
+import * as cors from "cors";
 
 export async function serverRun(repo: IRepo) {
   const typeDefs = gql(fs.readFileSync("node_modules/@anontown/schema/app.gql", "utf8"));
@@ -48,7 +49,7 @@ export async function serverRun(repo: IRepo) {
       if (error.extensions.exception[AtErrorSymbol]) {
         return error.extensions.exception.data;
       } else {
-        return new AtServerError().data;
+        return new AtServerError().data; cors
       }
     },
   });
@@ -57,6 +58,8 @@ export async function serverRun(repo: IRepo) {
 
   const app = express();
   server.applyMiddleware({ app });
+
+  app.get("/ping", cors(), (_req, res) => res.send("OK"));
 
   app.listen({ port: Config.server.port }, () => {
     console.log(`Server ready at ${server.graphqlPath}, ${server.subscriptionsPath}`);
