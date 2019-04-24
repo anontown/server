@@ -1,16 +1,16 @@
 import { isNullish } from "@kgtkr/utils";
 import { Subject } from "rxjs";
 import { AtNotFoundError } from "../../at-error";
-import { ESClient, RedisClient, createRedisClient } from "../../db";
+import { createRedisClient, ESClient, RedisClient } from "../../db";
 import * as G from "../../generated/graphql";
 import { AuthContainer } from "../../server/auth-container";
 import { IResRepo } from "./ires-repo";
 import { fromDBToRes, IResDB, Res, ResNormal } from "./res";
 
 interface ResPubSub {
-  res: IResDB,
-  count: number,
-  replyCount: number,
+  res: IResDB;
+  count: number;
+  replyCount: number;
 }
 
 export class ResRepo implements IResRepo {
@@ -54,9 +54,9 @@ export class ResRepo implements IResRepo {
     const data: ResPubSub = {
       res: res.toDB(),
       replyCount: res.replyCount,
-      count: resCount
+      count: resCount,
     };
-    RedisClient.publish("res/add", JSON.stringify(data));
+    await RedisClient.publish("res/add", JSON.stringify(data));
   }
 
   async update(res: Res): Promise<void> {

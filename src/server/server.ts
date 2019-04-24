@@ -1,5 +1,7 @@
 import { combineResolvers } from "apollo-resolvers";
 import { ApolloServer, gql, IResolvers } from "apollo-server-express";
+import * as cors from "cors";
+import * as express from "express";
 import * as fs from "fs";
 import {
   GraphQLDateTime,
@@ -9,8 +11,6 @@ import { Config } from "../config";
 import { IRepo } from "../models";
 import { resolvers as appResolvers } from "../resolvers";
 import { AppContext, createContext } from "./context";
-import * as express from "express";
-import * as cors from "cors";
 
 export async function serverRun(repo: IRepo) {
   const typeDefs = gql(fs.readFileSync("node_modules/@anontown/schema/app.gql", "utf8"));

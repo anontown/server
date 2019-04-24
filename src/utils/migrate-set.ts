@@ -1,7 +1,7 @@
 import * as migrate from "migrate";
+import * as path from "path";
 import { promisify } from "util";
 import { Config } from "../config";
-import * as path from "path";
 
 export const migrateSet: Promise<any> = promisify(migrate.load)({
   stateStore: path.join(Config.saveDir, "./data/.migrate"),
