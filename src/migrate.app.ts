@@ -1,7 +1,5 @@
-import { migrateSet } from "./utils";
-import { promisify } from "util";
+import { migrateUp } from "./utils";
 
-migrateSet
-  .then(x => promisify(x.up).bind(x)())
+migrateUp()
   .then(() => console.log("done"))
   .catch(e => console.error("error", e));

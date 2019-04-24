@@ -8,3 +8,11 @@ export const migrateSet: Promise<any> = promisify(migrate.load)({
   migrationsDirectory: "dist/migrations",
   filterFunction: (s: string) => s.endsWith(".js"),
 });
+
+export function migrateUp() {
+  return migrateSet.then(x => promisify(x.up).bind(x)());
+}
+
+export function migrateDown() {
+  return migrateSet.then(x => promisify(x.down).bind(x)());
+}
