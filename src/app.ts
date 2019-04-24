@@ -3,7 +3,6 @@ require("source-map-support").install();
 import * as fs from "fs-promise";
 import * as path from "path";
 import { Config } from "./config";
-import { createDB } from "./create-db";
 import { } from "./generator";
 import {
   Repo,
@@ -24,8 +23,6 @@ import { serverRun } from "./server";
   } catch {
     /* tslint:disable:no-empty */
   }
-
-  await createDB();
 
   await serverRun(new Repo());
 })();

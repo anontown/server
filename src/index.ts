@@ -6,4 +6,3 @@ export * from "./db";
 export * from "./generator";
 export * from "./logger";
 export * from "./utils";
-export * from "./create-db";
