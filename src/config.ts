@@ -1,4 +1,4 @@
-import { validateData } from "./utils";
+import { validateData } from "./utils/string-validate";
 
 export const Config = {
     timezone: "Asia/Tokyo",
