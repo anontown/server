@@ -25,6 +25,7 @@
     "jsonwebtoken": "^8.5.1",
     "lazy-value": "^1.0.0",
     "log4js": "^4.0.2",
+    "migrate": "^1.6.2",
     "moment-timezone": "^0.5.23",
     "mongodb": "^3.2.2",
     "nanoid": "^2.0.1",
@@ -71,6 +72,7 @@
     "lint:fix": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts' --fix",
     "loc": "sloc --format cli-table ./src",
     "codegen": "gql-gen --config codegen.yml",
-    "start:dev": "./start-dev.sh"
+    "start:dev": "./start-dev.sh",
+    "migrate": "migrate --migrations-dir dist/migrations --matches \"**/*.js\" -f $(node -e \"const path=require('path');console.log(path.join(process.env.SAVE_DIR || './','./data/.migrate'));\") up"
   }
 }
