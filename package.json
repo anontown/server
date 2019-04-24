@@ -73,6 +73,6 @@
     "loc": "sloc --format cli-table ./src",
     "codegen": "gql-gen --config codegen.yml",
     "start:dev": "./start-dev.sh",
-    "migrate": "migrate --migrations-dir dist/migrations --matches \"**/*.js\" -f $(node -e \"const path=require('path');console.log(path.join(process.env.SAVE_DIR || './','./data/.migrate'));\") up"
+    "migrate": "node ./dist/migrate.app.js"
   }
 }
