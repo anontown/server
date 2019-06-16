@@ -1,7 +1,6 @@
 # Anontown Server
 
-[![Join the chat at https://gitter.im/anontown/server](https://badges.gitter.im/anontown/server.svg)](https://gitter.im/anontown/server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/anontown/server.svg?branch=master)](https://travis-ci.org/anontown/server)
+[移動しました](https://github.com/anontown/anontown)
 
 Anontownのサーバープログラムです。  
 Dockerを使って動かすことが出来ます。
